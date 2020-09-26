@@ -89,8 +89,14 @@ public class PrositeParser {
             }
         }
         if (category.equals("PATTERN")) {
-            PrositePattern pat = new PrositePattern(ID, AC, DE, PA);
-            patternList.add(pat);
+            try {
+                PrositePattern pat = new PrositePattern(ID, AC, DE, PA);
+                patternList.add(pat);
+            } catch (Exception e) {
+                System.out.println(ID + "; " + AC + "; " + PA);
+                System.out.println("Caught exception " + e.getMessage());
+                System.exit(1);
+            }
         } else {
             System.err.println("TODO -- add MATRIX");
         }

@@ -44,24 +44,36 @@ public class PrositePattern {
             if (elem.startsWith("[") && elem.endsWith("]")) {
                 // alternatives., e.g., [RH] -- same syntax for regex
                 sb.append(elem);
-            } else if (elem.contains("(") && elem.contains(")") && ! elem.contains(",")) {
-                // something like this x(2)
+            } else if (elem.contains("(") && elem.contains(")") ) {
+                // something like this x(2) or this x(10,11)
                 int i = elem.indexOf("(");
                 int j = elem.indexOf(")");
                 count = elem.substring(i+1,j);
-                String amino = elem.substring(0,1);
+                String amino = elem.substring(0,i);
                 if (amino.equals("x")) {
                     sb.append(".{").append(count).append("}");
+                } else if (amino.startsWith("{") && amino.endsWith("}")) {
+                    j = amino.indexOf("}");
+                    String excluded = String.format("[^%s]",amino.substring(1,j));
+                    sb.append(excluded).append("{").append(count).append("}");
                 } else {
                     sb.append(amino).append("{").append(count).append("}");
                 }
             } else if (elem.equals("x")) {
                 // wildcard
                 sb.append(".");
+            } else if (elem.startsWith("{") && elem.endsWith("}")) {
+                int j = elem.indexOf("}");
+                String excluded = String.format("[^%s]",elem.substring(1,j));
+                sb.append(excluded);
             } else if (elem.length() == 1 && VALID_AMINOACIDS.contains(elem)) {
                 sb.append(elem);
+            } else if (elem.endsWith(">")) {
+                sb.append(elem.replace(">", "$"));
+            } else if (elem.startsWith("<")) {
+                sb.append(elem.replace("<", "^"));
             } else {
-                throw new PrositometryRuntimeException("Cound not deal with " + elem + " in " + this.prositePattern);
+                throw new PrositometryRuntimeException("Could not deal with " + elem + " in " + this.prositePattern);
             }
         }
         pattern = Pattern.compile(sb.toString());
@@ -89,7 +101,8 @@ public class PrositePattern {
 
     @Override
     public String toString() {
-        return String.format("ID: %s; AC: %s; PA: %s", this.prositeId, this.prositeAccession, this.prositePattern);
+        return String.format("ID: %s; AC: %s; PA: %s; regex: %s",
+                this.prositeId, this.prositeAccession, this.prositePattern, this.pattern);
     }
 
     public boolean matchesSequence(String seq) {
