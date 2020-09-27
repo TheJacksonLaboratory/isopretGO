@@ -24,3 +24,11 @@ required files are in the ``data`` directory.
 ```
 java -jar target/prositometry.jar download
 ```
+
+## Running
+
+After setting up the app and downloading the files, prositometry can be run with an HBA-DEALS output file that
+includes transcript IDs.
+```
+java -jar target/prositometry.jar hbadeals --hbadeals <path-to-hbadeals-file>
+```
