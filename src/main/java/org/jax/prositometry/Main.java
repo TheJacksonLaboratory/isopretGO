@@ -1,13 +1,13 @@
 package org.jax.prositometry;
 
-import org.jax.prositometry.prosite.PrositeParser;
+import org.jax.prositometry.command.DownloadCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 import java.util.concurrent.Callable;
 
 
-@Command(name = "prositometry", mixinStandardHelpOptions = true, version = "prositometry 0.0.1",
+@Command(name = "prositometry", mixinStandardHelpOptions = true, version = "prositometry 0.1.0",
         description = "Prosite tool.")
 public class Main implements Callable<Integer> {
 
@@ -15,7 +15,12 @@ public class Main implements Callable<Integer> {
     String prositePath;
 
     public static void main(String[] args) {
-        CommandLine cline = new CommandLine(new Main());
+        if (args.length == 0) {
+            // if the user doesn't pass any command or option, add -h to show help
+            args = new String[]{"-h"};
+        }
+        CommandLine cline = new CommandLine(new Main())
+                .addSubcommand(new DownloadCommand());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);
         System.exit(exitCode);
