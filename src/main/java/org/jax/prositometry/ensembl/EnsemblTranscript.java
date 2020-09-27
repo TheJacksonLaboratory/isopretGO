@@ -2,6 +2,13 @@ package org.jax.prositometry.ensembl;
 
 import org.jax.prositometry.except.PrositometryRuntimeException;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Extract information from the header line, which has the following format. Note that we can
  * split on space for everything before the description element.
@@ -24,6 +31,10 @@ public class EnsemblTranscript {
     private final String geneBiotype;
     private final String transcriptBiotype;
     private final String geneSymbol;
+
+    private final String cdna;
+
+
 
     public EnsemblTranscript(String header, String sequence) {
         String descr = "n/a";
@@ -83,6 +94,7 @@ public class EnsemblTranscript {
             throw new PrositometryRuntimeException("Malformed gene_symbol string: " + sym);
         }
         this.geneSymbol = sym.substring(12);
+        this.cdna = sequence;
     }
 
     public String getDescription() {
@@ -124,4 +136,7 @@ public class EnsemblTranscript {
     public String getGeneSymbol() {
         return geneSymbol;
     }
+
+
+
 }
