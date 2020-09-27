@@ -1,6 +1,7 @@
 package org.jax.prositometry;
 
 import org.jax.prositometry.command.DownloadCommand;
+import org.jax.prositometry.command.HbaDealsCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -20,7 +21,8 @@ public class Main implements Callable<Integer> {
             args = new String[]{"-h"};
         }
         CommandLine cline = new CommandLine(new Main())
-                .addSubcommand(new DownloadCommand());
+                .addSubcommand("download", new DownloadCommand())
+                .addSubcommand("hbadeals", new HbaDealsCommand());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);
         System.exit(exitCode);
