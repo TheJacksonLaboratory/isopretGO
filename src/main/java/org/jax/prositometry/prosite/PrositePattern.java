@@ -119,4 +119,24 @@ public class PrositePattern {
         }
         return pos;
     }
+
+    public String getPrositeId() {
+        return prositeId;
+    }
+
+    public String getPrositeAccession() {
+        return prositeAccession;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getPrositePattern() {
+        return prositePattern;
+    }
+
+    public Pattern getPattern() {
+        return pattern;
+    }
 }

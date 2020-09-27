@@ -1,6 +1,9 @@
 package org.jax.prositometry.ensembl;
 
-import java.io.*;;
+import org.jax.prositometry.except.PrositometryRuntimeException;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -19,7 +22,7 @@ public class EnsemblCdnaParser {
         try {
             InputStream fileStream = new FileInputStream(ensemblCdnaPath);
             InputStream gzipStream = new GZIPInputStream(fileStream);
-            Reader decoder = new InputStreamReader(gzipStream, "UTF8");
+            Reader decoder = new InputStreamReader(gzipStream, StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(decoder);
             String line;
             String currentHeader = null;
@@ -28,17 +31,32 @@ public class EnsemblCdnaParser {
                 if (line.startsWith(">")) {
                     if (currentHeader != null && currentSequenceBuilder.length() > 0) {
                         EnsemblTranscript transcript = new EnsemblTranscript(currentHeader, currentSequenceBuilder.toString());
-                        currentHeader = null;
+                        String genId = transcript.getGeneId();
+                        this.i2dGeneMap.putIfAbsent(genId, new EnsemblGene(transcript));
+                        this.i2dGeneMap.get(genId).addTranscript(transcript);
                         currentSequenceBuilder = new StringBuilder();
                     }
+                    currentHeader = line.substring(1); // remove '>' symbol
+                } else {
+                    currentSequenceBuilder.append(line);
                 }
-                System.out.println(line);
+                //System.out.println(line);
             }
         } catch (IOException e) {
-
+            throw new PrositometryRuntimeException(e.getLocalizedMessage());
         }
+        System.out.printf("[INFO] Parsed a total of %d Ensembl genes\n", i2dGeneMap.size());
     }
 
+    public Map<String, EnsemblGene> getI2dGeneMap() {
+        return i2dGeneMap;
+    }
 
-
+    public Map<String, EnsemblGene> getSymbol2GeneMap() {
+        Map<String, EnsemblGene> symbolmap = new HashMap<>();
+        for (EnsemblGene gene : this.i2dGeneMap.values()) {
+            symbolmap.putIfAbsent(gene.getGeneSymbol(), gene);
+        }
+        return symbolmap;
+    }
 }

@@ -1,11 +1,9 @@
 package org.jax.prositometry.ensembl;
 
 import org.jax.prositometry.except.PrositometryRuntimeException;
+import org.jax.prositometry.orf.OrfFinder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,9 +29,10 @@ public class EnsemblTranscript {
     private final String geneBiotype;
     private final String transcriptBiotype;
     private final String geneSymbol;
-
-    private final String cdna;
-
+    private final String cDNA;
+    private final String longestAaSequence;
+    private final boolean hasOrf;
+    private final Map<String, List<Integer>> motifMap;
 
 
     public EnsemblTranscript(String header, String sequence) {
@@ -61,7 +60,7 @@ public class EnsemblTranscript {
         }
         seqtype = fields[1];
         String chromString = fields[2];
-        if (! chromString.startsWith("chromosome")) {
+        if (! chromString.startsWith("chromosome") && ! chromString.startsWith("scaffold")) {
             throw new PrositometryRuntimeException("Malformed chromosome string: " + chromString);
         }
         this.chromosomalLocation = chromString.substring(11);
@@ -94,7 +93,16 @@ public class EnsemblTranscript {
             throw new PrositometryRuntimeException("Malformed gene_symbol string: " + sym);
         }
         this.geneSymbol = sym.substring(12);
-        this.cdna = sequence;
+        this.cDNA = sequence;
+        OrfFinder orff = new OrfFinder(sequence);
+        if (orff.hasORF()) {
+            this.longestAaSequence = orff.getLongestAaSequence();
+            this.hasOrf = true;
+        } else {
+            this.longestAaSequence = "";
+            this.hasOrf = false;
+        }
+        motifMap = new HashMap<>();
     }
 
     public String getDescription() {
@@ -137,6 +145,31 @@ public class EnsemblTranscript {
         return geneSymbol;
     }
 
+    public String getcDNA() {
+        return cDNA;
+    }
 
+    public boolean hasOrf() {
+        return hasOrf;
+    }
 
+    public String getLongestAaSequence() {
+        return longestAaSequence;
+    }
+
+    public void addMotif(String prositeId, List<Integer> positionList) {
+        motifMap.put(prositeId, positionList);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.geneSymbol).append(": ").append(this.transcriptId);
+        for (var entry : this.motifMap.entrySet()) {
+            sb.append("\n\t").append(entry.getKey());
+            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
+            sb.append("pos:").append(positions);
+        }
+        return sb.toString();
+    }
 }
