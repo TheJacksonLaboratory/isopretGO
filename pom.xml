@@ -43,7 +43,11 @@
         </dependency>
 
 
-
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.30</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/commons-net/commons-net -->
         <dependency>
