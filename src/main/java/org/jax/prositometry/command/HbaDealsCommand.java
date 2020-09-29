@@ -2,6 +2,7 @@ package org.jax.prositometry.command;
 
 import org.jax.prositometry.ensembl.EnsemblCdnaParser;
 import org.jax.prositometry.ensembl.EnsemblGene;
+import org.jax.prositometry.ensembl.EnsemblTranscript;
 import org.jax.prositometry.hbadeals.HbaDealsParser;
 import org.jax.prositometry.hbadeals.HbaDealsResult;
 import org.jax.prositometry.io.PrositometryDownloader;
@@ -12,6 +13,7 @@ import picocli.CommandLine;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "download", aliases = {"H"},
@@ -48,6 +50,17 @@ public class HbaDealsCommand implements Callable<Integer> {
                 EnsemblGene egene = ensemblGeneMap.get(gene);
                 prositeComparator.annotateEnsemblGene(egene);
                 System.out.println(egene);
+                if (egene.mapsAreDifferent()) {
+                    for (EnsemblTranscript et : egene.getTranscriptMap().values()) {
+                        Set<String> m = egene.getDifference(et.getTranscriptId());
+                        if (m.isEmpty()) {
+                            System.out.println("No difference");
+                        } else {
+                            System.out.printf("Differences (%s): %s.\n", et.getTranscriptId(), String.join(";", m));
+                        }
+                    }
+                }
+
             }
         }
 

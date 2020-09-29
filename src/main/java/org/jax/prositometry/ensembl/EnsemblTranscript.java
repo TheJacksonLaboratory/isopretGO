@@ -161,6 +161,10 @@ public class EnsemblTranscript {
         motifMap.put(prositeId, positionList);
     }
 
+    public Map<String, List<Integer>> getMotifMap() {
+        return motifMap;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
