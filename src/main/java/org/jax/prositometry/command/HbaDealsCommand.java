@@ -40,7 +40,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         for (var entry : hbaDealsResults.entrySet()) {
             String gene = entry.getKey();
             HbaDealsResult result = entry.getValue();
-            if (result.getExpressionP() < 0.5) {
+            if (! result.hasSignificantResult()) {
                 continue;
             }
             System.out.println("gene=" + gene);
@@ -50,11 +50,7 @@ public class HbaDealsCommand implements Callable<Integer> {
                 System.out.println(egene);
             }
         }
-        int c = 0;
-        for (String s : ensemblGeneMap.keySet()) {
-            System.out.println("key="+s);
-            if (++c > 20) break;
-        }
+
         return 0;
     }
 }
