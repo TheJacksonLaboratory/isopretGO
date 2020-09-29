@@ -44,6 +44,10 @@ public class HbaDealsResult {
         return expressionP;
     }
 
+    public double getCorrectedPval() {
+        return correctedPval;
+    }
+
     public Map<String, HbaDealsTranscriptResult> getTranscriptMap() {
         return transcriptMap;
     }

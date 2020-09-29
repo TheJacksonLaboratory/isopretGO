@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>LIRICAL</title>
+  <title>Prositometry</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -359,9 +359,7 @@ a.svg:hover, a.svg:active {
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
 <header class="banner">
-    <h1><font color="#FFDA1A">LIRICAL</font>: <font color="#FFDA1A">LI</font>kelihood <font color="#FFDA1A">R</font>atio
-    <font color="#FFDA1A">I</font>nterpretation of <font color="#FFDA1A">C</font>linical
-    <font color="#FFDA1A">A</font>bnorma<font color="#FFDA1A">L</font>ities</h1>
+    <h1><Prositometry</h1>
 </header>
 
   <nav>
@@ -378,61 +376,46 @@ a.svg:hover, a.svg:active {
   <main>
     <section>
       <a name="sample"></a>
-      <h2 class="center">Sample name: ${sample_name!"n/a"}</h2>
+      <h2 class="center">Input files:</h2>
       <article>
-        <div class="row">
-          <div class="column features-title center">
-            <h3>Observed Phenotypic Features</h3>
-          </div>
-          <div class="column features-title center">
-              <h3>Excluded Phenotypic Features</h3>
-          </div>
-        </div>
-        <div class="row" style="background-color:#e0e3ea;">
-            <div class="column features-data">
-            <p>
-              <ul class="no-list-style">
-              <#list  observedHPOs as hpo>
-                  <li>${hpo}</li>
-              </#list>
-              </ul>
-            </p>
-            <#if errorlist?has_content>
-              <p>The following errors were encountered while processing the Phenopacket.</p>
-              <ul>
-              <#list errorlist as error>
-                  <li>${error}</li>
-              </#list>
-              </ul>
-            </#if>
-          </div>
-          <div class="column features-data">
-            <p>
-                <#if excludedHPOs?has_content>
-                  <ul class="no-list-style">
-                  <#list excludedHPOs as hpo>
-                    <li>Excluded: ${hpo}</li>
-                  </#list>
-                  </ul>
-                <#else>
-                  None provided
-                </#if>
-            </p>
-          </div>
-        </div>
-
-        <#if vcf_file?has_content>
-          <p>VCF file: ${vcf_file}</p>
-        </#if>
-        <#if phenopacket_file?has_content>
-            <p>Phenopacket file: ${phenopacket_file}</p>
-        </#if>
-        <#if yaml?has_content>
-            <p>YAML configuration file: ${yaml}</p>
-        </#if>
-        <p>LIRICAL analysis performed on ${analysis_date}.</p>
+        <p>HBA-DEALS file: ${hbaDealsFile}.</p>
+        <p>FASTA file> ${fastaFile}</p>
+        <p>PROSITE file: ${prosite_file}</p>
+        <p>Prositometry analysis performed on ${analysis_date}.</p>
+        <p>Total genes: ${total_genes}</p>
+        <p>Total genes with significant expression or splicing: ${total_sig_genes}</p>
       </article>
     </section>
+
+    <#list genes as gene>
+    <section>
+          <article>
+            <h2>${gene.symbol}</h2>
+            <ul>
+            <li>foldchange: ${gene.foldchange}</li>
+            <li>P-value: ${gene.pval}</li>
+            <li>P-value (corrected): ${gene.pvalcorr}</li>
+            <li>Number of transcripts: ${gene.ntranscripts}</li>
+            </ul>
+            <#list gene.transcripts as t>
+                <h4>${t.identifier}</h4>
+                <ul>
+                <li>cDNA length: ${t.cdnalength} bp </li>
+                <li>CDS length: ${t.peptidelength} aa</li>
+                </ul>
+                <p>Motifs:<br/>${t.motifs}</p>
+                <#if t.hasdiff>
+                <p>Motifs by which this transcript differences from one or more other transcripts of this gene:<br/>
+                    ${t.differences}</p>
+                 <#else>
+                 <p>No differences in motifs for this isoform</p>
+                 </#if>
+            </#list>
+          </article>
+    </section>
+    </#list>
+
+
   </main>
   </body>
   </html>

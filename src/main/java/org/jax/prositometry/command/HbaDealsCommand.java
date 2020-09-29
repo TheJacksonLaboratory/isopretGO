@@ -5,15 +5,15 @@ import org.jax.prositometry.ensembl.EnsemblGene;
 import org.jax.prositometry.ensembl.EnsemblTranscript;
 import org.jax.prositometry.hbadeals.HbaDealsParser;
 import org.jax.prositometry.hbadeals.HbaDealsResult;
+import org.jax.prositometry.html.HtmlGene;
+import org.jax.prositometry.html.HtmlTemplate;
 import org.jax.prositometry.io.PrositometryDownloader;
 import org.jax.prositometry.prosite.PrositeComparator;
 import org.jax.prositometry.prosite.PrositeParser;
 import org.jax.prositometry.prosite.PrositePattern;
 import picocli.CommandLine;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "download", aliases = {"H"},
@@ -39,30 +39,43 @@ public class HbaDealsCommand implements Callable<Integer> {
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
+        List<String> unidentifiedSymbols = new ArrayList<>();
+        List<HtmlGene> htmlGenes = new ArrayList<>();
         for (var entry : hbaDealsResults.entrySet()) {
             String gene = entry.getKey();
             HbaDealsResult result = entry.getValue();
             if (! result.hasSignificantResult()) {
                 continue;
             }
+
             System.out.println("gene=" + gene);
             if (ensemblGeneMap.containsKey(gene)) {
+
                 EnsemblGene egene = ensemblGeneMap.get(gene);
                 prositeComparator.annotateEnsemblGene(egene);
                 System.out.println(egene);
-                if (egene.mapsAreDifferent()) {
-                    for (EnsemblTranscript et : egene.getTranscriptMap().values()) {
-                        Set<String> m = egene.getDifference(et.getTranscriptId());
-                        if (m.isEmpty()) {
-                            System.out.printf("%s: No difference.\n", et.getTranscriptId());
-                        } else {
-                            System.out.printf("%s: %s.\n", et.getTranscriptId(), String.join(";", m));
-                        }
-                    }
-                }
-
+                var htmlgene = new HtmlGene(result, egene);
+                htmlGenes.add(htmlgene);
+            } else {
+                unidentifiedSymbols.add(gene);
             }
         }
+        Map<String, Object> data = new HashMap<>();
+        data.put("hbaDealsFile", this.hbadealsFile);
+        data.put("fastaFile", this.fastaFile);
+        data.put("prosite_file", this.prositeDataFile);
+        int n_genes = hbaDealsResults.size();
+        int n_sig_genes = (int)hbaDealsResults
+                .values()
+                .stream()
+                .filter(HbaDealsResult::hasSignificantResult)
+                .count();
+        data.put("total_genes", n_genes);
+        data.put("total_sig_genes", n_sig_genes);
+        data.put("genes", htmlGenes);
+
+        HtmlTemplate template = new HtmlTemplate(data);
+        template.outputFile();
 
         return 0;
     }

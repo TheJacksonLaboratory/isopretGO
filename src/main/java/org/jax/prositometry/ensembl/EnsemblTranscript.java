@@ -165,6 +165,34 @@ public class EnsemblTranscript {
         return motifMap;
     }
 
+    public String getHtmlMotifString() {
+        StringBuilder sb = new StringBuilder();
+        boolean notFirst = false;
+        for (var entry : this.motifMap.entrySet()) {
+            if (notFirst) {
+                sb.append("<br/>&nbsp;&nbsp;");
+            } else {
+                sb.append("&nbsp;&nbsp;");
+                notFirst = true;
+            }
+            sb.append(entry.getKey()).append(": ");
+            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
+            sb.append("pos:").append(positions);
+        }
+        return sb.toString();
+    }
+
+    public int cDNAlen() {
+        return this.cDNA.length();
+    }
+
+    public int aaLen() {
+        return this.longestAaSequence.length();
+    }
+
+
+
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
