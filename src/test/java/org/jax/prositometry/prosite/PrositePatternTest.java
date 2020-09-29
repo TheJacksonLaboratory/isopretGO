@@ -179,4 +179,13 @@ public class PrositePatternTest {
         assertFalse(propat.matchesSequence(badSequence1));
     }
 
+    /**
+     * ID: RTC; AC: PS01287; PA: [RH]-G-x(2)-P-x-G(3)-x-[LIV]
+     * Here are some examples  RGmpPgGGGeV, RGapPnGGGsV, HGfyPaGGGvV, RGyyPkGGGeV
+     */
+    @Test
+    public void testCorrectParseOfMultilinePattern() {
+
+    }
+
 }

@@ -62,9 +62,10 @@ public class PrositeParser {
         String category = UNINITIALZED; // PATTERN or MATRIX
         String AC = UNINITIALZED; // e.g., AC   PS00001;, the PROSITE PATTERN CODE
         String DE = UNINITIALZED; // e.g., DE   N-glycosylation site.
-        String PA = UNINITIALZED; // e.g., PA   N-{P}-[ST]-{P}.
+        StringBuffer PA = new StringBuffer(); // e.g., PA   N-{P}-[ST]-{P}.
         // we skip some other elements for now that are not needed for our purposes.
         // Note that the "payload" of each line starts at the sixth character
+        // PA can be multi line
         for (int i = startIndex; i < endIndex; i++) {
             String line = lines.get(i);
             if (line.startsWith("ID")) {
@@ -85,12 +86,12 @@ public class PrositeParser {
             } else if (line.startsWith("DE")) {
                 DE = line.substring(5);
             } else if (line.startsWith("PA")) {
-                PA = line.substring(5);
+                PA.append(line.substring(5));
             }
         }
         if (category.equals("PATTERN")) {
             try {
-                PrositePattern pat = new PrositePattern(ID, AC, DE, PA);
+                PrositePattern pat = new PrositePattern(ID, AC, DE, PA.toString());
                 patternList.add(pat);
             } catch (Exception e) {
                 System.out.println(ID + "; " + AC + "; " + PA);

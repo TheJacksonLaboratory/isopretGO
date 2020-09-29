@@ -59,7 +59,7 @@ public class PrositePattern {
                 } else {
                     sb.append(amino).append("{").append(count).append("}");
                 }
-            } else if (elem.equals("x")) {
+            } else if (elem.equalsIgnoreCase("x")) {
                 // wildcard
                 sb.append(".");
             } else if (elem.startsWith("{") && elem.endsWith("}")) {

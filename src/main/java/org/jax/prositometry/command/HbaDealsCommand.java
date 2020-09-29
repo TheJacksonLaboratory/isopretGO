@@ -54,9 +54,9 @@ public class HbaDealsCommand implements Callable<Integer> {
                     for (EnsemblTranscript et : egene.getTranscriptMap().values()) {
                         Set<String> m = egene.getDifference(et.getTranscriptId());
                         if (m.isEmpty()) {
-                            System.out.println("No difference");
+                            System.out.printf("%s: No difference.\n", et.getTranscriptId());
                         } else {
-                            System.out.printf("Differences (%s): %s.\n", et.getTranscriptId(), String.join(";", m));
+                            System.out.printf("%s: %s.\n", et.getTranscriptId(), String.join(";", m));
                         }
                     }
                 }
