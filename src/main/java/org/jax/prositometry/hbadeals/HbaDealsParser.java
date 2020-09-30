@@ -118,10 +118,10 @@ public class HbaDealsParser {
             symbol = fields[0];
             if (fields[1].equalsIgnoreCase("Expression")) {
                 isIsoform = false;
-                isoform = fields[1];
+                isoform = UNINITIALIZED; // gene expression entry
             } else {
                 isIsoform = true;
-                isoform = UNINITIALIZED; // gene expression entry
+                isoform = fields[1];
             }
             this.expFC = Double.parseDouble(fields[2]);
             double q = Double.parseDouble(fields[3]);

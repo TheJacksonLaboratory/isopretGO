@@ -47,13 +47,17 @@ public class HbaDealsCommand implements Callable<Integer> {
             if (! result.hasSignificantResult()) {
                 continue;
             }
-
-            System.out.println("gene=" + gene);
+            System.out.printf("[INFO] processing %s: ", gene);
+            if (result.hasSignificantExpressionResult()) {
+                System.out.printf("; Expression pval = %f", result.getCorrectedPval());
+            }
+            if (result.hasaSignificantSplicingResult()) {
+                System.out.printf("; Splicing pval = %f", result.getMostSignificantSplicingPval());
+            }
+            System.out.println();
             if (ensemblGeneMap.containsKey(gene)) {
-
                 EnsemblGene egene = ensemblGeneMap.get(gene);
                 prositeComparator.annotateEnsemblGene(egene);
-                System.out.println(egene);
                 var htmlgene = new HtmlGene(result, egene);
                 htmlGenes.add(htmlgene);
             } else {
@@ -76,6 +80,7 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         HtmlTemplate template = new HtmlTemplate(data);
         template.outputFile();
+        System.out.println("[INFO] Total unidentified genes:"+ unidentifiedSymbols.size());
 
         return 0;
     }

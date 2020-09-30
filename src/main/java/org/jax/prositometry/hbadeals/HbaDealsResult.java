@@ -63,4 +63,26 @@ public class HbaDealsResult {
                 .findAny()
                 .isPresent();
     }
+
+    public boolean hasSignificantExpressionResult() {
+        return this.correctedPval < 0.05;
+    }
+
+    public boolean hasaSignificantSplicingResult() {
+        return this.transcriptMap
+                .values()
+                .stream()
+                .filter(HbaDealsTranscriptResult::isSignificant)
+                .findAny()
+                .isPresent();
+    }
+
+    public double getMostSignificantSplicingPval() {
+        return this.transcriptMap
+                .values()
+                .stream()
+                .map(HbaDealsTranscriptResult::getCorrectedP)
+                .min(Double::compareTo)
+                .orElse(1.0);
+    }
 }

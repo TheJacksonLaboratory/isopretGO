@@ -399,6 +399,9 @@ a.svg:hover, a.svg:active {
             </ul>
             <#list gene.transcripts as t>
                 <h4>${t.identifier}</h4>
+                <#if t.haspval>
+                <p>Alternative splicing p value: ${t.pval}, corrected ${t.pvalcorr}.</p>
+                </#if>
                 <ul>
                 <li>cDNA length: ${t.cdnalength} bp </li>
                 <li>CDS length: ${t.peptidelength} aa</li>
