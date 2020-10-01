@@ -3,6 +3,7 @@ package org.jax.prositometry.command;
 import org.jax.prositometry.ensembl.EnsemblCdnaParser;
 import org.jax.prositometry.ensembl.EnsemblGene;
 import org.jax.prositometry.ensembl.EnsemblTranscript;
+import org.jax.prositometry.go.GoParser;
 import org.jax.prositometry.hbadeals.HbaDealsParser;
 import org.jax.prositometry.hbadeals.HbaDealsResult;
 import org.jax.prositometry.html.HtmlGene;
@@ -11,6 +12,8 @@ import org.jax.prositometry.io.PrositometryDownloader;
 import org.jax.prositometry.prosite.PrositeComparator;
 import org.jax.prositometry.prosite.PrositeParser;
 import org.jax.prositometry.prosite.PrositePattern;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import picocli.CommandLine;
 
 import java.util.*;
@@ -27,12 +30,21 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String fastaFile = "data/Homo_sapiens.GRCh38.cdna.all.fa.gz";
     @CommandLine.Option(names={"-p","--prosite"}, description ="prosite.dat file")
     private String prositeDataFile = "data/prosite.dat";
+    @CommandLine.Option(names={"-g","--go"}, description ="go.obo file")
+    private String goOboFile = "data/go.obo";
+    @CommandLine.Option(names={"-a","--gaf"}, description ="goa_human.gaf.gz file")
+    private String goGafFile = "data/goa_human.gaf.gz";
 
     public HbaDealsCommand() {
 
     }
     @Override
     public Integer call() {
+        GoParser goParser = new GoParser(goOboFile, goGafFile);
+        final Ontology ontology = goParser.getOntology();
+        final Map<String, List<TermId>> annotationMap = goParser.getAnnotationMap();
+        System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
+        System.out.printf("[INFO] We got %d term to annotation list mappings\n",annotationMap.size());
         EnsemblCdnaParser cDnaParser = new EnsemblCdnaParser(this.fastaFile);
         Map<String, EnsemblGene>  ensemblGeneMap = cDnaParser.getSymbol2GeneMap();
         PrositeComparator prositeComparator = new PrositeComparator(this.prositeDataFile);

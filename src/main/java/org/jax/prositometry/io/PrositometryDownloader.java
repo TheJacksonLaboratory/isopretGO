@@ -1,9 +1,17 @@
 package org.jax.prositometry.io;
 
 
+import org.jax.prositometry.except.PrositometryRuntimeException;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Command to download the {@code hp.obo} and {@code phenotype.hpoa} files that
@@ -26,6 +34,12 @@ public class PrositometryDownloader {
     /** Basename of the file with cDNA sequences for ensembl genes. */
     private final static String ENSEMBL_CDNA ="Homo_sapiens.GRCh38.cdna.all.fa.gz";
 
+    private final static String GO_OBO = "go.obo";
+    private final static String GO_OBO_URL = "http://purl.obolibrary.org/obo/go.obo";
+    private final static String GO_ANNOT = "goa_human.gaf";
+    private final static String GO_ANNOT_GZ = "goa_human.gaf.gz";
+    private final static String GO_ANNOT_URL = "http://geneontology.org/gene-associations/goa_human.gaf.gz";
+
 
 
     public PrositometryDownloader(String path){
@@ -41,23 +55,47 @@ public class PrositometryDownloader {
      * Download the files unless they are already present.
      */
     public void download() {
-        int downloaded = 0;
-        downloaded += downloadFileIfNeeded(PROSITE_DAT, PROSITE_DAT_URL);
-        downloaded += downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
-        System.out.printf("[INFO] Downloaded %d files to \"%s\" (%d files were previously downloaded)\n",
-                downloaded,
-                downloadDirectory,
-                4- downloaded);
+        downloadFileIfNeeded(PROSITE_DAT, PROSITE_DAT_URL);
+        downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
+        downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
+        downloadFileIfNeeded(GO_OBO,GO_OBO_URL);
+
     }
 
 
-    private int downloadFileIfNeeded(String filename, String webAddress) {
+    private void downloadGzipFileIfNeeded(String filename, String gzFilename, String webAddress) {
+        File file = new File(String.format("%s%s%s",downloadDirectory,File.separator,filename));
+        File gzfile = new File(String.format("%s%s%s",downloadDirectory,File.separator,gzFilename));
+        if (! ( file.exists() || gzfile.exists()) && ! overwrite ) {
+            downloadFileIfNeeded(gzFilename, webAddress);
+        }
+        if (! file.exists()) {
+            Path source = Paths.get(gzfile.getAbsolutePath());
+            Path target = Paths.get(file.getAbsolutePath());
+            try (GZIPInputStream gis = new GZIPInputStream(
+                    new FileInputStream(source.toFile()));
+                 FileOutputStream fos = new FileOutputStream(target.toFile())) {
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = gis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+            } catch (IOException e) {
+                throw new PrositometryRuntimeException("Could not un-gzip GAF file: " + e.getMessage());
+            }
+        }
+    }
+
+
+
+
+    private void downloadFileIfNeeded(String filename, String webAddress) {
         File f = new File(String.format("%s%s%s",downloadDirectory,File.separator,filename));
         if (f.exists() && (! overwrite)) {
             System.out.printf("Cowardly refusing to download %s since we found it at %s.\n",
                     filename,
                     f.getAbsolutePath());
-            return 0;
+            return;
         }
         FileDownloader downloader=new FileDownloader();
         try {
@@ -69,11 +107,6 @@ public class PrositometryDownloader {
             System.err.printf("Error downloading %s from %s: %s\"" ,filename, webAddress,e.getMessage());
         }
         System.out.println("[INFO] Downloaded " + filename);
-        return 1;
     }
-
-
-
-
 
 }
