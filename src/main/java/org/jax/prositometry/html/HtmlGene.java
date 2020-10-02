@@ -21,14 +21,16 @@ public class HtmlGene {
     public final double pvalCorr;
     public final int n_transcripts;
     private final List<HtmlTranscript> transcriptList;
+    private final List<String> goAnnotations;
 
-    public HtmlGene(HbaDealsResult result, EnsemblGene egene) {
+    public HtmlGene(HbaDealsResult result, EnsemblGene egene, List<String> goAnnots) {
         symbol = result.getSymbol();
         FC = result.getExpressionFoldChange();
         pval = result.getExpressionP();
         pvalCorr = result.getCorrectedPval();
         this.n_transcripts = egene.getTranscriptMap().size();
         this.transcriptList = new ArrayList<>();
+        this.goAnnotations = goAnnots;
 
 
         for (EnsemblTranscript et : egene.getTranscriptMap().values()) {
@@ -46,11 +48,11 @@ public class HtmlGene {
                 HbaDealsTranscriptResult tresult = result.getTranscriptMap().get(transcriptId);
                 pval = tresult.getP();
                 correctedpval = tresult.getCorrectedP();
-            } else {
-                System.out.println("transcriptID " + transcriptId);
-                for (String id : result.getTranscriptMap().keySet()) {
-                    System.out.println("[\t" + id);
-                }
+//            } else {
+//                System.out.println("transcriptID " + transcriptId);
+//                for (String id : result.getTranscriptMap().keySet()) {
+//                    System.out.println("[\t" + id);
+//                }
             }
             HtmlTranscript htranscript = new HtmlTranscript(et.getTranscriptId(),
                     motifString,
@@ -87,5 +89,13 @@ public class HtmlGene {
 
     public List<HtmlTranscript> getTranscripts() {
         return transcriptList;
+    }
+
+    public List<String> getGoannotations() {
+        return goAnnotations;
+    }
+
+    public boolean getHasgo() {
+        return goAnnotations.size() > 0;
     }
 }

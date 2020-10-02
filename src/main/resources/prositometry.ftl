@@ -397,23 +397,28 @@ a.svg:hover, a.svg:active {
             <li>P-value (corrected): ${gene.pvalcorr}</li>
             <li>Number of transcripts: ${gene.ntranscripts}</li>
             </ul>
-            <#list gene.transcripts as t>
-                <h4>${t.identifier}</h4>
-                <#if t.haspval>
-                <p>Alternative splicing p value: ${t.pval}, corrected ${t.pvalcorr}.</p>
-                </#if>
-                <ul>
-                <li>cDNA length: ${t.cdnalength} bp </li>
-                <li>CDS length: ${t.peptidelength} aa</li>
-                </ul>
-                <p>Motifs:<br/>${t.motifs}</p>
-                <#if t.hasdiff>
-                <p>Motifs by which this transcript differences from one or more other transcripts of this gene:<br/>
-                    ${t.differences}</p>
-                 <#else>
-                 <p>No differences in motifs for this isoform</p>
-                 </#if>
+            <#if gene.hasgo>
+            <ul>
+            <#list gene.goannotations as go>
+            <li>${go}</li>
             </#list>
+            </ul>
+            </#if>
+            <p>
+             <table class="redTable">
+               <tr><th>Transcript</th><th>cDNA</th><th>Protein</th><th>P value</th><th>Motifs</th></tr>
+                <#list gene.transcripts as t>
+                        <tr><td>${t.identifier}</td><td>${t.cdnalength} bp</td><td>${t.peptidelength} aa</td>
+                        <td>
+                        <#if t.haspval>  ${t.pval} (${t.pvalcorr}. corr.)
+                        </#if>
+                        </td>
+                        <td>${t.motifs}<#if t.hasdiff><br/>***</#if></td></tr>
+                </#list>
+             </table>
+           </p>
+
+
           </article>
     </section>
     </#list>

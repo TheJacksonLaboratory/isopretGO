@@ -33,7 +33,7 @@ public class HbaDealsCommand implements Callable<Integer> {
     @CommandLine.Option(names={"-g","--go"}, description ="go.obo file")
     private String goOboFile = "data/go.obo";
     @CommandLine.Option(names={"-a","--gaf"}, description ="goa_human.gaf.gz file")
-    private String goGafFile = "data/goa_human.gaf.gz";
+    private String goGafFile = "data/goa_human.gaf";
 
     public HbaDealsCommand() {
 
@@ -69,8 +69,20 @@ public class HbaDealsCommand implements Callable<Integer> {
             System.out.println();
             if (ensemblGeneMap.containsKey(gene)) {
                 EnsemblGene egene = ensemblGeneMap.get(gene);
+                String symbol = egene.getGeneSymbol();
+                List<TermId> goAnnotations = annotationMap.getOrDefault(symbol, new ArrayList<>());
+                Set<String> goLabls = new HashSet<>();
+                for (TermId tid : goAnnotations) {
+                    if (ontology.getTermMap().containsKey(tid)) {
+                        String label = String.format("%s [%s]",ontology.getTermMap().get(tid).getName(), tid.getValue());
+                        goLabls.add(label);
+                       // System.out.println(label);
+                    } else {
+                        goLabls.add(tid.getValue());
+                    }
+                }
                 prositeComparator.annotateEnsemblGene(egene);
-                var htmlgene = new HtmlGene(result, egene);
+                var htmlgene = new HtmlGene(result, egene, new ArrayList<>(goLabls));
                 htmlGenes.add(htmlgene);
             } else {
                 unidentifiedSymbols.add(gene);
