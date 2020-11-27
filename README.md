@@ -5,8 +5,8 @@ prositometry -- a tool for searching for PROSITE Motifs in proteins encoded by s
 prositometry was developed under Java 11. To build the app, clone this repository and
 build the executable with maven.
 ```
-git clone https://github.com/pnrobinson/prositometry.git
-cd prositometry
+git clone https://github.com/TheJacksonLaboratory/isopret
+cd isopret
 mvn package
 ```
 This will create an executbale in the ``target`` subdirectory. Run the following command to make sure
