@@ -1,21 +1,15 @@
 package org.jax.isopret.webserviceclient;
 
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class BiomartClient {
 
-    private static final String BIOMARTVIEW_URL = "https://www.ensembl.org/biomart/martview";
+    private static final String BIOMARTVIEW_URL = "https://www.ensembl.org/biomart/martservice";
 
     public BiomartClient() {
 
@@ -51,34 +45,24 @@ public class BiomartClient {
 
 
     public void postRequest() throws IOException {
-        String request = exampleRequest;
+        String request = exampleRequest.replaceAll("\\n", " ");
 
         URL url = new URL(BIOMARTVIEW_URL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        // Set timeout as per needs
-        connection.setConnectTimeout(20000);
-        connection.setReadTimeout(20000);
-
-        // Set DoOutput to true if you want to use URLConnection for output.
-        // Default is false
         connection.setDoOutput(true);
-
         connection.setUseCaches(true);
         connection.setRequestMethod("POST");
+       // connection.setRequestProperty("Accept", "application/xml");
+        connection.setRequestProperty("Content-Type", "application/xml;charset=utf-8");
+        // Set timeout as per needs
+        //connection.setConnectTimeout(20000);
+       // connection.setReadTimeout(20000);
 
-        // Set Headers
-        connection.setRequestProperty("Accept", "application/xml");
-        connection.setRequestProperty("Content-Type", "application/xml");
-
-        // Write XML
-        OutputStream outputStream = connection.getOutputStream();
-        byte[] b = request.getBytes("UTF-8");
-        outputStream.write(b);
+        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+        outputStream.writeBytes(request);
         outputStream.flush();
         outputStream.close();
 
-        // Read XML
         InputStream inputStream = connection.getInputStream();
         byte[] res = new byte[2048];
         int i = 0;
