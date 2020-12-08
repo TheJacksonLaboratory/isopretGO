@@ -1,7 +1,7 @@
 package org.jax.isopret.io;
 
 
-import org.jax.isopret.except.PrositometryRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,7 +81,7 @@ public class PrositometryDownloader {
                     fos.write(buffer, 0, len);
                 }
             } catch (IOException e) {
-                throw new PrositometryRuntimeException("Could not un-gzip GAF file: " + e.getMessage());
+                throw new IsopretRuntimeException("Could not un-gzip GAF file: " + e.getMessage());
             }
         }
     }

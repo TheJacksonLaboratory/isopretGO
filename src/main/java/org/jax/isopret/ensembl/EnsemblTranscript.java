@@ -1,6 +1,6 @@
 package org.jax.isopret.ensembl;
 
-import org.jax.isopret.except.PrositometryRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.orf.OrfFinder;
 
 import java.util.*;
@@ -46,7 +46,7 @@ public class EnsemblTranscript {
         String [] fields = header.split("\\s+");
         String transcript_id = fields[0];
         if (! transcript_id.startsWith("ENST")) {
-            throw new PrositometryRuntimeException("Malformed Ensembl transcript id: " + transcript_id);
+            throw new IsopretRuntimeException("Malformed Ensembl transcript id: " + transcript_id);
         }
         i = transcript_id.indexOf(".");
         if (i > 0) {
@@ -60,12 +60,12 @@ public class EnsemblTranscript {
         seqtype = fields[1];
         String chromString = fields[2];
         if (! chromString.startsWith("chromosome") && ! chromString.startsWith("scaffold")) {
-            throw new PrositometryRuntimeException("Malformed chromosome string: " + chromString);
+            throw new IsopretRuntimeException("Malformed chromosome string: " + chromString);
         }
         this.chromosomalLocation = chromString.substring(11);
         String geneString = fields[3];
         if (! geneString.startsWith("gene:")) {
-            throw new PrositometryRuntimeException("Malformed gene string: " + geneString);
+            throw new IsopretRuntimeException("Malformed gene string: " + geneString);
         }
         geneString = geneString.substring(5);
         i = geneString.indexOf(".");
@@ -79,17 +79,17 @@ public class EnsemblTranscript {
         }
         String geneBiot = fields[4];
         if (! geneBiot.startsWith("gene_biotype")) {
-            throw new PrositometryRuntimeException("Malformed gene_biotype string: " + geneBiot);
+            throw new IsopretRuntimeException("Malformed gene_biotype string: " + geneBiot);
         }
         this.geneBiotype = geneBiot.substring(13);
         String trBiot = fields[5];
         if (! trBiot.startsWith("transcript_biotype")) {
-            throw new PrositometryRuntimeException("Malformed transcript_biotype string: " + trBiot);
+            throw new IsopretRuntimeException("Malformed transcript_biotype string: " + trBiot);
         }
         this.transcriptBiotype = trBiot.substring(19);
         String sym = fields[6];
         if (! sym.startsWith("gene_symbol")) {
-            throw new PrositometryRuntimeException("Malformed gene_symbol string: " + sym);
+            throw new IsopretRuntimeException("Malformed gene_symbol string: " + sym);
         }
         this.geneSymbol = sym.substring(12);
         this.cDNA = sequence;

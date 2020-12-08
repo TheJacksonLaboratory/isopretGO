@@ -17,8 +17,10 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <junit.version>5.7.0</junit.version>
+        <junit.platform.version>1.7.0</junit.platform.version>
         <slf4j.version>1.7.30</slf4j.version>
         <phenol.version>1.6.1</phenol.version>
+        <jannovar.version>0.35</jannovar.version>
     </properties>
 
 
@@ -123,7 +125,7 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>1.6.1</version>
+            <version>${junit.platform.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -135,7 +137,7 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
-            <version>1.6.1</version>
+            <version>${junit.platform.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -201,6 +203,35 @@
                     <artifactId>wagon-provider-api</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/de.charite.compbio/Jannovar -->
+        <dependency>
+            <groupId>de.charite.compbio</groupId>
+            <artifactId>Jannovar</artifactId>
+            <version>0.35</version>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/de.charite.compbio/jannovar-core -->
+        <dependency>
+            <groupId>de.charite.compbio</groupId>
+            <artifactId>jannovar-core</artifactId>
+            <version>0.35</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>org.monarchinitiative.variant</groupId>
+            <artifactId>variant-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
 

@@ -1,6 +1,6 @@
 package org.jax.isopret.prosite;
 
-import org.jax.isopret.except.PrositometryRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ public class PrositePattern {
             } else if (elem.startsWith("<")) {
                 sb.append(elem.replace("<", "^"));
             } else {
-                throw new PrositometryRuntimeException("Could not deal with " + elem + " in " + this.prositePattern);
+                throw new IsopretRuntimeException("Could not deal with " + elem + " in " + this.prositePattern);
             }
         }
         pattern = Pattern.compile(sb.toString());
