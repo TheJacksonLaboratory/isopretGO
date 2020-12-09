@@ -1,6 +1,7 @@
 package org.jax.isopret.prosite;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PrositeMapping {
@@ -30,6 +31,7 @@ public class PrositeMapping {
     }
 
     public List<PrositeHit> getHits() {
+        Collections.sort(hits);
         return hits;
     }
 }

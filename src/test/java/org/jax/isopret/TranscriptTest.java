@@ -62,9 +62,9 @@ public class TranscriptTest extends TestBase {
         // TODO -- starting here we should prototype how to map between the exon positions and the prosite motifs
         Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
         assertTrue(hbadealmaps.containsKey("ADAR"));
-        HbaDealsResult adarResult = hbadealmaps.get("ADAR");
+        HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes
 
-        AnnotatedTranscript atranscript = new AnnotatedTranscript(enst00000368474, hits,adarResult);
+        AnnotatedTranscript atranscript = new AnnotatedTranscript(adarTranscripts, hits,adarResult);
         //enst00000368474.exons().get(0).
       //  assertTrue(atranscript.hasPrositeHit());
 
