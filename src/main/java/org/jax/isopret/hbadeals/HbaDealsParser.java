@@ -1,6 +1,6 @@
 package org.jax.isopret.hbadeals;
 
-import org.jax.isopret.except.PrositometryRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -67,7 +67,7 @@ public class HbaDealsParser {
                 n_lines++;
             }
         } catch (IOException e) {
-            throw new PrositometryRuntimeException("Could not read HBA-DEALS file: " + e.getMessage());
+            throw new IsopretRuntimeException("Could not read HBA-DEALS file: " + e.getMessage());
         }
 
         Collections.sort(lines);
@@ -113,7 +113,7 @@ public class HbaDealsParser {
             String [] fields = line.split("\t");
             if (fields.length != 4) {
                 String msg = String.format("[ERROR] Malformed line with %d fields: %s\n", fields.length, line);
-                throw new PrositometryRuntimeException(msg);
+                throw new IsopretRuntimeException(msg);
             }
             symbol = fields[0];
             if (fields[1].equalsIgnoreCase("Expression")) {

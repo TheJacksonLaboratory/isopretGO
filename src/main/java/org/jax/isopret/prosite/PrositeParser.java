@@ -1,6 +1,6 @@
 package org.jax.isopret.prosite;
 
-import org.jax.isopret.except.PrositometryRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -75,7 +75,7 @@ public class PrositeParser {
                     } else if (fields[1].contains("MATRIX")) {
                         category = "MATRIX";
                     } else {
-                        throw new PrositometryRuntimeException("Did not recogize entry category: " + line);
+                        throw new IsopretRuntimeException("Did not recogize entry category: " + line);
                     }
                 }
             } else if (line.startsWith("AC")) {

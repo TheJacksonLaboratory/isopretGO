@@ -1,20 +1,9 @@
 package org.jax.isopret.webserviceclient;
 
-
-
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-public class BiomartClient {
-
-    private static final String BIOMARTVIEW_URL = "https://www.ensembl.org/biomart/martservice";
-
-
-    public BiomartClient() {
-
-    }
+/**
+ * Use a system process to run curl to get data from biomart
+ */
+public class BiomartViaCurl {
 
     private static String exampleRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<!DOCTYPE Query>\n" +
@@ -45,35 +34,12 @@ public class BiomartClient {
             "</Query>";
 
 
-    public void postRequest() throws IOException {
-        String request = exampleRequest.replaceAll("\\n", " ");
 
-        URL url = new URL(BIOMARTVIEW_URL);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
-        connection.setUseCaches(true);
-        connection.setRequestMethod("POST");
-       // connection.setRequestProperty("Accept", "application/xml");
-        connection.setRequestProperty("Content-Type", "application/xml;charset=utf-8");
-        // Set timeout as per needs
-        //connection.setConnectTimeout(20000);
-       // connection.setReadTimeout(20000);
-
-        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-        outputStream.writeBytes(request);
-        outputStream.flush();
-        outputStream.close();
-
-        InputStream inputStream = connection.getInputStream();
-        byte[] res = new byte[2048];
-        int i = 0;
-        StringBuilder response = new StringBuilder();
-        while ((i = inputStream.read(res)) != -1) {
-            response.append(new String(res, 0, i));
-        }
-        inputStream.close();
-
-        System.out.println("Response= " + response.toString());
+    public void curlQuery() {
+        String command = "curl -X POST https://postman-echo.com/post --data foo1=bar1&foo2=bar2";
+        //Process process = Runtime.getRuntime().exec(command);
     }
+
+
+
 }

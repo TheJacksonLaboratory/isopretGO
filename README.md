@@ -4,6 +4,16 @@ Isoform Interpretation (isopret) is (will be) a tool to help interpret the poten
 functions that are affected by differential alternative splicing.  Isopret is in a very early stage
 right now...
 
+## Prerequisites
+We will use the Variant-api from Exomiser to work with the transcript data
+Please install the library locally (later, it will go into maven central)
+```
+git clone https://github.com/exomiser/variant-api
+cd variant-api
+git fetch origin
+git checkout -b coordinate-systemed-region origin/coordinate-systemed-region
+mvn install
+```
 
 
 ## Building isopret

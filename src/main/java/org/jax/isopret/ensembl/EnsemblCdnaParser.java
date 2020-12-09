@@ -1,6 +1,6 @@
 package org.jax.isopret.ensembl;
 
-import org.jax.isopret.except.PrositometryRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +43,7 @@ public class EnsemblCdnaParser {
                 //System.out.println(line);
             }
         } catch (IOException e) {
-            throw new PrositometryRuntimeException(e.getLocalizedMessage());
+            throw new IsopretRuntimeException(e.getLocalizedMessage());
         }
         System.out.printf("[INFO] Parsed a total of %d Ensembl genes\n", i2dGeneMap.size());
     }
