@@ -3,16 +3,9 @@ package org.jax.isopret;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
-import org.jax.isopret.transcripts.GenomicAssemblyProvider;
-import org.jax.isopret.transcripts.JannovarReader;
-import org.jax.isopret.transcripts.Transcript;
-import org.junit.jupiter.api.BeforeAll;
+import org.jax.isopret.transcript.Transcript;
 import org.junit.jupiter.api.Test;
-import org.monarchinitiative.variant.api.GenomicAssembly;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 

@@ -2,9 +2,9 @@ package org.jax.isopret;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.prosite.PrositeMapParser;
-import org.jax.isopret.transcripts.GenomicAssemblyProvider;
-import org.jax.isopret.transcripts.JannovarReader;
-import org.jax.isopret.transcripts.Transcript;
+import org.jax.isopret.transcript.GenomicAssemblyProvider;
+import org.jax.isopret.transcript.JannovarReader;
+import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 
 import java.io.IOException;

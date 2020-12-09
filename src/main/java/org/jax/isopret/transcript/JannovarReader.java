@@ -1,11 +1,10 @@
-package org.jax.isopret.transcripts;
+package org.jax.isopret.transcript;
 
 import com.google.common.collect.ImmutableMultimap;
 import de.charite.compbio.jannovar.data.JannovarData;
 import de.charite.compbio.jannovar.data.JannovarDataSerializer;
 import de.charite.compbio.jannovar.data.SerializationException;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 

@@ -1,4 +1,4 @@
-package org.jax.isopret.transcripts;
+package org.jax.isopret.transcript;
 
 import org.monarchinitiative.variant.api.*;
 
