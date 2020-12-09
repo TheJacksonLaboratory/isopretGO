@@ -18,7 +18,7 @@ import java.util.zip.GZIPInputStream;
  * we will need to run the LIRICAL approach.
  * @author Peter N Robinson
  */
-public class PrositometryDownloader {
+public class IsopretDownloader {
     //private static final Logger logger = LoggerFactory.getLogger(PrositometryDownloader.class);
     /** Directory to which we will download the files. */
     private final String downloadDirectory;
@@ -42,11 +42,11 @@ public class PrositometryDownloader {
 
 
 
-    public PrositometryDownloader(String path){
+    public IsopretDownloader(String path){
         this(path,false);
     }
 
-    public PrositometryDownloader(String path, boolean overwrite){
+    public IsopretDownloader(String path, boolean overwrite){
         this.downloadDirectory=path;
         this.overwrite=overwrite;
     }

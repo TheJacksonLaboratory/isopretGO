@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Prositometry</title>
+  <title>Isopret</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -359,7 +359,7 @@ a.svg:hover, a.svg:active {
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
 <header class="banner">
-    <h1><Prositometry</h1>
+    <h1><Isopret</h1>
 </header>
 
   <nav>
@@ -381,7 +381,7 @@ a.svg:hover, a.svg:active {
         <p>HBA-DEALS file: ${hbaDealsFile}.</p>
         <p>FASTA file> ${fastaFile}</p>
         <p>PROSITE file: ${prosite_file}</p>
-        <p>Prositometry analysis performed on ${analysis_date}.</p>
+        <p>Isopret analysis performed on ${analysis_date}.</p>
         <p>Total genes: ${total_genes}</p>
         <p>Total genes with significant expression or splicing: ${total_sig_genes}</p>
       </article>

@@ -2,7 +2,7 @@ package org.jax.isopret.command;
 
 
 
-import org.jax.isopret.io.PrositometryDownloader;
+import org.jax.isopret.io.IsopretDownloader;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
@@ -31,7 +31,7 @@ public class DownloadCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        PrositometryDownloader downloader = new PrositometryDownloader(datadir, overwrite);
+        IsopretDownloader downloader = new IsopretDownloader(datadir, overwrite);
         downloader.download();
         return 0;
     }

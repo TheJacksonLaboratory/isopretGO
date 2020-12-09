@@ -21,7 +21,7 @@ public class HtmlTemplate {
 
     protected static final String EMPTY_STRING="";
 
-    private final String outpath = "prositometry.html";
+    private final String outpath = "isopret.html";
 
     public HtmlTemplate(Map<String, Object> data) {
         this.templateData = data;
@@ -38,7 +38,7 @@ public class HtmlTemplate {
 
     public void outputFile() {
         try (BufferedWriter out = new BufferedWriter(new FileWriter(this.outpath))) {
-            Template template = cfg.getTemplate("prositometry.ftl");
+            Template template = cfg.getTemplate("isopret.ftl");
             template.process(templateData, out);
         } catch (TemplateException | IOException te) {
             te.printStackTrace();
