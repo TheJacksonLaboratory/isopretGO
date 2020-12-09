@@ -21,22 +21,50 @@ public class PrositeMapParser {
 
     private final Map<String,String> prositeNameMap;
 
+    private final  Map<String, PrositeMapping> prositeMappingMap;
+
     public PrositeMapParser(String prositeMapFile, String prositeDatFile) {
         prositeNameMap = getPrositeEntryNames(prositeDatFile);
-        getPrositeMappings(prositeMapFile);
+        prositeMappingMap = getPrositeMappings(prositeMapFile);
     }
 
-    private void getPrositeMappings(String prositeMapFile) {
+    private boolean isNumber(String field) {
+        if (field.length() == 0) return false;
+        for (int i=0; i<field.length(); i++) {
+            if (! Character.isDigit(field.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Map<String, PrositeMapping> getPrositeMappings(String prositeMapFile) {
+        Map<String, PrositeMapping> prositeMappingMap = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(prositeMapFile))) {
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+                String [] fields = line.split("\t");
+                if (fields.length != 5) {
+                    throw new IsopretRuntimeException("Malformed prosite map file line: " + line);
+                }
+                String transcriptID = fields[0];
+                String geneID = fields[1];
+                String prositeAc = fields[2];
+               try {
+                   int begin = Integer.parseInt(fields[3]);
+                   int end = Integer.parseInt(fields[4]);
+                   prositeMappingMap.putIfAbsent(transcriptID, new PrositeMapping(transcriptID, geneID));
+                   prositeMappingMap.get(transcriptID).addPrositeHit(prositeAc, begin, end);
+               } catch (NumberFormatException e) {
+                   System.err.printf("[ERROR] Could not parse line in prosite map (%s): %s.\n", line, e.getMessage());
+               }
             }
 
         } catch (IOException e) {
             // not a recoverable error!
             throw new IsopretRuntimeException(e.getMessage());
         }
+        return prositeMappingMap;
     }
 
 
@@ -74,5 +102,9 @@ public class PrositeMapParser {
 
     public Map<String, String> getPrositeNameMap() {
         return prositeNameMap;
+    }
+
+    public Map<String, PrositeMapping> getPrositeMappingMap() {
+        return prositeMappingMap;
     }
 }
