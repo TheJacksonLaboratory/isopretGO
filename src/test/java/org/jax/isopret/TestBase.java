@@ -1,6 +1,8 @@
 package org.jax.isopret;
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.hbadeals.HbaDealsParser;
+import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.transcript.GenomicAssemblyProvider;
 import org.jax.isopret.transcript.JannovarReader;
@@ -23,11 +25,22 @@ public class TestBase {
     private static GenomicAssembly assembly = null;
     private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
 
+    private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
+    private static Map<String, HbaDealsResult> hbaDealsResultMap = null;
+
     public static PrositeMapParser getPrositeMapParser() {
         if (pmparser == null) {
             pmparser = new PrositeMapParser(PROSITE_MAP_PATH.toString(), PROSITE_DAT_PATH.toString());
         }
         return pmparser;
+    }
+
+    public static Map<String, HbaDealsResult> getADARHbaDealsResultMap () {
+        if (hbaDealsResultMap == null) {
+            final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString());
+            hbaDealsResultMap = parser.getHbaDealsResultMap();
+        }
+        return hbaDealsResultMap;
     }
 
 

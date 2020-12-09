@@ -1,8 +1,10 @@
 package org.jax.isopret;
 
+import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.transcript.AnnotatedTranscript;
 import org.jax.isopret.transcript.Transcript;
 import org.junit.jupiter.api.Test;
 
@@ -58,6 +60,14 @@ public class TranscriptTest extends TestBase {
         // This transcript has 6 prosite motifs in our test file
         assertEquals(6, hits.size());
         // TODO -- starting here we should prototype how to map between the exon positions and the prosite motifs
+        Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
+        assertTrue(hbadealmaps.containsKey("ADAR"));
+        HbaDealsResult adarResult = hbadealmaps.get("ADAR");
+
+        AnnotatedTranscript atranscript = new AnnotatedTranscript(enst00000368474, hits,adarResult);
+        //enst00000368474.exons().get(0).
+      //  assertTrue(atranscript.hasPrositeHit());
+
     }
 
 }
