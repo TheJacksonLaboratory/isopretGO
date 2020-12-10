@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  *
  * @author Peter N Robinson
  */
-public class SvgGenerator {
+public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     static final int SVG_WIDTH = 1400;
 
     static final int HEIGHT_FOR_SV_DISPLAY = 200;
@@ -112,12 +112,12 @@ public class SvgGenerator {
      * TODO document logic, cleanup
      *  @param atranscript Object with transcripts and annotations
      */
-    public SvgGenerator(AnnotatedTranscript atranscript) {
-
+    private TranscriptSvgGenerator(int height, AnnotatedTranscript atranscript) {
+        super(SVG_WIDTH,height);
         this.affectedTranscripts = getAffectedTranscripts(atranscript);
         this.hbaDealsResult = atranscript.getHbaDealsResult();
         this.foldChanges = getFoldChangesOfAffectedTranscripts(atranscript);
-        this.SVG_HEIGHT = HEIGHT_FOR_SV_DISPLAY + affectedTranscripts.size() * HEIGHT_PER_DISPLAY_ITEM;
+
 
 
         this.genomicMinPos= affectedTranscripts.stream()
@@ -142,50 +142,7 @@ public class SvgGenerator {
     }
 
 
-    /**
-     * Write the header of the SVG.
-     * @param writer file handle
-     * @param blackBorder if true, write a black border around the SVG
-     * @throws IOException if we cannot writ the SVG
-     */
-    private void writeHeader(Writer writer, boolean blackBorder) throws IOException {
-        writer.write("<svg width=\"" + SVG_WIDTH + "\" height=\"" + this.SVG_HEIGHT + "\" ");
-        if (blackBorder) {
-            writer.write("style=\"border:1px solid black\" ");
-        }
-        writer.write(
-                "xmlns=\"http://www.w3.org/2000/svg\" " +
-                        "xmlns:svg=\"http://www.w3.org/2000/svg\">\n");
-        writer.write("<!-- Created by Isopret -->\n");
-        writer.write("<style>\n" +
-                "  text { font: 24px; }\n" +
-                "  text.t20 { font: 20px; }\n" +
-                "  text.t14 { font: 14px; }\n");
-        writer.write("  .mytriangle{\n" +
-                "    margin: 0 auto;\n" +
-                "    width: 100px;\n" +
-                "    height: 100px;\n" +
-                "  }\n" +
-                "\n" +
-                "  .mytriangle polygon {\n" +
-                "    fill:#b31900;\n" +
-                "    stroke:#65b81d;\n" +
-                "    stroke-width:2;\n" +
-                "  }\n");
-        writer.write("  </style>\n");
-        writer.write("<g>\n");
-    }
 
-    private void writeHeader(Writer writer) throws IOException {
-        writeHeader(writer, true);
-    }
-
-    /**
-     * Write the footer of the SVG
-     */
-    private void writeFooter(Writer writer) throws IOException {
-        writer.write("</g>\n</svg>\n");
-    }
 
     /**
      * Transform a genomic coordinate to an SVG X coordinate
@@ -506,32 +463,34 @@ public class SvgGenerator {
      * @param writer a file handle
      * @throws IOException if we cannot write.
      */
-    public void write(Writer writer) throws IOException {
+    @Override
+    public void write(Writer writer)  {
         int starty = 50;
         int y = starty;
         // TODO WRITE SYMBOLS TO DESCRIBE THE ALTERNATE SPLICING
         y += 100;
-        for (var tmod : this.affectedTranscripts) {
-            writeTranscript(tmod, y, writer);
-            y += HEIGHT_PER_DISPLAY_ITEM;
+        try {
+            for (var tmod : this.affectedTranscripts) {
+                writeTranscript(tmod, y, writer);
+                y += HEIGHT_PER_DISPLAY_ITEM;
+            }
+            writeScale(writer, y);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        writeScale(writer, y);
     }
 
-    /**
-     * If there is some IO Exception, return an SVG with a text that indicates the error
-     *
-     * @param msg The error
-     * @return An SVG element that contains the error
-     */
-    protected String getSvgErrorMessage(String msg) {
-        return String.format("<svg width=\"200\" height=\"100\" " +
-                "xmlns=\"http://www.w3.org/2000/svg\" " +
-                "xmlns:svg=\"http://www.w3.org/2000/svg\">\n" +
-                "<!-- Created by SvAnna -->\n" +
-                "<g><text x=\"10\" y=\"10\">%s</text>\n</g>\n" +
-                "</svg>\n", msg);
+    public static AbstractSvgGenerator factory(AnnotatedTranscript annotatedTranscript) {
+        List<Transcript> transcripts = annotatedTranscript.getTranscripts();
+        HbaDealsResult result = annotatedTranscript.getHbaDealsResult();
+        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        List<Transcript> affectedTranscripts = transcripts
+                .stream()
+                .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
+                .collect(Collectors.toList());
+        int height = HEIGHT_FOR_SV_DISPLAY + affectedTranscripts.size() * HEIGHT_PER_DISPLAY_ITEM;
+        return new TranscriptSvgGenerator(height,
+                annotatedTranscript);
     }
-
 
 }
