@@ -4,14 +4,13 @@ package org.jax.isopret.visualization;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
-import org.jax.isopret.transcript.AnnotatedTranscript;
+import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.*;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,7 +94,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @param atranscript
      * @return
      */
-    private List<Transcript> getAffectedTranscripts(AnnotatedTranscript atranscript) {
+    private List<Transcript> getAffectedTranscripts(AnnotatedGene atranscript) {
         List<Transcript> transcripts = atranscript.getTranscripts();
         HbaDealsResult result = atranscript.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
@@ -112,7 +111,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * TODO document logic, cleanup
      *  @param atranscript Object with transcripts and annotations
      */
-    private TranscriptSvgGenerator(int height, AnnotatedTranscript atranscript) {
+    private TranscriptSvgGenerator(int height, AnnotatedGene atranscript) {
         super(SVG_WIDTH,height);
         this.affectedTranscripts = getAffectedTranscripts(atranscript);
         this.hbaDealsResult = atranscript.getHbaDealsResult();
@@ -236,7 +235,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
     }
 
-    private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedTranscript atranscript) {
+    private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedGene atranscript) {
         Map<String, Double> foldchanges = new HashMap<>();
         HbaDealsResult result = atranscript.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptResultMap = result.getTranscriptMap();
@@ -480,7 +479,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         }
     }
 
-    public static AbstractSvgGenerator factory(AnnotatedTranscript annotatedTranscript) {
+    public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript) {
         List<Transcript> transcripts = annotatedTranscript.getTranscripts();
         HbaDealsResult result = annotatedTranscript.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();

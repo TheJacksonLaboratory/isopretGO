@@ -1,7 +1,7 @@
 package org.jax.isopret.visualization;
 
 import org.jax.isopret.TestBase;
-import org.jax.isopret.transcript.AnnotatedTranscript;
+import org.jax.isopret.transcript.AnnotatedGene;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SvgGeneratorTest extends TestBase {
 
-    private static final AnnotatedTranscript adarAnnotated = getAdarAnnotatedTranscript();
+    private static final AnnotatedGene adarAnnotated = getAdarAnnotatedTranscript();
 
     @Test
     public void testWriteSvg() {

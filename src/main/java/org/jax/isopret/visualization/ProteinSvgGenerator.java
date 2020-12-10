@@ -3,7 +3,7 @@ package org.jax.isopret.visualization;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
-import org.jax.isopret.transcript.AnnotatedTranscript;
+import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
     private final Map<String, HbaDealsTranscriptResult> results;
 
-    private ProteinSvgGenerator(int height, List<Transcript> affected, HbaDealsResult result, List<PrositeHit> hits) {
+    private ProteinSvgGenerator(int height, List<Transcript> affected, HbaDealsResult result, Map<String, List<PrositeHit>> hitmap) {
         super(SVG_WIDTH,height);
         // get prosite data if possible
         this.results = result.getTranscriptMap();
@@ -72,7 +72,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
 
 
-    public static AbstractSvgGenerator factory(AnnotatedTranscript annotatedTranscript) {
+    public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript) {
         List<Transcript> transcripts = annotatedTranscript.getTranscripts();
         HbaDealsResult result = annotatedTranscript.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
@@ -84,6 +84,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         return new ProteinSvgGenerator(height,
                 affectedTranscripts,
                 annotatedTranscript.getHbaDealsResult(),
-                annotatedTranscript.getPrositeHits());
+                annotatedTranscript.getPrositeHitMap());
     }
 }
