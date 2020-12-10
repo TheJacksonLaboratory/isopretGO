@@ -14,6 +14,18 @@ public class PrositeHit implements Comparable<PrositeHit> {
         this.endAminoAcidPos = end;
     }
 
+    public String getAccession() {
+        return accession;
+    }
+
+    public int getStartAminoAcidPos() {
+        return startAminoAcidPos;
+    }
+
+    public int getEndAminoAcidPos() {
+        return endAminoAcidPos;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(accession, startAminoAcidPos, endAminoAcidPos);
@@ -31,8 +43,6 @@ public class PrositeHit implements Comparable<PrositeHit> {
 
     @Override
     public int compareTo(PrositeHit o) {
-        if (o.startAminoAcidPos < this.startAminoAcidPos) return  1;
-        else if (this.startAminoAcidPos < o.startAminoAcidPos) return -1;
-        else return 0;
+        return Integer.compare(this.startAminoAcidPos, o.startAminoAcidPos);
     }
 }

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TranscriptTest extends TestBase {
     /** Initialized in TestBase -- the key is ADAR, and there is a list of transcripts. */
-    private static Map<String, List<Transcript>> symbolToTranscriptMap = getADARToTranscriptMap();
+    private static final Map<String, List<Transcript>> symbolToTranscriptMap = getADARToTranscriptMap();
 
 
 

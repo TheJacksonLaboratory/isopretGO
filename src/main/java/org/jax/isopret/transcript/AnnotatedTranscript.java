@@ -44,4 +44,16 @@ public class AnnotatedTranscript {
     public List<Transcript> getExpressedTranscripts() {
         return expressedTranscripts;
     }
+
+    public List<Transcript> getTranscripts() {
+        return transcripts;
+    }
+
+    public List<PrositeHit> getPrositeHits() {
+        return prositeHits;
+    }
+
+    public HbaDealsResult getHbaDealsResult() {
+        return hbaDealsResult;
+    }
 }

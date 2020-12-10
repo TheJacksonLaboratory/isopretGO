@@ -27,7 +27,7 @@ public class JannovarReader {
     }
     public JannovarReader(File file, GenomicAssembly assembly) {
         jannovarSerFile = file;
-        assembly = assembly;
+        this.assembly = assembly;
         JannovarTxMapper jmapper = new JannovarTxMapper(assembly);
         symbolToTranscriptListMap = new HashMap<>();
         try {
