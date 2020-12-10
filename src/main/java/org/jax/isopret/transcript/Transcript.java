@@ -9,6 +9,8 @@ import java.util.Objects;
 public class Transcript extends PreciseGenomicRegion {
 
     private final String accessionId;
+    /** e.g., if {@link #accessionId} is ENST0000064021.6 then this would be ENST0000064021 */
+    private final String accessionIdNoVersion;
 
     private final String hgvsSymbol;
 
@@ -26,6 +28,12 @@ public class Transcript extends PreciseGenomicRegion {
                        List<GenomicRegion> exons) {
         super(txRegion);
         this.accessionId = accessionId;
+        int i = this.accessionId.indexOf(".");
+        if (i < 0) {
+            this.accessionIdNoVersion = this.accessionId;
+        } else {
+            this.accessionIdNoVersion = this.accessionId.substring(0,i);
+        }
         this.hgvsSymbol = hgvsSymbol;
         this.isCoding = isCoding;
         this.cdsStart = cdsStart;
@@ -73,6 +81,10 @@ public class Transcript extends PreciseGenomicRegion {
 
     public List<GenomicRegion> exons() {
         return exons;
+    }
+
+    public String getAccessionIdNoVersion() {
+        return accessionIdNoVersion;
     }
 
     @Override

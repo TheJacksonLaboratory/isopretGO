@@ -2,6 +2,8 @@ package org.jax.isopret.visualization;
 
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.hbadeals.HbaDealsResult;
+import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.transcript.AnnotatedTranscript;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.*;
@@ -9,9 +11,12 @@ import org.monarchinitiative.variant.api.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -29,6 +34,8 @@ public class SvgGenerator {
     protected int SVG_HEIGHT;
     /** List of transcripts that are affected by the SV and that are to be shown in the SVG. */
     protected final List<Transcript> affectedTranscripts;
+    /** List of log fold changes  -- key is the accession id from {@link #affectedTranscripts}. */
+    private final Map<String, Double> foldChanges;
 
     /** Boundaries of SVG we do not write to. */
     private final double OFFSET_FACTOR = 0.1;
@@ -80,8 +87,24 @@ public class SvgGenerator {
     public final static String BRIGHT_GREEN = "#00a087";
     public final static String YELLOW = "#FFFFE0"; //lightyellow
 
+    private final HbaDealsResult hbaDealsResult;
 
-
+    /**
+     * TODO -- make sure we deal with version numbers in a uniform way. Now, we
+     * are assuming that the HBADeals object does NOT use a version number.
+     * @param atranscript
+     * @return
+     */
+    private List<Transcript> getAffectedTranscripts(AnnotatedTranscript atranscript) {
+        List<Transcript> transcripts = atranscript.getTranscripts();
+        HbaDealsResult result = atranscript.getHbaDealsResult();
+        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        List<Transcript> affectedTranscripts = transcripts
+                .stream()
+                .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
+                .collect(Collectors.toList());
+        return affectedTranscripts;
+    }
 
 
     /**
@@ -91,8 +114,9 @@ public class SvgGenerator {
      */
     public SvgGenerator(AnnotatedTranscript atranscript) {
 
-        this.affectedTranscripts = atranscript.getExpressedTranscripts();
-
+        this.affectedTranscripts = getAffectedTranscripts(atranscript);
+        this.hbaDealsResult = atranscript.getHbaDealsResult();
+        this.foldChanges = getFoldChangesOfAffectedTranscripts(atranscript);
         this.SVG_HEIGHT = HEIGHT_FOR_SV_DISPLAY + affectedTranscripts.size() * HEIGHT_PER_DISPLAY_ITEM;
 
 
@@ -107,9 +131,9 @@ public class SvgGenerator {
                 .max()
                 .orElse(this.genomicMinPos + 1000); // We should never actually need the orElse
         this.genomicSpan = this.genomicMaxPos - this.genomicMinPos;
-        int extraSpaceOnSide = (int)(0.1*(this.genomicSpan));
-        this.paddedGenomicMinPos = genomicMinPos - extraSpaceOnSide;
-        this.paddedGenomicMaxPos = genomicMaxPos + extraSpaceOnSide;
+        int extraSpaceOnSide = (int)(0.15*(this.genomicSpan));
+        this.paddedGenomicMinPos = genomicMinPos - (int)(0.05*(this.genomicSpan));
+        this.paddedGenomicMaxPos = genomicMaxPos + (int)(0.23*(this.genomicSpan));
         this.paddedGenomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
         this.scaleBasePairs = 1 + this.genomicMaxPos  -  this.genomicMinPos;
         this.scaleMinPos = translateGenomicToSvg(genomicMinPos);
@@ -252,7 +276,76 @@ public class SvgGenerator {
         }
         writeIntrons(exons, ypos, writer);
         writeTranscriptName(transcript, minX, ypos, writer);
+       writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
     }
+
+    private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedTranscript atranscript) {
+        Map<String, Double> foldchanges = new HashMap<>();
+        HbaDealsResult result = atranscript.getHbaDealsResult();
+        Map<String, HbaDealsTranscriptResult> transcriptResultMap = result.getTranscriptMap();
+        for (Transcript transcript : this.affectedTranscripts) {
+            String id = transcript.getAccessionIdNoVersion();
+            if (transcriptResultMap.containsKey(id)) {
+                double fc = transcriptResultMap.get(id).getFoldChange();
+                double logFC = Math.log(fc)/ Math.log(2);
+                foldchanges.put(id , logFC);
+            } else {
+                foldchanges.put(id, 0.0);
+            }
+        }
+        return foldchanges;
+    }
+
+    private double getLogFoldChage(String id) {
+        Map<String, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+        if (! transcriptResultMap.containsKey(id)) return 0.0;
+        double fc = transcriptResultMap.get(id).getFoldChange();
+        return Math.log(fc) / Math.log(2);
+    }
+
+    private String getCorrectedP(String id) {
+        Map<String, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+        double logFC = getLogFoldChage(id);
+        if (! transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
+        double corrP =  transcriptResultMap.get(id).getCorrectedP();
+        if (corrP >= 0.05) {
+            return String.format("%.2f (n.s.)", logFC);
+        } else if (corrP > 0.001) {
+            return String.format("%.2f (p=%.4f)", logFC, corrP);
+        }
+        return String.format("%.2f (p=%.2E)", logFC, corrP);
+    }
+
+
+    private void writeFoldChange(String id, int ypos, Writer writer) throws IOException {
+        double fc = getLogFoldChage(id);
+        double startpos = translateGenomicToSvg(this.genomicMaxPos) + 25.0;
+        double y = (double)ypos;
+        writer.write(String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\"/>\n",
+                startpos, y, startpos+30, y));
+        double width = 20.0;
+        double boxstart = startpos + 5.0;
+        double factor = 25; // multiple logFC by this to get height
+        String rect;
+        if (fc > 0.0) {
+            double height = fc*factor;
+            rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
+                            "style=\"stroke:%s; fill: %s\" />\n",
+                    boxstart, y, width, height, DARKGREEN, RED);
+        } else {
+            double height = fc*-factor;
+            rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
+                            "style=\"stroke:%s; fill: %s\" />\n",
+                    boxstart, y-height, width, height, RED, DARKGREEN);
+        }
+        writer.write(rect);
+        double xpos = startpos + width + 10;
+        String txt = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
+                xpos, y, PURPLE, getCorrectedP(id));
+        writer.write(txt);
+
+    }
+
 
     /**
      * Write a line to indicate transcript (UTR) or a dotted line to indicate introns. The line forms
