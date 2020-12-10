@@ -1,8 +1,6 @@
 package org.jax.isopret.prosite;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class PrositeMapping {
 
@@ -10,16 +8,18 @@ public class PrositeMapping {
 
     private final String geneID;
 
-    private final List<PrositeHit> hits;
+    private final Map<String, List<PrositeHit>> transcriptToPrositeListMap;
+
 
     public PrositeMapping(String transcript, String gene) {
         this.transcriptID = transcript;
         this.geneID = gene;
-        hits = new ArrayList<>();
+        transcriptToPrositeListMap = new HashMap<>();
     }
 
-    public void addPrositeHit(String ac, int begin, int end) {
-        hits.add(new PrositeHit(ac, begin, end));
+    public void addPrositeHit(String transcriptID, String ac, int begin, int end) {
+        transcriptToPrositeListMap.putIfAbsent(transcriptID, new ArrayList<>());
+        transcriptToPrositeListMap.get(transcriptID).add(new PrositeHit(ac, begin, end));
     }
 
     public String getTranscriptID() {
@@ -30,8 +30,17 @@ public class PrositeMapping {
         return geneID;
     }
 
-    public List<PrositeHit> getHits() {
-        Collections.sort(hits);
-        return hits;
+    public List<PrositeHit> getHits(String transcriptID) {
+        if (transcriptToPrositeListMap.containsKey(transcriptID)) {
+            List<PrositeHit> hits = transcriptToPrositeListMap.get(transcriptID);
+            Collections.sort(hits);
+            return hits;
+        } else {
+            return List.of();
+        }
+    }
+
+    public Map<String, List<PrositeHit>> getTranscriptToPrositeListMap() {
+        return transcriptToPrositeListMap;
     }
 }

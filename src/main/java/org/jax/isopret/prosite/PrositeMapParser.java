@@ -55,7 +55,7 @@ public class PrositeMapParser {
                    int begin = Integer.parseInt(fields[3]);
                    int end = Integer.parseInt(fields[4]);
                    prositeMappingMap.putIfAbsent(geneID, new PrositeMapping(transcriptID, geneID));
-                   prositeMappingMap.get(geneID).addPrositeHit(prositeAc, begin, end);
+                   prositeMappingMap.get(geneID).addPrositeHit(transcriptID, prositeAc, begin, end);
                } catch (NumberFormatException e) {
                    System.err.printf("[ERROR] Could not parse line in prosite map (%s): %s.\n", line, e.getMessage());
                }

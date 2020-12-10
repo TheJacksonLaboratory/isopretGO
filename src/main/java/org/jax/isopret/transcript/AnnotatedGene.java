@@ -1,32 +1,40 @@
 package org.jax.isopret.transcript;
 
 import org.jax.isopret.hbadeals.HbaDealsResult;
+import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public class AnnotatedTranscript {
+public class AnnotatedGene {
     /** All annotated transcripts of some gene */
     private final List<Transcript> transcripts;
 
-    /** All annotated transcripts of some gene */
+    /** All annotated transcripts of some gene that were expressed according to HBA deals */
     private final List<Transcript> expressedTranscripts;
 
-    private final List<PrositeHit> prositeHits;
+    Map<String, List<PrositeHit>> transcriptToHitMap;
 
     private final HbaDealsResult hbaDealsResult;
 
     /**
      *
      * @param transcripts
-     * @param hits Protein-level hits with prosite domains
+
      */
-    public AnnotatedTranscript(List<Transcript> transcripts,  List<PrositeHit> hits, HbaDealsResult result) {
+    public AnnotatedGene(List<Transcript> transcripts, Map<String, List<PrositeHit>> transcriptToHitMap, HbaDealsResult result) {
         this.transcripts = transcripts;
-        this.prositeHits = hits;
+        this.transcriptToHitMap = transcriptToHitMap;
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
-        expressedTranscripts = List.of(); // todo
+        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        expressedTranscripts = transcripts
+                    .stream()
+                    .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
+                    .collect(Collectors.toList());
     }
 
 
@@ -49,8 +57,12 @@ public class AnnotatedTranscript {
         return transcripts;
     }
 
-    public List<PrositeHit> getPrositeHits() {
-        return prositeHits;
+    public List<PrositeHit> getPrositeHits(String id) {
+        return transcriptToHitMap.getOrDefault(id, new ArrayList<>());
+    }
+
+    public Map<String, List<PrositeHit>> getPrositeHitMap() {
+        return this.transcriptToHitMap;
     }
 
     public HbaDealsResult getHbaDealsResult() {

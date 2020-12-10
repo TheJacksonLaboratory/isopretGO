@@ -4,7 +4,7 @@ import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
-import org.jax.isopret.transcript.AnnotatedTranscript;
+import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.junit.jupiter.api.Test;
 
@@ -56,15 +56,17 @@ public class TranscriptTest extends TestBase {
         Map<String, PrositeMapping> prositeMappingMap = prositeMapParser.getPrositeMappingMap();
         assertTrue(prositeMappingMap.containsKey(transcriptIDWithoutVersion));
         PrositeMapping enst00000368474Prosite = prositeMappingMap.get(transcriptIDWithoutVersion);
-        List<PrositeHit> hits = enst00000368474Prosite.getHits();
+        List<PrositeHit> hits = enst00000368474Prosite.getHits(transcriptIDWithVersion);
         // This transcript has 6 prosite motifs in our test file
         assertEquals(6, hits.size());
         // TODO -- starting here we should prototype how to map between the exon positions and the prosite motifs
         Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
         assertTrue(hbadealmaps.containsKey("ADAR"));
         HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes
+        String adarGeneId = "ENSG00000160710";
+        PrositeMapping psm = prositeMappingMap.get(adarGeneId);
 
-        AnnotatedTranscript atranscript = new AnnotatedTranscript(adarTranscripts, hits,adarResult);
+        AnnotatedGene atranscript = new AnnotatedGene(adarTranscripts, psm.getTranscriptToPrositeListMap(),adarResult);
         //enst00000368474.exons().get(0).
       //  assertTrue(atranscript.hasPrositeHit());
 
