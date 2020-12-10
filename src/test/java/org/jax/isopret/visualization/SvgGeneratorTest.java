@@ -16,7 +16,7 @@ public class SvgGeneratorTest extends TestBase {
 
     @Test
     public void testWriteSvg() {
-        SvgGenerator gen = new SvgGenerator(adarAnnotated);
+        AbstractSvgGenerator gen = TranscriptSvgGenerator.factory(adarAnnotated);
         String svg = gen.getSvg();
         assertNotNull(svg);
         System.out.println(svg);
@@ -28,5 +28,22 @@ public class SvgGeneratorTest extends TestBase {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testWriteProteinSvg() {
+        AbstractSvgGenerator gen = ProteinSvgGenerator.factory(adarAnnotated);
+        String svg = gen.getSvg();
+        assertNotNull(svg);
+        System.out.println(svg);
+        try {
+            String path = "target/adar-protein.svg";
+            BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+            writer.write(svg);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
