@@ -4,6 +4,8 @@ import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.prosite.PrositeMapParser;
+import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.transcript.AnnotatedTranscript;
 import org.jax.isopret.transcript.GenomicAssemblyProvider;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
@@ -64,6 +66,21 @@ public class TestBase {
             symbolToTranscriptMap = reader.getSymbolToTranscriptListMap();
         }
         return symbolToTranscriptMap;
+    }
+
+    public static AnnotatedTranscript getAdarAnnotatedTranscript() {
+        String transcriptIDWithVersion = "ENST00000368474.8";
+        String transcriptIDWithoutVersion = "ENST00000368474";
+        String adarGeneId = "ENSG00000160710";
+        Map<String, List<Transcript>> adarSymbolToTranscriptMap = getADARToTranscriptMap();
+        List<Transcript> adarTranscripts = adarSymbolToTranscriptMap.get("ADAR");
+        PrositeMapParser prositeMapParser = getPrositeMapParser();
+        Map<String, PrositeMapping> prositeMappingMap = prositeMapParser.getPrositeMappingMap();
+        Map<String,String> prositeIdMap = prositeMapParser.getPrositeNameMap();
+        Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
+        HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes
+        PrositeMapping adarPrositeMapping = prositeMappingMap.get(adarGeneId);
+        return new AnnotatedTranscript(adarTranscripts,  adarPrositeMapping.getHits(), adarResult);
     }
 
 }

@@ -124,8 +124,7 @@ public class HbaDealsParser {
                 isoform = fields[1];
             }
             this.expFC = Double.parseDouble(fields[2]);
-            double q = Double.parseDouble(fields[3]);
-            this.raw_p = q;
+            this.raw_p = Double.parseDouble(fields[3]);
         }
 
         /** sort in reverse order, i.e., with lowest values first */

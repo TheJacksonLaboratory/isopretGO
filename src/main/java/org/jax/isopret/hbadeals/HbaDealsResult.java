@@ -59,9 +59,7 @@ public class HbaDealsResult {
         return this.transcriptMap
                 .values()
                 .stream()
-                .filter(HbaDealsTranscriptResult::isSignificant)
-                .findAny()
-                .isPresent();
+                .anyMatch(HbaDealsTranscriptResult::isSignificant);
     }
 
     public boolean hasSignificantExpressionResult() {
@@ -72,9 +70,7 @@ public class HbaDealsResult {
         return this.transcriptMap
                 .values()
                 .stream()
-                .filter(HbaDealsTranscriptResult::isSignificant)
-                .findAny()
-                .isPresent();
+                .anyMatch(HbaDealsTranscriptResult::isSignificant);
     }
 
     public double getMostSignificantSplicingPval() {

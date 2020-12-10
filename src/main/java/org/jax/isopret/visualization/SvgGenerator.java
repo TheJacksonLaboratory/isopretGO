@@ -2,6 +2,7 @@ package org.jax.isopret.visualization;
 
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.transcript.AnnotatedTranscript;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.*;
 
@@ -18,7 +19,7 @@ import java.util.List;
  *
  * @author Peter N Robinson
  */
-public abstract class SvSvgGenerator {
+public class SvgGenerator {
     static final int SVG_WIDTH = 1400;
 
     static final int HEIGHT_FOR_SV_DISPLAY = 200;
@@ -28,8 +29,6 @@ public abstract class SvSvgGenerator {
     protected int SVG_HEIGHT;
     /** List of transcripts that are affected by the SV and that are to be shown in the SVG. */
     protected final List<Transcript> affectedTranscripts;
-    /** Variant on {@link Strand#POSITIVE} */
-    protected final Variant variant;
 
     /** Boundaries of SVG we do not write to. */
     private final double OFFSET_FACTOR = 0.1;
@@ -82,105 +81,48 @@ public abstract class SvSvgGenerator {
     public final static String YELLOW = "#FFFFE0"; //lightyellow
 
 
-    private final VariantType variantType;
+
 
 
     /**
      * The constructor calculates the left and right boundaries for display
      * TODO document logic, cleanup
-     *  @param transcripts transcripts affected by the structural variant we are displaying
+     *  @param atranscript Object with transcripts and annotations
      */
-    public SvSvgGenerator(Variant variant, List<Transcript> transcripts) {
-        this.variantType = variant.variantType();
-        this.affectedTranscripts = transcripts;
-        this.variant = variant.withStrand(Strand.POSITIVE);
-        if (variantType.baseType() == VariantType.TRA || variantType.baseType() == VariantType.BND) {
-            this.SVG_HEIGHT = 100 + HEIGHT_FOR_SV_DISPLAY +  transcripts.size() * HEIGHT_PER_DISPLAY_ITEM;
-        } else {
-            this.SVG_HEIGHT = HEIGHT_FOR_SV_DISPLAY + transcripts.size() * HEIGHT_PER_DISPLAY_ITEM;
-        }
-        switch (variantType.baseType()) {
-            case DEL:
-            case INS:
-            default:
-                // get min/max for SVs with one region
-                // todo  -- do we need to check how many coordinate pairs there are?
-                this.genomicMinPos= getGenomicMinPos(this.variant.start(), transcripts);
-                this.genomicMaxPos = getGenomicMaxPos(this.variant.end(), transcripts);
-                this.genomicSpan = this.genomicMaxPos - this.genomicMinPos;
-                int extraSpaceOnSide = (int)(0.1*(this.genomicSpan));
-                this.paddedGenomicMinPos = genomicMinPos - extraSpaceOnSide;
-                this.paddedGenomicMaxPos = genomicMaxPos + extraSpaceOnSide;
-                this.paddedGenomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
-                this.scaleBasePairs = 1 + this.genomicMaxPos  -  this.genomicMinPos;
-                this.scaleMinPos = translateGenomicToSvg(genomicMinPos);
-                this.scaleMaxPos = translateGenomicToSvg(genomicMaxPos);
-        }
-    }
+    public SvgGenerator(AnnotatedTranscript atranscript) {
 
-    public SvSvgGenerator(int minPos,
-                          int maxPos,
-                          Variant variant,
-                          List<Transcript> transcripts) {
-        this.variantType = variant.variantType();
-        this.affectedTranscripts = transcripts;
-        this.variant = variant.withStrand(Strand.POSITIVE);
-        if (variantType.baseType() == VariantType.TRA) {
-            this.SVG_HEIGHT = 500 + HEIGHT_FOR_SV_DISPLAY + transcripts.size() * HEIGHT_PER_DISPLAY_ITEM;
-        } else {
-            this.SVG_HEIGHT = HEIGHT_FOR_SV_DISPLAY + transcripts.size() * HEIGHT_PER_DISPLAY_ITEM;
-        }
-        int delta = maxPos - minPos;
-        int offset = (int) (OFFSET_FACTOR * delta);
-        this.genomicMinPos = minPos;
-        this.genomicMaxPos = maxPos;
-        // don't care if we fall off the end, this is not important for visualization
-        this.paddedGenomicMinPos = minPos - offset;
-        this.paddedGenomicMaxPos = maxPos + offset;
-        this.paddedGenomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
-        this.genomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
-        this.scaleBasePairs = 1 + maxPos - minPos;
-        this.scaleMinPos = translateGenomicToSvg(this.genomicMinPos);
-        this.scaleMaxPos = translateGenomicToSvg(this.genomicMaxPos);
-    }
+        this.affectedTranscripts = atranscript.getExpressedTranscripts();
+
+        this.SVG_HEIGHT = HEIGHT_FOR_SV_DISPLAY + affectedTranscripts.size() * HEIGHT_PER_DISPLAY_ITEM;
 
 
-
-    /**
-     * For plotting SVs, we need to know the minimum and maximum genomic position.
-     *
-     * @param transcripts Transcripts on the same chromosome as cpair that overlap with the entire or in some cases a component of the SV
-     * @return minimum coordinate (i.e., most 5' coordinate)
-     */
-    int getGenomicMinPos(int pos, List<Transcript> transcripts) {
-        int transcriptMin = transcripts.stream()
+        this.genomicMinPos= affectedTranscripts.stream()
                 .map(t -> t.withStrand(Strand.POSITIVE))
                 .mapToInt(GenomicRegion::start)
                 .min()
-                .orElse(Integer.MAX_VALUE);
-        return Math.min(transcriptMin, pos);
-    }
-
-
-    /**
-     * For plotting SVs, we need to know the minimum and maximum genomic position.
-     *
-     * @param pos  variant position
-     * @param transcripts Transcripts on the same chromosome as cpair that overlap with the entire or in some cases a component of the SV
-     * @return minimum coordinate (i.e., most 5' coordinate)
-     */
-    int getGenomicMaxPos(int pos, List<Transcript> transcripts) {
-        int transcriptMax = transcripts.stream()
+                .orElse(0);
+        this.genomicMaxPos = affectedTranscripts.stream()
                 .map(t -> t.withStrand(Strand.POSITIVE))
                 .mapToInt(GenomicRegion::end)
                 .max()
-                .orElse(Integer.MIN_VALUE);
-        return Math.max(transcriptMax,  pos);
+                .orElse(this.genomicMinPos + 1000); // We should never actually need the orElse
+        this.genomicSpan = this.genomicMaxPos - this.genomicMinPos;
+        int extraSpaceOnSide = (int)(0.1*(this.genomicSpan));
+        this.paddedGenomicMinPos = genomicMinPos - extraSpaceOnSide;
+        this.paddedGenomicMaxPos = genomicMaxPos + extraSpaceOnSide;
+        this.paddedGenomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
+        this.scaleBasePairs = 1 + this.genomicMaxPos  -  this.genomicMinPos;
+        this.scaleMinPos = translateGenomicToSvg(genomicMinPos);
+        this.scaleMaxPos = translateGenomicToSvg(genomicMaxPos);
+
     }
 
 
     /**
      * Write the header of the SVG.
+     * @param writer file handle
+     * @param blackBorder if true, write a black border around the SVG
+     * @throws IOException if we cannot writ the SVG
      */
     private void writeHeader(Writer writer, boolean blackBorder) throws IOException {
         writer.write("<svg width=\"" + SVG_WIDTH + "\" height=\"" + this.SVG_HEIGHT + "\" ");
@@ -190,7 +132,7 @@ public abstract class SvSvgGenerator {
         writer.write(
                 "xmlns=\"http://www.w3.org/2000/svg\" " +
                         "xmlns:svg=\"http://www.w3.org/2000/svg\">\n");
-        writer.write("<!-- Created by SvAnna -->\n");
+        writer.write("<!-- Created by Isopret -->\n");
         writer.write("<style>\n" +
                 "  text { font: 24px; }\n" +
                 "  text.t20 { font: 20px; }\n" +
@@ -444,13 +386,44 @@ public abstract class SvSvgGenerator {
     }
 
     /**
+     * PROTOTYPE -- THIS MAYBE NOT BE THE BEST WAY TO REPRESENT OTHER TUPES OF SV
+     * @param ypos  The y position where we will write the cartoon
+     * @param msg A String describing the SV
+     * @param writer a file handle
+     * @throws IOException if we can't write
+     * TODO -- ADAPT THIS TO SHOW A BOX OVER AREAS THAT SHOW ALTERNATIVE SPLICING
+     */
+    private void writeDeletion(int ypos, String msg, Writer writer) throws IOException {
+        double start = 42;//translateGenomicToSvg(variant.start());
+        double end = 43;//translateGenomicToSvg(variant.end()); -- TODO
+        double width = end - start;
+        double Y = ypos + 0.5 * SV_HEIGHT;
+        String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
+                        "style=\"stroke:%s; fill: %s\" />\n",
+                start, Y, width, SV_HEIGHT, DARKGREEN, RED);
+        writer.write(rect);
+        Y += 1.75*SV_HEIGHT;
+        writer.write(String.format("<text x=\"%f\" y=\"%f\"  fill=\"%s\">%s</text>\n",start -10,Y, PURPLE, msg));
+    }
+
+    /**
      * Wirte an SVG (without header) representing this SV. Not intended to be used to create a stand-alone
      * SVG (for this, user {@link #getSvg()}
      *
      * @param writer a file handle
      * @throws IOException if we cannot write.
      */
-    public abstract void write(Writer writer) throws IOException;
+    public void write(Writer writer) throws IOException {
+        int starty = 50;
+        int y = starty;
+        // TODO WRITE SYMBOLS TO DESCRIBE THE ALTERNATE SPLICING
+        y += 100;
+        for (var tmod : this.affectedTranscripts) {
+            writeTranscript(tmod, y, writer);
+            y += HEIGHT_PER_DISPLAY_ITEM;
+        }
+        writeScale(writer, y);
+    }
 
     /**
      * If there is some IO Exception, return an SVG with a text that indicates the error

@@ -3,8 +3,6 @@ package org.jax.isopret.prosite;
 import org.jax.isopret.TestBase;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
