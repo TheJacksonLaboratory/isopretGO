@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>Isopret</title>
+  <title>svann: Structural Variant Annotator</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -83,7 +83,6 @@ h1 {
 .center {
   text-align: center;
 }
-/* Your really should address semantic issues with your markup that make selectors like this necessary */
 
 main > section > a[name="othergenes"] > h3,
 h2 {
@@ -350,6 +349,19 @@ a.svg:hover, a.svg:active {
 #hide-symbol-table, #symbol-table {
   display: none;
 }
+.column {
+  float: left;
+  width: 50%;
+  padding: 60px;
+  height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 
 </style>
 </head>
@@ -359,7 +371,7 @@ a.svg:hover, a.svg:active {
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
 <header class="banner">
-    <h1><Isopret</h1>
+    <h1><font color="#FFDA1A">Isopret</font></h1>
 </header>
 
   <nav>
@@ -367,8 +379,6 @@ a.svg:hover, a.svg:active {
           <ul>
               <li><a href="#sample">Sample</a></li>
               <li><a href="#diff">Differential diagnosis</a></li>
-              <li><a href="#othergenes">Remaining genes</a></li>
-              <li><a href="#explain">Definitions</a></li>
               <li><a href="#about">About</a></li>
           </ul>
       </div>
@@ -376,54 +386,91 @@ a.svg:hover, a.svg:active {
   <main>
     <section>
       <a name="sample"></a>
-      <h2 class="center">Input files:</h2>
-      <article>
-        <p>HBA-DEALS file: ${hbaDealsFile}.</p>
-        <p>FASTA file> ${fastaFile}</p>
-        <p>PROSITE file: ${prosite_file}</p>
-        <p>Isopret analysis performed on ${analysis_date}.</p>
-        <p>Total genes: ${total_genes}</p>
-        <p>Total genes with significant expression or splicing: ${total_sig_genes}</p>
+        <article>
+        <p>Isopret -- Isoform interpretation.</p>
+        <p>Add some text here.</p>
       </article>
-    </section>
-
-    <#list genes as gene>
-    <section>
-          <article>
-            <h2>${gene.symbol}</h2>
-            <ul>
-            <li>foldchange: ${gene.foldchange}</li>
-            <li>P-value: ${gene.pval}</li>
-            <li>P-value (corrected): ${gene.pvalcorr}</li>
-            <li>Number of transcripts: ${gene.ntranscripts}</li>
-            </ul>
-            <#if gene.hasgo>
-            <ul>
-            <#list gene.goannotations as go>
-            <li>${go}</li>
-            </#list>
-            </ul>
-            </#if>
-            <p>
-             <table class="redTable">
-               <tr><th>Transcript</th><th>cDNA</th><th>Protein</th><th>P value</th><th>Motifs</th></tr>
-                <#list gene.transcripts as t>
-                        <tr><td>${t.identifier}</td><td>${t.cdnalength} bp</td><td>${t.peptidelength} aa</td>
-                        <td>
-                        <#if t.haspval>  ${t.pval} (${t.pvalcorr}. corr.)
-                        </#if>
-                        </td>
-                        <td>${t.motifs}<#if t.hasdiff><br/>***</#if></td></tr>
-                </#list>
-             </table>
-           </p>
+  </section>
 
 
-          </article>
-    </section>
-    </#list>
+
+        <#list genelist as gene>
+        <section>
+              <article>
+              ${gene?no_esc}
+             </article>
+             </section>
+        </#list>
 
 
+      <section>
+        <a name="about"></a>
+        <article>
+          <h2>About</h2>
+            <p>Isopret TODO some text.</p>
+
+
+        </article>
+      </section>
+      <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
   </main>
-  </body>
-  </html>
+  <footer>
+    <p>SvAnn &copy; 2020</p>
+  </footer>
+
+  <script>
+  function showTooltip(evt, text) {
+    let tooltip = document.getElementById("tooltip");
+    tooltip.innerText = text;
+    tooltip.style.display = "block";
+    tooltip.style.left = evt.pageX + 10 + 'px';
+    tooltip.style.top = evt.pageY + 10 + 'px';
+  }
+
+  function hideTooltip() {
+    var tooltip = document.getElementById("tooltip");
+    tooltip.style.display = "none";
+  }
+
+function showTable() {
+    var table = document.getElementById("other-genes-table");
+    table.style.display = "block";
+    var showtablebtn = document.getElementById("show-other-genes-table");
+    showtablebtn.style.display = "none";
+
+    var hidetablebtn = document.getElementById("hide-other-genes-table");
+    hidetablebtn.style.display = "block";
+  }
+
+   function hideTable() {
+    var table = document.getElementById("other-genes-table");
+    table.style.display = "none";
+    var showtablebtn = document.getElementById("show-other-genes-table");
+    showtablebtn.style.display = "block";
+
+    var hidetablebtn = document.getElementById("hide-other-genes-table");
+    hidetablebtn.style.display = "none";
+  }
+
+  function showSymbolTable() {
+      var table = document.getElementById("symbol-table");
+      table.style.display = "block";
+      var showtablebtn = document.getElementById("show-symbol-table");
+      showtablebtn.style.display = "none";
+
+      var hidetablebtn = document.getElementById("hide-symbol-table");
+      hidetablebtn.style.display = "block";
+    }
+
+     function hideSymbolTable() {
+      var table = document.getElementById("symbol-table");
+      table.style.display = "none";
+      var showtablebtn = document.getElementById("show-symbol-table");
+      showtablebtn.style.display = "block";
+
+      var hidetablebtn = document.getElementById("hide-symbol-table");
+      hidetablebtn.style.display = "none";
+    }
+  </script>
+</body>
+</html>

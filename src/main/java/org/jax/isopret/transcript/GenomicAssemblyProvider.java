@@ -1,5 +1,6 @@
 package org.jax.isopret.transcript;
 
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.monarchinitiative.variant.api.Contig;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 import org.monarchinitiative.variant.api.SequenceRole;
@@ -7,9 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -25,6 +30,9 @@ public class GenomicAssemblyProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GenomicAssemblyProvider.class);
 
+    private static final Path HG38_ASSEMBLY_REPORT_PATH = Paths.get("src/main/resources/GCA_000001405.28_GRCh38.p13_assembly_report.txt");
+
+
     private static final NumberFormat NF = NumberFormat.getInstance();
 
     private static final Pattern ASSEMBLY_NAME_PATTERN = Pattern.compile("^#\\s*Assembly\\s+name:\\s*(?<payload>[\\w.]+)$");
@@ -38,6 +46,20 @@ public class GenomicAssemblyProvider {
     private GenomicAssemblyProvider() {
         // private no-op
     }
+
+    public static GenomicAssembly hg38() {
+        try {
+            URL resource = GenomicAssemblyProvider.class.getClassLoader().getResource("assemblies/GCA_000001405.28_GRCh38.p13_assembly_report.txt");
+            File f = new File(resource.toURI());
+            return fromAssemblyReport(f.toPath());
+        } catch (URISyntaxException e) {
+            throw new IsopretRuntimeException("Could not get URI for hg38 resource");
+        } catch (IOException e) {
+            throw  new IsopretRuntimeException("Could not read hg38 resource");
+        }
+    }
+
+
 
     public static GenomicAssembly fromAssemblyReport(Path assemblyReport) throws IOException {
         String assemblyName = null;
