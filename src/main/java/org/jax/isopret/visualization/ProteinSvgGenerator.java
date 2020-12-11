@@ -1,30 +1,65 @@
 package org.jax.isopret.visualization;
 
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
+import org.monarchinitiative.variant.api.GenomicRegion;
+import org.monarchinitiative.variant.api.Strand;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
     static final int SVG_WIDTH = 1400;
     static final int HEIGHT_FOR_SV_DISPLAY = 200;
     static final int HEIGHT_PER_DISPLAY_ITEM = 80;
-
+    private final static String colors[] = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF","F7DC6F", "CFFF98", "A1D6E2",
+            "EC96A4", "E6DF44", "F76FDA","FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6","FFC300" ,"F76FF5" , "FFFF99",
+            "FF99FF", "99FFFF","CCFF99","FFE5CC","FFD700","9ACD32","7FFFD4","FFB6C1","FFFACD",
+            "FFE4E1","F0FFF0","F0FFFF"};
 
     private final Map<String, HbaDealsTranscriptResult> results;
 
-    private ProteinSvgGenerator(int height, List<Transcript> affected, HbaDealsResult result, Map<String, List<PrositeHit>> hitmap) {
+    private final Map<String, List<PrositeHit>> prositeHitMap;
+
+    private final List<Transcript> expressedTranscriptList;
+
+    private final Map<String,String> prositeId2nameMap;
+    /** Map of the prosite IDs and name that we actually used. */
+    private final  SortedMap<String, String> sortedPrositeIdMap;
+
+    private final Map<String, String> prositeIdToColorMap;
+
+    private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String,String> id2nameMap) {
         super(SVG_WIDTH,height);
         // get prosite data if possible
-        this.results = result.getTranscriptMap();
+        this.results = annotatedGene.getHbaDealsResult().getTranscriptMap();
+        this.prositeHitMap = annotatedGene.getPrositeHitMap();
+        this.prositeId2nameMap = id2nameMap;
+        this.expressedTranscriptList = annotatedGene.getExpressedTranscripts();
+        this.sortedPrositeIdMap = new TreeMap<>();
+        for (var hitlist : prositeHitMap.values()) {
+            for (var hit : hitlist) {
+                String id = hit.getAccession();
+                String label = this.prositeId2nameMap.getOrDefault(id, id); // if we cannot find the label, just use the id
+                this.sortedPrositeIdMap.put(id, label);
+            }
+        }
+        // get colors -- start from a random index
+        prositeIdToColorMap = new HashMap<>();
+        Random random = new Random();
+        int i = random.nextInt(colors.length);
+        for (var id : sortedPrositeIdMap.keySet()) {
+            prositeIdToColorMap.put(id, colors[i]);
+            i = i+1 == colors.length ? 0 : i+1;
+        }
+
 
     }
 
@@ -72,18 +107,11 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
 
 
-    public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript) {
-        List<Transcript> transcripts = annotatedTranscript.getTranscripts();
-        HbaDealsResult result = annotatedTranscript.getHbaDealsResult();
-        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
-        List<Transcript> affectedTranscripts = transcripts
-                .stream()
-                .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
-                .collect(Collectors.toList());
+    public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript, Map<String,String> id2nameMap) {
+        List<Transcript> affectedTranscripts = annotatedTranscript.getExpressedTranscripts();
         int height = HEIGHT_PER_DISPLAY_ITEM * affectedTranscripts.size() + HEIGHT_FOR_SV_DISPLAY;
         return new ProteinSvgGenerator(height,
-                affectedTranscripts,
-                annotatedTranscript.getHbaDealsResult(),
-                annotatedTranscript.getPrositeHitMap());
+                annotatedTranscript,
+                id2nameMap);
     }
 }
