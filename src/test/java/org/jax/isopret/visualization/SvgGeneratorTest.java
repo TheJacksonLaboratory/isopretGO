@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -32,7 +33,8 @@ public class SvgGeneratorTest extends TestBase {
 
     @Test
     public void testWriteProteinSvg() {
-        AbstractSvgGenerator gen = ProteinSvgGenerator.factory(adarAnnotated);
+        Map<String,String> id2nameMap = getPrositeMapParser().getPrositeNameMap();
+        AbstractSvgGenerator gen = ProteinSvgGenerator.factory(adarAnnotated,id2nameMap);
         String svg = gen.getSvg();
         assertNotNull(svg);
         System.out.println(svg);

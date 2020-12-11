@@ -72,19 +72,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /** Height of the symbol that represents the structural variant. */
     protected final double SV_HEIGHT = 30;
 
-    public final static String PURPLE = "#790079";
-    public final static String GREEN = "#00A087";
-    public final static String DARKGREEN = "#006600";
-    public final static String RED ="#e64b35";
-    public final static String BLACK = "#000000";
-    public final static String NEARLYBLACK = "#040C04";
-    public final static String BLUE ="#4dbbd5";
-    public final static String BROWN="#7e6148";
-    public final static String DARKBLUE = "#3c5488";
-    public final static String VIOLET = "#8333ff";
-    public final static String ORANGE = "#ff9900";
-    public final static String BRIGHT_GREEN = "#00a087";
-    public final static String YELLOW = "#FFFFE0"; //lightyellow
 
     private final HbaDealsResult hbaDealsResult;
 
@@ -116,8 +103,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         this.affectedTranscripts = getAffectedTranscripts(atranscript);
         this.hbaDealsResult = atranscript.getHbaDealsResult();
         this.foldChanges = getFoldChangesOfAffectedTranscripts(atranscript);
-
-
 
         this.genomicMinPos= affectedTranscripts.stream()
                 .map(t -> t.withStrand(Strand.POSITIVE))
@@ -204,7 +189,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @param writer file handle
      * @throws IOException if we cannot write.
      */
-    protected void writeTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
+    private void writeCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
         Transcript transcript = tmod.withStrand(Strand.POSITIVE);
         GenomicRegion cds = transcript.cdsRegion();
 
@@ -235,7 +220,24 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
     }
 
-    private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedGene atranscript) {
+    private void writeNonCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
+        Transcript transcript = tmod.withStrand(Strand.POSITIVE);
+        List<GenomicRegion> exons = transcript.exons();
+        double minX = Double.MAX_VALUE;
+        // write a line for UTR, otherwise write a box
+        for (GenomicRegion exon : exons) {
+            double exonStart = translateGenomicToSvg(exon.start());
+            double exonEnd = translateGenomicToSvg(exon.end());
+            if (exonStart < minX) minX = exonStart;
+            writeUtrExon(exonStart, exonEnd, ypos, writer);
+        }
+        writeIntrons(exons, ypos, writer);
+        writeTranscriptName(transcript, minX, ypos, writer);
+        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
+    }
+
+
+        private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedGene atranscript) {
         Map<String, Double> foldchanges = new HashMap<>();
         HbaDealsResult result = atranscript.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptResultMap = result.getTranscriptMap();
@@ -470,7 +472,11 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         y += 100;
         try {
             for (var tmod : this.affectedTranscripts) {
-                writeTranscript(tmod, y, writer);
+                if (tmod.isCoding()) {
+                    writeCodingTranscript(tmod, y, writer);
+                } else {
+                    writeNonCodingTranscript(tmod, y, writer);
+                }
                 y += HEIGHT_PER_DISPLAY_ITEM;
             }
             writeScale(writer, y);

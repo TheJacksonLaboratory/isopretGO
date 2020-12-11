@@ -8,6 +8,22 @@ public abstract class AbstractSvgGenerator {
     protected final int SVG_WIDTH;
     protected final int SVG_HEIGHT;
 
+    protected final static String PURPLE = "#790079";
+    protected final static String GREEN = "#00A087";
+    protected final static String DARKGREEN = "#006600";
+    protected final static String RED ="#e64b35";
+    protected final static String BLACK = "#000000";
+    protected final static String NEARLYBLACK = "#040C04";
+    protected final static String BLUE ="#4dbbd5";
+    protected final static String BROWN="#7e6148";
+    protected final static String DARKBLUE = "#3c5488";
+    protected final static String VIOLET = "#8333ff";
+    protected final static String ORANGE = "#ff9900";
+    protected final static String BRIGHT_GREEN = "#00a087";
+    protected final static String YELLOW = "#FFFFE0"; //lightyellow
+    protected final static String LIGHT_GREY = "#D3D3D3";
+
+
 
     public AbstractSvgGenerator(int width, int height) {
         this.SVG_WIDTH = width;

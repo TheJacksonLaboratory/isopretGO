@@ -1,5 +1,6 @@
 package org.jax.isopret.transcript;
 
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.monarchinitiative.variant.api.*;
 
 import java.util.ArrayList;
@@ -104,6 +105,51 @@ public class Transcript extends PreciseGenomicRegion {
                     cdsEndOnPositive, cdsStartOnPositive, exonsOnPositive);
         }
     }
+
+    public int getProteinLength() {
+        if (! this.isCoding) {
+            return 0;
+        }
+        Transcript t;
+        if (strand() == Strand.NEGATIVE) {
+            t = this.withStrand(Strand.POSITIVE);
+        } else {
+            t = this;
+        }
+        GenomicRegion cds = t.cdsRegion();
+        int cdsStart = t.cdsStart().posOneBased();
+        int cdsEnd   = t.cdsEnd().posOneBased();
+        int cdsNtCount = 0;
+        for (GenomicRegion exon : t.exons()) {
+            int exonStart = exon.startGenomicPosition().posOneBased();
+            int exonEnd = exon.endGenomicPosition().posOneBased();
+            if (cds.contains(exon)) {
+                cdsNtCount += exon.length();
+            } else if (! cds.overlapsWith(exon)) {
+                continue;
+                // completely non-coding exon
+                // past this point, either an exon is partially 5UTR or partially 3UTR
+            } else if (exonStart < cdsStart) {
+                // start coding located in this exon
+                int exonLen = exonEnd - cdsStart;
+                cdsNtCount += exonLen;
+            } else if (exonEnd > cdsEnd) {
+                int exonLen = cdsEnd - exonStart;
+                cdsNtCount += exonLen;
+            }
+        }
+        if (cdsNtCount % 3 != 0) {
+            // should never happen
+            throw new IsopretRuntimeException("Invalid amino acid length determined for " + t.accessionId() +": " + cdsNtCount);
+        } else {
+            int aalen = cdsNtCount / 3 - 1; // remove 1 essentially to get rid of the 3 nt of the stop codon
+            return aalen;
+        }
+    }
+
+
+
+
 
     @Override
     public Transcript withCoordinateSystem(CoordinateSystem other) {
