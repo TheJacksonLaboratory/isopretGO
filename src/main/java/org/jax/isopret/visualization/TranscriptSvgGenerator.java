@@ -189,7 +189,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @param writer file handle
      * @throws IOException if we cannot write.
      */
-    protected void writeTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
+    private void writeCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
         Transcript transcript = tmod.withStrand(Strand.POSITIVE);
         GenomicRegion cds = transcript.cdsRegion();
 
@@ -220,7 +220,24 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
     }
 
-    private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedGene atranscript) {
+    private void writeNonCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
+        Transcript transcript = tmod.withStrand(Strand.POSITIVE);
+        List<GenomicRegion> exons = transcript.exons();
+        double minX = Double.MAX_VALUE;
+        // write a line for UTR, otherwise write a box
+        for (GenomicRegion exon : exons) {
+            double exonStart = translateGenomicToSvg(exon.start());
+            double exonEnd = translateGenomicToSvg(exon.end());
+            if (exonStart < minX) minX = exonStart;
+            writeUtrExon(exonStart, exonEnd, ypos, writer);
+        }
+        writeIntrons(exons, ypos, writer);
+        writeTranscriptName(transcript, minX, ypos, writer);
+        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
+    }
+
+
+        private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedGene atranscript) {
         Map<String, Double> foldchanges = new HashMap<>();
         HbaDealsResult result = atranscript.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptResultMap = result.getTranscriptMap();
@@ -455,7 +472,11 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         y += 100;
         try {
             for (var tmod : this.affectedTranscripts) {
-                writeTranscript(tmod, y, writer);
+                if (tmod.isCoding()) {
+                    writeCodingTranscript(tmod, y, writer);
+                } else {
+                    writeNonCodingTranscript(tmod, y, writer);
+                }
                 y += HEIGHT_PER_DISPLAY_ITEM;
             }
             writeScale(writer, y);
