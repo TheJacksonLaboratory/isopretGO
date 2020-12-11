@@ -72,19 +72,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /** Height of the symbol that represents the structural variant. */
     protected final double SV_HEIGHT = 30;
 
-    public final static String PURPLE = "#790079";
-    public final static String GREEN = "#00A087";
-    public final static String DARKGREEN = "#006600";
-    public final static String RED ="#e64b35";
-    public final static String BLACK = "#000000";
-    public final static String NEARLYBLACK = "#040C04";
-    public final static String BLUE ="#4dbbd5";
-    public final static String BROWN="#7e6148";
-    public final static String DARKBLUE = "#3c5488";
-    public final static String VIOLET = "#8333ff";
-    public final static String ORANGE = "#ff9900";
-    public final static String BRIGHT_GREEN = "#00a087";
-    public final static String YELLOW = "#FFFFE0"; //lightyellow
 
     private final HbaDealsResult hbaDealsResult;
 
@@ -116,8 +103,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         this.affectedTranscripts = getAffectedTranscripts(atranscript);
         this.hbaDealsResult = atranscript.getHbaDealsResult();
         this.foldChanges = getFoldChangesOfAffectedTranscripts(atranscript);
-
-
 
         this.genomicMinPos= affectedTranscripts.stream()
                 .map(t -> t.withStrand(Strand.POSITIVE))
