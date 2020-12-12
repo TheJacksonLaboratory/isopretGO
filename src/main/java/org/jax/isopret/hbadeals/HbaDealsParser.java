@@ -38,7 +38,8 @@ public class HbaDealsParser {
      */
     public Map<Double, Double> calculateBenjaminiHochbergMTC() {
         Map<Double, Double> p2correctedP = new HashMap<>();
-        Collections.sort(this.uncorrectedPvals, Collections.reverseOrder());
+        //Collections.sort(this.uncorrectedPvals, Collections.reverseOrder());
+        this.uncorrectedPvals.sort(Comparator.reverseOrder());
         int N=this.uncorrectedPvals.size();
         for (int r = 0;r<N;r++) {
             double raw_p = this.uncorrectedPvals.get(r);
@@ -48,7 +49,24 @@ public class HbaDealsParser {
         return p2correctedP;
     }
 
-
+    /**
+     * Sanity check that the header is correct.
+     * @param header
+     */
+    public void checkHeader(String header) {
+        String [] headerFields = {"Ensembl Gene ID", "Gene", "Isoform", "ExplogFC.FC","P"};
+        String [] fields = header.split("\t");
+        if (headerFields.length != fields.length) {
+            throw new IsopretRuntimeException("Malformed HBADEALS header line (Should have 5 fields but had "
+                    + fields.length + "): " + header);
+        }
+        for (int i=0; i<headerFields.length; i++) {
+            if (! headerFields[i].equals(fields[i])) {
+                throw new IsopretRuntimeException("HBADEALS header field " +i+ " malformed. We expected \"" +
+                        headerFields[i] + "\" but got \"" + fields[i] + "\"");
+            }
+        }
+    }
 
     public HbaDealsParser(String fname, double thresh) {
         hbadealsFile = fname;
@@ -59,7 +77,7 @@ public class HbaDealsParser {
         List<HbaLine> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(this.hbadealsFile))) {
             String line;
-            br.readLine(); // skip header
+            checkHeader(br.readLine()); // skip header
             while ((line = br.readLine()) != null) {
                 //System.out.println(line);
                 HbaLine hline = new HbaLine(line);
@@ -77,7 +95,7 @@ public class HbaDealsParser {
             HbaLine hline = lines.get(r);
             double raw_p = hline.raw_p;
             hline.corrected_p = Math.min(1.0, raw_p * N/(r+1));
-            this.hbaDealsResultMap.putIfAbsent(hline.symbol, new HbaDealsResult(hline.symbol));
+            this.hbaDealsResultMap.putIfAbsent(hline.symbol, new HbaDealsResult(hline.geneAccession, hline.symbol));
             HbaDealsResult hbaresult = this.hbaDealsResultMap.get(hline.symbol);
             if (hline.isIsoform) {
                 hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p, hline.corrected_p);
@@ -103,6 +121,7 @@ public class HbaDealsParser {
     static class HbaLine implements Comparable<HbaLine> {
         final static String UNINITIALIZED = "";
         final String symbol;
+        final String geneAccession;
         final boolean isIsoform;
         final String isoform;
         final double expFC;
@@ -111,21 +130,21 @@ public class HbaDealsParser {
 
         public HbaLine(String line) {
             String [] fields = line.split("\t");
-            if (fields.length != 4) {
+            if (fields.length != 5) {
                 String msg = String.format("[ERROR] Malformed line with %d fields: %s\n", fields.length, line);
                 throw new IsopretRuntimeException(msg);
             }
-            symbol = fields[0];
-            if (fields[1].equalsIgnoreCase("Expression")) {
+            geneAccession = fields[0];
+            symbol = fields[1];
+            if (fields[2].equalsIgnoreCase("Expression")) {
                 isIsoform = false;
                 isoform = UNINITIALIZED; // gene expression entry
             } else {
                 isIsoform = true;
-                isoform = fields[1];
+                isoform = fields[2];
             }
-            this.expFC = Double.parseDouble(fields[2]);
-            double q = Double.parseDouble(fields[3]);
-            this.raw_p = q;
+            this.expFC = Double.parseDouble(fields[3]);
+            this.raw_p = Double.parseDouble(fields[4]);
         }
 
         /** sort in reverse order, i.e., with lowest values first */

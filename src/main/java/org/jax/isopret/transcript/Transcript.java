@@ -1,5 +1,6 @@
-package org.jax.isopret.transcripts;
+package org.jax.isopret.transcript;
 
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.monarchinitiative.variant.api.*;
 
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import java.util.Objects;
 public class Transcript extends PreciseGenomicRegion {
 
     private final String accessionId;
+    /** e.g., if {@link #accessionId} is ENST0000064021.6 then this would be ENST0000064021 */
+    private final String accessionIdNoVersion;
 
     private final String hgvsSymbol;
 
@@ -26,6 +29,12 @@ public class Transcript extends PreciseGenomicRegion {
                        List<GenomicRegion> exons) {
         super(txRegion);
         this.accessionId = accessionId;
+        int i = this.accessionId.indexOf(".");
+        if (i < 0) {
+            this.accessionIdNoVersion = this.accessionId;
+        } else {
+            this.accessionIdNoVersion = this.accessionId.substring(0,i);
+        }
         this.hgvsSymbol = hgvsSymbol;
         this.isCoding = isCoding;
         this.cdsStart = cdsStart;
@@ -75,6 +84,10 @@ public class Transcript extends PreciseGenomicRegion {
         return exons;
     }
 
+    public String getAccessionIdNoVersion() {
+        return accessionIdNoVersion;
+    }
+
     @Override
     public Transcript withStrand(Strand other) {
         if (strand == other) {
@@ -92,6 +105,50 @@ public class Transcript extends PreciseGenomicRegion {
                     cdsEndOnPositive, cdsStartOnPositive, exonsOnPositive);
         }
     }
+
+    public int getProteinLength() {
+        if (! this.isCoding) {
+            return 0;
+        }
+        Transcript t;
+        if (strand() == Strand.NEGATIVE) {
+            t = this.withStrand(Strand.POSITIVE);
+        } else {
+            t = this;
+        }
+        GenomicRegion cds = t.cdsRegion();
+        int cdsStart = t.cdsStart().posOneBased();
+        int cdsEnd   = t.cdsEnd().posOneBased();
+        int cdsNtCount = 0;
+        for (GenomicRegion exon : t.exons()) {
+            int exonStart = exon.startGenomicPosition().posOneBased();
+            int exonEnd = exon.endGenomicPosition().posOneBased();
+            if (cds.contains(exon)) {
+                cdsNtCount += exon.length();
+            } else if (! cds.overlapsWith(exon)) {
+                continue;
+                // completely non-coding exon
+                // past this point, either an exon is partially 5UTR or partially 3UTR
+            } else if (exonStart < cdsStart) {
+                // start coding located in this exon
+                int exonLen = exonEnd - cdsStart;
+                cdsNtCount += exonLen;
+            } else if (exonEnd > cdsEnd) {
+                int exonLen = cdsEnd - exonStart;
+                cdsNtCount += exonLen;
+            }
+        }
+        if (cdsNtCount % 3 != 0) {
+            // should never happen
+            throw new IsopretRuntimeException("Invalid amino acid length determined for " + t.accessionId() +": " + cdsNtCount);
+        } else {
+            return cdsNtCount / 3 - 1;
+        }
+    }
+
+
+
+
 
     @Override
     public Transcript withCoordinateSystem(CoordinateSystem other) {

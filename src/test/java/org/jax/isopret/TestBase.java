@@ -1,10 +1,14 @@
 package org.jax.isopret;
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.hbadeals.HbaDealsParser;
+import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.prosite.PrositeMapParser;
-import org.jax.isopret.transcripts.GenomicAssemblyProvider;
-import org.jax.isopret.transcripts.JannovarReader;
-import org.jax.isopret.transcripts.Transcript;
+import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.transcript.AnnotatedGene;
+import org.jax.isopret.transcript.GenomicAssemblyProvider;
+import org.jax.isopret.transcript.JannovarReader;
+import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 
 import java.io.IOException;
@@ -23,11 +27,22 @@ public class TestBase {
     private static GenomicAssembly assembly = null;
     private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
 
+    private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
+    private static Map<String, HbaDealsResult> hbaDealsResultMap = null;
+
     public static PrositeMapParser getPrositeMapParser() {
         if (pmparser == null) {
             pmparser = new PrositeMapParser(PROSITE_MAP_PATH.toString(), PROSITE_DAT_PATH.toString());
         }
         return pmparser;
+    }
+
+    public static Map<String, HbaDealsResult> getADARHbaDealsResultMap () {
+        if (hbaDealsResultMap == null) {
+            final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString());
+            hbaDealsResultMap = parser.getHbaDealsResultMap();
+        }
+        return hbaDealsResultMap;
     }
 
 
@@ -51,6 +66,21 @@ public class TestBase {
             symbolToTranscriptMap = reader.getSymbolToTranscriptListMap();
         }
         return symbolToTranscriptMap;
+    }
+
+    public static AnnotatedGene getAdarAnnotatedTranscript() {
+        String transcriptIDWithVersion = "ENST00000368474.8";
+        String transcriptIDWithoutVersion = "ENST00000368474";
+        String adarGeneId = "ENSG00000160710";
+        Map<String, List<Transcript>> adarSymbolToTranscriptMap = getADARToTranscriptMap();
+        List<Transcript> adarTranscripts = adarSymbolToTranscriptMap.get("ADAR");
+        PrositeMapParser prositeMapParser = getPrositeMapParser();
+        Map<String, PrositeMapping> prositeMappingMap = prositeMapParser.getPrositeMappingMap();
+        Map<String,String> prositeIdMap = prositeMapParser.getPrositeNameMap();
+        Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
+        HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes
+        PrositeMapping adarPrositeMapping = prositeMappingMap.get(adarGeneId);
+        return new AnnotatedGene(adarTranscripts,  adarPrositeMapping.getTranscriptToPrositeListMap(), adarResult);
     }
 
 }

@@ -2,7 +2,7 @@ package org.jax.isopret.prosite;
 
 import java.util.Objects;
 
-public class PrositeHit {
+public class PrositeHit implements Comparable<PrositeHit> {
 
     private final String accession;
     private final int startAminoAcidPos;
@@ -12,6 +12,18 @@ public class PrositeHit {
         this.accession = ac;
         this.startAminoAcidPos = begin;
         this.endAminoAcidPos = end;
+    }
+
+    public String getAccession() {
+        return accession;
+    }
+
+    public int getStartAminoAcidPos() {
+        return startAminoAcidPos;
+    }
+
+    public int getEndAminoAcidPos() {
+        return endAminoAcidPos;
     }
 
     @Override
@@ -27,5 +39,10 @@ public class PrositeHit {
         return this.accession.equals(that.accession)
                 && this.startAminoAcidPos == that.startAminoAcidPos &&
                 this.endAminoAcidPos == that.endAminoAcidPos;
+    }
+
+    @Override
+    public int compareTo(PrositeHit o) {
+        return Integer.compare(this.startAminoAcidPos, o.startAminoAcidPos);
     }
 }

@@ -4,11 +4,8 @@ package org.jax.isopret.prosite;
 import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +35,10 @@ public class PrositeMapParser {
         return true;
     }
 
+    /**
+     * @param prositeMapFile
+     * @return map with key=gene ID, value {@link PrositeMapping} object with prosite hits for the transcripts of the gene
+     */
     private Map<String, PrositeMapping> getPrositeMappings(String prositeMapFile) {
         Map<String, PrositeMapping> prositeMappingMap = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(prositeMapFile))) {
@@ -53,8 +54,8 @@ public class PrositeMapParser {
                try {
                    int begin = Integer.parseInt(fields[3]);
                    int end = Integer.parseInt(fields[4]);
-                   prositeMappingMap.putIfAbsent(transcriptID, new PrositeMapping(transcriptID, geneID));
-                   prositeMappingMap.get(transcriptID).addPrositeHit(prositeAc, begin, end);
+                   prositeMappingMap.putIfAbsent(geneID, new PrositeMapping(transcriptID, geneID));
+                   prositeMappingMap.get(geneID).addPrositeHit(transcriptID, prositeAc, begin, end);
                } catch (NumberFormatException e) {
                    System.err.printf("[ERROR] Could not parse line in prosite map (%s): %s.\n", line, e.getMessage());
                }

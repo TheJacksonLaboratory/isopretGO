@@ -1,11 +1,10 @@
-package org.jax.isopret.transcripts;
+package org.jax.isopret.transcript;
 
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 
 import org.monarchinitiative.variant.api.*;
 
-import org.monarchinitiative.variant.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

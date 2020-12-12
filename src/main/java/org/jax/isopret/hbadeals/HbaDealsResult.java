@@ -5,12 +5,17 @@ import java.util.*;
 public class HbaDealsResult {
     /** Some genes only have a splicing result. */
     private boolean hasExpressionResult = false;
+    /** Accession number of the gene, e.g., ENSG00000001167. */
+    private final String geneAccession;
     private final String symbol;
     private double expressionFoldChange;
     private double expressionP;
     private double correctedPval;
-    private Map<String, HbaDealsTranscriptResult> transcriptMap;
-    public HbaDealsResult(String sym) {
+    private final Map<String, HbaDealsTranscriptResult> transcriptMap;
+
+
+    public HbaDealsResult(String geneAccession, String sym) {
+        this.geneAccession = geneAccession;
         this.symbol = sym;
         transcriptMap = new HashMap<>();
     }
@@ -30,6 +35,10 @@ public class HbaDealsResult {
         }
         HbaDealsTranscriptResult tresult = new HbaDealsTranscriptResult(isoform, expFC, P, corrP);
         transcriptMap.putIfAbsent(isoform, tresult);
+    }
+
+    public String getGeneAccession() {
+        return geneAccession;
     }
 
     public String getSymbol() {
@@ -59,9 +68,7 @@ public class HbaDealsResult {
         return this.transcriptMap
                 .values()
                 .stream()
-                .filter(HbaDealsTranscriptResult::isSignificant)
-                .findAny()
-                .isPresent();
+                .anyMatch(HbaDealsTranscriptResult::isSignificant);
     }
 
     public boolean hasSignificantExpressionResult() {
@@ -72,9 +79,7 @@ public class HbaDealsResult {
         return this.transcriptMap
                 .values()
                 .stream()
-                .filter(HbaDealsTranscriptResult::isSignificant)
-                .findAny()
-                .isPresent();
+                .anyMatch(HbaDealsTranscriptResult::isSignificant);
     }
 
     public double getMostSignificantSplicingPval() {

@@ -40,6 +40,9 @@ public class IsopretDownloader {
     private final static String GO_ANNOT_GZ = "goa_human.gaf.gz";
     private final static String GO_ANNOT_URL = "http://geneontology.org/gene-associations/goa_human.gaf.gz";
 
+    private static final String JannovarZenodoUrl = "https://zenodo.org/record/4311513/files/hg38_ensembl.ser?download=1";
+    private static final String JannovarFilename = "hg38_ensembl.ser";
+
 
 
     public IsopretDownloader(String path){
@@ -59,6 +62,7 @@ public class IsopretDownloader {
         downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
         downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
         downloadFileIfNeeded(GO_OBO,GO_OBO_URL);
+        downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
 
     }
 

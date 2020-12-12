@@ -3,8 +3,6 @@ package org.jax.isopret.prosite;
 import org.jax.isopret.TestBase;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -46,10 +44,11 @@ public class PrositeMapParserTest extends TestBase {
         PrositeMapParser parser = getPrositeMapParser();
         Map<String, PrositeMapping> prositeMappingMap = parser.getPrositeMappingMap();
         String enstId = "ENST00000648231";
-        assertTrue(prositeMappingMap.containsKey(enstId));
-        PrositeMapping prositeMapping = prositeMappingMap.get(enstId);
-        assertEquals("ENSG00000160710", prositeMapping.getGeneID());
-        List<PrositeHit> hitList = prositeMapping.getHits();
+        String ensGeneId = "ENSG00000160710";
+        assertTrue(prositeMappingMap.containsKey(ensGeneId));
+        PrositeMapping prositeMapping = prositeMappingMap.get(ensGeneId);
+        assertEquals(ensGeneId, prositeMapping.getGeneID());
+        List<PrositeHit> hitList = prositeMapping.getHits(enstId);
         assertEquals(5, hitList.size());
         PrositeHit hit1 = new PrositeHit("PS50137",319, 387);
         assertTrue(hitList.stream().anyMatch(t -> t.equals(hit1)));

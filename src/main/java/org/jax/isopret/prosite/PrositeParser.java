@@ -13,7 +13,7 @@ import java.util.List;
 public class PrositeParser {
 
     private final static String UNINITIALZED = "";
-    private List<PrositePattern> patternList;
+    private final List<PrositePattern> patternList;
 
     public PrositeParser(String prositePath) {
         patternList = new ArrayList<>();
@@ -59,7 +59,7 @@ public class PrositeParser {
         String category = UNINITIALZED; // PATTERN or MATRIX
         String AC = UNINITIALZED; // e.g., AC   PS00001;, the PROSITE PATTERN CODE
         String DE = UNINITIALZED; // e.g., DE   N-glycosylation site.
-        StringBuffer PA = new StringBuffer(); // e.g., PA   N-{P}-[ST]-{P}.
+        StringBuilder PA = new StringBuilder(); // e.g., PA   N-{P}-[ST]-{P}.
         // we skip some other elements for now that are not needed for our purposes.
         // Note that the "payload" of each line starts at the sixth character
         // PA can be multi line
