@@ -27,5 +27,7 @@ public interface Visualizable {
 
    List<List<String>> getIsoformTableData();
 
+   List<List<String>> getPrositeModuleLinks(Map<String, String> prositeIdToName);
+
 
 }

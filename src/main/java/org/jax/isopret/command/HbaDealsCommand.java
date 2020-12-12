@@ -38,8 +38,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String goOboFile = "data/go.obo";
     @CommandLine.Option(names={"-a","--gaf"}, description ="goa_human.gaf.gz file")
     private String goGafFile = "data/goa_human.gaf";
-    @CommandLine.Option(names = {"-j", "--jannovar"}, required = true, description = "Path to Jannovar transcript file")
-    private String jannovarPath;
+    @CommandLine.Option(names = {"-j", "--jannovar"}, description = "Path to Jannovar transcript file")
+    private String jannovarPath = "data/hg38_ensembl.ser";
 
 
     private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();

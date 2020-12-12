@@ -5,6 +5,8 @@ functions that are affected by differential alternative splicing.  Isopret is in
 right now...
 
 ## Prerequisites
+
+### variant-api
 We will use the Variant-api from Exomiser to work with the transcript data
 Please install the library locally (later, it will go into maven central)
 ```
@@ -13,6 +15,21 @@ cd variant-api
 git fetch origin
 git checkout -b coordinate-systemed-region origin/coordinate-systemed-region
 mvn install
+```
+
+### Jannovar
+We will require the [Jannovar](https://github.com/charite/jannovar) transcript file for hg38.
+The ``download`` command downloads hg38_refseq_curated.ser 
+from [Zenodo](https://zenodo.org/record/4311513). If desired, you can create your own 
+transcript file as follows (Note: there are some difficulties with Jannovar right now,
+so it is probably easier to add a number of transcript files to Jannovar):
+
+
+```
+git clone https://github.com/charite/jannovar
+cd jannovar
+mvn package
+java -jar jannovar-cli/target/jannovar-cli-0.35-SNAPSHOT.jar download -d hg38/ensembl
 ```
 
 
@@ -40,16 +57,6 @@ Commands:
 ```
 
 
-## Webservice
-
-We are trying to get the tool to query the Ensembl biomart web service.
-To run the code, enter this
-
-```
-$ java -jar target/isopret.jar biomart
-```
-
-
 ## Download
 
 isopret requires several files to run (NOTE--everything is being refactored, but this command works now). It will download these files and copy them
@@ -65,5 +72,16 @@ java -jar target/isopret.jar download
 After setting up the app and downloading the files, prositometry can be run with an HBA-DEALS output file that
 includes transcript IDs.
 ```
-java -jar target/isopret.jar hbadeals --hbadeals <path-to-hbadeals-file>
+java -jar target/isopret.jar hbadeals 
+-b
+<path to HBADEALS output file>
+-j
+hg38_ensembl.ser
+--prositemap
+all_prosite_motifs.txt
 ```
+
+To get these files not the following
+
+1. HBADEALS output -- please use with format that includes the ENSEMBL id in the first column (gene accession number).
+2. hg38_ensembl.ser -- this is the [Jannovar](https://github.com/charite/jannovar) transcript file.

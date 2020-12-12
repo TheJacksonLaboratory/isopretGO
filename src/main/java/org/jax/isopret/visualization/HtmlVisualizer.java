@@ -13,6 +13,15 @@ public class HtmlVisualizer implements Visualizer {
         this.prositeIdToName = prositeIdToName;
     }
 
+
+    private final static String PROSITE_TABLE_HEADER = "<table>\n" +
+            "  <thead>\n" +
+            "    <tr>\n" +
+            "      <th>Prosite id</th>\n" +
+            "      <th>Name</th>\n" +
+            "    </tr>\n" +
+            "  </thead>\n";
+
     public String getGeneBox(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
         sb.append("<p>").append(vis.getGeneSymbol()).append("</p>\n");
@@ -21,6 +30,20 @@ public class HtmlVisualizer implements Visualizer {
         sb.append("<p>").append(a).append("</p>\n");
         sb.append(String.format("<p>Fold change: %.2f (log fold change: %.2f)</p>\n", vis.getExpressionFoldChange(), vis.getExpressionLogFoldChange()));
         sb.append("<p>P-value: ").append(vis.getExpressionPval()).append("</p>\n");
+        List<List<String>> prositeLinks = vis.getPrositeModuleLinks(this.prositeIdToName);
+        if (prositeLinks.isEmpty()) {
+            return sb.toString();
+        }
+        sb.append(PROSITE_TABLE_HEADER);
+        for (var row : prositeLinks) {
+            if (row.size() != 2) {
+                // should never happen!
+                throw new IsopretRuntimeException("Malformed prosite row: " + row);
+            }
+            sb.append("<tr><td>").append(row.get(0)).append("</td>");
+            sb.append("<td>").append(row.get(1)).append("</td></tr>\n");
+        }
+        sb.append("</table>\n");
         return sb.toString();
     }
 

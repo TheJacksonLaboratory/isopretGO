@@ -7,9 +7,8 @@ import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.Contig;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class acts as an interface between the HtmlVisualizer and the analysis results and
@@ -138,5 +137,38 @@ public class EnsemblVisualizable implements Visualizable {
             }
         }
         return rows;
+    }
+
+
+    private String getPrositeHtmlAnchor(String id, String label) {
+        String url = "https://prosite.expasy.org/cgi-bin/prosite/prosite-search-ac?" + id;
+        return "<a href=\"" + url +"\" target=\"__blank\">" + label +"</a>\n";
+    }
+
+
+    @Override
+    public List<List<String>> getPrositeModuleLinks(Map<String, String> prositeIdToName) {
+        var prositeHitMap = this.agene.getPrositeHitMap();
+        SortedMap<String,String> uniqueHitsMap = new TreeMap<>();
+        for (List<PrositeHit> hits : prositeHitMap.values()) {
+            for (PrositeHit hit : hits) {
+                String acc = hit.getAccession();
+                if (prositeIdToName.containsKey(acc)) {
+                    uniqueHitsMap.putIfAbsent(acc, prositeIdToName.get(acc));
+                }
+            }
+        }
+        List<List<String>> prositeLinks = new ArrayList<>();
+        for (var entry : uniqueHitsMap.entrySet()) {
+            String id = entry.getKey();
+            String label = entry.getValue();
+            String anchor = getPrositeHtmlAnchor(id, label);
+            List<String> row = new ArrayList<>();
+            row.add(id);
+           // row.add(label);
+            row.add(anchor);
+            prositeLinks.add(row);
+        }
+        return prositeLinks;
     }
 }
