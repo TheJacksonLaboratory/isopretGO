@@ -89,7 +89,7 @@ public abstract class AbstractSvgGenerator {
         return String.format("<svg width=\"200\" height=\"100\" " +
                 "xmlns=\"http://www.w3.org/2000/svg\" " +
                 "xmlns:svg=\"http://www.w3.org/2000/svg\">\n" +
-                "<!-- Created by SvAnna -->\n" +
+                "<!-- Created by Isopret -->\n" +
                 "<g><text x=\"10\" y=\"10\">%s</text>\n</g>\n" +
                 "</svg>\n", msg);
     }

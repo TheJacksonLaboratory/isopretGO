@@ -1,14 +1,9 @@
 package org.jax.isopret.command;
 
-import de.charite.compbio.jannovar.reference.TranscriptModel;
-import org.jax.isopret.ensembl.EnsemblCdnaParser;
-import org.jax.isopret.ensembl.EnsemblGene;
 import org.jax.isopret.go.GoParser;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
-import org.jax.isopret.html.HtmlGene;
 import org.jax.isopret.html.HtmlTemplate;
-import org.jax.isopret.prosite.PrositeComparator;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
@@ -16,9 +11,8 @@ import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.GenomicAssemblyProvider;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
-import org.jax.isopret.visualization.HrmlVisualizable;
+import org.jax.isopret.visualization.EnsemblVisualizable;
 import org.jax.isopret.visualization.HtmlVisualizer;
-import org.jax.isopret.visualization.Visualizer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.variant.api.GenomicAssembly;
@@ -74,12 +68,13 @@ public class HbaDealsCommand implements Callable<Integer> {
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
         PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
         Map<String, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
+        Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
         List<String> visualizations = new ArrayList<>();
-        HtmlVisualizer visualizer = new HtmlVisualizer();
+        HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
         for (var entry : hbaDealsResults.entrySet()) {
             String geneSymbol = entry.getKey();
             hbadeals++;
@@ -97,15 +92,21 @@ public class HbaDealsCommand implements Callable<Integer> {
            // String geneID = transcripts.stream().map(TranscriptModel)
 
             Map<String, PrositeMapping> transcriptToHitMap = EMPTY_PROSITE_MAP;
-            if (! prositeMappingMap.containsKey(geneSymbol)) {
+            //Map<String, List<PrositeHit>>
+            final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
+            Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
+            if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
                 System.err.printf("[WARN] Could not identify prosite Mapping for %s.\n", geneSymbol);
-                continue;
+                prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
+            } else {
+                PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
+                prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
+                foundProsite++;
             }
-            foundProsite++;
-            PrositeMapping pmapping = prositeMappingMap.get(result.);
-            AnnotatedGene agene = new AnnotatedGene(transcripts, pmapping.getTranscriptToPrositeListMap(), result);
+
+            AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
             System.out.printf("[INFO] processing %s: ", geneSymbol);
-            visualizations.add(visualizer.getHtml(new HrmlVisualizable(agene)));
+            visualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene)));
         }
         Map<String, Object> data = new HashMap<>();
         data.put("genelist", visualizations);

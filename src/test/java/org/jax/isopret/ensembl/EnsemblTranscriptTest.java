@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EnsemblTranscriptTest {
 
-    private static String header = "ENST00000474740.1 cdna chromosome:GRCh38:18:9126627:9134295:1 gene:ENSG00000178127.13 gene_biotype:protein_coding transcript_biotype:processed_transcript gene_symbol:NDUFV2 description:NADH:ubiquinone oxidoreductase core subunit V2 [Source:HGNC Symbol;Acc:HGNC:7717]";
-    private static String seq = "ACGT";
-    private static EnsemblTranscript ndufv2 = new EnsemblTranscript(header, seq);
+    private static final String header = "ENST00000474740.1 cdna chromosome:GRCh38:18:9126627:9134295:1 gene:ENSG00000178127.13 gene_biotype:protein_coding transcript_biotype:processed_transcript gene_symbol:NDUFV2 description:NADH:ubiquinone oxidoreductase core subunit V2 [Source:HGNC Symbol;Acc:HGNC:7717]";
+    private static final String seq = "ACGT";
+    private static final EnsemblTranscript ndufv2 = new EnsemblTranscript(header, seq);
 
     @Test
     public void testNDUFV2() {

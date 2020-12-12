@@ -14,7 +14,7 @@ import java.util.zip.GZIPInputStream;
 public class EnsemblCdnaParser {
 
     private final String ensemblCdnaPath;
-    private Map<String, EnsemblGene> i2dGeneMap;
+    private final Map<String, EnsemblGene> i2dGeneMap;
 
     public EnsemblCdnaParser(String path) {
         this.ensemblCdnaPath = path;

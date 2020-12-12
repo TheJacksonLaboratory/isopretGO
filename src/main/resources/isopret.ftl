@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>svann: Structural Variant Annotator</title>
+  <title>Isopret: Isoform interpretation</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -397,7 +397,7 @@ a.svg:hover, a.svg:active {
         <#list genelist as gene>
         <section>
               <article>
-              ${gene?no_esc}
+              ${gene}
              </article>
              </section>
         </#list>
@@ -415,7 +415,7 @@ a.svg:hover, a.svg:active {
       <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
   </main>
   <footer>
-    <p>SvAnn &copy; 2020</p>
+    <p>Isopret &copy; 2021</p>
   </footer>
 
   <script>

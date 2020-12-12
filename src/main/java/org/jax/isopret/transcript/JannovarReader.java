@@ -37,9 +37,7 @@ public class JannovarReader {
                 symbolToTranscriptListMap.put(symbol, new ArrayList<>());
                 for (TranscriptModel tmod : mp.get(symbol)) {
                     Optional<Transcript> opt = jmapper.remap(tmod);
-                    if (opt.isPresent()) {
-                        symbolToTranscriptListMap.get(symbol).add(opt.get());
-                    }
+                    opt.ifPresent(transcript -> symbolToTranscriptListMap.get(symbol).add(transcript));
                 }
             }
         } catch (SerializationException e) {

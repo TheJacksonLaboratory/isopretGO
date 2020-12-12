@@ -5,7 +5,7 @@ package org.jax.isopret.webserviceclient;
  */
 public class BiomartViaCurl {
 
-    private static String exampleRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+    private static final String exampleRequest = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<!DOCTYPE Query>\n" +
             "<Query  virtualSchemaName = \"default\" formatter = \"TSV\" header = \"0\" uniqueRows = \"0\" count = \"\" datasetConfigVersion = \"0.6\" >\n" +
             "\t\t\t\n" +
