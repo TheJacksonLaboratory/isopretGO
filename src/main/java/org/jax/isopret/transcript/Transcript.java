@@ -142,8 +142,7 @@ public class Transcript extends PreciseGenomicRegion {
             // should never happen
             throw new IsopretRuntimeException("Invalid amino acid length determined for " + t.accessionId() +": " + cdsNtCount);
         } else {
-            int aalen = cdsNtCount / 3 - 1; // remove 1 essentially to get rid of the 3 nt of the stop codon
-            return aalen;
+            return cdsNtCount / 3 - 1;
         }
     }
 

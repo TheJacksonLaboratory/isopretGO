@@ -3,7 +3,6 @@ package org.jax.isopret.transcript;
 import org.jax.isopret.TestBase;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 

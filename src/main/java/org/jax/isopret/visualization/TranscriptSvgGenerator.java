@@ -278,7 +278,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private void writeFoldChange(String id, int ypos, Writer writer) throws IOException {
         double fc = getLogFoldChage(id);
         double startpos = translateGenomicToSvg(this.genomicMaxPos) + 25.0;
-        double y = (double)ypos;
+        double y = ypos;
         writer.write(String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\"/>\n",
                 startpos, y, startpos+30, y));
         double width = 20.0;
