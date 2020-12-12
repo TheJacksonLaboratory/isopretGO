@@ -70,13 +70,11 @@ java -jar target/isopret.jar download
 ## HBA-DEALS
 
 After setting up the app and downloading the files, prositometry can be run with an HBA-DEALS output file that
-includes transcript IDs.
+includes transcript IDs. Additional options are available (TODO).
 ```
 java -jar target/isopret.jar hbadeals 
 -b
 <path to HBADEALS output file>
--j
-hg38_ensembl.ser
 --prositemap
 all_prosite_motifs.txt
 ```
