@@ -47,7 +47,7 @@ public class HtmlVisualizer implements Visualizer {
         return sb.toString();
     }
 
-    private final static String HTML_TABLE_HEADER = "<table>\n" +
+    private final static String ISOFORM_TABLE_HEADER = "<table>\n" +
             "  <thead>\n" +
             "    <tr>\n" +
             "      <th>Isoform</th>\n" +
@@ -63,7 +63,11 @@ public class HtmlVisualizer implements Visualizer {
         if (tableData.isEmpty()) {
             return "<p>No isoform data found.</p>\n";
         }
-        sb.append(HTML_TABLE_HEADER);
+        int totalIsoforms = vis.getTotalTranscriptCount();
+        int expressionIsoforms = vis.getExpressedTranscriptCount();
+        sb.append("<p>").append(expressionIsoforms).append(" transcripts were expressed in the data from ")
+                .append(totalIsoforms).append(" annotated transcripts.</p>\n");
+        sb.append(ISOFORM_TABLE_HEADER);
         for (var row : tableData) {
             if (row.size() != 4) {
                 // should never happen!

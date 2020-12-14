@@ -13,6 +13,10 @@ public interface Visualizable {
 
     String getChromosome();
 
+    int getExpressedTranscriptCount();
+
+    int getTotalTranscriptCount();
+
     double getExpressionPval();
 
     double getExpressionFoldChange();
