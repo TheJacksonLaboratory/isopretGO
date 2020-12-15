@@ -63,6 +63,16 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
+    public int getTotalTranscriptCount() {
+        return this.totalTranscriptCount;
+    }
+
+    @Override
+    public int getExpressedTranscriptCount() {
+        return this.expressedTranscripts.size();
+    }
+
+    @Override
     public String getGeneUrl() {
         return getEnsemblUrl(getGeneAccession());
     }
