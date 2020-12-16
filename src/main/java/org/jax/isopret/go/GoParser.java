@@ -1,5 +1,7 @@
 package org.jax.isopret.go;
 
+import org.monarchinitiative.phenol.analysis.AssociationContainer;
+import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.annotations.formats.go.GoGaf21Annotation;
 import org.monarchinitiative.phenol.annotations.obo.go.GoGeneAnnotationParser;
 import org.monarchinitiative.phenol.io.OntologyLoader;
@@ -15,26 +17,19 @@ import java.util.Map;
 public class GoParser {
 
     private final Ontology ontology;
-    private final Map<String, List<TermId>> annotationMap;
+    GoAssociationContainer associationContainer;
 
     public GoParser(String obo, String gaf) {
         System.out.println("go.obo: " + obo);
         this.ontology = OntologyLoader.loadOntology(new File(obo));
-        Map<String, List<TermId>> annotmap = new HashMap<>();
-        List<GoGaf21Annotation> annotations = GoGeneAnnotationParser.loadAnnotations(gaf);
-        for (GoGaf21Annotation a : annotations) {
-            String symbol = a.getDbObjectSymbol();
-            annotmap.putIfAbsent(symbol, new ArrayList<>());
-            annotmap.get(symbol).add(a.getGoId());
-        }
-        annotationMap = Map.copyOf(annotmap);
+        this.associationContainer = GoAssociationContainer.loadGoGafAssociationContainer(new File(gaf), this.ontology);
     }
 
     public Ontology getOntology() {
         return ontology;
     }
 
-    public Map<String, List<TermId>> getAnnotationMap() {
-        return annotationMap;
+    public GoAssociationContainer getAssociationContainer() {
+        return associationContainer;
     }
 }

@@ -13,6 +13,7 @@ import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
 import org.jax.isopret.visualization.EnsemblVisualizable;
 import org.jax.isopret.visualization.HtmlVisualizer;
+import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.variant.api.GenomicAssembly;
@@ -48,13 +49,6 @@ public class HbaDealsCommand implements Callable<Integer> {
 
     }
 
-    private void initializeGO() {
-        GoParser goParser = new GoParser(goOboFile, goGafFile);
-        final Ontology ontology = goParser.getOntology();
-        final Map<String, List<TermId>> annotationMap = goParser.getAnnotationMap();
-        System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
-        System.out.printf("[INFO] We got %d term to annotation list mappings\n",annotationMap.size());
-    }
 
     @Override
     public Integer call() {
@@ -62,6 +56,12 @@ public class HbaDealsCommand implements Callable<Integer> {
         int hbadealSig = 0;
         int foundTranscripts = 0;
         int foundProsite = 0;
+
+        GoParser goParser = new GoParser(goOboFile, goGafFile);
+        final Ontology ontology = goParser.getOntology();
+        final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
+        System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
+        System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
 
         GenomicAssembly hg38 =  GenomicAssemblyProvider.hg38();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
