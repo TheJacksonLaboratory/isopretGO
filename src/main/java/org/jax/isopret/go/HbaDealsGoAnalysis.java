@@ -53,7 +53,7 @@ public class HbaDealsGoAnalysis {
 
     }
 
-   List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
+   public List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
                 this.goAssociationContainer,
                 this.population,
@@ -65,7 +65,7 @@ public class HbaDealsGoAnalysis {
                 .collect(Collectors.toList());
     }
 
-    List<GoTerm2PValAndCounts> dasOverrepresetationAnalysis() {
+    public List<GoTerm2PValAndCounts> dasOverrepresetationAnalysis() {
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
                 this.goAssociationContainer,
                 this.population,
