@@ -16,7 +16,7 @@ public class AnnotatedGene {
     /** All annotated transcripts of some gene that were expressed according to HBA deals */
     private final List<Transcript> expressedTranscripts;
 
-    Map<String, List<PrositeHit>> transcriptToHitMap;
+    private final Map<String, List<PrositeHit>> transcriptToHitMap;
 
     private final HbaDealsResult hbaDealsResult;
 
