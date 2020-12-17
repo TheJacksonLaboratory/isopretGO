@@ -1,5 +1,6 @@
 package org.jax.isopret.command;
 
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.GoParser;
 import org.jax.isopret.go.HbaDealsGoAnalysis;
 import org.jax.isopret.hbadeals.HbaDealsParser;
@@ -19,6 +20,7 @@ import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -80,7 +82,9 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
-        List<String> visualizations = new ArrayList<>();
+        List<String> dasAndDgeVisualizations = new ArrayList<>();
+        List<String> dasVisualizations = new ArrayList<>();
+        List<String> dgeVisualizations = new ArrayList<>();
         HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
         for (var entry : hbaDealsResults.entrySet()) {
             String geneSymbol = entry.getKey();
@@ -96,7 +100,7 @@ public class HbaDealsCommand implements Callable<Integer> {
             }
             hbadealSig++;
             List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
-           // String geneID = transcripts.stream().map(TranscriptModel)
+
 
             Map<String, PrositeMapping> transcriptToHitMap = EMPTY_PROSITE_MAP;
             //Map<String, List<PrositeHit>>
@@ -113,10 +117,21 @@ public class HbaDealsCommand implements Callable<Integer> {
 
             AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
             System.out.printf("[INFO] processing %s: ", geneSymbol);
-            visualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene)));
+            if (result.isDASandDGE()) {
+                dasAndDgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene)));
+            } else if (result.isDAS()) {
+                dasVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene)));
+            } else if (result.isDGE()) {
+                dgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene)));
+            } else {
+                // should never get here, sanity check
+                throw new IsopretRuntimeException("Neither DAS, nor DGE, not DAS/DGE, nor non-significant");
+            }
         }
         Map<String, Object> data = new HashMap<>();
-        data.put("genelist", visualizations);
+        data.put("dgedaslist", dasAndDgeVisualizations);
+        data.put("daslist", dasVisualizations);
+        data.put("dgelist", dgeVisualizations);
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();
         for (var v : dgeGoTerms) {
@@ -132,6 +147,8 @@ public class HbaDealsCommand implements Callable<Integer> {
         String dasTable = htmlGoVisualizer.getHtml();
         data.put("dgeTable", dgeTable);
         data.put("dasTable", dasTable);
+        File f = new File(hbadealsFile);
+        data.put("hbadealsFile", f.getName());
 
 
         HtmlTemplate template = new HtmlTemplate(data);

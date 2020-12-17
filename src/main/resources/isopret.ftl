@@ -378,7 +378,10 @@ a.svg:hover, a.svg:active {
       <div id="navi">
           <ul>
               <li><a href="#sample">Sample</a></li>
-              <li><a href="#diff">Differential diagnosis</a></li>
+              <li><a href="#go">GO analysis</a></li>
+              <li><a href="#dasdge">DAS/DGE</a></li>
+              <li><a href="#das">DAS</a></li>
+              <li><a href="#dge">DGE</a></li>
               <li><a href="#about">About</a></li>
           </ul>
       </div>
@@ -388,7 +391,7 @@ a.svg:hover, a.svg:active {
       <a name="sample"></a>
         <article>
         <p>Isopret -- Isoform interpretation.</p>
-        <p>Add some text here.</p>
+        <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
       </article>
   </section>
 
@@ -403,15 +406,37 @@ a.svg:hover, a.svg:active {
         </article>
     </section>
 
-
-
-        <#list genelist as gene>
-        <section>
+    <section>
+        <a name="dasdge"></a>
+        <h1>Genes displaying both differential expression and differential alternative splicing (DAS/DGE)</h1>
+        <#list dgedaslist as gene>
               <article>
               ${gene}
              </article>
-             </section>
         </#list>
+    </section>
+
+        <section>
+            <a name="das"></a>
+            <h1>Genes displaying differential alternative splicing (DAS)</h1>
+            <#list daslist as gene>
+                  <article>
+                  ${gene}
+                 </article>
+            </#list>
+        </section>
+
+
+
+           <section>
+               <a name="dge"></a>
+               <h1>Genes displaying differential expression (DGE)</h1>
+               <#list dgelist as gene>
+                     <article>
+                     ${gene}
+                    </article>
+               </#list>
+           </section>
 
 
       <section>
@@ -419,8 +444,6 @@ a.svg:hover, a.svg:active {
         <article>
           <h2>About</h2>
             <p>Isopret TODO some text.</p>
-
-
         </article>
       </section>
       <span id="tooltip" display="none" style="position: absolute; display: none;"></span>

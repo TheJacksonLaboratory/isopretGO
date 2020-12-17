@@ -90,4 +90,17 @@ public class HbaDealsResult {
                 .min(Double::compareTo)
                 .orElse(1.0);
     }
+
+
+    public boolean isDAS() {
+        return hasaSignificantSplicingResult() && (! hasSignificantExpressionResult());
+    }
+
+    public boolean isDGE() {
+        return  hasSignificantExpressionResult() && (! hasaSignificantSplicingResult());
+    }
+
+    public boolean isDASandDGE() {
+        return hasaSignificantSplicingResult() && hasSignificantExpressionResult();
+    }
 }
