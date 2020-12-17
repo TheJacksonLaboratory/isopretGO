@@ -5,6 +5,7 @@ import org.jax.isopret.go.HbaDealsGoAnalysis;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -17,13 +18,14 @@ import java.util.Map;
 /**
  *
  */
+@Disabled
 public class HbaDealsGoAnalysisTest {
 
     private static Map<String, HbaDealsResult> hbaDealsResultMap;
 
     @BeforeAll
     private static void  init() {
-        String path = "/home/peter/Downloads/mason_with_ensembl.txt";
+        String path = "/home/peter/Downloads/mason_with_ensembl2.txt";
         HbaDealsParser parser = new HbaDealsParser(path);
         hbaDealsResultMap = parser.getHbaDealsResultMap();
     }
