@@ -130,8 +130,11 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
         Map<String, Object> data = new HashMap<>();
         data.put("dgedaslist", dasAndDgeVisualizations);
+        data.put("n_dgedas", dasAndDgeVisualizations.size());
         data.put("daslist", dasVisualizations);
+        data.put("n_das", dasVisualizations.size());
         data.put("dgelist", dgeVisualizations);
+        data.put("n_dge", dgeVisualizations.size());
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();
         for (var v : dgeGoTerms) {
@@ -146,7 +149,9 @@ public class HbaDealsCommand implements Callable<Integer> {
         htmlGoVisualizer = new HtmlGoVisualizer(govis);
         String dasTable = htmlGoVisualizer.getHtml();
         data.put("dgeTable", dgeTable);
+
         data.put("dasTable", dasTable);
+
         File f = new File(hbadealsFile);
         data.put("hbadealsFile", f.getName());
 

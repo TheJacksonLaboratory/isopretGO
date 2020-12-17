@@ -409,6 +409,8 @@ a.svg:hover, a.svg:active {
     <section>
         <a name="dasdge"></a>
         <h1>Genes displaying both differential expression and differential alternative splicing (DAS/DGE)</h1>
+        <p>A total of ${n_dgedas} out of ${populationCount} genes in the population showed both differential alternative splicing (DAS) and
+        differential gene expression (DGE).</p>
         <#list dgedaslist as gene>
               <article>
               ${gene}
@@ -419,6 +421,7 @@ a.svg:hover, a.svg:active {
         <section>
             <a name="das"></a>
             <h1>Genes displaying differential alternative splicing (DAS)</h1>
+             <p>A total of ${n_das} out of ${populationCount} genes in the population showed differential alternative splicing (DAS).</p>
             <#list daslist as gene>
                   <article>
                   ${gene}
@@ -431,6 +434,7 @@ a.svg:hover, a.svg:active {
            <section>
                <a name="dge"></a>
                <h1>Genes displaying differential expression (DGE)</h1>
+                <p>A total of ${n_dge} out of ${populationCount} genes in the population showed  differential gene expression (DGE).</pb>
                <#list dgelist as gene>
                      <article>
                      ${gene}
