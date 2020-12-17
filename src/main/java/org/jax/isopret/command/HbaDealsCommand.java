@@ -1,6 +1,7 @@
 package org.jax.isopret.command;
 
 import org.jax.isopret.go.GoParser;
+import org.jax.isopret.go.HbaDealsGoAnalysis;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.html.HtmlTemplate;
@@ -11,11 +12,10 @@ import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.GenomicAssemblyProvider;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
-import org.jax.isopret.visualization.EnsemblVisualizable;
-import org.jax.isopret.visualization.HtmlVisualizer;
+import org.jax.isopret.visualization.*;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 import picocli.CommandLine;
 
@@ -63,6 +63,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
         System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
 
+
         GenomicAssembly hg38 =  GenomicAssemblyProvider.hg38();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
@@ -71,6 +72,12 @@ public class HbaDealsCommand implements Callable<Integer> {
         Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+
+        HbaDealsGoAnalysis hbago = new HbaDealsGoAnalysis(hbaDealsResults, ontology, goAssociationContainer);
+        int populationSize = hbago.populationCount();
+        List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
+        List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dasOverrepresetationAnalysis();
+
         System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
         List<String> visualizations = new ArrayList<>();
@@ -110,6 +117,21 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
         Map<String, Object> data = new HashMap<>();
         data.put("genelist", visualizations);
+        data.put("populationCount", populationSize);
+        List<GoVisualizable> govis = new ArrayList<>();
+        for (var v : dgeGoTerms) {
+            govis.add(new HtmlGoVisualizable(v, ontology));
+        }
+        HtmlGoVisualizer htmlGoVisualizer = new HtmlGoVisualizer(govis);
+        String dgeTable = htmlGoVisualizer.getHtml();
+        govis.clear();
+        for (var v : dasGoTerms) {
+            govis.add(new HtmlGoVisualizable(v, ontology));
+        }
+        htmlGoVisualizer = new HtmlGoVisualizer(govis);
+        String dasTable = htmlGoVisualizer.getHtml();
+        data.put("dgeTable", dgeTable);
+        data.put("dasTable", dasTable);
 
 
         HtmlTemplate template = new HtmlTemplate(data);

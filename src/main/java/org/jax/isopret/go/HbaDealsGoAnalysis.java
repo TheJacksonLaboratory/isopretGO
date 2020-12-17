@@ -50,12 +50,10 @@ public class HbaDealsGoAnalysis {
         this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge", ontology);
         this.das = associationContainer.fromGeneSymbols(dasGenes, "das", ontology);
         this.population = associationContainer.fromGeneSymbols(population, "population", ontology);
-
     }
 
    public List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
-                this.goAssociationContainer,
                 this.population,
                 this.dge,
                 new Bonferroni());
@@ -67,7 +65,6 @@ public class HbaDealsGoAnalysis {
 
     public List<GoTerm2PValAndCounts> dasOverrepresetationAnalysis() {
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
-                this.goAssociationContainer,
                 this.population,
                 this.dge,
                 new Bonferroni());
@@ -75,6 +72,10 @@ public class HbaDealsGoAnalysis {
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
                 .collect(Collectors.toList());
+    }
+
+    public int populationCount() {
+        return this.population.getAnnotatedItemCount();
     }
 
 

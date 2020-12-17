@@ -6,7 +6,6 @@ import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -39,8 +38,15 @@ public class HbaDealsGoAnalysisTest {
         HbaDealsGoAnalysis goAnalysis = new HbaDealsGoAnalysis(hbaDealsResultMap,ontology, associationContainer);
         List<GoTerm2PValAndCounts> dge = goAnalysis.dgeOverrepresetationAnalysis();
         for (var g : dge) {
-            System.out.println(g);
+            TermId termId = g.getItem();
+            String label = "n/a";
+            if (ontology.getTermMap().containsKey(termId)) {
+                label = ontology.getTermMap().get(termId).getName();
+            }
+            System.out.println(label +": " + g);
         }
     }
+
+
 
 }

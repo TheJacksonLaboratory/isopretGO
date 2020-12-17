@@ -8,7 +8,6 @@ import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.Contig;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class acts as an interface between the HtmlVisualizer and the analysis results and

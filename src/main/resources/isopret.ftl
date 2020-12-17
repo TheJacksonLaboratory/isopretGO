@@ -392,6 +392,17 @@ a.svg:hover, a.svg:active {
       </article>
   </section>
 
+  <section>
+        <a name="go"></a>
+          <article>
+          <h2>Gene Ontology Overrepresentation Analysis.</h2>
+          <h4>Differentially expressed genes.</h4>
+          ${dgeTable}
+           <h4>Differentially spliced genes.</h4>
+           ${dasTable}
+        </article>
+    </section>
+
 
 
         <#list genelist as gene>
