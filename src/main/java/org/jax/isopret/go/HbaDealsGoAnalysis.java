@@ -29,8 +29,7 @@ public class HbaDealsGoAnalysis {
 
     public HbaDealsGoAnalysis(Map<String, HbaDealsResult> hbaDealsResultMap,
                               Ontology ontology,
-                              GoAssociationContainer associationContainer
-                              ) {
+                              GoAssociationContainer associationContainer) {
         this.ontology = ontology;
         this.goAssociationContainer = associationContainer;
 
