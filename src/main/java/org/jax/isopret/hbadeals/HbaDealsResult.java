@@ -10,7 +10,6 @@ public class HbaDealsResult {
     private final String symbol;
     private double expressionFoldChange;
     private double expressionP;
-    private double correctedPval;
     private final Map<String, HbaDealsTranscriptResult> transcriptMap;
 
 
@@ -20,20 +19,19 @@ public class HbaDealsResult {
         transcriptMap = new HashMap<>();
     }
 
-    public void addExpressionResult(double fc, double p, double corrP) {
+    public void addExpressionResult(double fc, double p) {
         this.expressionFoldChange = fc;
         this.expressionP = p;
-        this.correctedPval = corrP;
         hasExpressionResult = true;
     }
 
-    public void addTranscriptResult(String isoform, double expFC, double P, double corrP) {
+    public void addTranscriptResult(String isoform, double expFC, double P) {
         int i = isoform.indexOf(".");
         if (i>0) {
             // remove version
             isoform = isoform.substring(0,i);
         }
-        HbaDealsTranscriptResult tresult = new HbaDealsTranscriptResult(isoform, expFC, P, corrP);
+        HbaDealsTranscriptResult tresult = new HbaDealsTranscriptResult(isoform, expFC, P);
         transcriptMap.putIfAbsent(isoform, tresult);
     }
 
@@ -53,16 +51,14 @@ public class HbaDealsResult {
         return expressionP;
     }
 
-    public double getCorrectedPval() {
-        return correctedPval;
-    }
+
 
     public Map<String, HbaDealsTranscriptResult> getTranscriptMap() {
         return transcriptMap;
     }
 
     public boolean hasSignificantResult() {
-        if (this.correctedPval <= 0.05) {
+        if (this.expressionP <= 0.05) {
             return true;
         }
         return this.transcriptMap
@@ -72,7 +68,7 @@ public class HbaDealsResult {
     }
 
     public boolean hasSignificantExpressionResult() {
-        return this.correctedPval < 0.05;
+        return this.expressionP < 0.05;
     }
 
     public boolean hasaSignificantSplicingResult() {
@@ -86,7 +82,7 @@ public class HbaDealsResult {
         return this.transcriptMap
                 .values()
                 .stream()
-                .map(HbaDealsTranscriptResult::getCorrectedP)
+                .map(HbaDealsTranscriptResult::getP)
                 .min(Double::compareTo)
                 .orElse(1.0);
     }

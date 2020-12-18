@@ -122,9 +122,8 @@ public class EnsemblVisualizable implements Visualizable {
     private List<String> getIsoformRow(HbaDealsTranscriptResult transcriptResult) {
         List<String> row = new ArrayList<>();
         row.add(getHtmlAnchor(transcriptResult.getTranscript()));
-        row.add(String.valueOf(transcriptResult.getFoldChange()));
+        row.add(String.format("%.3f",transcriptResult.getLog2FoldChange()));
         row.add(String.valueOf(transcriptResult.getP()));
-        row.add(String.valueOf(transcriptResult.getCorrectedP()));
         return row;
     }
 

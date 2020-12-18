@@ -4,13 +4,12 @@ public class HbaDealsTranscriptResult {
     private final String transcript;
     private final double foldChange;
     private final double P;
-    private final double correctedP;
 
-    public HbaDealsTranscriptResult(String transcript, double fc, double p, double correctedP) {
+
+    public HbaDealsTranscriptResult(String transcript, double fc, double p) {
         this.transcript = transcript;
         this.foldChange = fc;
         this.P = p;
-        this.correctedP = correctedP;
     }
 
 
@@ -22,15 +21,16 @@ public class HbaDealsTranscriptResult {
         return foldChange;
     }
 
+    public double getLog2FoldChange() {
+        if (foldChange == 0.0) return foldChange;
+        return Math.log(foldChange)/Math.log(2.0);
+    }
+
     public double getP() {
         return P;
     }
 
-    public double getCorrectedP() {
-        return correctedP;
-    }
-
     public boolean isSignificant() {
-        return correctedP <= 0.05;
+        return P <= 0.05;
     }
 }

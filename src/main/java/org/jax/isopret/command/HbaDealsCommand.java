@@ -140,13 +140,13 @@ public class HbaDealsCommand implements Callable<Integer> {
         for (var v : dgeGoTerms) {
             govis.add(new HtmlGoVisualizable(v, ontology));
         }
-        HtmlGoVisualizer htmlGoVisualizer = new HtmlGoVisualizer(govis);
+        HtmlGoVisualizer htmlGoVisualizer = new HtmlGoVisualizer(govis, "dgego-table");
         String dgeTable = htmlGoVisualizer.getHtml();
         govis.clear();
         for (var v : dasGoTerms) {
             govis.add(new HtmlGoVisualizable(v, ontology));
         }
-        htmlGoVisualizer = new HtmlGoVisualizer(govis);
+        htmlGoVisualizer = new HtmlGoVisualizer(govis, "dasgo-table");
         String dasTable = htmlGoVisualizer.getHtml();
         data.put("dgeTable", dgeTable);
 

@@ -30,6 +30,13 @@ public class HtmlVisualizer implements Visualizer {
         sb.append("<p>").append(a).append("</p>\n");
         sb.append(String.format("<p>Fold change: %.2f (log fold change: %.2f)</p>\n", vis.getExpressionFoldChange(), vis.getExpressionLogFoldChange()));
         sb.append("<p>P-value: ").append(vis.getExpressionPval()).append("</p>\n");
+
+        return sb.toString();
+    }
+
+
+    public String getPrositeBox(Visualizable vis) {
+        StringBuilder sb = new StringBuilder();
         List<List<String>> prositeLinks = vis.getPrositeModuleLinks(this.prositeIdToName);
         if (prositeLinks.isEmpty()) {
             return sb.toString();
@@ -53,11 +60,11 @@ public class HtmlVisualizer implements Visualizer {
             "      <th>Isoform</th>\n" +
             "      <th>Log<sub>2</sub> fold change</th>\n" +
             "      <th>P-value</th>\n" +
-            "      <th>Corrected P-value</th>\n" +
             "    </tr>\n" +
             "  </thead>\n";
 
     private String getTranscriptBox(Visualizable vis) {
+        final int EXPECTED_N_COLUMNS = 3;
         StringBuilder sb = new StringBuilder();
         List<List<String>> tableData = vis.getIsoformTableData();
         if (tableData.isEmpty()) {
@@ -69,14 +76,13 @@ public class HtmlVisualizer implements Visualizer {
                 .append(totalIsoforms).append(" annotated transcripts.</p>\n");
         sb.append(ISOFORM_TABLE_HEADER);
         for (var row : tableData) {
-            if (row.size() != 4) {
+            if (row.size() != EXPECTED_N_COLUMNS) {
                 // should never happen!
                 throw new IsopretRuntimeException("Malformed isoform row: " + row);
             }
             sb.append("<tr><td>").append(row.get(0)).append("</td>");
             sb.append("<td>").append(row.get(1)).append("</td>");
-            sb.append("<td>").append(row.get(2)).append("</td>");
-            sb.append("<td>").append(row.get(3)).append("</td></tr>\n");
+            sb.append("<td>").append(row.get(2)).append("</td></tr>\n");
         }
         sb.append("</table>\n");
         return sb.toString();
@@ -90,6 +96,9 @@ public class HtmlVisualizer implements Visualizer {
         sb.append("<div class=\"column\" style=\"background-color:#F8F8F8;\">\n");
         sb.append("<h2>Gene</h2>\n");
         sb.append(getGeneBox(vis)).append("\n");
+        sb.append("</div>\n");
+        sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
+        sb.append(getPrositeBox(vis)).append("\n");
         sb.append("</div>\n");
         sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
         sb.append("<h2>Transcripts</h2>\n");
