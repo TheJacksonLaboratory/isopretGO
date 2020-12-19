@@ -89,8 +89,7 @@ public class HbaDealsParser {
         }
 
         int N=lines.size();
-        for (int r = 0;r<N;r++) {
-            HbaLine hline = lines.get(r);
+        for (HbaLine hline : lines) {
             this.hbaDealsResultMap.putIfAbsent(hline.symbol, new HbaDealsResult(hline.geneAccession, hline.symbol));
             HbaDealsResult hbaresult = this.hbaDealsResultMap.get(hline.symbol);
             if (hline.isIsoform) {
