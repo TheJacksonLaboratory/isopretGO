@@ -1,6 +1,9 @@
 package org.jax.isopret.command;
 
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.GoParser;
+import org.jax.isopret.go.GoTermIdPlusLabel;
+import org.jax.isopret.go.HbaDealsGoAnalysis;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.html.HtmlTemplate;
@@ -11,15 +14,20 @@ import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.GenomicAssemblyProvider;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
-import org.jax.isopret.visualization.EnsemblVisualizable;
-import org.jax.isopret.visualization.HtmlVisualizer;
+import org.jax.isopret.visualization.*;
+import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @CommandLine.Command(name = "hbadeals", aliases = {"H"},
         mixinStandardHelpOptions = true,
@@ -48,13 +56,6 @@ public class HbaDealsCommand implements Callable<Integer> {
 
     }
 
-    private void initializeGO() {
-        GoParser goParser = new GoParser(goOboFile, goGafFile);
-        final Ontology ontology = goParser.getOntology();
-        final Map<String, List<TermId>> annotationMap = goParser.getAnnotationMap();
-        System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
-        System.out.printf("[INFO] We got %d term to annotation list mappings\n",annotationMap.size());
-    }
 
     @Override
     public Integer call() {
@@ -62,6 +63,13 @@ public class HbaDealsCommand implements Callable<Integer> {
         int hbadealSig = 0;
         int foundTranscripts = 0;
         int foundProsite = 0;
+        Map<String, Object> data = new HashMap<>(); // for the HTML template engine
+        GoParser goParser = new GoParser(goOboFile, goGafFile);
+        final Ontology ontology = goParser.getOntology();
+        final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
+        System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
+        System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
+
 
         GenomicAssembly hg38 =  GenomicAssemblyProvider.hg38();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
@@ -71,9 +79,46 @@ public class HbaDealsCommand implements Callable<Integer> {
         Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+
+        HbaDealsGoAnalysis hbago = HbaDealsGoAnalysis.termForTerm(hbaDealsResults, ontology, goAssociationContainer);
+        int populationSize = hbago.populationCount();
+        List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
+        List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
+        List<GoTerm2PValAndCounts> dasDgeGoTerms = hbago.dasDgeOverrepresetationAnalysis();
+        dasGoTerms.sort(new SortByPvalue());
+        dgeGoTerms.sort(new SortByPvalue());
+        dasDgeGoTerms.sort(new SortByPvalue());
+        // Add differentially expressed genes/GO analysis
+        String dgeTable = getGoHtmlTable(dgeGoTerms, ontology, "dgego-table");
+        data.put("dgeTable", dgeTable);
+        // Same for DAS (note -- in this application, DAS may overlap with DAS/DGE)
+        String dasTable = getGoHtmlTable(dasGoTerms, ontology, "dasgo-table");
+        data.put("dasTable", dasTable);
+        // Same for DAS+DGE
+        String dasDgeTable = getGoHtmlTable(dasDgeGoTerms, ontology, "dasdgego-table");
+        data.put("dasDgeTable", dasDgeTable);
+        // The following sets are used for the HTML output to mark genes
+        // that are annotated to a significant GO term.
+        Predicate<HbaDealsResult> diffExpressed = HbaDealsResult::hasSignificantExpressionResult;
+        Predicate<HbaDealsResult> diffSpliced = HbaDealsResult::hasaSignificantSplicingResult;
+        // Set of all gene symbols for gene with significant expression OR splicing
+        Set<String> significantGeneSymbols = hbaDealsResults
+                .values()
+                .stream()
+                .filter(diffExpressed.or(diffSpliced))
+                .map(HbaDealsResult::getSymbol)
+                .collect(Collectors.toSet());
+        // Set of all enriched GO Terms Ids for significant expression OR splicing
+        Set<TermId> einrichedGoTermIdSet = Stream.concat(dasDgeGoTerms.stream(), dgeGoTerms.stream())
+                .map(GoTerm2PValAndCounts::getItem)
+                .collect(Collectors.toSet());
+        Map<String, List<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
+
         System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
-        List<String> visualizations = new ArrayList<>();
+        List<String> dasAndDgeVisualizations = new ArrayList<>();
+        List<String> dasVisualizations = new ArrayList<>();
+        List<String> dgeVisualizations = new ArrayList<>();
         HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
         for (var entry : hbaDealsResults.entrySet()) {
             String geneSymbol = entry.getKey();
@@ -89,10 +134,7 @@ public class HbaDealsCommand implements Callable<Integer> {
             }
             hbadealSig++;
             List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
-           // String geneID = transcripts.stream().map(TranscriptModel)
 
-            Map<String, PrositeMapping> transcriptToHitMap = EMPTY_PROSITE_MAP;
-            //Map<String, List<PrositeHit>>
             final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
             Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
             if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
@@ -106,10 +148,41 @@ public class HbaDealsCommand implements Callable<Integer> {
 
             AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
             System.out.printf("[INFO] processing %s: ", geneSymbol);
-            visualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene)));
+            if (einrichedGoTermIdSet.contains(geneSymbol)) {
+                System.out.println("[WOW] " + geneSymbol);
+            } else {
+                System.out.println("[MISED] " + geneSymbol);
+            }
+            if (result.isDASandDGE()) {
+                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                dasAndDgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
+            } else if (result.isDAS()) {
+                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                dasVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
+            } else if (result.isDGE()) {
+                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                dgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
+            } else {
+                // should never get here, sanity check
+                throw new IsopretRuntimeException("Neither DAS, nor DGE, not DAS/DGE, nor non-significant");
+            }
         }
-        Map<String, Object> data = new HashMap<>();
-        data.put("genelist", visualizations);
+
+        data.put("dgedaslist", dasAndDgeVisualizations);
+        data.put("n_dgedas", dasAndDgeVisualizations.size());
+        data.put("daslist", dasVisualizations);
+        data.put("n_das", dasVisualizations.size());
+        data.put("dgelist", dgeVisualizations);
+        data.put("n_dge", dgeVisualizations.size());
+        data.put("populationCount", populationSize);
+        List<GoVisualizable> govis = new ArrayList<>();
+        for (var v : dgeGoTerms) {
+            govis.add(new HtmlGoVisualizable(v, ontology));
+        }
+
+        // record source of analysis
+        File f = new File(hbadealsFile);
+        data.put("hbadealsFile", f.getName());
 
 
         HtmlTemplate template = new HtmlTemplate(data);
@@ -119,4 +192,42 @@ public class HbaDealsCommand implements Callable<Integer> {
                 hbadeals, foundTranscripts, hbadealSig, foundProsite);
         return 0;
     }
+
+    /**
+     *
+     * @param goTerms
+     * @param ontology
+     * @param title -- title as it will be used in the JavaScript, e.g., "dgego-table"
+     * @return
+     */
+    private String getGoHtmlTable(List<GoTerm2PValAndCounts> goTerms, Ontology ontology, String title) {
+        List<GoVisualizable> govis = new ArrayList<>();
+        for (var v : goTerms) {
+            govis.add(new HtmlGoVisualizable(v, ontology));
+        }
+        HtmlGoVisualizer htmlGoVisualizer = new HtmlGoVisualizer(govis, title);
+        return htmlGoVisualizer.getHtml();
+    }
+
+    private void getOverrepresentedGoAnnotationsForGene(String symbol, GoAssociationContainer container, Set<TermId> enriched) {
+       // container.
+    }
+
+    static class SortByPvalue implements Comparator<GoTerm2PValAndCounts>
+    {
+        // Used for sorting in ascending order of
+        // roll number
+        public int compare(GoTerm2PValAndCounts a, GoTerm2PValAndCounts b)
+        {
+            double diff = a.getRawPValue() - b.getRawPValue();
+            if (diff > 0) {
+                return 1;
+            } else if (diff < 0) {
+                return -1;
+            } else  {
+                return 0;
+            }
+        }
+    }
+
 }

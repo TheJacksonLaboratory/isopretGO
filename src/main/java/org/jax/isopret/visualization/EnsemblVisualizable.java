@@ -1,5 +1,6 @@
 package org.jax.isopret.visualization;
 
+import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
@@ -8,7 +9,6 @@ import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.Contig;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class acts as an interface between the HtmlVisualizer and the analysis results and
@@ -32,9 +32,12 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final AnnotatedGene agene;
 
+    private final List<GoTermIdPlusLabel> goterms;
 
-    public EnsemblVisualizable(AnnotatedGene agene) {
+
+    public EnsemblVisualizable(AnnotatedGene agene, List<GoTermIdPlusLabel> goterms) {
         this.agene = agene;
+        this.goterms = goterms;
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
         this.transcriptToHitMap = agene.getPrositeHitMap();
@@ -60,6 +63,16 @@ public class EnsemblVisualizable implements Visualizable {
     private String getHtmlAnchor(String accession) {
         String url = getEnsemblUrl(accession);
         return String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, accession);
+    }
+
+    @Override
+    public int getTotalTranscriptCount() {
+        return this.totalTranscriptCount;
+    }
+
+    @Override
+    public int getExpressedTranscriptCount() {
+        return this.expressedTranscripts.size();
     }
 
     @Override
@@ -113,9 +126,8 @@ public class EnsemblVisualizable implements Visualizable {
     private List<String> getIsoformRow(HbaDealsTranscriptResult transcriptResult) {
         List<String> row = new ArrayList<>();
         row.add(getHtmlAnchor(transcriptResult.getTranscript()));
-        row.add(String.valueOf(transcriptResult.getFoldChange()));
+        row.add(String.format("%.3f",transcriptResult.getLog2FoldChange()));
         row.add(String.valueOf(transcriptResult.getP()));
-        row.add(String.valueOf(transcriptResult.getCorrectedP()));
         return row;
     }
 
@@ -170,5 +182,10 @@ public class EnsemblVisualizable implements Visualizable {
             prositeLinks.add(row);
         }
         return prositeLinks;
+    }
+
+    @Override
+    public List<GoTermIdPlusLabel> getGoTerms() {
+        return this.goterms;
     }
 }

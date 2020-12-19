@@ -88,19 +88,14 @@ public class HbaDealsParser {
             throw new IsopretRuntimeException("Could not read HBA-DEALS file: " + e.getMessage());
         }
 
-        Collections.sort(lines);
-        // Benjamini Hochberg
         int N=lines.size();
-        for (int r = 0;r<N;r++) {
-            HbaLine hline = lines.get(r);
-            double raw_p = hline.raw_p;
-            hline.corrected_p = Math.min(1.0, raw_p * N/(r+1));
+        for (HbaLine hline : lines) {
             this.hbaDealsResultMap.putIfAbsent(hline.symbol, new HbaDealsResult(hline.geneAccession, hline.symbol));
             HbaDealsResult hbaresult = this.hbaDealsResultMap.get(hline.symbol);
             if (hline.isIsoform) {
-                hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p, hline.corrected_p);
+                hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p);
             } else {
-                hbaresult.addExpressionResult(hline.expFC, hline.raw_p, hline.corrected_p);
+                hbaresult.addExpressionResult(hline.expFC, hline.raw_p);
             }
         }
 
@@ -126,7 +121,6 @@ public class HbaDealsParser {
         final String isoform;
         final double expFC;
         final double raw_p;
-        double corrected_p;
 
         public HbaLine(String line) {
             String [] fields = line.split("\t");

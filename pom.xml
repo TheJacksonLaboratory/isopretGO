@@ -5,7 +5,7 @@
 
     <groupId>org.jax</groupId>
     <artifactId>isopret</artifactId>
-    <version>0.1.7</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
     <name>isopret</name>
@@ -19,7 +19,7 @@
         <junit.version>5.7.0</junit.version>
         <junit.platform.version>1.7.0</junit.platform.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <phenol.version>1.6.1</phenol.version>
+        <phenol.version>1.6.2-SNAPSHOT</phenol.version>
         <jannovar.version>0.35</jannovar.version>
     </properties>
 

@@ -261,17 +261,17 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         return Math.log(fc) / Math.log(2);
     }
 
-    private String getCorrectedP(String id) {
+    private String getFormatedPvalue(String id) {
         Map<String, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         double logFC = getLogFoldChage(id);
         if (! transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
-        double corrP =  transcriptResultMap.get(id).getCorrectedP();
-        if (corrP >= 0.05) {
+        double p =  transcriptResultMap.get(id).getP();
+        if (p >= 0.05) {
             return String.format("%.2f (n.s.)", logFC);
-        } else if (corrP > 0.001) {
-            return String.format("%.2f (p=%.4f)", logFC, corrP);
+        } else if (p > 0.001) {
+            return String.format("%.2f (p=%.4f)", logFC, p);
         }
-        return String.format("%.2f (p=%.2E)", logFC, corrP);
+        return String.format("%.2f (p=%.2E)", logFC, p);
     }
 
 
@@ -287,19 +287,20 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         String rect;
         if (fc > 0.0) {
             double height = fc*factor;
+            double ybase = y - height;
             rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
                             "style=\"stroke:%s; fill: %s\" />\n",
-                    boxstart, y, width, height, DARKGREEN, RED);
+                    boxstart, ybase, width, height, BLACK, GREEN);
         } else {
             double height = fc*-factor;
             rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
                             "style=\"stroke:%s; fill: %s\" />\n",
-                    boxstart, y-height, width, height, RED, DARKGREEN);
+                    boxstart, y, width, height, BLACK, RED);
         }
         writer.write(rect);
-        double xpos = startpos + width + 10;
+        double xpos = startpos + width + 15;
         String txt = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
-                xpos, y, PURPLE, getCorrectedP(id));
+                xpos, y, PURPLE, getFormatedPvalue(id));
         writer.write(txt);
 
     }

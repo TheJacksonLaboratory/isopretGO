@@ -13,12 +13,12 @@ import java.util.Set;
  * This class is intended to be a final common pathway to display results about a gene and the isoforms it
  * contains in the HTML output.
  */
+@Deprecated
 public class HtmlGene {
 
     public final String symbol;
     public final double FC;
     public final double pval;
-    public final double pvalCorr;
     public final int n_transcripts;
     private final List<HtmlTranscript> transcriptList;
     private final List<String> goAnnotations;
@@ -27,7 +27,6 @@ public class HtmlGene {
         symbol = result.getSymbol();
         FC = result.getExpressionFoldChange();
         pval = result.getExpressionP();
-        pvalCorr = result.getCorrectedPval();
         this.n_transcripts = egene.getTranscriptMap().size();
         this.transcriptList = new ArrayList<>();
         this.goAnnotations = goAnnots;
@@ -47,12 +46,6 @@ public class HtmlGene {
             if (result.getTranscriptMap().containsKey(transcriptId)) {
                 HbaDealsTranscriptResult tresult = result.getTranscriptMap().get(transcriptId);
                 pval = tresult.getP();
-                correctedpval = tresult.getCorrectedP();
-//            } else {
-//                System.out.println("transcriptID " + transcriptId);
-//                for (String id : result.getTranscriptMap().keySet()) {
-//                    System.out.println("[\t" + id);
-//                }
             }
             HtmlTranscript htranscript = new HtmlTranscript(et.getTranscriptId(),
                     motifString,
@@ -77,10 +70,6 @@ public class HtmlGene {
 
     public double getPval() {
         return pval;
-    }
-
-    public double getPvalcorr() {
-        return pvalCorr;
     }
 
     public int getNtranscripts() {
