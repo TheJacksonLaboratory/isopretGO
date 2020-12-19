@@ -4,19 +4,20 @@ import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
+import org.monarchinitiative.phenol.analysis.ItemAssociations;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.analysis.mgsa.MgsaCalculation;
+import org.monarchinitiative.phenol.annotations.formats.go.GoGaf21Annotation;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.stats.ParentChildIntersectionPValueCalculation;
 import org.monarchinitiative.phenol.stats.ParentChildUnionPValueCalculation;
 import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
 import org.monarchinitiative.phenol.stats.mtc.Bonferroni;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class HbaDealsGoAnalysis {
@@ -51,7 +52,7 @@ public class HbaDealsGoAnalysis {
             population.add(geneSymbol);
             if (result.hasSignificantExpressionResult()) {
                 dgeGenes.add(geneSymbol);
-                if (result.hasSignificantExpressionResult()) {
+                if (result.hasaSignificantSplicingResult()) {
                     dasDgeGenes.add(geneSymbol); // both splicing and expression
                 }
             }
@@ -182,6 +183,28 @@ public class HbaDealsGoAnalysis {
     }
 
 
-
+    /**
+     * Given a list of enriched GO terms and the list of genes in the study set that are
+     * enriched in these terms, this function creates a map with
+     * Key -- gene symbols for any genes that are annotated to enriched GO terms.
+     * Value -- list of correspondings annotations, but only to the enriched GO terms
+     */
+    public Map<String, List<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap (Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
+        Map<String, List<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
+        List<GoGaf21Annotation> rawAnnots = this.goAssociationContainer.getRawAssociations();
+        Map<String, ItemAssociations> tempMap = new HashMap<>();
+        for (GoGaf21Annotation a : rawAnnots) {
+            String symbol = a.getDbObjectSymbol();
+            if (symbols.contains(symbol)) {
+                symbolToGoTermResults.putIfAbsent(symbol, new ArrayList<>());
+                TermId goId = a.getGoId();
+                if (einrichedGoTermIdSet.contains(goId) && ontology.getTermMap().containsKey(goId)) {
+                    String label = ontology.getTermMap().get(goId).getName();
+                    symbolToGoTermResults.get(symbol).add(new GoTermIdPlusLabel(goId, label));
+                }
+            }
+        }
+        return symbolToGoTermResults;
+    }
 
 }

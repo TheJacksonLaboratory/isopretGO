@@ -1,5 +1,7 @@
 package org.jax.isopret.visualization;
 
+import org.jax.isopret.go.GoTermIdPlusLabel;
+
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +34,8 @@ public interface Visualizable {
    List<List<String>> getIsoformTableData();
 
    List<List<String>> getPrositeModuleLinks(Map<String, String> prositeIdToName);
+
+   List<GoTermIdPlusLabel> getGoTerms();
 
 
 }

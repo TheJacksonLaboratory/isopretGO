@@ -1,5 +1,6 @@
 package org.jax.isopret.visualization;
 
+import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
@@ -31,9 +32,12 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final AnnotatedGene agene;
 
+    private final List<GoTermIdPlusLabel> goterms;
 
-    public EnsemblVisualizable(AnnotatedGene agene) {
+
+    public EnsemblVisualizable(AnnotatedGene agene, List<GoTermIdPlusLabel> goterms) {
         this.agene = agene;
+        this.goterms = goterms;
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
         this.transcriptToHitMap = agene.getPrositeHitMap();
@@ -178,5 +182,10 @@ public class EnsemblVisualizable implements Visualizable {
             prositeLinks.add(row);
         }
         return prositeLinks;
+    }
+
+    @Override
+    public List<GoTermIdPlusLabel> getGoTerms() {
+        return this.goterms;
     }
 }

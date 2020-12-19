@@ -273,13 +273,35 @@ a[name="othergenes"] table.goTable a::first-letter {
 }
 
 
-
-/* Clear floats after the columns */
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
+.generow{
+    width: 90%;
+    min-height: 100px;
+    margin: 0 auto;
+    display: -webkit-flex; /* Safari */
+    display: flex; /* Standard syntax */
 }
+
+.generow .column{
+    padding: 10px;
+    background: #dbdfe5;
+    -webkit-flex: 1; /* Safari */
+    -ms-flex: 1; /* IE 10 */
+    flex: 1; /* Standard syntax */
+}
+.generow .column.bg-alt{
+    background: #b4bac0;
+}
+
+.svgrow{
+    width: 90%;
+    min-height: 100px;
+    margin: 0 auto;
+    display: -webkit-flex; /* Safari */
+    display: flex; /* Standard syntax */
+}
+
+
+
 
 footer {
 	background-color: #05396b;
@@ -349,8 +371,7 @@ a.svg:hover, a.svg:active {
   display: none;
 }
 
-
-#hide-symbol-table, #symbol-table {
+#hide-dasdgego-table, #dasdgego-table {
   display: none;
 }
 
