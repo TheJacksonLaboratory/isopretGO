@@ -273,13 +273,35 @@ a[name="othergenes"] table.goTable a::first-letter {
 }
 
 
-
-/* Clear floats after the columns */
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
+.generow{
+    width: 90%;
+    min-height: 100px;
+    margin: 0 auto;
+    display: -webkit-flex; /* Safari */
+    display: flex; /* Standard syntax */
 }
+
+.generow .column{
+    padding: 10px;
+    background: #dbdfe5;
+    -webkit-flex: 1; /* Safari */
+    -ms-flex: 1; /* IE 10 */
+    flex: 1; /* Standard syntax */
+}
+.generow .column.bg-alt{
+    background: #b4bac0;
+}
+
+.svgrow{
+    width: 90%;
+    min-height: 100px;
+    margin: 0 auto;
+    display: -webkit-flex; /* Safari */
+    display: flex; /* Standard syntax */
+}
+
+
+
 
 footer {
 	background-color: #05396b;
@@ -349,8 +371,7 @@ a.svg:hover, a.svg:active {
   display: none;
 }
 
-
-#hide-symbol-table, #symbol-table {
+#hide-dasdgego-table, #dasdgego-table {
   display: none;
 }
 
@@ -391,6 +412,10 @@ a.svg:hover, a.svg:active {
         <a name="go"></a>
           <article>
           <h2>Gene Ontology Overrepresentation Analysis.</h2>
+           <h4>Differentially expressed and differentially spliced genes.</h4>
+                <a id="show-dasdgego-table" class="table-btn" onclick="showDasDgeGoTable()">Show Table</a>
+                <a id="hide-dasdgego-table" class="table-btn" onclick="hideDasDgeGoTable()">Hide Table</a>
+                ${dasDgeTable}
           <h4>Differentially expressed genes.</h4>
             <a id="show-dgego-table" class="table-btn" onclick="showDgeGoTable()">Show Table</a>
            <a id="hide-dgego-table" class="table-btn" onclick="hideDgeGoTable()">Hide Table</a>
@@ -467,17 +492,16 @@ a.svg:hover, a.svg:active {
   }
 
 
-function showDgeGoTable() {
+   function showDgeGoTable() {
       var table = document.getElementById("dgego-table");
       table.style.display = "block";
       var showtablebtn = document.getElementById("show-dgego-table");
       showtablebtn.style.display = "none";
-
       var hidetablebtn = document.getElementById("hide-dgego-table");
       hidetablebtn.style.display = "block";
     }
 
-     function hideDgeGoTable() {
+    function hideDgeGoTable() {
       var table = document.getElementById("dgego-table");
       table.style.display = "none";
       var showtablebtn = document.getElementById("show-dgego-table");
@@ -485,7 +509,8 @@ function showDgeGoTable() {
       var hidetablebtn = document.getElementById("hide-dgego-table");
       hidetablebtn.style.display = "none";
     }
-  function showDasGoTable() {
+
+    function showDasGoTable() {
       var table = document.getElementById("dasgo-table");
       table.style.display = "block";
       var showtablebtn = document.getElementById("show-dasgo-table");
@@ -494,13 +519,30 @@ function showDgeGoTable() {
       hidetablebtn.style.display = "block";
     }
 
-     function hideDasGoTable() {
+    function hideDasGoTable() {
       var table = document.getElementById("dasgo-table");
       table.style.display = "none";
       var showtablebtn = document.getElementById("show-dasgo-table");
       showtablebtn.style.display = "block";
-
       var hidetablebtn = document.getElementById("hide-dasgo-table");
+      hidetablebtn.style.display = "none";
+    }
+
+    function showDasDgeGoTable() {
+      var table = document.getElementById("dasdgego-table");
+      table.style.display = "block";
+      var showtablebtn = document.getElementById("show-dasdgego-table");
+      showtablebtn.style.display = "none";
+      var hidetablebtn = document.getElementById("hide-dasdgego-table");
+      hidetablebtn.style.display = "block";
+    }
+
+    function hideDasDgeGoTable() {
+      var table = document.getElementById("dasdgego-table");
+      table.style.display = "none";
+      var showtablebtn = document.getElementById("show-dasdgego-table");
+      showtablebtn.style.display = "block";
+      var hidetablebtn = document.getElementById("hide-dasdgego-table");
       hidetablebtn.style.display = "none";
     }
   </script>

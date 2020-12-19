@@ -15,9 +15,9 @@ import java.util.*;
 
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
     static final int SVG_WIDTH = 1400;
-    static final int HEIGHT_FOR_SV_DISPLAY = 200;
-    static final int HEIGHT_PER_DISPLAY_ITEM = 100;
-    private static final int ISOFORM_HEIGHT = 70;
+    static final int HEIGHT_FOR_SV_DISPLAY = 100;
+    static final int HEIGHT_PER_DISPLAY_ITEM = 80;
+    private static final int ISOFORM_HEIGHT = 30;
     private final static String[] colors = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF", "F7DC6F", "CFFF98", "A1D6E2",
             "EC96A4", "E6DF44", "F76FDA", "FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6", "FFC300", "F76FF5", "FFFF99",
             "FF99FF", "99FFFF", "CCFF99", "FFE5CC", "FFD700", "9ACD32", "7FFFD4", "FFB6C1", "FFFACD",
