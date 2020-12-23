@@ -17,6 +17,9 @@ import org.monarchinitiative.phenol.stats.ParentChildUnionPValueCalculation;
 import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
 import org.monarchinitiative.phenol.stats.mtc.Bonferroni;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,10 +63,10 @@ public class HbaDealsGoAnalysis {
                 dasGenes.add(geneSymbol);
             }
         }
-        this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge", ontology);
-        this.das = associationContainer.fromGeneSymbols(dasGenes, "das", ontology);
-        this.dasDge = associationContainer.fromGeneSymbols(dasDgeGenes, "dasdge", ontology);
-        this.population = associationContainer.fromGeneSymbols(population, "population", ontology);
+        this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge");
+        this.das = associationContainer.fromGeneSymbols(dasGenes, "das");
+        this.dasDge = associationContainer.fromGeneSymbols(dasDgeGenes, "dasdge");
+        this.population = associationContainer.fromGeneSymbols(population, "population");
     }
 
     private List<GoTerm2PValAndCounts> termForTerm(StudySet study) {
