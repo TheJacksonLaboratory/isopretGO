@@ -21,33 +21,9 @@ public class HbaDealsParser {
      */
     private final String hbadealsFile;
 
-    private final static double DEFAULT_PROB_THRESHOLD = 0.9;
-
-    private final double threshold;
-
+    /** Key -- a gene symbol, value -- an {@link HbaDealsResult} object with results for gene expression and splicing.*/
     private final Map<String, HbaDealsResult> hbaDealsResultMap;
 
-    private final List<Double> uncorrectedPvals;
-
-    public HbaDealsParser(String fname) {
-        this(fname, DEFAULT_PROB_THRESHOLD);
-    }
-
-    /**
-     * The following is not an efficient way of doing things, but it works for now
-     */
-    public Map<Double, Double> calculateBenjaminiHochbergMTC() {
-        Map<Double, Double> p2correctedP = new HashMap<>();
-        //Collections.sort(this.uncorrectedPvals, Collections.reverseOrder());
-        this.uncorrectedPvals.sort(Comparator.reverseOrder());
-        int N=this.uncorrectedPvals.size();
-        for (int r = 0;r<N;r++) {
-            double raw_p = this.uncorrectedPvals.get(r);
-            double corrected = raw_p * N/(r+1);
-            p2correctedP.put(raw_p, corrected);
-        }
-        return p2correctedP;
-    }
 
     /**
      * Sanity check that the header is correct.
@@ -68,11 +44,10 @@ public class HbaDealsParser {
         }
     }
 
-    public HbaDealsParser(String fname, double thresh) {
+    public HbaDealsParser(String fname) {
         hbadealsFile = fname;
-        threshold = thresh;
         this.hbaDealsResultMap = new HashMap<>();
-        this.uncorrectedPvals = new ArrayList<>();
+        //this.uncorrectedPvals = new ArrayList<>();
         int n_lines = 0;
         List<HbaLine> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(this.hbadealsFile))) {
@@ -88,7 +63,6 @@ public class HbaDealsParser {
             throw new IsopretRuntimeException("Could not read HBA-DEALS file: " + e.getMessage());
         }
 
-        int N=lines.size();
         for (HbaLine hline : lines) {
             this.hbaDealsResultMap.putIfAbsent(hline.symbol, new HbaDealsResult(hline.geneAccession, hline.symbol));
             HbaDealsResult hbaresult = this.hbaDealsResultMap.get(hline.symbol);
@@ -113,7 +87,7 @@ public class HbaDealsParser {
      * A convenience class that will let us calculate the Benjamini Hochberg p values
      * To do so, we sort these lines by raw p value
      */
-    static class HbaLine implements Comparable<HbaLine> {
+    static class HbaLine {
         final static String UNINITIALIZED = "";
         final String symbol;
         final String geneAccession;
@@ -139,12 +113,6 @@ public class HbaDealsParser {
             }
             this.expFC = Double.parseDouble(fields[3]);
             this.raw_p = Double.parseDouble(fields[4]);
-        }
-
-        /** sort in reverse order, i.e., with lowest values first */
-        @Override
-        public int compareTo(HbaLine that) {
-            return Double.compare(this.raw_p, that.raw_p);
         }
     }
 
