@@ -94,11 +94,15 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         int populationSize = hbago.populationCount();
         data.put("n_population", populationSize);
-        data.put("n_das", String.valueOf(hbago.dasCount()));
+        data.put("n_das", String.format("BLA=%d",hbago.dasCount()));
         data.put("n_das_unmapped", hbago.unmappedDasCount());
         data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
         data.put("n_dge", hbago.dgeCount());
+        data.put("n_dge_unmapped", hbago.unmappedDgeCount());
+        data.put("unmappable_dge_list", Util.fromList(hbago.unmappedDgeSymbols(), "Unmappable DGE Gene Symbols"));
         data.put("n_dasdge", hbago.dasDgeCount());
+        data.put("n_dasdge_unmapped", hbago.unmappedDasDgeCount());
+        data.put("unmappable_dasdge_list", Util.fromList(hbago.unmappedDasDgeSymbols(), "Unmappable DAS/DGE Gene Symbols"));
         data.put("probability_threshold", thresholder.getProbabilityThreshold());
         data.put("expression_threshold", thresholder.getExpressionThreshold());
         data.put("splicing_threshold", thresholder.getSplicingThreshold());
@@ -184,11 +188,11 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
 
         data.put("dgedaslist", dasAndDgeVisualizations);
-        data.put("n_dgedas", dasAndDgeVisualizations.size());
+      //  data.put("n_dgedas", dasAndDgeVisualizations.size());
         data.put("daslist", dasVisualizations);
-        data.put("n_das", dasVisualizations.size());
+        //data.put("n_das", dasVisualizations.size());
         data.put("dgelist", dgeVisualizations);
-        data.put("n_dge", dgeVisualizations.size());
+        //data.put("n_dge", dgeVisualizations.size());
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();
         for (var v : dgeGoTerms) {

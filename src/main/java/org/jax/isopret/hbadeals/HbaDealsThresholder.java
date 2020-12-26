@@ -4,9 +4,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * THis class is used to perform Bayesian false discovery rate control.
+ * The HBA-DEALS probability resulted for each gene expression assessment (or splicing) is
+ * a Posterior Error Probability (PEP). By the linearity of expected value we
+ * can add these probabilities at any threshold in order to get the total
+ * expected number of false discoveries. If we thus rank the observations by PEP (from smallest to largest)
+ * and choose the rank just before the rank where the cumulative mean of the FDR (called qvalue after John Storey),
+ * this is where we set the threshold.
+ */
 public class HbaDealsThresholder {
 
 
@@ -41,8 +49,12 @@ public class HbaDealsThresholder {
         this.splicingThreshold = calculateSplicingThreshold();
     }
 
-
-    private double getThreshold( List<Double> probs) {
+    /**
+     * Calculates the q-value threshold needed to attain a desired FDR
+     * @param probs List of probabilities from HBA-DEALS
+     * @return the p-value threshold associated with the q-value threshold to reach the desired FDR
+     */
+    private double getThreshold(List<Double> probs) {
         Collections.sort(probs);
         double cumSum = 0.0;
         double p_threshold = 0.0;
@@ -51,7 +63,8 @@ public class HbaDealsThresholder {
             if (p > MAX_PROB) break;
             count++;
             cumSum += p;
-            if (cumSum/count > probabilityThreshold) break;
+            double qvalue = cumSum/count; // cumulative mean of PEP
+            if (qvalue > probabilityThreshold) break;
             p_threshold = p;
         }
         return p_threshold;

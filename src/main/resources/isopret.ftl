@@ -345,18 +345,20 @@ a.svg:hover, a.svg:active {
   position: relative;
   display: inline-block;
   border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  outline: none;
+  width: 150px;
+  min-width: 150px;
+  max-width: 250px;
 }
 
 /* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 120px;
   background-color: black;
   color: #fff;
-  text-align: center;
+  text-align: left;
   padding: 5px 0;
   border-radius: 6px;
-
   /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
@@ -437,15 +439,26 @@ a.svg:hover, a.svg:active {
       <p>Gene Ontology <tt>go.obo</tt> file: ${go_version} with ${n_go_terms} terms.</p>
       <p>${annotation_term_count} terms used for a total of ${annotation_count} annotations for ${annotated_genes} genes.</p>
       <h4>Differentially expressed and differentially spliced genes (n=${n_dasdge})</h4>
+       <p>${n_dasdge_unmapped} of the ${n_dasdge} genes could not be mapped to gene ids for GO analysis
+            <div class="tooltip">(Hover here for details)
+              <span class="tooltiptext">${unmappable_dasdge_list}</span>
+            </div>.</p>
       <a id="show-dasdgego-table" class="table-btn" onclick="showDasDgeGoTable()">Show Table</a>
       <a id="hide-dasdgego-table" class="table-btn" onclick="hideDasDgeGoTable()">Hide Table</a>
       ${dasDgeTable}
       <h4>Differentially expressed genes (n=${n_dge})</h4>
+       <p>${n_dge_unmapped} of the ${n_dge} genes could not be mapped to gene ids for GO analysis
+       <div class="tooltip">(Hover here for details)
+              <span class="tooltiptext">${unmappable_dge_list}</span>
+            </div>.</p>
       <a id="show-dgego-table" class="table-btn" onclick="showDgeGoTable()">Show Table</a>
       <a id="hide-dgego-table" class="table-btn" onclick="hideDgeGoTable()">Hide Table</a>
       ${dgeTable}
-      <h4>Differentially spliced genes (n=${n_das})</h4>
-      <p>${n_das_unmapped} of the ${n_das} genes could not be mapped to gene ids for GO analysis.</p>
+      <h4>Differentially spliced genes (n=${n_das?string})</h4>
+      <p>${n_das_unmapped} of the ${n_das} genes could not be mapped to gene ids for GO analysis
+      <div class="tooltip">(Hover here for details)
+        <span class="tooltiptext">${unmappable_das_list}</span>
+      </div>.</p>
       <a id="show-dasgo-table" class="table-btn" onclick="showDasGoTable()">Show Table</a>
       <a id="hide-dasgo-table" class="table-btn" onclick="hideDasGoTable()">Hide Table</a>
       ${dasTable}
@@ -455,7 +468,7 @@ a.svg:hover, a.svg:active {
   <section>
     <a name="dasdge"></a>
     <h1>Genes displaying both differential expression and differential alternative splicing (DAS/DGE)</h1>
-    <p>A total of ${n_dgedas} out of ${populationCount} genes in the population showed both differential alternative splicing (DAS) and
+    <p>A total of ${n_dasdge} out of ${populationCount} genes in the population showed both differential alternative splicing (DAS) and
         differential gene expression (DGE).</p>
     <#list dgedaslist as gene>
       <article>

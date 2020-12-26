@@ -15,16 +15,17 @@ public class HtmlVisualizer implements Visualizer {
     }
 
 
-
     private final static String GENE_TABLE_HEADER = "<table>\n" +
             "  <thead>\n" +
             "    <tr>\n" +
             "      <th>Gene</th>\n" +
             "      <th>Chrom.</th>\n" +
             "      <th>Log<sub>2</sub> fold change</th>\n" +
-            "      <th>P-value</th>\n" +
+            "      <th>Probability (PEP)</th>\n" +
             "    </tr>\n" +
             "  </thead>\n";
+
+
 
     private String getGoAnchor(GoTermIdPlusLabel go) {
         //QuickGO - https://www.ebi.ac.uk/QuickGO/term/GO:0006915
@@ -87,7 +88,7 @@ public class HtmlVisualizer implements Visualizer {
             "    <tr>\n" +
             "      <th>Isoform</th>\n" +
             "      <th>Log<sub>2</sub> fold change</th>\n" +
-            "      <th>P-value</th>\n" +
+            "      <th>Probability (PEP)</th>\n" +
             "    </tr>\n" +
             "  </thead>\n";
 
@@ -128,7 +129,6 @@ public class HtmlVisualizer implements Visualizer {
         sb.append(getPrositeBox(vis)).append("\n");
         sb.append("</div>\n");
         sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
-        sb.append("<h2>Transcripts</h2>\n");
         sb.append(getTranscriptBox(vis)).append("\n");
        sb.append("</div>\n");
         sb.append("</div>\n");
