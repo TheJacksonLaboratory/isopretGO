@@ -3,6 +3,7 @@ package org.jax.isopret.go;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 
+import org.jax.isopret.hbadeals.HbaDealsThresholder;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.analysis.ItemAssociations;
 import org.monarchinitiative.phenol.analysis.StudySet;
@@ -36,38 +37,39 @@ public class HbaDealsGoAnalysis {
     private final StudySet population;
     private final GoMethod method;
 
-    enum GoMethod { TFT, PCunion, PCintersect, MGSA};
+    enum GoMethod { TFT, PCunion, PCintersect, MGSA}
 
 
-    private HbaDealsGoAnalysis(Map<String, HbaDealsResult> hbaDealsResultMap,
+    private HbaDealsGoAnalysis(HbaDealsThresholder thresholder,
                               Ontology ontology,
                               GoAssociationContainer associationContainer,
                                GoMethod method) {
         this.ontology = ontology;
         this.goAssociationContainer = associationContainer;
         this.method = method;
-        Set<String> population = new HashSet<>();
-        Set<String> dgeGenes = new HashSet<>();
-        Set<String> dasGenes = new HashSet<>();
-        Set<String> dasDgeGenes = new HashSet<>();
-        for (var result : hbaDealsResultMap.values()) {
-            String geneSymbol = result.getSymbol();
-            population.add(geneSymbol);
-            if (result.hasSignificantExpressionResult()) {
-                dgeGenes.add(geneSymbol);
-                if (result.hasaSignificantSplicingResult()) {
-                    dasDgeGenes.add(geneSymbol); // both splicing and expression
-                }
-            }
-            if (result.hasaSignificantSplicingResult()) {
-                dasGenes.add(geneSymbol);
-            }
-        }
+        Set<String> population = thresholder.population();
+        Set<String> dgeGenes = thresholder.dgeGeneSymbols();
+        Set<String> dasGenes = thresholder.dasGeneSymbols();
+        Set<String> dasDgeGenes = thresholder.dasDgeGeneSymbols();
         this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge");
         this.das = associationContainer.fromGeneSymbols(dasGenes, "das");
         this.dasDge = associationContainer.fromGeneSymbols(dasDgeGenes, "dasdge");
         this.population = associationContainer.fromGeneSymbols(population, "population");
     }
+
+
+    public int populationCount() { return this.population.getAnnotatedItemCount(); }
+    public int dasCount() { return  this.das.getAnnotatedItemCount(); }
+    public int unmappedDasCount() { return this.das.getUnmappedGeneSymbolCount(); }
+    public List<String> unmappedDasSymbols() { return this.das.getSortedUnmappedGeneSymbols(); }
+    public int dgeCount() { return this.dge.getAnnotatedItemCount(); }
+    public int unmappedDgeCount() { return this.dge.getUnmappedGeneSymbolCount(); }
+    public List<String> unmappedDgeSymbols() { return this.dge.getSortedUnmappedGeneSymbols(); }
+    public int dasDgeCount() { return this.dasDge.getAnnotatedItemCount(); }
+    public int unmappedDasDgeCount() { return this.dasDge.getUnmappedGeneSymbolCount(); }
+    public List<String> unmappedDasDgeSymbols() { return this.dasDge.getSortedUnmappedGeneSymbols(); }
+
+
 
     private List<GoTerm2PValAndCounts> termForTerm(StudySet study) {
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
@@ -156,33 +158,30 @@ public class HbaDealsGoAnalysis {
         }
     }
 
-    public int populationCount() {
-        return this.population.getAnnotatedItemCount();
-    }
 
 
-    public static HbaDealsGoAnalysis termForTerm(Map<String, HbaDealsResult> hbaDealsResultMap,
+    public static HbaDealsGoAnalysis termForTerm(HbaDealsThresholder thresholder,
                                                  Ontology ontology,
                                                  GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(hbaDealsResultMap, ontology, associationContainer, GoMethod.TFT);
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.TFT);
     }
 
-    public static HbaDealsGoAnalysis parentChildUnion(Map<String, HbaDealsResult> hbaDealsResultMap,
+    public static HbaDealsGoAnalysis parentChildUnion(HbaDealsThresholder thresholder,
                                                  Ontology ontology,
                                                  GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(hbaDealsResultMap, ontology, associationContainer, GoMethod.PCunion);
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCunion);
     }
 
-    public static HbaDealsGoAnalysis parentChildIntersect(Map<String, HbaDealsResult> hbaDealsResultMap,
+    public static HbaDealsGoAnalysis parentChildIntersect(HbaDealsThresholder thresholder,
                                                  Ontology ontology,
                                                  GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(hbaDealsResultMap, ontology, associationContainer, GoMethod.PCintersect);
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCintersect);
     }
 
-    public static HbaDealsGoAnalysis mgssa(Map<String, HbaDealsResult> hbaDealsResultMap,
+    public static HbaDealsGoAnalysis mgssa(HbaDealsThresholder thresholder,
                                                           Ontology ontology,
                                                           GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(hbaDealsResultMap, ontology, associationContainer, GoMethod.MGSA);
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.MGSA);
     }
 
 

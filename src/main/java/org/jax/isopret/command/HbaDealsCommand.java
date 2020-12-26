@@ -6,6 +6,7 @@ import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.go.HbaDealsGoAnalysis;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
+import org.jax.isopret.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.html.HtmlTemplate;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
@@ -67,6 +68,11 @@ public class HbaDealsCommand implements Callable<Integer> {
         GoParser goParser = new GoParser(goOboFile, goGafFile);
         final Ontology ontology = goParser.getOntology();
         final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
+        data.put("go_version", ontology.getMetaInfo().getOrDefault("data-version", "unknown"));
+        data.put("n_go_terms", ontology.getNonObsoleteTermIds().size());
+        data.put("annotation_term_count", goAssociationContainer.getOntologyTermCount());
+        data.put("annotation_count", goAssociationContainer.getRawAssociations().size());
+        data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
         System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
         System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
 
@@ -79,9 +85,23 @@ public class HbaDealsCommand implements Callable<Integer> {
         Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        HbaDealsThresholder thresholder = new HbaDealsThresholder(hbaDealsResults);
 
-        HbaDealsGoAnalysis hbago = HbaDealsGoAnalysis.termForTerm(hbaDealsResults, ontology, goAssociationContainer);
+
+
+
+        HbaDealsGoAnalysis hbago = HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer);
+
         int populationSize = hbago.populationCount();
+        data.put("n_population", populationSize);
+        data.put("n_das", String.valueOf(hbago.dasCount()));
+        data.put("n_das_unmapped", hbago.unmappedDasCount());
+        data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
+        data.put("n_dge", hbago.dgeCount());
+        data.put("n_dasdge", hbago.dasDgeCount());
+        data.put("probability_threshold", thresholder.getProbabilityThreshold());
+        data.put("expression_threshold", thresholder.getExpressionThreshold());
+        data.put("splicing_threshold", thresholder.getSplicingThreshold());
         List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
         List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
         List<GoTerm2PValAndCounts> dasDgeGoTerms = hbago.dasDgeOverrepresetationAnalysis();
@@ -148,11 +168,6 @@ public class HbaDealsCommand implements Callable<Integer> {
 
             AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
             System.out.printf("[INFO] processing %s: ", geneSymbol);
-            if (einrichedGoTermIdSet.contains(geneSymbol)) {
-                System.out.println("[WOW] " + geneSymbol);
-            } else {
-                System.out.println("[MISED] " + geneSymbol);
-            }
             if (result.isDASandDGE()) {
                 List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
                 dasAndDgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
@@ -195,10 +210,10 @@ public class HbaDealsCommand implements Callable<Integer> {
 
     /**
      *
-     * @param goTerms
-     * @param ontology
+     * @param goTerms List of Pvals & counts for an enriched GO Term
+     * @param ontology reference to Gene Ontology object
      * @param title -- title as it will be used in the JavaScript, e.g., "dgego-table"
-     * @return
+     * @return an HTML table representing the results of GO analysis
      */
     private String getGoHtmlTable(List<GoTerm2PValAndCounts> goTerms, Ontology ontology, String title) {
         List<GoVisualizable> govis = new ArrayList<>();

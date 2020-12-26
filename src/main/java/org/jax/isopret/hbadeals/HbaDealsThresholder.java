@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class HbaDealsThresholder {
@@ -12,18 +13,18 @@ public class HbaDealsThresholder {
     private static final double DEFAULT_THRESHOLD = 0.05;
 
     private final double MAX_PROB = 0.25;
-
+    /** Threshold for total probability to calculate Bayesian FDR. */
     private final double probabilityThreshold;
-
+    /** HBA-DEALS results for all genes in the experiment. */
     private final Map<String, HbaDealsResult> rawResults;
-
+    /** Probability threshold for expression results that attains {@link #probabilityThreshold} FDR for expression. */
     private final double expressionThreshold;
-
+    /** Probability threshold for splicing results that attains {@link #probabilityThreshold} FDR for splicing. */
     private final double splicingThreshold;
 
     /**
      * Find the FDR thresholds for splicing and expression
-     * @param results
+     * @param results Map of HBA-DEALS analysis results (key: gene symbol)
      */
     public HbaDealsThresholder(Map<String, HbaDealsResult> results) {
        this(results, DEFAULT_THRESHOLD);
@@ -31,7 +32,7 @@ public class HbaDealsThresholder {
 
     /**
      * Find the FDR thresholds for splicing and expression
-     * @param results
+     * @param results Map of HBA-DEALS analysis results (key: gene symbol)
      */
     public HbaDealsThresholder(Map<String, HbaDealsResult> results, double probThres) {
         rawResults = results;
@@ -42,13 +43,15 @@ public class HbaDealsThresholder {
 
 
     private double getThreshold( List<Double> probs) {
-        Collections.sort(probs, Collections.reverseOrder());
+        Collections.sort(probs);
         double cumSum = 0.0;
         double p_threshold = 0.0;
+        int count = 0;
         for (double p : probs) {
             if (p > MAX_PROB) break;
+            count++;
             cumSum += p;
-            if (cumSum > probabilityThreshold) break;
+            if (cumSum/count > probabilityThreshold) break;
             p_threshold = p;
         }
         return p_threshold;
@@ -105,5 +108,19 @@ public class HbaDealsThresholder {
                 .collect(Collectors.toSet());
     }
 
+    public Set<String> population() {
+        return this.rawResults.keySet();
+    }
 
+    public double getProbabilityThreshold() {
+        return probabilityThreshold;
+    }
+
+    public double getExpressionThreshold() {
+        return expressionThreshold;
+    }
+
+    public double getSplicingThreshold() {
+        return splicingThreshold;
+    }
 }

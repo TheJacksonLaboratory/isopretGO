@@ -139,6 +139,6 @@ public class HtmlVisualizer implements Visualizer {
         sb.append(vis.getProteinSvg(this.prositeIdToName));
         sb.append("</div>\n");
         return sb.toString();
-
     }
+
 }
