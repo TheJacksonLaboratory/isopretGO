@@ -35,9 +35,11 @@ public class EnsemblVisualizable implements Visualizable {
     private final List<GoTermIdPlusLabel> goterms;
 
 
-    public EnsemblVisualizable(AnnotatedGene agene, List<GoTermIdPlusLabel> goterms) {
+    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms) {
         this.agene = agene;
-        this.goterms = goterms;
+        List<GoTermIdPlusLabel> golist = new ArrayList<>(goterms);
+        Collections.sort(golist);
+        this.goterms = golist;
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
         this.transcriptToHitMap = agene.getPrositeHitMap();

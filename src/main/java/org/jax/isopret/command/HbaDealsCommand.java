@@ -136,7 +136,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         Set<TermId> einrichedGoTermIdSet = Stream.concat(dasDgeGoTerms.stream(), dgeGoTerms.stream())
                 .map(GoTerm2PValAndCounts::getItem)
                 .collect(Collectors.toSet());
-        Map<String, List<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
+        Map<String, Set<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
 
         System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
@@ -173,13 +173,13 @@ public class HbaDealsCommand implements Callable<Integer> {
             AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
             System.out.printf("[INFO] processing %s: ", geneSymbol);
             if (result.isDASandDGE()) {
-                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
                 dasAndDgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
             } else if (result.isDAS()) {
-                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
                 dasVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
             } else if (result.isDGE()) {
-                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
                 dgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
             } else {
                 // should never get here, sanity check

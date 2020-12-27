@@ -37,6 +37,10 @@ public class HbaDealsGoAnalysis {
     private final StudySet population;
     private final GoMethod method;
 
+//    public List<GoTermIdPlusLabel> getAnnotatingGoTerms(String symbol) {
+//        goAssociationContainer.
+//    }
+
     enum GoMethod { TFT, PCunion, PCintersect, MGSA}
 
 
@@ -189,20 +193,21 @@ public class HbaDealsGoAnalysis {
      * Given a list of enriched GO terms and the list of genes in the study set that are
      * enriched in these terms, this function creates a map with
      * Key -- gene symbols for any genes that are annotated to enriched GO terms.
-     * Value -- list of correspondings annotations, but only to the enriched GO terms
+     * Value -- list of corresponding annotations, but only to the enriched GO terms
      */
-    public Map<String, List<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap (Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
-        Map<String, List<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
+    public Map<String, Set<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap (Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
+        Map<String, Set<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
         List<GoGaf21Annotation> rawAnnots = this.goAssociationContainer.getRawAssociations();
-        Map<String, ItemAssociations> tempMap = new HashMap<>();
         for (GoGaf21Annotation a : rawAnnots) {
             String symbol = a.getDbObjectSymbol();
             if (symbols.contains(symbol)) {
-                symbolToGoTermResults.putIfAbsent(symbol, new ArrayList<>());
+                symbolToGoTermResults.putIfAbsent(symbol, new HashSet<>());
                 TermId goId = a.getGoId();
-                if (einrichedGoTermIdSet.contains(goId) && ontology.getTermMap().containsKey(goId)) {
-                    String label = ontology.getTermMap().get(goId).getName();
-                    symbolToGoTermResults.get(symbol).add(new GoTermIdPlusLabel(goId, label));
+                if (einrichedGoTermIdSet.contains(goId)) {
+                    Optional<String> labelOpt = ontology.getTermLabel(goId);
+                    if (labelOpt.isPresent()) {
+                        symbolToGoTermResults.get(symbol).add(new GoTermIdPlusLabel(goId, labelOpt.get()));
+                    }
                 }
             }
         }
