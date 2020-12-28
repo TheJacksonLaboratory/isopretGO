@@ -94,7 +94,7 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         int populationSize = hbago.populationCount();
         data.put("n_population", populationSize);
-        data.put("n_das", String.format("BLA=%d",hbago.dasCount()));
+        data.put("n_das", hbago.dasCount());
         data.put("n_das_unmapped", hbago.unmappedDasCount());
         data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
         data.put("n_dge", hbago.dgeCount());

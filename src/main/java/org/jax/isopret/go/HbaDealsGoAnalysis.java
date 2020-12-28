@@ -1,16 +1,12 @@
 package org.jax.isopret.go;
 
 import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.hbadeals.HbaDealsResult;
 
 import org.jax.isopret.hbadeals.HbaDealsThresholder;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
-import org.monarchinitiative.phenol.analysis.ItemAssociations;
 import org.monarchinitiative.phenol.analysis.StudySet;
-import org.monarchinitiative.phenol.analysis.mgsa.MgsaCalculation;
 import org.monarchinitiative.phenol.annotations.formats.go.GoGaf21Annotation;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.stats.ParentChildIntersectionPValueCalculation;
@@ -18,9 +14,6 @@ import org.monarchinitiative.phenol.stats.ParentChildUnionPValueCalculation;
 import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
 import org.monarchinitiative.phenol.stats.mtc.Bonferroni;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 

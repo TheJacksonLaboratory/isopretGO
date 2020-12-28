@@ -27,7 +27,7 @@ public class HbaDealsParser {
 
     /**
      * Sanity check that the header is correct.
-     * @param header
+     * @param header Header of the HBA-DEALS file
      */
     public void checkHeader(String header) {
         String [] headerFields = {"Ensembl Gene ID", "Gene", "Isoform", "ExplogFC.FC","P"};
