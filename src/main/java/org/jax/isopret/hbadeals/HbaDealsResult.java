@@ -4,8 +4,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HbaDealsResult {
-    /** Some genes only have a splicing result. */
-    private boolean hasExpressionResult = false;
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final String geneAccession;
     private final String symbol;
@@ -25,7 +23,6 @@ public class HbaDealsResult {
     public void addExpressionResult(double fc, double p) {
         this.expressionFoldChange = fc;
         this.expressionP = p;
-        hasExpressionResult = true;
     }
 
     public void addTranscriptResult(String isoform, double expFC, double P) {

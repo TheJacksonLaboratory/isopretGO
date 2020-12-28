@@ -137,7 +137,7 @@ public class EnsemblVisualizable implements Visualizable {
      * Return data to show the isoforms.
      * We have isoform accession number as a HTML link, followed by isoform log fold change and isoform p value and
      * corrected P value, that is for M rows, we return an M*4 matrix of strings intended to build an HTML table
-     * @return
+     * @return a matrix of data representing the contents of an HTML table for the isoforms
      */
     @Override
     public List<List<String>> getIsoformTableData() {

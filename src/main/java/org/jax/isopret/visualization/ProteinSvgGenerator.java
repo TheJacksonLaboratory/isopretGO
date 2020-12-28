@@ -23,8 +23,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             "FF99FF", "99FFFF", "CCFF99", "FFE5CC", "FFD700", "9ACD32", "7FFFD4", "FFB6C1", "FFFACD",
             "FFE4E1", "F0FFF0", "F0FFFF"};
 
-    private final Map<String, HbaDealsTranscriptResult> results;
-
     private final Map<String, List<PrositeHit>> prositeHitMap;
 
     private final List<Transcript> expressedTranscriptList;
@@ -48,7 +46,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
         super(SVG_WIDTH, height);
         // get prosite data if possible
-        this.results = annotatedGene.getHbaDealsResult().getTranscriptMap();
         this.prositeHitMap = annotatedGene.getPrositeHitMap();
         this.prositeId2nameMap = id2nameMap;
         this.expressedTranscriptList = annotatedGene.getExpressedTranscripts();
@@ -83,7 +80,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     /**
      * Transform an amino-acid coordinate to an SVG X coordinate
      *
-     * @return
+     * @return coordinate of a given protein amino acid position in SVG space
      */
     protected double translateProteinToSvgCoordinate(int aminoAcidPosition) {
         final double span = this.proteinMaxSvgPos - this.proteinMinSvgPos;
@@ -95,9 +92,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     /**
      * Write a box for the entire transcript
      *
-     * @param ypos
-     * @param writer
-     * @throws IOException
+     * @param ypos SVG Y coordinate to write the protein box
+     * @param writer file handle
+     * @throws IOException if we cannot write the box
      */
     protected void writeProteinBox(Transcript transcript, int ypos, Writer writer) throws IOException {
         double xstart = this.proteinMinSvgPos;
@@ -205,7 +202,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      * SVG (for this, user {@link #getSvg()}
      *
      * @param writer a file handle
-     * @throws IOException if we cannot write.
      */
     @Override
     public void write(Writer writer) {

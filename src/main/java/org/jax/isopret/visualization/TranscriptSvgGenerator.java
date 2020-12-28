@@ -58,11 +58,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private final double scaleMaxPos;
 
     private final int scaleBasePairs;
-    /** This will be 10% of genomicSpan, extra area on the sides of the graphic to make things look nicer. */
-    private int genomicOffset;
 
-//    final String pattern = "###,###.###";
-//    final DecimalFormat decimalFormat = new DecimalFormat(pattern);
 
     protected final double INTRON_MIDPOINT_ELEVATION = 10.0;
     /** Height of the symbols that represent the transcripts */
@@ -78,12 +74,12 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * TODO -- make sure we deal with version numbers in a uniform way. Now, we
      * are assuming that the HBADeals object does NOT use a version number.
-     * @param atranscript
-     * @return
+     * @param annotatedGene an object with all information about a gene that is relevant for making the SVG/HTML output
+     * @return list of transcripts
      */
-    private List<Transcript> getAffectedTranscripts(AnnotatedGene atranscript) {
-        List<Transcript> transcripts = atranscript.getTranscripts();
-        HbaDealsResult result = atranscript.getHbaDealsResult();
+    private List<Transcript> getAffectedTranscripts(AnnotatedGene annotatedGene) {
+        List<Transcript> transcripts = annotatedGene.getTranscripts();
+        HbaDealsResult result = annotatedGene.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
         List<Transcript> affectedTranscripts = transcripts
                 .stream()
@@ -115,7 +111,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
                 .max()
                 .orElse(this.genomicMinPos + 1000); // We should never actually need the orElse
         this.genomicSpan = this.genomicMaxPos - this.genomicMinPos;
-        int extraSpaceOnSide = (int)(0.15*(this.genomicSpan));
         this.paddedGenomicMinPos = genomicMinPos - (int)(0.05*(this.genomicSpan));
         this.paddedGenomicMaxPos = genomicMaxPos + (int)(0.23*(this.genomicSpan));
         this.paddedGenomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
@@ -164,11 +159,11 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * WRite a non-coding (i.e., UTR) exon of a non-coding gene
      *
-     * @param start
-     * @param end
-     * @param ypos
-     * @param writer
-     * @throws IOException
+     * @param start start position in SVG coordinates of the UTR exon
+     * @param end end position in SVG coordinates of the UTR exon
+     * @param ypos yposition on SVG canvas
+     * @param writer file handle
+     * @throws IOException if we cannot write
      */
     protected void writeUtrExon(double start, double end, int ypos, Writer writer) throws IOException {
         double width = end - start;
@@ -216,7 +211,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             }
         }
         writeIntrons(exons, ypos, writer);
-        writeTranscriptName(transcript, minX, ypos, writer);
+        writeTranscriptName(tmod, minX, ypos, writer);
        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
     }
 
@@ -463,7 +458,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * SVG (for this, user {@link #getSvg()}
      *
      * @param writer a file handle
-     * @throws IOException if we cannot write.
      */
     @Override
     public void write(Writer writer)  {

@@ -36,7 +36,7 @@ public class PrositeMapParser {
     }
 
     /**
-     * @param prositeMapFile
+     * @param prositeMapFile Our mapping of prosite modules to transcript locations
      * @return map with key=gene ID, value {@link PrositeMapping} object with prosite hits for the transcripts of the gene
      */
     private Map<String, PrositeMapping> getPrositeMappings(String prositeMapFile) {

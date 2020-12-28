@@ -49,6 +49,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String goGafFile = "data/goa_human.gaf";
     @CommandLine.Option(names = {"-j", "--jannovar"}, description = "Path to Jannovar transcript file")
     private String jannovarPath = "data/hg38_ensembl.ser";
+    @CommandLine.Option(names={"--prefix"}, description = "Name of output file (without .html ending)")
+    private String outprefix = "isopret";
 
 
     private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();
@@ -204,7 +206,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         data.put("hbadealsFile", f.getName());
 
 
-        HtmlTemplate template = new HtmlTemplate(data);
+        HtmlTemplate template = new HtmlTemplate(data, this.outprefix);
         template.outputFile();
         System.out.println("[INFO] Total unidentified genes:"+ unidentifiedSymbols.size());
         System.out.printf("[INFO] Total HBADEALS results: %d, found transcripts %d, also significant %d, also prosite: %d\n",
