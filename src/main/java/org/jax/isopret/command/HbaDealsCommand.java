@@ -1,9 +1,7 @@
 package org.jax.isopret.command;
 
 import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.go.GoParser;
-import org.jax.isopret.go.GoTermIdPlusLabel;
-import org.jax.isopret.go.HbaDealsGoAnalysis;
+import org.jax.isopret.go.*;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsThresholder;
@@ -17,13 +15,17 @@ import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
 import org.jax.isopret.visualization.*;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
+import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 import picocli.CommandLine;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
@@ -37,7 +39,10 @@ public class HbaDealsCommand implements Callable<Integer> {
 
     @CommandLine.Option(names={"-b","--hbadeals"}, description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
-    @CommandLine.Option(names={"-f","--fasta"}, description ="FASTA file" )
+    @CommandLine.Option(names={"-c","--calculation"}, description ="Ontologizer calculation (Term-for-Term, PC-Union, PC-Intersection)" )
+    public String ontologizerCalculation = "Term-for-Term";
+    @CommandLine.Option(names={"--mtc"}, description="Multiple-Testing-Correction for GO analysis")
+    public String mtc = "Bonferroni";
     private String fastaFile = "data/Homo_sapiens.GRCh38.cdna.all.fa.gz";
     @CommandLine.Option(names={"-p","--prosite"}, description ="prosite.dat file")
     private String prositeDataFile = "data/prosite.dat";
@@ -51,6 +56,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String jannovarPath = "data/hg38_ensembl.ser";
     @CommandLine.Option(names={"--prefix"}, description = "Name of output file (without .html ending)")
     private String outprefix = "isopret";
+    @CommandLine.Option(names={"--tsv"}, description = "Output TSV files with ontology results and study sets")
+    private boolean outputTsv = false;
 
 
     private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();
@@ -77,7 +84,8 @@ public class HbaDealsCommand implements Callable<Integer> {
         data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
         System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
         System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
-
+        MtcMethod mtc = MtcMethod.fromString(this.mtc);
+        GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
 
         GenomicAssembly hg38 =  GenomicAssemblyProvider.hg38();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
@@ -89,10 +97,14 @@ public class HbaDealsCommand implements Callable<Integer> {
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         HbaDealsThresholder thresholder = new HbaDealsThresholder(hbaDealsResults);
 
-
-
-
-        HbaDealsGoAnalysis hbago = HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer);
+        HbaDealsGoAnalysis hbago;
+        if (goMethod == GoMethod.PCunion) {
+            hbago = HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
+        } else if (goMethod == GoMethod.PCintersect) {
+            hbago = HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
+        } else {
+            hbago = HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
+        }
 
         int populationSize = hbago.populationCount();
         data.put("n_population", populationSize);
@@ -114,6 +126,14 @@ public class HbaDealsCommand implements Callable<Integer> {
         dasGoTerms.sort(new SortByPvalue());
         dgeGoTerms.sort(new SortByPvalue());
         dasDgeGoTerms.sort(new SortByPvalue());
+        if (outputTsv) {
+            outputGoResultsTable(dasGoTerms, "das", ontology);
+            outputGoResultsTable(dgeGoTerms, "dge", ontology);
+            outputGoResultsTable(dasDgeGoTerms, "dasdge", ontology);
+            outputStudySet(thresholder.dasGeneSymbols(), "das");
+            outputStudySet(thresholder.dgeGeneSymbols(), "dge");
+            outputStudySet(thresholder.dasDgeGeneSymbols(), "dasdge");
+        }
         // Add differentially expressed genes/GO analysis
         String dgeTable = getGoHtmlTable(dgeGoTerms, ontology, "dgego-table");
         data.put("dgeTable", dgeTable);
@@ -190,11 +210,8 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
 
         data.put("dgedaslist", dasAndDgeVisualizations);
-      //  data.put("n_dgedas", dasAndDgeVisualizations.size());
         data.put("daslist", dasVisualizations);
-        //data.put("n_das", dasVisualizations.size());
         data.put("dgelist", dgeVisualizations);
-        //data.put("n_dge", dgeVisualizations.size());
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();
         for (var v : dgeGoTerms) {
@@ -215,6 +232,40 @@ public class HbaDealsCommand implements Callable<Integer> {
     }
 
     /**
+     * Out put an Ontologizer-like output file with a name such as
+     * table-mason_latest_de-Term-For-Term-Bonferroni.txt
+     * @param goTerms List of {@link GoTerm2PValAndCounts} objects, assumed to be presorted
+     * @param nameComponent one of DAS, DGE, DASDGE
+     */
+    private void outputGoResultsTable(List<GoTerm2PValAndCounts> goTerms, String nameComponent, Ontology ontology) {
+        String fname = String.format("table-%s_%s-%s-%s.txt", outprefix, nameComponent, this.ontologizerCalculation, this.mtc);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fname))) {
+            writer.write(GoTerm2PValAndCounts.header() + "\n");
+            for (GoTerm2PValAndCounts pval : goTerms) {
+                writer.write(pval.getRow(ontology) + "\n");
+            }
+        } catch (IOException e ) {
+            e.printStackTrace();
+        }
+    }
+
+    private void outputStudySet(Set<String> geneSymbols, String nameComponent) {
+        String fname = String.format("symbols-%s_%s.txt", outprefix, nameComponent);
+        List<String> geneList = new ArrayList<>(geneSymbols);
+        Collections.sort(geneList);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fname))) {
+            writer.write(GoTerm2PValAndCounts.header() + "\n");
+            for (String symbol: geneList) {
+                writer.write(symbol + "\n");
+            }
+        } catch (IOException e ) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    /**
      *
      * @param goTerms List of Pvals & counts for an enriched GO Term
      * @param ontology reference to Gene Ontology object
@@ -230,9 +281,6 @@ public class HbaDealsCommand implements Callable<Integer> {
         return htmlGoVisualizer.getHtml();
     }
 
-    private void getOverrepresentedGoAnnotationsForGene(String symbol, GoAssociationContainer container, Set<TermId> enriched) {
-       // container.
-    }
 
     static class SortByPvalue implements Comparator<GoTerm2PValAndCounts>
     {
