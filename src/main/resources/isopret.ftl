@@ -300,9 +300,6 @@ a[name="othergenes"] table.goTable a::first-letter {
     display: flex; /* Standard syntax */
 }
 
-
-
-
 footer {
 	background-color: #05396b;
 	color: white;
@@ -344,12 +341,32 @@ a.svg:hover, a.svg:active {
   list-style-type: none;
 }
 
-#tooltip {
-  background: #05396b;
-  border: 1px solid black;
-  border-radius: 0;
-  padding: 5px;
-  color: white;
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  outline: none;
+  width: 150px;
+  min-width: 150px;
+  max-width: 250px;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: left;
+  padding: 5px 0;
+  border-radius: 6px;
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
 .table-btn {
@@ -387,97 +404,120 @@ a.svg:hover, a.svg:active {
     <h1><font color="#FFDA1A">Isopret</font></h1>
 </header>
 
-  <nav>
-      <div id="navi">
-          <ul>
-              <li><a href="#sample">Sample</a></li>
-              <li><a href="#go">GO analysis</a></li>
-              <li><a href="#dasdge">DAS/DGE</a></li>
-              <li><a href="#das">DAS</a></li>
-              <li><a href="#dge">DGE</a></li>
-              <li><a href="#about">About</a></li>
-          </ul>
-      </div>
-  </nav>
-  <main>
-    <section>
-      <a name="sample"></a>
-        <article>
-        <h2>Isopret -- Isoform interpretation.</h2>
-        <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
-      </article>
+<nav>
+  <div id="navi">
+    <ul>
+      <li><a href="#sample">Sample</a></li>
+      <li><a href="#go">GO analysis</a></li>
+      <li><a href="#dasdge">DAS/DGE</a></li>
+      <li><a href="#das">DAS</a></li>
+      <li><a href="#dge">DGE</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section>
+    <a name="sample"></a>
+    <article>
+      <h2>Isopret -- Isoform interpretation.</h2>
+      <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
+      <p>${n_population} genes were included in the analysis. ${n_das} had one or more differentially spliced isoforms.
+            ${n_dge} were differentially expressed. ${n_dasdge} were both differentially spliced and
+            differentially expressed.</p>
+      <p>Using a desired FDR threshold of ${probability_threshold}, a probability threshold of
+          ${expression_threshold} was calculated for differential expression, and a threshold of
+          ${splicing_threshold} was calculated for differential splicing.</p>
+    </article>
   </section>
 
   <section>
-        <a name="go"></a>
-          <article>
-          <h2>Gene Ontology Overrepresentation Analysis.</h2>
-           <h4>Differentially expressed and differentially spliced genes.</h4>
-                <a id="show-dasdgego-table" class="table-btn" onclick="showDasDgeGoTable()">Show Table</a>
-                <a id="hide-dasdgego-table" class="table-btn" onclick="hideDasDgeGoTable()">Hide Table</a>
-                ${dasDgeTable}
-          <h4>Differentially expressed genes.</h4>
-            <a id="show-dgego-table" class="table-btn" onclick="showDgeGoTable()">Show Table</a>
-           <a id="hide-dgego-table" class="table-btn" onclick="hideDgeGoTable()">Hide Table</a>
-          ${dgeTable}
-           <h4>Differentially spliced genes.</h4>
-            <a id="show-dasgo-table" class="table-btn" onclick="showDasGoTable()">Show Table</a>
-            <a id="hide-dasgo-table" class="table-btn" onclick="hideDasGoTable()">Hide Table</a>
-           ${dasTable}
-        </article>
-    </section>
+    <a name="go"></a>
+    <article>
+      <h2>Gene Ontology Overrepresentation Analysis.</h2>
+      <p>Gene Ontology <tt>go.obo</tt> file: ${go_version} with ${n_go_terms} terms.</p>
+      <p>${annotation_term_count} terms used for a total of ${annotation_count} annotations for ${annotated_genes} genes.</p>
+      <h4>Differentially expressed and differentially spliced genes (n=${n_dasdge})</h4>
+       <p>${n_dasdge_unmapped} of the ${n_dasdge} genes could not be mapped to gene ids for GO analysis
+            <div class="tooltip">(Hover here for details)
+              <span class="tooltiptext">${unmappable_dasdge_list}</span>
+            </div>.</p>
+      <a id="show-dasdgego-table" class="table-btn" onclick="showDasDgeGoTable()">Show Table</a>
+      <a id="hide-dasdgego-table" class="table-btn" onclick="hideDasDgeGoTable()">Hide Table</a>
+      ${dasDgeTable}
+      <h4>Differentially expressed genes (n=${n_dge})</h4>
+       <p>${n_dge_unmapped} of the ${n_dge} genes could not be mapped to gene ids for GO analysis
+       <div class="tooltip">(Hover here for details)
+              <span class="tooltiptext">${unmappable_dge_list}</span>
+            </div>.</p>
+      <a id="show-dgego-table" class="table-btn" onclick="showDgeGoTable()">Show Table</a>
+      <a id="hide-dgego-table" class="table-btn" onclick="hideDgeGoTable()">Hide Table</a>
+      ${dgeTable}
+      <h4>Differentially spliced genes (n=${n_das?string})</h4>
+      <p>${n_das_unmapped} of the ${n_das} genes could not be mapped to gene ids for GO analysis
+      <div class="tooltip">(Hover here for details)
+        <span class="tooltiptext">${unmappable_das_list}</span>
+      </div>.</p>
+      <a id="show-dasgo-table" class="table-btn" onclick="showDasGoTable()">Show Table</a>
+      <a id="hide-dasgo-table" class="table-btn" onclick="hideDasGoTable()">Hide Table</a>
+      ${dasTable}
+    </article>
+  </section>
 
-    <section>
-        <a name="dasdge"></a>
-        <h1>Genes displaying both differential expression and differential alternative splicing (DAS/DGE)</h1>
-        <p>A total of ${n_dgedas} out of ${populationCount} genes in the population showed both differential alternative splicing (DAS) and
+  <section>
+    <a name="dasdge"></a>
+    <h1>Genes displaying both differential expression and differential alternative splicing (DAS/DGE)</h1>
+    <p>A total of ${n_dasdge} out of ${populationCount} genes in the population showed both differential alternative splicing (DAS) and
         differential gene expression (DGE).</p>
-        <#list dgedaslist as gene>
-              <article>
-              ${gene}
-             </article>
-        </#list>
-    </section>
+    <#list dgedaslist as gene>
+      <article>
+        ${gene}
+      </article>
+    </#list>
+  </section>
 
-        <section>
-            <a name="das"></a>
-            <h1>Genes displaying differential alternative splicing (DAS)</h1>
-             <p>A total of ${n_das} out of ${populationCount} genes in the population showed differential alternative splicing (DAS).</p>
-            <#list daslist as gene>
-                  <article>
-                  ${gene}
-                 </article>
-            </#list>
-        </section>
+  <section>
+    <a name="das"></a>
+    <h1>Genes displaying differential alternative splicing (DAS)</h1>
+    <p>A total of ${n_das} out of ${populationCount} genes in the population showed differential alternative splicing (DAS).
+    <div class="tooltip">(Details)
+      <span class="tooltiptext">${unmappable_das_list}</span>
+    </div> </p>
+    <#list daslist as gene>
+      <article>
+        ${gene}
+      </article>
+    </#list>
+  </section>
 
+  <section>
+    <a name="dge"></a>
+    <h1>Genes displaying differential expression (DGE)</h1>
+    <p>A total of ${n_dge} out of ${populationCount} genes in the population showed  differential gene expression (DGE).</pb>
+    <#list dgelist as gene>
+      <article>
+        ${gene}
+      </article>
+    </#list>
+  </section>
 
+  <section>
+    <a name="about"></a>
+    <article>
+      <h2>About</h2>
+      <p>Isopret TODO some text.</p>
+    </article>
+  </section>
 
-           <section>
-               <a name="dge"></a>
-               <h1>Genes displaying differential expression (DGE)</h1>
-                <p>A total of ${n_dge} out of ${populationCount} genes in the population showed  differential gene expression (DGE).</pb>
-               <#list dgelist as gene>
-                     <article>
-                     ${gene}
-                    </article>
-               </#list>
-           </section>
-
-
-      <section>
-        <a name="about"></a>
-        <article>
-          <h2>About</h2>
-            <p>Isopret TODO some text.</p>
-        </article>
-      </section>
       <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
-  </main>
-  <footer>
-    <p>Isopret &copy; 2021</p>
-  </footer>
 
-  <script>
+</main>
+<footer>
+  <p>Isopret &copy; 2021</p>
+</footer>
+
+<script>
   function showTooltip(evt, text) {
     let tooltip = document.getElementById("tooltip");
     tooltip.innerText = text;
@@ -492,59 +532,59 @@ a.svg:hover, a.svg:active {
   }
 
 
-   function showDgeGoTable() {
-      var table = document.getElementById("dgego-table");
-      table.style.display = "block";
-      var showtablebtn = document.getElementById("show-dgego-table");
-      showtablebtn.style.display = "none";
-      var hidetablebtn = document.getElementById("hide-dgego-table");
-      hidetablebtn.style.display = "block";
-    }
+  function showDgeGoTable() {
+    var table = document.getElementById("dgego-table");
+    table.style.display = "block";
+    var showtablebtn = document.getElementById("show-dgego-table");
+    showtablebtn.style.display = "none";
+    var hidetablebtn = document.getElementById("hide-dgego-table");
+    hidetablebtn.style.display = "block";
+  }
 
-    function hideDgeGoTable() {
-      var table = document.getElementById("dgego-table");
-      table.style.display = "none";
-      var showtablebtn = document.getElementById("show-dgego-table");
-      showtablebtn.style.display = "block";
-      var hidetablebtn = document.getElementById("hide-dgego-table");
-      hidetablebtn.style.display = "none";
-    }
+  function hideDgeGoTable() {
+    var table = document.getElementById("dgego-table");
+    table.style.display = "none";
+    var showtablebtn = document.getElementById("show-dgego-table");
+    showtablebtn.style.display = "block";
+    var hidetablebtn = document.getElementById("hide-dgego-table");
+    hidetablebtn.style.display = "none";
+  }
 
-    function showDasGoTable() {
-      var table = document.getElementById("dasgo-table");
-      table.style.display = "block";
-      var showtablebtn = document.getElementById("show-dasgo-table");
-      showtablebtn.style.display = "none";
-      var hidetablebtn = document.getElementById("hide-dasgo-table");
-      hidetablebtn.style.display = "block";
-    }
+  function showDasGoTable() {
+    var table = document.getElementById("dasgo-table");
+    table.style.display = "block";
+    var showtablebtn = document.getElementById("show-dasgo-table");
+    showtablebtn.style.display = "none";
+    var hidetablebtn = document.getElementById("hide-dasgo-table");
+    hidetablebtn.style.display = "block";
+  }
 
-    function hideDasGoTable() {
-      var table = document.getElementById("dasgo-table");
-      table.style.display = "none";
-      var showtablebtn = document.getElementById("show-dasgo-table");
-      showtablebtn.style.display = "block";
-      var hidetablebtn = document.getElementById("hide-dasgo-table");
-      hidetablebtn.style.display = "none";
-    }
+  function hideDasGoTable() {
+    var table = document.getElementById("dasgo-table");
+    table.style.display = "none";
+    var showtablebtn = document.getElementById("show-dasgo-table");
+    showtablebtn.style.display = "block";
+    var hidetablebtn = document.getElementById("hide-dasgo-table");
+    hidetablebtn.style.display = "none";
+  }
 
-    function showDasDgeGoTable() {
-      var table = document.getElementById("dasdgego-table");
-      table.style.display = "block";
-      var showtablebtn = document.getElementById("show-dasdgego-table");
-      showtablebtn.style.display = "none";
-      var hidetablebtn = document.getElementById("hide-dasdgego-table");
-      hidetablebtn.style.display = "block";
-    }
+  function showDasDgeGoTable() {
+    var table = document.getElementById("dasdgego-table");
+    table.style.display = "block";
+    var showtablebtn = document.getElementById("show-dasdgego-table");
+    showtablebtn.style.display = "none";
+    var hidetablebtn = document.getElementById("hide-dasdgego-table");
+    hidetablebtn.style.display = "block";
+  }
 
-    function hideDasDgeGoTable() {
-      var table = document.getElementById("dasdgego-table");
-      table.style.display = "none";
-      var showtablebtn = document.getElementById("show-dasdgego-table");
-      showtablebtn.style.display = "block";
-      var hidetablebtn = document.getElementById("hide-dasdgego-table");
-      hidetablebtn.style.display = "none";
-    }
-  </script>
+  function hideDasDgeGoTable() {
+    var table = document.getElementById("dasdgego-table");
+    table.style.display = "none";
+    var showtablebtn = document.getElementById("show-dasdgego-table");
+    showtablebtn.style.display = "block";
+    var hidetablebtn = document.getElementById("hide-dasdgego-table");
+    hidetablebtn.style.display = "none";
+  }
+</script>
 </body>
 </html>

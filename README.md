@@ -85,11 +85,24 @@ java -jar target/isopret.jar download
 After setting up the app and downloading the files, prositometry can be run with an HBA-DEALS output file that
 includes transcript IDs. Additional options are available (TODO).
 ```
-java -jar target/isopret.jar hbadeals 
--b
-<path to HBADEALS output file>
---prositemap
-all_prosite_motifs.txt
+Usage: isopret hbadeals [-hV] [-a=<goGafFile>] -b=<hbadealsFile>
+                        [-f=<fastaFile>] [-g=<goOboFile>] [-j=<jannovarPath>]
+                        [-p=<prositeDataFile>] [--prefix=<outprefix>]
+                        --prositemap=<prositeMapFile>
+Analyze HBA-DEALS files
+  -a, --gaf=<goGafFile>      goa_human.gaf.gz file
+  -b, --hbadeals=<hbadealsFile>
+                             HBA-DEALS output file
+  -g, --go=<goOboFile>       go.obo file
+  -h, --help                 Show this help message and exit.
+  -j, --jannovar=<jannovarPath>
+                             Path to Jannovar transcript file
+  -p, --prosite=<prositeDataFile>
+                             prosite.dat file
+      --prefix=<outprefix>   Name of output file (without .html ending)
+      --prositemap=<prositeMapFile>
+                             prosite mape file
+  -V, --version              Print version information and exit.
 ```
 
 To get these files not the following

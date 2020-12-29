@@ -6,6 +6,7 @@ import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.go.HbaDealsGoAnalysis;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
+import org.jax.isopret.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.html.HtmlTemplate;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
@@ -48,6 +49,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String goGafFile = "data/goa_human.gaf";
     @CommandLine.Option(names = {"-j", "--jannovar"}, description = "Path to Jannovar transcript file")
     private String jannovarPath = "data/hg38_ensembl.ser";
+    @CommandLine.Option(names={"--prefix"}, description = "Name of output file (without .html ending)")
+    private String outprefix = "isopret";
 
 
     private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();
@@ -67,6 +70,11 @@ public class HbaDealsCommand implements Callable<Integer> {
         GoParser goParser = new GoParser(goOboFile, goGafFile);
         final Ontology ontology = goParser.getOntology();
         final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
+        data.put("go_version", ontology.getMetaInfo().getOrDefault("data-version", "unknown"));
+        data.put("n_go_terms", ontology.getNonObsoleteTermIds().size());
+        data.put("annotation_term_count", goAssociationContainer.getOntologyTermCount());
+        data.put("annotation_count", goAssociationContainer.getRawAssociations().size());
+        data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
         System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
         System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
 
@@ -79,9 +87,27 @@ public class HbaDealsCommand implements Callable<Integer> {
         Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        HbaDealsThresholder thresholder = new HbaDealsThresholder(hbaDealsResults);
 
-        HbaDealsGoAnalysis hbago = HbaDealsGoAnalysis.termForTerm(hbaDealsResults, ontology, goAssociationContainer);
+
+
+
+        HbaDealsGoAnalysis hbago = HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer);
+
         int populationSize = hbago.populationCount();
+        data.put("n_population", populationSize);
+        data.put("n_das", hbago.dasCount());
+        data.put("n_das_unmapped", hbago.unmappedDasCount());
+        data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
+        data.put("n_dge", hbago.dgeCount());
+        data.put("n_dge_unmapped", hbago.unmappedDgeCount());
+        data.put("unmappable_dge_list", Util.fromList(hbago.unmappedDgeSymbols(), "Unmappable DGE Gene Symbols"));
+        data.put("n_dasdge", hbago.dasDgeCount());
+        data.put("n_dasdge_unmapped", hbago.unmappedDasDgeCount());
+        data.put("unmappable_dasdge_list", Util.fromList(hbago.unmappedDasDgeSymbols(), "Unmappable DAS/DGE Gene Symbols"));
+        data.put("probability_threshold", thresholder.getProbabilityThreshold());
+        data.put("expression_threshold", thresholder.getExpressionThreshold());
+        data.put("splicing_threshold", thresholder.getSplicingThreshold());
         List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
         List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
         List<GoTerm2PValAndCounts> dasDgeGoTerms = hbago.dasDgeOverrepresetationAnalysis();
@@ -112,7 +138,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         Set<TermId> einrichedGoTermIdSet = Stream.concat(dasDgeGoTerms.stream(), dgeGoTerms.stream())
                 .map(GoTerm2PValAndCounts::getItem)
                 .collect(Collectors.toSet());
-        Map<String, List<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
+        Map<String, Set<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
 
         System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
@@ -148,19 +174,14 @@ public class HbaDealsCommand implements Callable<Integer> {
 
             AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
             System.out.printf("[INFO] processing %s: ", geneSymbol);
-            if (einrichedGoTermIdSet.contains(geneSymbol)) {
-                System.out.println("[WOW] " + geneSymbol);
-            } else {
-                System.out.println("[MISED] " + geneSymbol);
-            }
             if (result.isDASandDGE()) {
-                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
                 dasAndDgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
             } else if (result.isDAS()) {
-                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
                 dasVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
             } else if (result.isDGE()) {
-                List<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new ArrayList<>());
+                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
                 dgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
             } else {
                 // should never get here, sanity check
@@ -169,11 +190,11 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
 
         data.put("dgedaslist", dasAndDgeVisualizations);
-        data.put("n_dgedas", dasAndDgeVisualizations.size());
+      //  data.put("n_dgedas", dasAndDgeVisualizations.size());
         data.put("daslist", dasVisualizations);
-        data.put("n_das", dasVisualizations.size());
+        //data.put("n_das", dasVisualizations.size());
         data.put("dgelist", dgeVisualizations);
-        data.put("n_dge", dgeVisualizations.size());
+        //data.put("n_dge", dgeVisualizations.size());
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();
         for (var v : dgeGoTerms) {
@@ -185,7 +206,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         data.put("hbadealsFile", f.getName());
 
 
-        HtmlTemplate template = new HtmlTemplate(data);
+        HtmlTemplate template = new HtmlTemplate(data, this.outprefix);
         template.outputFile();
         System.out.println("[INFO] Total unidentified genes:"+ unidentifiedSymbols.size());
         System.out.printf("[INFO] Total HBADEALS results: %d, found transcripts %d, also significant %d, also prosite: %d\n",
@@ -195,10 +216,10 @@ public class HbaDealsCommand implements Callable<Integer> {
 
     /**
      *
-     * @param goTerms
-     * @param ontology
+     * @param goTerms List of Pvals & counts for an enriched GO Term
+     * @param ontology reference to Gene Ontology object
      * @param title -- title as it will be used in the JavaScript, e.g., "dgego-table"
-     * @return
+     * @return an HTML table representing the results of GO analysis
      */
     private String getGoHtmlTable(List<GoTerm2PValAndCounts> goTerms, Ontology ontology, String title) {
         List<GoVisualizable> govis = new ArrayList<>();

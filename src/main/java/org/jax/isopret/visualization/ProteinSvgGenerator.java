@@ -1,7 +1,6 @@
 package org.jax.isopret.visualization;
 
 
-import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
@@ -16,14 +15,12 @@ import java.util.*;
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
     static final int SVG_WIDTH = 1400;
     static final int HEIGHT_FOR_SV_DISPLAY = 100;
-    static final int HEIGHT_PER_DISPLAY_ITEM = 80;
-    private static final int ISOFORM_HEIGHT = 30;
+    static final int HEIGHT_PER_DISPLAY_ITEM = 60;
+    private static final int ISOFORM_HEIGHT = 20;
     private final static String[] colors = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF", "F7DC6F", "CFFF98", "A1D6E2",
             "EC96A4", "E6DF44", "F76FDA", "FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6", "FFC300", "F76FF5", "FFFF99",
             "FF99FF", "99FFFF", "CCFF99", "FFE5CC", "FFD700", "9ACD32", "7FFFD4", "FFB6C1", "FFFACD",
             "FFE4E1", "F0FFF0", "F0FFFF"};
-
-    private final Map<String, HbaDealsTranscriptResult> results;
 
     private final Map<String, List<PrositeHit>> prositeHitMap;
 
@@ -48,7 +45,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
         super(SVG_WIDTH, height);
         // get prosite data if possible
-        this.results = annotatedGene.getHbaDealsResult().getTranscriptMap();
         this.prositeHitMap = annotatedGene.getPrositeHitMap();
         this.prositeId2nameMap = id2nameMap;
         this.expressedTranscriptList = annotatedGene.getExpressedTranscripts();
@@ -83,7 +79,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     /**
      * Transform an amino-acid coordinate to an SVG X coordinate
      *
-     * @return
+     * @return coordinate of a given protein amino acid position in SVG space
      */
     protected double translateProteinToSvgCoordinate(int aminoAcidPosition) {
         final double span = this.proteinMaxSvgPos - this.proteinMinSvgPos;
@@ -95,9 +91,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     /**
      * Write a box for the entire transcript
      *
-     * @param ypos
-     * @param writer
-     * @throws IOException
+     * @param ypos SVG Y coordinate to write the protein box
+     * @param writer file handle
+     * @throws IOException if we cannot write the box
      */
     protected void writeProteinBox(Transcript transcript, int ypos, Writer writer) throws IOException {
         double xstart = this.proteinMinSvgPos;
@@ -205,7 +201,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      * SVG (for this, user {@link #getSvg()}
      *
      * @param writer a file handle
-     * @throws IOException if we cannot write.
      */
     @Override
     public void write(Writer writer) {
