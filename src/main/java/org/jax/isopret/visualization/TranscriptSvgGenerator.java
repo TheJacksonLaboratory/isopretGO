@@ -29,30 +29,55 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     static final int HEIGHT_FOR_SV_DISPLAY = 200;
     static final int HEIGHT_PER_DISPLAY_ITEM = 80;
 
-    /** Canvas height of the SVG.*/
+    /**
+     * Canvas height of the SVG.
+     */
     protected int SVG_HEIGHT;
-    /** List of transcripts that are affected by the SV and that are to be shown in the SVG. */
+    /**
+     * List of transcripts that are affected by the SV and that are to be shown in the SVG.
+     */
     protected final List<Transcript> affectedTranscripts;
-    /** List of log fold changes  -- key is the accession id from {@link #affectedTranscripts}. */
+    /**
+     * List of log fold changes  -- key is the accession id from {@link #affectedTranscripts}.
+     */
     private final Map<String, Double> foldChanges;
 
-    /** Boundaries of SVG we do not write to. */
+    private final double expressionLog2FoldChange;
+    private final double expressionPval;
+
+    /**
+     * Boundaries of SVG we do not write to.
+     */
     private final double OFFSET_FACTOR = 0.1;
 
-    private final double SVG_OFFSET = SVG_WIDTH * OFFSET_FACTOR;
-    /** Number of base pairs from left to right boundary of the display area */
+    // private final double SVG_OFFSET = SVG_WIDTH * OFFSET_FACTOR;
+    /**
+     * Number of base pairs from left to right boundary of the display area
+     */
     private final double genomicSpan;
-    /** Leftmost position (most 5' on chromosome). */
+    /**
+     * Leftmost position (most 5' on chromosome).
+     */
     protected final int genomicMinPos;
-    /** Rightmost position (most 3' on chromosome). */
+    /**
+     * Rightmost position (most 3' on chromosome).
+     */
     protected final int genomicMaxPos;
-    /** Equivalent to {@link #genomicMinPos} minus an offset so that the display items are not at the very edge. */
+    /**
+     * Equivalent to {@link #genomicMinPos} minus an offset so that the display items are not at the very edge.
+     */
     protected final int paddedGenomicMinPos;
-    /** Equivalent to {@link #genomicMaxPos} plus an offset so that the display items are not at the very edge. */
+    /**
+     * Equivalent to {@link #genomicMaxPos} plus an offset so that the display items are not at the very edge.
+     */
     protected final int paddedGenomicMaxPos;
-    /** Number of base pairs from left to right boundary of the entire canvas */
+    /**
+     * Number of base pairs from left to right boundary of the entire canvas
+     */
     private final double paddedGenomicSpan;
-    /** Minimum position of the scale TODO shouldnt this be {@link #genomicMinPos} ??? */
+    /**
+     * Minimum position of the scale TODO shouldnt this be {@link #genomicMinPos} ???
+     */
     private final double scaleMinPos;
 
     private final double scaleMaxPos;
@@ -61,11 +86,17 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
 
     protected final double INTRON_MIDPOINT_ELEVATION = 10.0;
-    /** Height of the symbols that represent the transcripts */
+    /**
+     * Height of the symbols that represent the transcripts
+     */
     private final double EXON_HEIGHT = 20;
-    /** Y skip to put text underneath transcripts. Works with {@link #writeTranscriptName}*/
-    protected final double Y_SKIP_BENEATH_TRANSCRIPTS = 50;
-    /** Height of the symbol that represents the structural variant. */
+    /**
+     * Y skip to put text underneath transcripts. Works with {@link #writeTranscriptName}
+     */
+    protected final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
+    /**
+     * Height of the symbol that represents the structural variant.
+     */
     protected final double SV_HEIGHT = 30;
 
 
@@ -74,6 +105,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * TODO -- make sure we deal with version numbers in a uniform way. Now, we
      * are assuming that the HBADeals object does NOT use a version number.
+     *
      * @param annotatedGene an object with all information about a gene that is relevant for making the SVG/HTML output
      * @return list of transcripts
      */
@@ -81,26 +113,27 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         List<Transcript> transcripts = annotatedGene.getTranscripts();
         HbaDealsResult result = annotatedGene.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
-        List<Transcript> affectedTranscripts = transcripts
+        return transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
                 .collect(Collectors.toList());
-        return affectedTranscripts;
     }
 
 
     /**
      * The constructor calculates the left and right boundaries for display
-     * TODO document logic, cleanup
-     *  @param atranscript Object with transcripts and annotations
+     *
+     * @param annotatedGene Object with transcripts and annotations
      */
-    private TranscriptSvgGenerator(int height, AnnotatedGene atranscript) {
-        super(SVG_WIDTH,height);
-        this.affectedTranscripts = getAffectedTranscripts(atranscript);
-        this.hbaDealsResult = atranscript.getHbaDealsResult();
-        this.foldChanges = getFoldChangesOfAffectedTranscripts(atranscript);
+    private TranscriptSvgGenerator(int height, AnnotatedGene annotatedGene) {
+        super(SVG_WIDTH, height);
+        this.affectedTranscripts = getAffectedTranscripts(annotatedGene);
+        this.hbaDealsResult = annotatedGene.getHbaDealsResult();
+        this.foldChanges = getFoldChangesOfAffectedTranscripts(annotatedGene);
+        this.expressionPval = annotatedGene.getHbaDealsResult().getExpressionP();
+        this.expressionLog2FoldChange =  annotatedGene.getHbaDealsResult().getExpressionFoldChange();
 
-        this.genomicMinPos= affectedTranscripts.stream()
+        this.genomicMinPos = affectedTranscripts.stream()
                 .map(t -> t.withStrand(Strand.POSITIVE))
                 .mapToInt(GenomicRegion::start)
                 .min()
@@ -111,16 +144,14 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
                 .max()
                 .orElse(this.genomicMinPos + 1000); // We should never actually need the orElse
         this.genomicSpan = this.genomicMaxPos - this.genomicMinPos;
-        this.paddedGenomicMinPos = genomicMinPos - (int)(0.05*(this.genomicSpan));
-        this.paddedGenomicMaxPos = genomicMaxPos + (int)(0.23*(this.genomicSpan));
+        this.paddedGenomicMinPos = genomicMinPos - (int) (0.05 * (this.genomicSpan));
+        this.paddedGenomicMaxPos = genomicMaxPos + (int) (0.23 * (this.genomicSpan));
         this.paddedGenomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
-        this.scaleBasePairs = 1 + this.genomicMaxPos  -  this.genomicMinPos;
+        this.scaleBasePairs = 1 + this.genomicMaxPos - this.genomicMinPos;
         this.scaleMinPos = translateGenomicToSvg(genomicMinPos);
         this.scaleMaxPos = translateGenomicToSvg(genomicMaxPos);
 
     }
-
-
 
 
     /**
@@ -141,11 +172,11 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * Write a coding exon
      *
-     * @param start
-     * @param end
-     * @param ypos
-     * @param writer
-     * @throws IOException
+     * @param start start position in SVG sapce of a CDS exon
+     * @param end end position in SVG sapce of a CDS exon
+     * @param ypos vertical position to draw exon
+     * @param writer file handle
+     * @throws IOException if we cannot write the exon
      */
     protected void writeCdsExon(double start, double end, int ypos, Writer writer) throws IOException {
         double width = end - start;
@@ -159,9 +190,9 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * WRite a non-coding (i.e., UTR) exon of a non-coding gene
      *
-     * @param start start position in SVG coordinates of the UTR exon
-     * @param end end position in SVG coordinates of the UTR exon
-     * @param ypos yposition on SVG canvas
+     * @param start  start position in SVG coordinates of the UTR exon
+     * @param end    end position in SVG coordinates of the UTR exon
+     * @param ypos   yposition on SVG canvas
      * @param writer file handle
      * @throws IOException if we cannot write
      */
@@ -212,18 +243,17 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         }
         writeIntrons(exons, ypos, writer);
         writeTranscriptName(tmod, minX, ypos, writer);
-       writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
+        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
     }
 
     private void writeNonCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
         Transcript transcript = tmod.withStrand(Strand.POSITIVE);
         List<GenomicRegion> exons = transcript.exons();
-        double minX = Double.MAX_VALUE;
+        double minX = transcript.start();
         // write a line for UTR, otherwise write a box
         for (GenomicRegion exon : exons) {
             double exonStart = translateGenomicToSvg(exon.start());
             double exonEnd = translateGenomicToSvg(exon.end());
-            if (exonStart < minX) minX = exonStart;
             writeUtrExon(exonStart, exonEnd, ypos, writer);
         }
         writeIntrons(exons, ypos, writer);
@@ -232,7 +262,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     }
 
 
-        private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedGene atranscript) {
+    private Map<String, Double> getFoldChangesOfAffectedTranscripts(AnnotatedGene atranscript) {
         Map<String, Double> foldchanges = new HashMap<>();
         HbaDealsResult result = atranscript.getHbaDealsResult();
         Map<String, HbaDealsTranscriptResult> transcriptResultMap = result.getTranscriptMap();
@@ -240,8 +270,8 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             String id = transcript.getAccessionIdNoVersion();
             if (transcriptResultMap.containsKey(id)) {
                 double fc = transcriptResultMap.get(id).getFoldChange();
-                double logFC = Math.log(fc)/ Math.log(2);
-                foldchanges.put(id , logFC);
+                double logFC = Math.log(fc) / Math.log(2);
+                foldchanges.put(id, logFC);
             } else {
                 foldchanges.put(id, 0.0);
             }
@@ -251,7 +281,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
     private double getLogFoldChage(String id) {
         Map<String, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
-        if (! transcriptResultMap.containsKey(id)) return 0.0;
+        if (!transcriptResultMap.containsKey(id)) return 0.0;
         double fc = transcriptResultMap.get(id).getFoldChange();
         return Math.log(fc) / Math.log(2);
     }
@@ -259,14 +289,18 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private String getFormatedPvalue(String id) {
         Map<String, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         double logFC = getLogFoldChage(id);
-        if (! transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
-        double p =  transcriptResultMap.get(id).getP();
-        if (p >= 0.05) {
-            return String.format("%.2f (n.s.)", logFC);
-        } else if (p > 0.001) {
-            return String.format("%.2f (p=%.4f)", logFC, p);
+        if (!transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
+        double p = transcriptResultMap.get(id).getP();
+        return getFormatedPvalue(logFC, p);
+    }
+
+    private String getFormatedPvalue(double logFc, double pval) {
+        if (pval >= 0.05) {
+            return String.format("%.2f (n.s.)", logFc);
+        } else if (pval > 0.001) {
+            return String.format("%.2f (p=%.4f)", logFc, pval);
         }
-        return String.format("%.2f (p=%.2E)", logFC, p);
+        return String.format("%.2f (p=%.2E)", logFc, pval);
     }
 
 
@@ -275,19 +309,19 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         double startpos = translateGenomicToSvg(this.genomicMaxPos) + 25.0;
         double y = ypos;
         writer.write(String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\"/>\n",
-                startpos, y, startpos+30, y));
+                startpos, y, startpos + 30, y));
         double width = 20.0;
         double boxstart = startpos + 5.0;
         double factor = 25; // multiple logFC by this to get height
         String rect;
         if (fc > 0.0) {
-            double height = fc*factor;
+            double height = fc * factor;
             double ybase = y - height;
             rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
                             "style=\"stroke:%s; fill: %s\" />\n",
                     boxstart, ybase, width, height, BLACK, GREEN);
         } else {
-            double height = fc*-factor;
+            double height = fc * -factor;
             rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
                             "style=\"stroke:%s; fill: %s\" />\n",
                     boxstart, y, width, height, BLACK, RED);
@@ -296,6 +330,36 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         double xpos = startpos + width + 15;
         String txt = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
                 xpos, y, PURPLE, getFormatedPvalue(id));
+        writer.write(txt);
+
+    }
+
+
+    private void writeFoldChange(double logFc, double pval, int ypos, Writer writer) throws IOException {
+        double startpos = translateGenomicToSvg(this.genomicMaxPos) + 25.0;
+        double y = ypos;
+        writer.write(String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\"/>\n",
+                startpos, y, startpos + 30, y));
+        double width = 20.0;
+        double boxstart = startpos + 5.0;
+        double factor = 25; // multiple logFC by this to get height
+        String rect;
+        if (logFc > 0.0) {
+            double height = logFc * factor;
+            double ybase = y - height;
+            rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
+                            "style=\"stroke:%s; fill: %s\" />\n",
+                    boxstart, ybase, width, height, BLACK, GREEN);
+        } else {
+            double height = logFc * -factor;
+            rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
+                            "style=\"stroke:%s; fill: %s\" />\n",
+                    boxstart, y, width, height, BLACK, RED);
+        }
+        writer.write(rect);
+        double xpos = startpos + width + 15;
+        String txt = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
+                xpos, y, PURPLE, getFormatedPvalue(logFc, pval));
         writer.write(txt);
 
     }
@@ -370,31 +434,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         writer.write(txt);
     }
 
-    protected void writeScale(Writer writer, Contig contig, int ypos) throws IOException {
-        int verticalOffset = 10;
-        String line = String.format("<line x1=\"%f\" y1=\"%d\"  x2=\"%f\"  y2=\"%d\" style=\"stroke: #000000; fill:none;" +
-                " stroke-width: 1px;" +
-                " stroke-dasharray: 5 2\" />\n", this.scaleMinPos, ypos, this.scaleMaxPos, ypos);
-        String leftVertical = String.format("<line x1=\"%f\" y1=\"%d\"  x2=\"%f\"  y2=\"%d\" style=\"stroke: #000000; fill:none;" +
-                " stroke-width: 1px;\" />\n", this.scaleMinPos, ypos + verticalOffset, this.scaleMinPos, ypos - verticalOffset);
-        String rightVertical = String.format("<line x1=\"%f\" y1=\"%d\"  x2=\"%f\"  y2=\"%d\" style=\"stroke: #000000; fill:none;" +
-                " stroke-width: 1px;\" />\n", this.scaleMaxPos, ypos + verticalOffset, this.scaleMaxPos, ypos - verticalOffset);
-        String sequenceLength = getSequenceLengthString(scaleBasePairs);
-        writer.write(line);
-        writer.write(leftVertical);
-        writer.write(rightVertical);
-        int y = ypos - 15;
-        double xmiddle = 0.45 * (this.scaleMinPos + this.scaleMaxPos);
-        double xcloseToStart = 0.1 * (this.scaleMinPos + this.scaleMaxPos);
-        String txt = String.format("<text x=\"%f\" y=\"%d\" fill=\"%s\">%s</text>\n",
-                xmiddle, y, PURPLE, sequenceLength);
-        writer.write(txt);
-        String contigName = contig.ucscName();
-        txt = String.format("<text x=\"%f\" y=\"%d\" fill=\"%s\">%s</text>\n",
-                xcloseToStart, y, PURPLE, contigName);
-        writer.write(txt);
-    }
-
 
     /**
      * Get a string that represents a sequence length using bp, kb, or Mb as appropriate
@@ -432,25 +471,12 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         }
     }
 
-    /**
-     * PROTOTYPE -- THIS MAYBE NOT BE THE BEST WAY TO REPRESENT OTHER TUPES OF SV
-     * @param ypos  The y position where we will write the cartoon
-     * @param msg A String describing the SV
-     * @param writer a file handle
-     * @throws IOException if we can't write
-     * TODO -- ADAPT THIS TO SHOW A BOX OVER AREAS THAT SHOW ALTERNATIVE SPLICING
-     */
-    private void writeDeletion(int ypos, String msg, Writer writer) throws IOException {
-        double start = 42;//translateGenomicToSvg(variant.start());
-        double end = 43;//translateGenomicToSvg(variant.end()); -- TODO
-        double width = end - start;
-        double Y = ypos + 0.5 * SV_HEIGHT;
-        String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
-                        "style=\"stroke:%s; fill: %s\" />\n",
-                start, Y, width, SV_HEIGHT, DARKGREEN, RED);
-        writer.write(rect);
-        Y += 1.75*SV_HEIGHT;
-        writer.write(String.format("<text x=\"%f\" y=\"%f\"  fill=\"%s\">%s</text>\n",start -10,Y, PURPLE, msg));
+    private void writeGeneExpression(Writer writer, int ypos) throws IOException {
+        int xpos = 1050;
+        String txt = String.format("<text font-style=\"italic\" font-weight=\"bold\" font-size=\"1.2em\" x=\"%d\" y=\"%d\" fill=\"%s\">Expression:</text>\n",
+                xpos, ypos, DARKBLUE);
+        writeFoldChange(this.expressionLog2FoldChange, this.expressionPval, ypos, writer);
+        writer.write(txt);
     }
 
     /**
@@ -460,12 +486,12 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @param writer a file handle
      */
     @Override
-    public void write(Writer writer)  {
+    public void write(Writer writer) {
         int starty = 50;
         int y = starty;
-        // TODO WRITE SYMBOLS TO DESCRIBE THE ALTERNATE SPLICING
-        y += 100;
         try {
+            writeGeneExpression(writer, y);
+            y += 50;
             for (var tmod : this.affectedTranscripts) {
                 if (tmod.isCoding()) {
                     writeCodingTranscript(tmod, y, writer);
