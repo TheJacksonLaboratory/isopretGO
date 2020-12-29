@@ -155,9 +155,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
 
     /**
-     * Transform a genomic coordinate to an SVG X coordinate
-     *
-     * @return
+     * @return SVG coordinate that corresponds to a genomic position.
      */
     protected double translateGenomicToSvg(int genomicCoordinate) {
         double pos = genomicCoordinate - paddedGenomicMinPos;
@@ -487,8 +485,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     @Override
     public void write(Writer writer) {
-        int starty = 50;
-        int y = starty;
+        int y = 50;
         try {
             writeGeneExpression(writer, y);
             y += 50;

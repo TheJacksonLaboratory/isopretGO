@@ -1,7 +1,5 @@
 package org.jax.isopret.go;
 
-import org.monarchinitiative.phenol.stats.mtc.BenjaminiHochberg;
-
 public enum MtcMethod {
     BENJAMINI_HOCHBERG("Benjamini-Hochberg"),
     BENJAMINI_YEKUTIELI("Benjamini-Yekutieli"),

@@ -15,7 +15,6 @@ import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
 import org.jax.isopret.visualization.*;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
-import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
@@ -133,6 +132,7 @@ public class HbaDealsCommand implements Callable<Integer> {
             outputStudySet(thresholder.dasGeneSymbols(), "das");
             outputStudySet(thresholder.dgeGeneSymbols(), "dge");
             outputStudySet(thresholder.dasDgeGeneSymbols(), "dasdge");
+            outputStudySet(thresholder.population(), "population");
         }
         // Add differentially expressed genes/GO analysis
         String dgeTable = getGoHtmlTable(dgeGoTerms, ontology, "dgego-table");
