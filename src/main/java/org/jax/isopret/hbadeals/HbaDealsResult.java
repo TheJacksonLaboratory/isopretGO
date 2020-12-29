@@ -1,16 +1,17 @@
 package org.jax.isopret.hbadeals;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class HbaDealsResult {
-    /** Some genes only have a splicing result. */
-    private boolean hasExpressionResult = false;
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final String geneAccession;
     private final String symbol;
     private double expressionFoldChange;
     private double expressionP;
     private final Map<String, HbaDealsTranscriptResult> transcriptMap;
+
+    private final double DEFAULT_THRESHOLD = 0.1;
 
 
     public HbaDealsResult(String geneAccession, String sym) {
@@ -22,7 +23,6 @@ public class HbaDealsResult {
     public void addExpressionResult(double fc, double p) {
         this.expressionFoldChange = fc;
         this.expressionP = p;
-        hasExpressionResult = true;
     }
 
     public void addTranscriptResult(String isoform, double expFC, double P) {
@@ -51,6 +51,13 @@ public class HbaDealsResult {
         return expressionP;
     }
 
+    public List<Double> getSplicingPlist() {
+        return this.transcriptMap
+                .values()
+                .stream()
+                .map(HbaDealsTranscriptResult::getP)
+                .collect(Collectors.toList());
+    }
 
 
     public Map<String, HbaDealsTranscriptResult> getTranscriptMap() {
@@ -67,8 +74,10 @@ public class HbaDealsResult {
                 .anyMatch(HbaDealsTranscriptResult::isSignificant);
     }
 
+    public boolean hasSignificantExpressionResult(double threshold) { return this.expressionP < threshold; }
+
     public boolean hasSignificantExpressionResult() {
-        return this.expressionP < 0.05;
+        return hasSignificantExpressionResult(DEFAULT_THRESHOLD);
     }
 
     public boolean hasaSignificantSplicingResult() {

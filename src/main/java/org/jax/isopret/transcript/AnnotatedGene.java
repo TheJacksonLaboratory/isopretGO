@@ -22,8 +22,9 @@ public class AnnotatedGene {
 
     /**
      *
-     * @param transcripts
-
+     * @param transcripts transcripts encoded by this gene
+     * @param transcriptToHitMap Prosite hits for the transcripts
+     * @param result result of HBA-DEALS analysis for this gene.
      */
     public AnnotatedGene(List<Transcript> transcripts, Map<String, List<PrositeHit>> transcriptToHitMap, HbaDealsResult result) {
         this.transcripts = transcripts;
@@ -35,17 +36,6 @@ public class AnnotatedGene {
                     .stream()
                     .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
                     .collect(Collectors.toList());
-    }
-
-
-    /**
-     * Return true if a Prosite motif overlaps an HBADeals specific exon
-     * and we have at least one significant differential splicing event
-     * @return
-     */
-    public boolean hasOverlappingPrositeHit() {
-        // among expressed transcripts, are the motifs different for differential vs other
-        return false;
     }
 
 

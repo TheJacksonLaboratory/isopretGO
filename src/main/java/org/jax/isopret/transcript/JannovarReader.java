@@ -18,9 +18,9 @@ public class JannovarReader {
 
     private final File jannovarSerFile;
 
-    GenomicAssembly assembly;
-
-    Map<String, List<Transcript>> symbolToTranscriptListMap;
+    private final GenomicAssembly assembly;
+    /** Key -- a gene symbol; value -- list of corresponding transcripts. */
+    private final Map<String, List<Transcript>> symbolToTranscriptListMap;
 
     public JannovarReader(String path, GenomicAssembly assembly) {
         this(new File(path), assembly);

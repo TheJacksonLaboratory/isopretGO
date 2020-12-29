@@ -35,9 +35,11 @@ public class EnsemblVisualizable implements Visualizable {
     private final List<GoTermIdPlusLabel> goterms;
 
 
-    public EnsemblVisualizable(AnnotatedGene agene, List<GoTermIdPlusLabel> goterms) {
+    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms) {
         this.agene = agene;
-        this.goterms = goterms;
+        List<GoTermIdPlusLabel> golist = new ArrayList<>(goterms);
+        Collections.sort(golist);
+        this.goterms = golist;
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
         this.transcriptToHitMap = agene.getPrositeHitMap();
@@ -135,7 +137,7 @@ public class EnsemblVisualizable implements Visualizable {
      * Return data to show the isoforms.
      * We have isoform accession number as a HTML link, followed by isoform log fold change and isoform p value and
      * corrected P value, that is for M rows, we return an M*4 matrix of strings intended to build an HTML table
-     * @return
+     * @return a matrix of data representing the contents of an HTML table for the isoforms
      */
     @Override
     public List<List<String>> getIsoformTableData() {

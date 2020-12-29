@@ -5,6 +5,8 @@ public class HbaDealsTranscriptResult {
     private final double foldChange;
     private final double P;
 
+    private final double DEFAULT_THRESHOLD = 0.13;
+
 
     public HbaDealsTranscriptResult(String transcript, double fc, double p) {
         this.transcript = transcript;
@@ -31,6 +33,10 @@ public class HbaDealsTranscriptResult {
     }
 
     public boolean isSignificant() {
-        return P <= 0.05;
+        return isSignificant(DEFAULT_THRESHOLD);
+    }
+
+    public boolean isSignificant(double threshold) {
+        return this.P < threshold;
     }
 }

@@ -21,10 +21,16 @@ public class HtmlTemplate {
 
     protected static final String EMPTY_STRING="";
 
-    private final String outpath = "isopret.html";
+    private final String outpath;
 
-    public HtmlTemplate(Map<String, Object> data) {
+    /**
+     *
+     * @param data data for freemarker template.
+     * @param outprefix Name of output file (without .html file ending)
+     */
+    public HtmlTemplate(Map<String, Object> data, String outprefix) {
         this.templateData = data;
+        this.outpath = outprefix + ".html";
         this.cfg = new Configuration(new Version("2.3.23"));
         cfg.setDefaultEncoding("UTF-8");
         ClassLoader classLoader = HtmlTemplate.class.getClassLoader();
