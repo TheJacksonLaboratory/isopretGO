@@ -52,19 +52,53 @@ public class HbaDealsThresholder {
     /**
      * Calculates the q-value threshold needed to attain a desired FDR
      * @param probs List of probabilities from HBA-DEALS
-     * @return the p-value threshold associated with the q-value threshold to reach the desired FDR
+     * @return the probability threshold associated with the q-value threshold to reach the desired FDR
      */
     private double getThreshold(List<Double> probs) {
         Collections.sort(probs);
         double cumSum = 0.0;
         double p_threshold = 0.0;
         int count = 0;
-        for (double p : probs) {
-            if (p > MAX_PROB) break;
+        int [] tiesTracker = new int[probs.size()];
+        double previousP = -1.0;
+        int tiesIndex = 0;
+        for (int i=0; i<probs.size(); i++) {
+            double p = probs.get(i);
+            if (p != previousP) {
+                tiesIndex++;
+                previousP = p;
+            }
+            tiesTracker[i] = tiesIndex;
+            if (p > MAX_PROB) {
+                break; // we are done, this and the remaining PEP's are too high
+                // if we get here, then we do not need to worry about ties, the previous element is different
+            }
             count++;
             cumSum += p;
             double qvalue = cumSum/count; // cumulative mean of PEP
-            if (qvalue > probabilityThreshold) break;
+            if (qvalue > probabilityThreshold) {
+                // when we get here, then p_threshold is the threshold for the desired FDR
+                // the exception is when there is a stretch of equal values and we reach the
+                // threshold in the middle of the stretch. If that is the case, then we
+                // go back and take the prior value.
+                // Watch out for edge cases where we would go below an index of zero
+                int j=i-1;
+                if (tiesTracker[j] == tiesTracker[i]) {
+                    // if we get here, then the qvalue has exceeded the desired probability threshold
+                    // in the middle of a run of ties.
+                    // therefore we need to go back to the value right before the run of ties
+                    while (tiesTracker[j] == tiesTracker[i]) j--;
+                    return probs.get(j);
+                }
+
+                while (j>=0 && probs.get(j) == p) {
+                    count--;
+                    cumSum -= p;
+                    qvalue = cumSum/count; // cumulative mean of PEP
+                    j--;
+                }
+                break;
+            }
             p_threshold = p;
         }
         return p_threshold;

@@ -69,7 +69,7 @@ public abstract class AbstractSvgGenerator {
     }
 
     protected void writeHeader(Writer writer) throws IOException {
-        writeHeader(writer, true);
+        writeHeader(writer, false);
     }
 
     /**
