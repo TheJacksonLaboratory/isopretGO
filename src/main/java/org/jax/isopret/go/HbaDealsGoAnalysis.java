@@ -12,7 +12,7 @@ import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.stats.ParentChildIntersectionPValueCalculation;
 import org.monarchinitiative.phenol.stats.ParentChildUnionPValueCalculation;
 import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
-import org.monarchinitiative.phenol.stats.mtc.Bonferroni;
+import org.monarchinitiative.phenol.stats.mtc.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,22 +28,42 @@ public class HbaDealsGoAnalysis {
     private final StudySet das;
     private final StudySet dasDge;
     private final StudySet population;
-    private final GoMethod method;
-
-//    public List<GoTermIdPlusLabel> getAnnotatingGoTerms(String symbol) {
-//        goAssociationContainer.
-//    }
-
-    enum GoMethod { TFT, PCunion, PCintersect, MGSA}
+    private final GoMethod goMethod;
+    private final MultipleTestingCorrection mtc;
 
 
     private HbaDealsGoAnalysis(HbaDealsThresholder thresholder,
-                              Ontology ontology,
-                              GoAssociationContainer associationContainer,
-                               GoMethod method) {
+                               Ontology ontology,
+                               GoAssociationContainer associationContainer,
+                               GoMethod method,
+                               MtcMethod mtcMethod) {
         this.ontology = ontology;
         this.goAssociationContainer = associationContainer;
-        this.method = method;
+        this.goMethod = method;
+        switch(mtcMethod) {
+            case BONFERRONI:
+                this.mtc = new Bonferroni();
+                break;
+            case BONFERRONI_HOLM:
+                this.mtc = new BonferroniHolm();
+                break;
+            case BENJAMINI_HOCHBERG:
+                this.mtc = new BenjaminiHochberg();
+                break;
+            case BENJAMINI_YEKUTIELI:
+                this.mtc = new BenjaminiYekutieli();
+                break;
+            case SIDAK:
+                this.mtc = new Sidak();
+                break;
+            case NONE:
+                this.mtc = new NoMultipleTestingCorrection();
+                break;
+            default:
+                // should never happen
+                System.err.println("[WARNING] Did not recognize MTC");
+                this.mtc = new Bonferroni();
+        }
         Set<String> population = thresholder.population();
         Set<String> dgeGenes = thresholder.dgeGeneSymbols();
         Set<String> dasGenes = thresholder.dasGeneSymbols();
@@ -55,17 +75,45 @@ public class HbaDealsGoAnalysis {
     }
 
 
-    public int populationCount() { return this.population.getAnnotatedItemCount(); }
-    public int dasCount() { return  this.das.getAnnotatedItemCount(); }
-    public int unmappedDasCount() { return this.das.getUnmappedGeneSymbolCount(); }
-    public List<String> unmappedDasSymbols() { return this.das.getSortedUnmappedGeneSymbols(); }
-    public int dgeCount() { return this.dge.getAnnotatedItemCount(); }
-    public int unmappedDgeCount() { return this.dge.getUnmappedGeneSymbolCount(); }
-    public List<String> unmappedDgeSymbols() { return this.dge.getSortedUnmappedGeneSymbols(); }
-    public int dasDgeCount() { return this.dasDge.getAnnotatedItemCount(); }
-    public int unmappedDasDgeCount() { return this.dasDge.getUnmappedGeneSymbolCount(); }
-    public List<String> unmappedDasDgeSymbols() { return this.dasDge.getSortedUnmappedGeneSymbols(); }
+    public int populationCount() {
+        return this.population.getAnnotatedItemCount();
+    }
 
+    public int dasCount() {
+        return this.das.getAnnotatedItemCount();
+    }
+
+    public int unmappedDasCount() {
+        return this.das.getUnmappedGeneSymbolCount();
+    }
+
+    public List<String> unmappedDasSymbols() {
+        return this.das.getSortedUnmappedGeneSymbols();
+    }
+
+    public int dgeCount() {
+        return this.dge.getAnnotatedItemCount();
+    }
+
+    public int unmappedDgeCount() {
+        return this.dge.getUnmappedGeneSymbolCount();
+    }
+
+    public List<String> unmappedDgeSymbols() {
+        return this.dge.getSortedUnmappedGeneSymbols();
+    }
+
+    public int dasDgeCount() {
+        return this.dasDge.getAnnotatedItemCount();
+    }
+
+    public int unmappedDasDgeCount() {
+        return this.dasDge.getUnmappedGeneSymbolCount();
+    }
+
+    public List<String> unmappedDasDgeSymbols() {
+        return this.dasDge.getSortedUnmappedGeneSymbols();
+    }
 
 
     private List<GoTerm2PValAndCounts> termForTerm(StudySet study) {
@@ -102,13 +150,12 @@ public class HbaDealsGoAnalysis {
     }
 
     private List<GoTerm2PValAndCounts> mgsa(StudySet study) {
-       throw new UnsupportedOperationException(); // TODO
+        throw new UnsupportedOperationException(); // TODO
     }
 
 
-
-   public List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
-        switch (this.method) {
+    public List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
+        switch (this.goMethod) {
             case TFT:
                 return termForTerm(this.dge);
             case PCunion:
@@ -124,7 +171,7 @@ public class HbaDealsGoAnalysis {
     }
 
     public List<GoTerm2PValAndCounts> dasOverrepresetationAnalysis() {
-        switch (this.method) {
+        switch (this.goMethod) {
             case TFT:
                 return termForTerm(this.das);
             case PCunion:
@@ -140,7 +187,7 @@ public class HbaDealsGoAnalysis {
     }
 
     public List<GoTerm2PValAndCounts> dasDgeOverrepresetationAnalysis() {
-        switch (this.method) {
+        switch (this.goMethod) {
             case TFT:
                 return termForTerm(this.dasDge);
             case PCunion:
@@ -156,29 +203,31 @@ public class HbaDealsGoAnalysis {
     }
 
 
-
     public static HbaDealsGoAnalysis termForTerm(HbaDealsThresholder thresholder,
                                                  Ontology ontology,
-                                                 GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.TFT);
+                                                 GoAssociationContainer associationContainer,
+                                                 MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.TFT, mtcMethod);
     }
 
     public static HbaDealsGoAnalysis parentChildUnion(HbaDealsThresholder thresholder,
-                                                 Ontology ontology,
-                                                 GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCunion);
+                                                      Ontology ontology,
+                                                      GoAssociationContainer associationContainer, MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCunion, mtcMethod);
     }
 
     public static HbaDealsGoAnalysis parentChildIntersect(HbaDealsThresholder thresholder,
-                                                 Ontology ontology,
-                                                 GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCintersect);
+                                                          Ontology ontology,
+                                                          GoAssociationContainer associationContainer,
+                                                          MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCintersect, mtcMethod);
     }
 
     public static HbaDealsGoAnalysis mgssa(HbaDealsThresholder thresholder,
-                                                          Ontology ontology,
-                                                          GoAssociationContainer associationContainer) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.MGSA);
+                                           Ontology ontology,
+                                           GoAssociationContainer associationContainer,
+                                           MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.MGSA, mtcMethod);
     }
 
 
@@ -188,7 +237,7 @@ public class HbaDealsGoAnalysis {
      * Key -- gene symbols for any genes that are annotated to enriched GO terms.
      * Value -- list of corresponding annotations, but only to the enriched GO terms
      */
-    public Map<String, Set<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap (Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
+    public Map<String, Set<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap(Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
         Map<String, Set<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
         List<GoGaf21Annotation> rawAnnots = this.goAssociationContainer.getRawAssociations();
         for (GoGaf21Annotation a : rawAnnots) {
