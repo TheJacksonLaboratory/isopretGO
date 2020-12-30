@@ -21,7 +21,7 @@ public class DumpStatsCommand implements Callable<Integer> {
 
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         PrositeParser proparser = new PrositeParser(this.prositeDataFile);
         patternList = proparser.getPatternList();
         System.out.printf("[INFO] %s.\n", this.prositeDataFile);
