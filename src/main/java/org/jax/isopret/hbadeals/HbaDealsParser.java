@@ -1,6 +1,7 @@
 package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.hgnc.HgncItem;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -30,21 +31,21 @@ public class HbaDealsParser {
      * @param header Header of the HBA-DEALS file
      */
     public void checkHeader(String header) {
-        String [] headerFields = {"Ensembl Gene ID", "Gene", "Isoform", "ExplogFC.FC","P"};
+        String [] headerFields = {"Gene",  "Isoform", "ExplogFC/FC","P"};
         String [] fields = header.split("\t");
         if (headerFields.length != fields.length) {
-            throw new IsopretRuntimeException("Malformed HBADEALS header line (Should have 5 fields but had "
+            throw new IsopretRuntimeException("Malformed HBADEALS header line (Should have 4 fields but had "
                     + fields.length + "): " + header);
         }
         for (int i=0; i<headerFields.length; i++) {
             if (! headerFields[i].equals(fields[i])) {
                 throw new IsopretRuntimeException("HBADEALS header field " +i+ " malformed. We expected \"" +
-                        headerFields[i] + "\" but got \"" + fields[i] + "\"");
+                        headerFields[i] + "\" but got \"" + fields[i] + "\" (" + header +")");
             }
         }
     }
 
-    public HbaDealsParser(String fname) {
+    public HbaDealsParser(String fname, Map<String, HgncItem> hgncMap) {
         hbadealsFile = fname;
         this.hbaDealsResultMap = new HashMap<>();
         //this.uncorrectedPvals = new ArrayList<>();
@@ -64,8 +65,12 @@ public class HbaDealsParser {
         }
 
         for (HbaLine hline : lines) {
-            this.hbaDealsResultMap.putIfAbsent(hline.symbol, new HbaDealsResult(hline.geneAccession, hline.symbol));
-            HbaDealsResult hbaresult = this.hbaDealsResultMap.get(hline.symbol);
+            String symbol = hline.geneAccession; // if we cannot find symbol, just show the accession
+            if (hgncMap.containsKey(hline.geneAccession)) {
+                symbol = hgncMap.get(hline.geneAccession).getGeneSymbol();
+            }
+            this.hbaDealsResultMap.putIfAbsent(symbol, new HbaDealsResult(hline.geneAccession, symbol));
+            HbaDealsResult hbaresult = this.hbaDealsResultMap.get(symbol);
             if (hline.isIsoform) {
                 hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p);
             } else {
@@ -89,7 +94,6 @@ public class HbaDealsParser {
      */
     static class HbaLine {
         final static String UNINITIALIZED = "";
-        final String symbol;
         final String geneAccession;
         final boolean isIsoform;
         final String isoform;
@@ -98,21 +102,20 @@ public class HbaDealsParser {
 
         public HbaLine(String line) {
             String [] fields = line.split("\t");
-            if (fields.length != 5) {
+            if (fields.length != 4) {
                 String msg = String.format("[ERROR] Malformed line with %d fields: %s\n", fields.length, line);
                 throw new IsopretRuntimeException(msg);
             }
             geneAccession = fields[0];
-            symbol = fields[1];
-            if (fields[2].equalsIgnoreCase("Expression")) {
+            if (fields[1].equalsIgnoreCase("Expression")) {
                 isIsoform = false;
                 isoform = UNINITIALIZED; // gene expression entry
             } else {
                 isIsoform = true;
-                isoform = fields[2];
+                isoform = fields[1];
             }
-            this.expFC = Double.parseDouble(fields[3]);
-            this.raw_p = Double.parseDouble(fields[4]);
+            this.expFC = Double.parseDouble(fields[2]);
+            this.raw_p = Double.parseDouble(fields[3]);
         }
     }
 

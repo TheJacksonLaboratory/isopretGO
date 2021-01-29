@@ -43,6 +43,8 @@ public class IsopretDownloader {
     private static final String JannovarZenodoUrl = "https://zenodo.org/record/4311513/files/hg38_ensembl.ser?download=1";
     private static final String JannovarFilename = "hg38_ensembl.ser";
 
+    private static final String HGNC_URL = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt";
+    private static final String HGNC_FILENAME = "hgnc_complete_set.txt";
 
 
     public IsopretDownloader(String path){
@@ -63,7 +65,7 @@ public class IsopretDownloader {
         downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
         downloadFileIfNeeded(GO_OBO,GO_OBO_URL);
         downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
-
+        downloadFileIfNeeded(HGNC_FILENAME, HGNC_URL);
     }
 
 

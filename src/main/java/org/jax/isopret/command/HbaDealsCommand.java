@@ -5,6 +5,8 @@ import org.jax.isopret.go.*;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsThresholder;
+import org.jax.isopret.hgnc.HgncItem;
+import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.html.HtmlTemplate;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
@@ -57,6 +59,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String outprefix = "isopret";
     @CommandLine.Option(names={"--tsv"}, description = "Output TSV files with ontology results and study sets")
     private boolean outputTsv = false;
+    @CommandLine.Option(names={"-n", "--namespace"}, required = true, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
+    private String namespace = "ensembl";
 
 
     private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();
@@ -73,6 +77,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         int foundTranscripts = 0;
         int foundProsite = 0;
         Map<String, Object> data = new HashMap<>(); // for the HTML template engine
+        // ----------  1. Gene Ontology -------------------
         GoParser goParser = new GoParser(goOboFile, goGafFile);
         final Ontology ontology = goParser.getOntology();
         final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
@@ -85,14 +90,25 @@ public class HbaDealsCommand implements Callable<Integer> {
         System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
         MtcMethod mtc = MtcMethod.fromString(this.mtc);
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
-
+        // ----------  2. HGNC Mapping from accession numbers to gene symbols -------------
+        Map<String, HgncItem> hgncMap;
+        HgncParser hgncParser = new HgncParser();
+        if (this.namespace.equalsIgnoreCase("ensembl")) {
+            hgncMap = hgncParser.ensemblMap();
+        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
+            hgncMap = hgncParser.ucscMap();
+        } else if (this.namespace.equalsIgnoreCase("refseq")) {
+            hgncMap = hgncParser.refseqMap();
+        } else {
+            throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
+        }
         GenomicAssembly hg38 =  GenomicAssemblyProvider.hg38();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
         PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
         Map<String, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
         Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile);
+        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         HbaDealsThresholder thresholder = new HbaDealsThresholder(hbaDealsResults);
 

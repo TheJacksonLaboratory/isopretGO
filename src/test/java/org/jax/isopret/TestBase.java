@@ -3,6 +3,7 @@ package org.jax.isopret;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
+import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
 import org.jax.isopret.transcript.AnnotatedGene;
@@ -12,12 +13,18 @@ import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.variant.api.GenomicAssembly;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 public class TestBase {
+    private static ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    private static URL url = classloader.getResource("hgnc/hgnc_complete_set_excerpt.txt");
+    private static final String hgncPath = url.getPath();
+//        String path = url.getPath();
+//        hgncParser = new HgncParser(path);
     protected static final Path PROSITE_MAP_PATH = Paths.get("src/test/resources/prosite/ADAR_prosite_profiles.txt");
     protected static final Path PROSITE_DAT_PATH = Paths.get("src/test/resources/prosite/prosite-excerpt.dat");
     private static PrositeMapParser pmparser = null;
@@ -26,6 +33,9 @@ public class TestBase {
     private static final Path ASSEMBLY_REPORT_PATH = Paths.get("src/test/resources/GCA_000001405.28_GRCh38.p13_assembly_report.txt");
     private static GenomicAssembly assembly = null;
     private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
+
+
+    protected static final HgncParser hgncParser = new HgncParser(hgncPath);
 
     private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
     private static Map<String, HbaDealsResult> hbaDealsResultMap = null;
@@ -39,7 +49,7 @@ public class TestBase {
 
     public static Map<String, HbaDealsResult> getADARHbaDealsResultMap () {
         if (hbaDealsResultMap == null) {
-            final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString());
+            final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString(), hgncParser.ensemblMap());
             hbaDealsResultMap = parser.getHbaDealsResultMap();
         }
         return hbaDealsResultMap;

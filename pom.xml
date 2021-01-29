@@ -5,7 +5,7 @@
 
     <groupId>org.jax</groupId>
     <artifactId>isopret</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
 
     <name>isopret</name>
@@ -96,6 +96,7 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
 
 
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
