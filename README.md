@@ -33,17 +33,7 @@ java -jar jannovar-cli/target/jannovar-cli-0.35-SNAPSHOT.jar download -d hg38/en
 ```
 
 ### phenol
-We have updated some functions in phenol to perform GO analysis. We will soon release to maven central
-but for now we need to install phenol locally
-```
-git clone https://github.com/monarch-initiative/phenol.git
-cd phenol
-git fetch
-git checkout develop
-mvn install
-```
-
-This will install phenol-1.6.2-SNAPSHOT to the local .m2 maven repository.
+Note that phenol-1.6.2 is now on maven central and a local install is no longer required.
 
 
 ## Building isopret
