@@ -12,7 +12,6 @@ import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
 import org.jax.isopret.transcript.AnnotatedGene;
-import org.jax.isopret.transcript.GenomicAssemblyProvider;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
 import org.jax.isopret.visualization.*;

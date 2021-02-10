@@ -7,14 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Transcript extends GenomicRegion {
-
-//    protected final Contig contig;
-//    protected final Strand strand;
-//    protected final CoordinateSystem coordinateSystem;
-//
-//    protected final Position start;
-//    protected final Position end;
+public class Transcript extends BaseGenomicRegion<Transcript> {
 
     private final String accessionId;
     /** e.g., if {@link #accessionId} is ENST0000064021.6 then this would be ENST0000064021 */
@@ -27,16 +20,19 @@ public class Transcript extends GenomicRegion {
     private final Position cdsEnd;
     private final List<GenomicRegion> exons;
 
-    private final GenomicRegion txRegion;
 
-    private Transcript(GenomicRegion txRegion,
+    private Transcript(Contig contig,
+                       Strand strand,
+                       CoordinateSystem coordinateSystem,
+                       Position start,
+                       Position end,
                        String accessionId,
                        String hgvsSymbol,
                        boolean isCoding,
                        Position cdsStart,
                        Position cdsEnd,
                        List<GenomicRegion> exons) {
-        this.txRegion =  txRegion;
+        super(contig, strand,coordinateSystem, start, end);
         this.accessionId = accessionId;
         int i = this.accessionId.indexOf(".");
         if (i < 0) {
@@ -52,17 +48,28 @@ public class Transcript extends GenomicRegion {
     }
 
     public static Transcript of(Contig contig,
-                                int start,
-                                int end,
                                 Strand strand,
                                 CoordinateSystem coordinateSystem,
-                                int cdsStart, int cdsEnd,
+                                int start,
+                                int end,
+                                int cdsStart,
+                                int cdsEnd,
                                 String accessionId,
                                 String hgvsSymbol,
                                 boolean isCoding,
                                 List<GenomicRegion> exons) {
-        GenomicRegion txRegion = PreciseGenomicRegion.of(contig, strand, coordinateSystem, Position.of(start), Position.of(end));
-        return new Transcript(txRegion, accessionId, hgvsSymbol, isCoding, Position.of(cdsStart), Position.of(cdsEnd), exons);
+        //GenomicRegion txRegion = PreciseGenomicRegion.of(contig, strand, coordinateSystem, Position.of(start), Position.of(end));
+        return new Transcript(contig,
+                strand,
+                coordinateSystem,
+                Position.of(start),
+                Position.of(end),
+                accessionId,
+                hgvsSymbol,
+                isCoding,
+                Position.of(cdsStart),
+                Position.of(cdsEnd),
+                exons);
     }
 
     public String accessionId() {
@@ -76,16 +83,16 @@ public class Transcript extends GenomicRegion {
     public boolean isCoding() {
         return isCoding;
     }
-
+    // TODO Optional ?????
     public GenomicRegion cdsRegion() {
-        return GenomicRegion.zeroBased(contig, strand, cdsStart, cdsEnd);
+        return GenomicRegion.of(contig, strand, coordinateSystem(),cdsStart, cdsEnd);
     }
-
+    // TODO Optional ?????
     public Position cdsStart() {
         return GenomicPosition.zeroBased(contig, strand, cdsStart);
     }
-
-    public GenomicPosition cdsEnd() {
+    // TODO Optional ?????
+    public Optional<Position> cdsEnd() {
         return GenomicPosition.zeroBased(contig, strand, cdsEnd);
     }
 
@@ -98,25 +105,26 @@ public class Transcript extends GenomicRegion {
     }
 
     @Override
-    public Strand strand() {
-        return null;
-    }
-
-    @Override
     public Transcript withStrand(Strand other) {
-        if (strand == other) {
+
+        if (this.strand() == other) {
             return this;
         } else {
-            Position cdsStartOnPositive = cdsStart.invert(contig, coordinateSystem);
-            Position cdsEndOnPositive = cdsEnd.invert(contig, coordinateSystem);
+            Position spos= startPosition().invert(this.coordinateSystem(), contig());
+           // Position cdsStartOnPositive = cdsStart.invert(contig, coordinateSystem);
+            Position endpos= endPosition().invert(this.coordinateSystem(), contig());
             List<GenomicRegion> exonsOnPositive = new ArrayList<>(exons.size());
             for (int i = exons.size() - 1; i >= 0; i--) {
                 GenomicRegion exon = exons.get(i);
                 exonsOnPositive.add(exon.withStrand(other));
             }
+            if (! this.isCoding) {
+// dont care about CDS
+            }
+            // switch CDS also
             return new Transcript(super.withStrand(other),
                     accessionId, hgvsSymbol, isCoding,
-                    cdsEndOnPositive, cdsStartOnPositive, exonsOnPositive);
+                    endpos, startPosition(), exonsOnPositive);
         }
     }
 
@@ -131,12 +139,12 @@ public class Transcript extends GenomicRegion {
             t = this;
         }
         GenomicRegion cds = t.cdsRegion();
-        int cdsStart = t.cdsStart().posOneBased();
-        int cdsEnd   = t.cdsEnd().posOneBased();
+        int cdsStart = cds.startWithCoordinateSystem(CoordinateSystem.oneBased());
+        int cdsEnd   = cds.endWithCoordinateSystem(CoordinateSystem.oneBased());
         int cdsNtCount = 0;
         for (GenomicRegion exon : t.exons()) {
-            int exonStart = exon.startGenomicPosition().posOneBased();
-            int exonEnd = exon.endGenomicPosition().posOneBased();
+            int exonStart = exon.startWithCoordinateSystem(CoordinateSystem.oneBased());
+            int exonEnd = exon.endWithCoordinateSystem(CoordinateSystem.oneBased());
             if (cds.contains(exon)) {
                 cdsNtCount += exon.length();
             } else if (! cds.overlapsWith(exon)) {
@@ -160,36 +168,16 @@ public class Transcript extends GenomicRegion {
         }
     }
 
-
-    @Override
-    public Contig contig() {
-        return this.txRegion.contig();
-    }
-
-    @Override
-    public Position startPosition() {
-        return this.txRegion.startPosition();
-    }
-
-    @Override
-    public Position endPosition() {
-        return this.txRegion.endPosition();
-    }
-
-    @Override
-    public CoordinateSystem coordinateSystem() {
-        return this.txRegion.coordinateSystem();
-    }
-
     @Override
     public Transcript withCoordinateSystem(CoordinateSystem other) {
-        if (this.txRegion.coordinateSystem() == other) {
+        if (coordinateSystem() == other) {
             return this;
         } else {
-            Position otherTxStart = txRegion.startPosition().shift(txRegion.coordinateSystem().startDelta(other));
-            Position otherTxEnd = txRegion.endPosition().shift(txRegion.coordinateSystem().startDelta(other));
+            Position otherTxStart = startPositionWithCoordinateSystem(other);
+            Position otherTxEnd = endPositionWithCoordinateSystem(other);
+            // TODO MAKE CDS BE a genomic Region
             Position otherCdsStart = cdsStart.shift(txRegion.coordinateSystem().startDelta(other));
-            Position otherCdsEnd = cdsStart.shift(txRegion.coordinateSystem().startDelta(other));
+            Position otherCdsEnd = cdsStart.shift(txRegion.coordinateSystem().endDelta(other));
             List<GenomicRegion> exonsWithCoordinateSystem = new ArrayList<>(exons.size());
             for (GenomicRegion region : exons) {
                 GenomicRegion exon = region.withCoordinateSystem(other);
@@ -202,9 +190,10 @@ public class Transcript extends GenomicRegion {
         }
     }
 
+
     @Override
-    public Transcript toOppositeStrand() {
-        return withStrand(strand().opposite());
+    protected Transcript newRegionInstance(Contig contig, Strand strand, CoordinateSystem coordinateSystem, Position startPosition, Position endPosition) {
+        return null;
     }
 
     @Override
