@@ -1,6 +1,8 @@
 package org.jax.isopret.hgnc;
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -73,6 +75,7 @@ import java.util.Map;
  * @author Peter N Robinson
  */
 public class HgncParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HgncParser.class);
     private final static int GENE_SYMBOL = 1;
     private final static int GENE_NAME = 2;
     private final static int ENTREZ_ID = 18;
@@ -101,6 +104,8 @@ public class HgncParser {
 
     private List<HgncItem> initHgncItems(String hgncPath) {
         List<HgncItem> items = new ArrayList<>();
+        int less_than_24_fields = 0;
+        int well_formed_lines = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(hgncPath))) {
             String line = br.readLine();
             if (! line.startsWith("hgnc_id")) {
@@ -109,9 +114,10 @@ public class HgncParser {
             while ((line=br.readLine()) != null) {
                 String [] fields = line.split("\t");
                 if (fields.length < 24) {
-                    System.err.println("[ERROR] Malformed HGNC line: " + line);
-                    System.err.printf("[ERROR] We were expected at least 24 fields but got %d\n", fields.length);
+                    less_than_24_fields++;
                     continue;
+                } else {
+                    well_formed_lines++;
                 }
                 HgncItem item = new HgncItem(fields[GENE_SYMBOL], fields[GENE_NAME], fields[ENTREZ_ID], fields[ENSEMBL_GENE_ID], fields[USCS_ID], fields[REFSEQ_ACCESSION]);
                 items.add(item);
@@ -119,6 +125,8 @@ public class HgncParser {
         } catch (IOException e) {
             throw new IsopretRuntimeException("Could not parse the HGNC file: " + e.getMessage());
         }
+        LOGGER.info("{} HGNC lines with less than 24 fields skipped.", less_than_24_fields);
+        LOGGER.info("{} valid HGNC lines successsfully parsed.", well_formed_lines);
         return items;
     }
 

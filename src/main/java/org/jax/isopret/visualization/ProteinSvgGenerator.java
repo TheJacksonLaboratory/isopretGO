@@ -22,9 +22,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             "FF99FF", "99FFFF", "CCFF99", "FFE5CC", "FFD700", "9ACD32", "7FFFD4", "FFB6C1", "FFFACD",
             "FFE4E1", "F0FFF0", "F0FFFF"};
 
-    private final Map<String, List<PrositeHit>> prositeHitMap;
-
-    private final List<Transcript> expressedTranscriptList;
+   private final List<Transcript> expressedTranscriptList;
 
     private final Map<String, String> prositeId2nameMap;
     /**
@@ -33,6 +31,8 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private final SortedMap<String, String> sortedPrositeIdMap;
 
     private final Map<String, String> prositeIdToColorMap;
+
+    private final AnnotatedGene annotatedGene;
 
     private final int minProteinLength = 0;
     private final int maxProteinLength;
@@ -45,11 +45,11 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
         super(SVG_WIDTH, height);
         // get prosite data if possible
-        this.prositeHitMap = annotatedGene.getPrositeHitMap();
+        this.annotatedGene = annotatedGene;
         this.prositeId2nameMap = id2nameMap;
         this.expressedTranscriptList = annotatedGene.getExpressedTranscripts();
         this.sortedPrositeIdMap = new TreeMap<>();
-        for (var hitlist : prositeHitMap.values()) {
+        for (var hitlist : this.annotatedGene.getPrositeHitMap().values()) {
             for (var hit : hitlist) {
                 String id = hit.getAccession();
                 String label = this.prositeId2nameMap.getOrDefault(id, id); // if we cannot find the label, just use the id
@@ -113,7 +113,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
 
     private void writeDomains(Transcript transcript, int ypos, Writer writer) throws IOException {
-        List<PrositeHit> hits = this.prositeHitMap.getOrDefault(transcript.getAccessionIdNoVersion(), new ArrayList<>());
+        List<PrositeHit> hits = this.annotatedGene.getPrositeHitMap().getOrDefault(transcript.getAccessionIdNoVersion(), new ArrayList<>());
         for (PrositeHit hit : hits) {
             String color = this.prositeIdToColorMap.get(hit.getAccession());
             double xstart = translateProteinToSvgCoordinate(hit.getStartAminoAcidPos());
@@ -169,12 +169,27 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         StringWriter swriter = new StringWriter();
         try {
             writeHeader(swriter);
-            write(swriter);
+            if (hasVisualizableDomains()) {
+                write(swriter);
+            } else {
+                writeExcuse(swriter);
+            }
             writeFooter(swriter);
             return swriter.toString();
         } catch (IOException e) {
             return getSvgErrorMessage(e.getMessage());
         }
+    }
+
+    private void writeExcuse(StringWriter swriter) {
+        String svg = String.format("<text>" +
+                "No protein domains for " + this.annotatedGene.getHbaDealsResult().getSymbol() +
+                "  </text>");
+        swriter.write(svg);
+    }
+
+    private boolean hasVisualizableDomains() {
+        return ! this.annotatedGene.getPrositeHitMap().isEmpty();
     }
 
 

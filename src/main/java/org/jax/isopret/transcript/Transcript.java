@@ -1,13 +1,20 @@
 package org.jax.isopret.transcript;
 
 import org.jax.isopret.except.IsopretRuntimeException;
-import org.monarchinitiative.variant.api.*;
+import org.monarchinitiative.svart.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Transcript extends PreciseGenomicRegion {
+public class Transcript extends GenomicRegion {
+
+//    protected final Contig contig;
+//    protected final Strand strand;
+//    protected final CoordinateSystem coordinateSystem;
+//
+//    protected final Position start;
+//    protected final Position end;
 
     private final String accessionId;
     /** e.g., if {@link #accessionId} is ENST0000064021.6 then this would be ENST0000064021 */
@@ -20,6 +27,8 @@ public class Transcript extends PreciseGenomicRegion {
     private final Position cdsEnd;
     private final List<GenomicRegion> exons;
 
+    private final GenomicRegion txRegion;
+
     private Transcript(GenomicRegion txRegion,
                        String accessionId,
                        String hgvsSymbol,
@@ -27,7 +36,7 @@ public class Transcript extends PreciseGenomicRegion {
                        Position cdsStart,
                        Position cdsEnd,
                        List<GenomicRegion> exons) {
-        super(txRegion);
+        this.txRegion =  txRegion;
         this.accessionId = accessionId;
         int i = this.accessionId.indexOf(".");
         if (i < 0) {
@@ -72,7 +81,7 @@ public class Transcript extends PreciseGenomicRegion {
         return GenomicRegion.zeroBased(contig, strand, cdsStart, cdsEnd);
     }
 
-    public GenomicPosition cdsStart() {
+    public Position cdsStart() {
         return GenomicPosition.zeroBased(contig, strand, cdsStart);
     }
 
@@ -86,6 +95,11 @@ public class Transcript extends PreciseGenomicRegion {
 
     public String getAccessionIdNoVersion() {
         return accessionIdNoVersion;
+    }
+
+    @Override
+    public Strand strand() {
+        return null;
     }
 
     @Override
@@ -147,24 +161,44 @@ public class Transcript extends PreciseGenomicRegion {
     }
 
 
+    @Override
+    public Contig contig() {
+        return this.txRegion.contig();
+    }
 
+    @Override
+    public Position startPosition() {
+        return this.txRegion.startPosition();
+    }
 
+    @Override
+    public Position endPosition() {
+        return this.txRegion.endPosition();
+    }
+
+    @Override
+    public CoordinateSystem coordinateSystem() {
+        return this.txRegion.coordinateSystem();
+    }
 
     @Override
     public Transcript withCoordinateSystem(CoordinateSystem other) {
-        if (coordinateSystem == other) {
+        if (this.txRegion.coordinateSystem() == other) {
             return this;
         } else {
-            Position start = cdsStart.shift(coordinateSystem.startDelta(other));
+            Position otherTxStart = txRegion.startPosition().shift(txRegion.coordinateSystem().startDelta(other));
+            Position otherTxEnd = txRegion.endPosition().shift(txRegion.coordinateSystem().startDelta(other));
+            Position otherCdsStart = cdsStart.shift(txRegion.coordinateSystem().startDelta(other));
+            Position otherCdsEnd = cdsStart.shift(txRegion.coordinateSystem().startDelta(other));
             List<GenomicRegion> exonsWithCoordinateSystem = new ArrayList<>(exons.size());
             for (GenomicRegion region : exons) {
                 GenomicRegion exon = region.withCoordinateSystem(other);
                 exonsWithCoordinateSystem.add(exon);
             }
-            GenomicRegion txRegion = super.withCoordinateSystem(other);
-            return new Transcript(txRegion,
+            GenomicRegion otherTxRegion = GenomicRegion.of(txRegion.contig(), txRegion.strand(), other, otherTxStart, otherTxEnd);
+            return new Transcript(otherTxRegion,
                     accessionId, hgvsSymbol, isCoding,
-                    start, cdsEnd, exonsWithCoordinateSystem);
+                    otherCdsStart, otherCdsEnd, exonsWithCoordinateSystem);
         }
     }
 
@@ -177,9 +211,9 @@ public class Transcript extends PreciseGenomicRegion {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         Transcript that = (Transcript) o;
         return isCoding == that.isCoding &&
+                Objects.equals(txRegion, that.txRegion) &&
                 Objects.equals(accessionId, that.accessionId) &&
                 Objects.equals(hgvsSymbol, that.hgvsSymbol) &&
                 Objects.equals(cdsStart, that.cdsStart) &&
@@ -189,7 +223,7 @@ public class Transcript extends PreciseGenomicRegion {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), accessionId, hgvsSymbol, isCoding, cdsStart, cdsEnd, exons);
+        return Objects.hash(txRegion, accessionId, hgvsSymbol, isCoding, cdsStart, cdsEnd, exons);
     }
 
     @Override

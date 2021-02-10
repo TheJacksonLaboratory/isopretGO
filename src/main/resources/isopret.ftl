@@ -421,7 +421,7 @@ a.svg:hover, a.svg:active {
   <section>
     <a name="sample"></a>
     <article>
-      <h2>Isopret -- Isoform interpretation.</h2>
+      <h2>Isopret &mdash; Isoform interpretation.</h2>
       <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
       <p>${n_population} genes were included in the analysis. ${n_das} had one or more differentially spliced isoforms.
             ${n_dge} were differentially expressed. ${n_dasdge} were both differentially spliced and

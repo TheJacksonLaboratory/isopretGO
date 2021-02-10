@@ -20,7 +20,9 @@ import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
-import org.monarchinitiative.variant.api.GenomicAssembly;
+import org.monarchinitiative.svart.*;
+
+
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
@@ -132,7 +134,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         data.put("n_dasdge", hbago.dasDgeCount());
         data.put("n_dasdge_unmapped", hbago.unmappedDasDgeCount());
         data.put("unmappable_dasdge_list", Util.fromList(hbago.unmappedDasDgeSymbols(), "Unmappable DAS/DGE Gene Symbols"));
-        data.put("probability_threshold", thresholder.getProbabilityThreshold());
+        data.put("probability_threshold", thresholder.getFdrThreshold());
         data.put("expression_threshold", thresholder.getExpressionThreshold());
         data.put("splicing_threshold", thresholder.getSplicingThreshold());
         List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
