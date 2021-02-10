@@ -42,9 +42,8 @@ class JannovarTxMapper {
 
         // these coordinates are already adjusted to the appropriate strand
         GenomeInterval cdsRegion = tm.getCDSRegion();
-        int cdsStart = cdsRegion.getBeginPos();
-        int cdsEnd = cdsRegion.getEndPos();
-
+        GenomicRegion cds = GenomicRegion.of(contig, strand, CoordinateSystem.zeroBased(),cdsRegion.getBeginPos(), cdsRegion.getEndPos());
+        // cds is ignored if not coding.
         // process exons
         List<GenomicRegion> exons = new ArrayList<>();
         for (GenomeInterval exon : tm.getExonRegions()) {
@@ -52,7 +51,7 @@ class JannovarTxMapper {
         }
 
         return Optional.of(Transcript.of(contig, strand, CoordinateSystem.zeroBased(), txRegion.getBeginPos(), txRegion.getEndPos(),
-                cdsStart, cdsEnd, tm.getAccession(), tm.getGeneSymbol(), tm.isCoding(),
+                cds, tm.getAccession(), tm.getGeneSymbol(), tm.isCoding(),
                 exons));
     }
 }

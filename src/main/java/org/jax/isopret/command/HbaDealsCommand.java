@@ -103,7 +103,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
-        GenomicAssembly hg38 =  GenomicAssemblyProvider.hg38();
+        GenomicAssembly hg38 =  GenomicAssemblies.GRCh38p13();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
         PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);

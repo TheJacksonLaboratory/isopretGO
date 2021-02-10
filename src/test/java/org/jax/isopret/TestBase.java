@@ -1,6 +1,5 @@
 package org.jax.isopret;
 
-import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hgnc.HgncParser;
@@ -9,9 +8,9 @@ import org.jax.isopret.prosite.PrositeMapping;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
-import org.monarchinitiative.variant.api.GenomicAssembly;
+import org.monarchinitiative.svart.GenomicAssemblies;
+import org.monarchinitiative.svart.GenomicAssembly;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,18 +18,21 @@ import java.util.List;
 import java.util.Map;
 
 public class TestBase {
-    private static ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-    private static URL url = classloader.getResource("hgnc/hgnc_complete_set_excerpt.txt");
-    private static final String hgncPath = url.getPath();
-//        String path = url.getPath();
-//        hgncParser = new HgncParser(path);
+    private static final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    private static final URL url = classloader.getResource("hgnc/hgnc_complete_set_excerpt.txt");
+    private static final String hgncPath;
+
+    static {
+        assert url != null;
+        hgncPath = url.getPath();
+    }
+
     protected static final Path PROSITE_MAP_PATH = Paths.get("src/test/resources/prosite/ADAR_prosite_profiles.txt");
     protected static final Path PROSITE_DAT_PATH = Paths.get("src/test/resources/prosite/prosite-excerpt.dat");
     private static PrositeMapParser pmparser = null;
 
     private static final Path JANNOVAR_ADAR_PATH = Paths.get("src/test/resources/jannovar/hg38_ensembl_ADAR.ser");
-    private static final Path ASSEMBLY_REPORT_PATH = Paths.get("src/test/resources/GCA_000001405.28_GRCh38.p13_assembly_report.txt");
-    private static GenomicAssembly assembly = null;
+    private static final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
     private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
 
 
@@ -56,20 +58,10 @@ public class TestBase {
 
 
     public static GenomicAssembly getHg38() {
-        try {
-            if (assembly == null) {
-                assembly = GenomicAssemblyProvider.fromAssemblyReport(ASSEMBLY_REPORT_PATH);
-            }
-            return assembly;
-        } catch (IOException e) {
-            throw new IsopretRuntimeException("Could not ingest assembly");
-        }
+        return assembly;
     }
 
     public static Map<String, List<Transcript>> getADARToTranscriptMap() {
-        if (assembly == null) {
-            assembly = getHg38();
-        }
         if (symbolToTranscriptMap == null) {
             JannovarReader reader = new JannovarReader(JANNOVAR_ADAR_PATH.toAbsolutePath().toString(), assembly);
             symbolToTranscriptMap = reader.getSymbolToTranscriptListMap();

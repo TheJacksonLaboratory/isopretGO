@@ -6,7 +6,8 @@ import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
-import org.monarchinitiative.variant.api.Contig;
+import org.monarchinitiative.svart.Contig;
+
 
 import java.util.*;
 

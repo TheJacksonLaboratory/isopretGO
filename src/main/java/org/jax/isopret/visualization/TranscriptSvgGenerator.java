@@ -215,7 +215,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     private void writeCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
         Transcript transcript = tmod.withStrand(Strand.POSITIVE);
-        GenomicRegion cds = transcript.cdsRegion();
+        GenomicRegion cds = transcript.cdsRegion().get(); // guaranteed not null for coding
 
         double cdsStart = translateGenomicToSvg(cds.start());
         double cdsEnd = translateGenomicToSvg(cds.end());

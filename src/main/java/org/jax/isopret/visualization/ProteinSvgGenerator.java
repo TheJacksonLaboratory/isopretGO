@@ -182,9 +182,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
     private void writeExcuse(StringWriter swriter) {
-        String svg = String.format("<text>" +
+        String svg = "<text>" +
                 "No protein domains for " + this.annotatedGene.getHbaDealsResult().getSymbol() +
-                "  </text>");
+                "  </text>";
         swriter.write(svg);
     }
 
