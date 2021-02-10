@@ -6,45 +6,14 @@ right now...
 
 ## Prerequisites
 
-### variant-api
-We will use the Variant-api from Exomiser to work with the transcript data
-Please install the library locally (later, it will go into maven central)
+### svart
+We will use the svart library to work with the transcript data
+Please install the library locally (soon, it will go into maven central)
 ```
-git clone https://github.com/exomiser/variant-api
-cd variant-api
-git fetch origin
-git checkout -b coordinate-systemed-region origin/coordinate-systemed-region
+git clone https://github.com/exomiser/svart
+cd svart
 mvn install
 ```
-
-### Jannovar
-We will require the [Jannovar](https://github.com/charite/jannovar) transcript file for hg38.
-The ``download`` command downloads hg38_refseq_curated.ser 
-from [Zenodo](https://zenodo.org/record/4311513). If desired, you can create your own 
-transcript file as follows (Note: there are some difficulties with Jannovar right now,
-so it is probably easier to add a number of transcript files to Jannovar):
-
-
-```
-git clone https://github.com/charite/jannovar
-cd jannovar
-mvn package
-java -jar jannovar-cli/target/jannovar-cli-0.35-SNAPSHOT.jar download -d hg38/ensembl
-```
-
-### phenol
-We have updated some functions in phenol to perform GO analysis. We will soon release to maven central
-but for now we need to install phenol locally
-```
-git clone https://github.com/monarch-initiative/phenol.git
-cd phenol
-git fetch
-git checkout develop
-mvn install
-```
-
-This will install phenol-1.6.2-SNAPSHOT to the local .m2 maven repository.
-
 
 ## Building isopret
 isopret was developed under Java 11. To build the app, clone this repository and
@@ -105,7 +74,6 @@ Analyze HBA-DEALS files
   -V, --version              Print version information and exit.
 ```
 
-To get these files not the following
+To get these files note the following
 
 1. HBADEALS output -- please use with format that includes the ENSEMBL id in the first column (gene accession number).
-2. hg38_ensembl.ser -- this is the [Jannovar](https://github.com/charite/jannovar) transcript file.

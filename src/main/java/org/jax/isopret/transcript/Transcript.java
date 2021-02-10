@@ -1,59 +1,77 @@
 package org.jax.isopret.transcript;
 
 import org.jax.isopret.except.IsopretRuntimeException;
-import org.monarchinitiative.variant.api.*;
+import org.monarchinitiative.svart.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-public class Transcript extends PreciseGenomicRegion {
+public class Transcript extends BaseGenomicRegion<Transcript> {
 
     private final String accessionId;
-    /** e.g., if {@link #accessionId} is ENST0000064021.6 then this would be ENST0000064021 */
+    /**
+     * e.g., if {@link #accessionId} is ENST0000064021.6 then this would be ENST0000064021
+     */
     private final String accessionIdNoVersion;
 
     private final String hgvsSymbol;
 
     private final boolean isCoding;
-    private final Position cdsStart;
-    private final Position cdsEnd;
+
     private final List<GenomicRegion> exons;
 
-    private Transcript(GenomicRegion txRegion,
+    private final GenomicRegion cdsRegion;
+
+    private Transcript(Contig contig,
+                       Strand strand,
+                       CoordinateSystem coordinateSystem,
+                       Position start,
+                       Position end,
                        String accessionId,
                        String hgvsSymbol,
                        boolean isCoding,
-                       Position cdsStart,
-                       Position cdsEnd,
+                       GenomicRegion cds,
                        List<GenomicRegion> exons) {
-        super(txRegion);
+        super(contig, strand, coordinateSystem, start, end);
+        if (isCoding) {
+            this.cdsRegion = cds;
+        } else {
+            this.cdsRegion = null;
+        }
         this.accessionId = accessionId;
         int i = this.accessionId.indexOf(".");
         if (i < 0) {
             this.accessionIdNoVersion = this.accessionId;
         } else {
-            this.accessionIdNoVersion = this.accessionId.substring(0,i);
+            this.accessionIdNoVersion = this.accessionId.substring(0, i);
         }
         this.hgvsSymbol = hgvsSymbol;
         this.isCoding = isCoding;
-        this.cdsStart = cdsStart;
-        this.cdsEnd = cdsEnd;
         this.exons = exons;
     }
 
     public static Transcript of(Contig contig,
-                                int start,
-                                int end,
                                 Strand strand,
                                 CoordinateSystem coordinateSystem,
-                                int cdsStart, int cdsEnd,
+                                int start,
+                                int end,
+                                GenomicRegion cds,
                                 String accessionId,
                                 String hgvsSymbol,
                                 boolean isCoding,
                                 List<GenomicRegion> exons) {
-        GenomicRegion txRegion = PreciseGenomicRegion.of(contig, strand, coordinateSystem, Position.of(start), Position.of(end));
-        return new Transcript(txRegion, accessionId, hgvsSymbol, isCoding, Position.of(cdsStart), Position.of(cdsEnd), exons);
+        return new Transcript(contig,
+                strand,
+                coordinateSystem,
+                Position.of(start),
+                Position.of(end),
+                accessionId,
+                hgvsSymbol,
+                isCoding,
+                cds,
+                exons);
     }
 
     public String accessionId() {
@@ -68,16 +86,28 @@ public class Transcript extends PreciseGenomicRegion {
         return isCoding;
     }
 
-    public GenomicRegion cdsRegion() {
-        return GenomicRegion.zeroBased(contig, strand, cdsStart, cdsEnd);
+    public Optional<GenomicRegion> cdsRegion() {
+        if (!isCoding()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(cdsRegion);
+        }
     }
 
-    public GenomicPosition cdsStart() {
-        return GenomicPosition.zeroBased(contig, strand, cdsStart);
+    public Optional<Position> cdsStart() {
+        if (!isCoding()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(cdsRegion.startPosition());
+        }
     }
 
-    public GenomicPosition cdsEnd() {
-        return GenomicPosition.zeroBased(contig, strand, cdsEnd);
+    public Optional<Position> cdsEnd() {
+        if (!isCoding()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(cdsRegion.endPosition());
+        }
     }
 
     public List<GenomicRegion> exons() {
@@ -90,24 +120,32 @@ public class Transcript extends PreciseGenomicRegion {
 
     @Override
     public Transcript withStrand(Strand other) {
-        if (strand == other) {
+        if (this.strand() == other) {
             return this;
         } else {
-            Position cdsStartOnPositive = cdsStart.invert(contig, coordinateSystem);
-            Position cdsEndOnPositive = cdsEnd.invert(contig, coordinateSystem);
-            List<GenomicRegion> exonsOnPositive = new ArrayList<>(exons.size());
+            Position spos = startPosition().invert(this.coordinateSystem(), contig());
+            // Position cdsStartOnPositive = cdsStart.invert(contig, coordinateSystem);
+            Position endpos = endPosition().invert(this.coordinateSystem(), contig());
+            List<GenomicRegion> exonsWithOther = new ArrayList<>(exons.size());
             for (int i = exons.size() - 1; i >= 0; i--) {
                 GenomicRegion exon = exons.get(i);
-                exonsOnPositive.add(exon.withStrand(other));
+                exonsWithOther.add(exon.withStrand(other));
             }
-            return new Transcript(super.withStrand(other),
-                    accessionId, hgvsSymbol, isCoding,
-                    cdsEndOnPositive, cdsStartOnPositive, exonsOnPositive);
+            return new Transcript(contig(),
+                    strand(),
+                    coordinateSystem(),
+                    endpos,
+                    spos,
+                    accessionId,
+                    hgvsSymbol,
+                    isCoding,
+                    isCoding ? cdsRegion.withStrand(other) : null,
+                    exonsWithOther);
         }
     }
 
     public int getProteinLength() {
-        if (! this.isCoding) {
+        if (!this.isCoding) {
             return 0;
         }
         Transcript t;
@@ -116,62 +154,64 @@ public class Transcript extends PreciseGenomicRegion {
         } else {
             t = this;
         }
-        GenomicRegion cds = t.cdsRegion();
-        int cdsStart = t.cdsStart().posOneBased();
-        int cdsEnd   = t.cdsEnd().posOneBased();
+        int cdsStart = cdsRegion.startWithCoordinateSystem(CoordinateSystem.oneBased());
+        int cdsEnd = cdsRegion.endWithCoordinateSystem(CoordinateSystem.oneBased());
         int cdsNtCount = 0;
         for (GenomicRegion exon : t.exons()) {
-            int exonStart = exon.startGenomicPosition().posOneBased();
-            int exonEnd = exon.endGenomicPosition().posOneBased();
-            if (cds.contains(exon)) {
+            int exonStart = exon.startWithCoordinateSystem(CoordinateSystem.oneBased());
+            int exonEnd = exon.endWithCoordinateSystem(CoordinateSystem.oneBased());
+            if (cdsRegion.contains(exon)) {
                 cdsNtCount += exon.length();
-            } else if (! cds.overlapsWith(exon)) {
+            } else if (!cdsRegion.overlapsWith(exon)) {
                 continue;
                 // completely non-coding exon
                 // past this point, either an exon is partially 5UTR or partially 3UTR
             } else if (exonStart < cdsStart) {
                 // start coding located in this exon
-                int exonLen = exonEnd - cdsStart;
-                cdsNtCount += exonLen;
+                cdsNtCount += exon.overlapLength(cdsRegion);
             } else if (exonEnd > cdsEnd) {
-                int exonLen = cdsEnd - exonStart;
-                cdsNtCount += exonLen;
+                cdsNtCount += exon.overlapLength(cdsRegion);
             }
         }
         if (cdsNtCount % 3 != 0) {
             // should never happen
-            throw new IsopretRuntimeException("Invalid amino acid length determined for " + t.accessionId() +": " + cdsNtCount);
+            throw new IsopretRuntimeException("Invalid amino acid length determined for " + t.accessionId() + ": " + cdsNtCount);
         } else {
             return cdsNtCount / 3 - 1;
         }
     }
 
-
-
-
-
     @Override
     public Transcript withCoordinateSystem(CoordinateSystem other) {
-        if (coordinateSystem == other) {
+        if (coordinateSystem() == other) {
             return this;
         } else {
-            Position start = cdsStart.shift(coordinateSystem.startDelta(other));
             List<GenomicRegion> exonsWithCoordinateSystem = new ArrayList<>(exons.size());
             for (GenomicRegion region : exons) {
                 GenomicRegion exon = region.withCoordinateSystem(other);
                 exonsWithCoordinateSystem.add(exon);
             }
-            GenomicRegion txRegion = super.withCoordinateSystem(other);
-            return new Transcript(txRegion,
-                    accessionId, hgvsSymbol, isCoding,
-                    start, cdsEnd, exonsWithCoordinateSystem);
+            //  CDS is null if noncoding
+            return new Transcript(contig(),
+                    strand(),
+                    coordinateSystem(),
+                    Position.of(startWithCoordinateSystem(other)),
+                    Position.of(endWithCoordinateSystem(other)),
+                    accessionId,
+                    hgvsSymbol,
+                    isCoding,
+                    isCoding ? cdsRegion.withCoordinateSystem(other) : null,
+                    exonsWithCoordinateSystem);
         }
+
     }
 
+
     @Override
-    public Transcript toOppositeStrand() {
-        return withStrand(strand().opposite());
+    protected Transcript newRegionInstance(Contig contig, Strand strand, CoordinateSystem coordinateSystem, Position startPosition, Position endPosition) {
+        return null;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -180,16 +220,16 @@ public class Transcript extends PreciseGenomicRegion {
         if (!super.equals(o)) return false;
         Transcript that = (Transcript) o;
         return isCoding == that.isCoding &&
-                Objects.equals(accessionId, that.accessionId) &&
-                Objects.equals(hgvsSymbol, that.hgvsSymbol) &&
-                Objects.equals(cdsStart, that.cdsStart) &&
-                Objects.equals(cdsEnd, that.cdsEnd) &&
-                Objects.equals(exons, that.exons);
+                accessionId.equals(that.accessionId) &&
+                accessionIdNoVersion.equals(that.accessionIdNoVersion) &&
+                hgvsSymbol.equals(that.hgvsSymbol) &&
+                exons.equals(that.exons) &&
+                Objects.equals(cdsRegion, that.cdsRegion);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), accessionId, hgvsSymbol, isCoding, cdsStart, cdsEnd, exons);
+        return Objects.hash(super.hashCode(), accessionId, accessionIdNoVersion, hgvsSymbol, isCoding, exons, cdsRegion);
     }
 
     @Override
@@ -198,8 +238,6 @@ public class Transcript extends PreciseGenomicRegion {
                 "accessionId='" + accessionId + '\'' +
                 ", hgvsSymbol='" + hgvsSymbol + '\'' +
                 ", isCoding=" + isCoding +
-                ", cdsStart=" + cdsStart +
-                ", cdsEnd=" + cdsEnd +
                 ", exons=" + exons +
                 "} " + super.toString();
     }

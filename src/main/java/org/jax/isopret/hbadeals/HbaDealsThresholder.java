@@ -1,5 +1,8 @@
 package org.jax.isopret.hbadeals;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,18 +19,18 @@ import java.util.stream.Collectors;
  * this is where we set the threshold.
  */
 public class HbaDealsThresholder {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsThresholder.class);
 
     private static final double DEFAULT_THRESHOLD = 0.05;
-
+    /** We will choose no gene with a higher probability of non-differentiality than this while calculating FDR. */
     private final double MAX_PROB = 0.25;
-    /** Threshold for total probability to calculate Bayesian FDR. */
-    private final double probabilityThreshold;
+    /** Threshold for total probability to calculate Bayesian FDR (Usually, we will use 0.05). */
+    private final double fdrThreshold;
     /** HBA-DEALS results for all genes in the experiment. */
     private final Map<String, HbaDealsResult> rawResults;
-    /** Probability threshold for expression results that attains {@link #probabilityThreshold} FDR for expression. */
+    /** Probability threshold for expression results that attains {@link #fdrThreshold} FDR for expression. */
     private final double expressionThreshold;
-    /** Probability threshold for splicing results that attains {@link #probabilityThreshold} FDR for splicing. */
+    /** Probability threshold for splicing results that attains {@link #fdrThreshold} FDR for splicing. */
     private final double splicingThreshold;
 
     /**
@@ -44,65 +47,67 @@ public class HbaDealsThresholder {
      */
     public HbaDealsThresholder(Map<String, HbaDealsResult> results, double probThres) {
         rawResults = results;
-        probabilityThreshold = probThres;
+        fdrThreshold = probThres;
         this.expressionThreshold = calculateExpressionThreshold();
         this.splicingThreshold = calculateSplicingThreshold();
     }
 
+
     /**
+     * Calculate a false discovery rate,
+     * where the FDR is simply the sum of probabilities of not being differential of all items below threshold.
+     * @param p probability threshold
+     * @param probs probabilities of not being differential
+     * @return estimated FDR at this probability threshold
+     */
+    private double getFdr(double p, List<Double> probs) {
+        int i = 0;
+        double fdr = 0.0;
+        for (double prob : probs) {
+            if (prob > p) {
+                break;
+            } else {
+                fdr += prob;
+                i++;
+            }
+        }
+        if (i==0) return 0.0;
+        return fdr/(double) i;
+    }
+
+
+    /**
+     * Implements the following R
+     * s <- seq(0.01,0.25,0.01) # 0.01, 0.02, ..., 0.25
+     * # The following gets the sum of all P values not more than s[i] divided by the count of such instances
+     * h0.de <- unlist(lapply(s,function(p)sum(res$P[res$Isoform=='Expression'& res$P<=p])/sum(res$Isoform=='Expression'& res$P<=p)))
+     * exp.thresh <- s[max(which(h0.de<=fdr))] highest prob threshold below threshold.
      * Calculates the q-value threshold needed to attain a desired FDR
      * @param probs List of probabilities from HBA-DEALS
      * @return the probability threshold associated with the q-value threshold to reach the desired FDR
      */
     private double getThreshold(List<Double> probs) {
+        double FDR_THRESHOLD = 0.05;
         Collections.sort(probs);
-        double cumSum = 0.0;
         double p_threshold = 0.0;
-        int count = 0;
-        int [] tiesTracker = new int[probs.size()];
-        double previousP = -1.0;
-        int tiesIndex = 0;
-        for (int i=0; i<probs.size(); i++) {
-            double p = probs.get(i);
-            if (p != previousP) {
-                tiesIndex++;
-                previousP = p;
+        double min_p = 0.0;
+        double max_p = 0.25;
+        double delta = max_p - min_p;
+        double TOL = 0.001;
+        while (delta > TOL) {
+            double mid_p = min_p + (max_p - min_p)/2.0;
+            double fdr = getFdr(mid_p, probs);
+            if (fdr <= FDR_THRESHOLD) {
+                min_p = mid_p;
+                p_threshold = mid_p;
+            } else {
+                max_p = mid_p;
             }
-            tiesTracker[i] = tiesIndex;
-            if (p > MAX_PROB) {
-                break; // we are done, this and the remaining PEP's are too high
-                // if we get here, then we do not need to worry about ties, the previous element is different
-            }
-            count++;
-            cumSum += p;
-            double qvalue = cumSum/count; // cumulative mean of PEP
-            if (qvalue > probabilityThreshold) {
-                // when we get here, then p_threshold is the threshold for the desired FDR
-                // the exception is when there is a stretch of equal values and we reach the
-                // threshold in the middle of the stretch. If that is the case, then we
-                // go back and take the prior value.
-                // Watch out for edge cases where we would go below an index of zero
-                int j=i-1;
-                if (tiesTracker[j] == tiesTracker[i]) {
-                    // if we get here, then the qvalue has exceeded the desired probability threshold
-                    // in the middle of a run of ties.
-                    // therefore we need to go back to the value right before the run of ties
-                    while (tiesTracker[j] == tiesTracker[i]) j--;
-                    return probs.get(j);
-                }
-
-                while (j>=0 && probs.get(j) == p) {
-                    count--;
-                    cumSum -= p;
-                    qvalue = cumSum/count; // cumulative mean of PEP
-                    j--;
-                }
-                break;
-            }
-            p_threshold = p;
+            delta = max_p - min_p;
         }
         return p_threshold;
     }
+
 
     private double calculateExpressionThreshold() {
         List<Double> expressionProbs = rawResults
@@ -159,8 +164,8 @@ public class HbaDealsThresholder {
         return this.rawResults.keySet();
     }
 
-    public double getProbabilityThreshold() {
-        return probabilityThreshold;
+    public double getFdrThreshold() {
+        return fdrThreshold;
     }
 
     public double getExpressionThreshold() {
