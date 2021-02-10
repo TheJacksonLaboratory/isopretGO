@@ -3,7 +3,7 @@ package org.jax.isopret.transcript;
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 
-import org.monarchinitiative.variant.api.*;
+import org.monarchinitiative.svart.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +42,16 @@ class JannovarTxMapper {
 
         // these coordinates are already adjusted to the appropriate strand
         GenomeInterval cdsRegion = tm.getCDSRegion();
-        int cdsStart = cdsRegion.getBeginPos();
-        int cdsEnd = cdsRegion.getEndPos();
-
+        GenomicRegion cds = GenomicRegion.of(contig, strand, CoordinateSystem.zeroBased(),cdsRegion.getBeginPos(), cdsRegion.getEndPos());
+        // cds is ignored if not coding.
         // process exons
         List<GenomicRegion> exons = new ArrayList<>();
         for (GenomeInterval exon : tm.getExonRegions()) {
-            exons.add(GenomicRegion.zeroBased(contig, strand, Position.of(exon.getBeginPos()), Position.of(exon.getEndPos())));
+            exons.add(GenomicRegion.of(contig, strand, CoordinateSystem.zeroBased(), Position.of(exon.getBeginPos()), Position.of(exon.getEndPos())));
         }
 
-        return Optional.of(Transcript.of(contig, txRegion.getBeginPos(), txRegion.getEndPos(), strand, CoordinateSystem.ZERO_BASED,
-                cdsStart, cdsEnd, tm.getAccession(), tm.getGeneSymbol(), tm.isCoding(),
+        return Optional.of(Transcript.of(contig, strand, CoordinateSystem.zeroBased(), txRegion.getBeginPos(), txRegion.getEndPos(),
+                cds, tm.getAccession(), tm.getGeneSymbol(), tm.isCoding(),
                 exons));
     }
 }

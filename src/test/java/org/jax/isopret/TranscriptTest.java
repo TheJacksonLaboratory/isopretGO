@@ -68,8 +68,6 @@ public class TranscriptTest extends TestBase {
         PrositeMapping psm = prositeMappingMap.get(adarGeneId);
 
         AnnotatedGene atranscript = new AnnotatedGene(adarTranscripts, psm.getTranscriptToPrositeListMap(),adarResult);
-        //enst00000368474.exons().get(0).
-      //  assertTrue(atranscript.hasPrositeHit());
 
     }
 

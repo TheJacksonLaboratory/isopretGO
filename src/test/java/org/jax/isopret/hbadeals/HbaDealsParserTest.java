@@ -1,7 +1,6 @@
 package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.TestBase;
-import org.jax.isopret.hgnc.HgncParser;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

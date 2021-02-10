@@ -12,7 +12,6 @@ import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
 import org.jax.isopret.transcript.AnnotatedGene;
-import org.jax.isopret.transcript.GenomicAssemblyProvider;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
 import org.jax.isopret.visualization.*;
@@ -20,7 +19,9 @@ import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
-import org.monarchinitiative.variant.api.GenomicAssembly;
+import org.monarchinitiative.svart.*;
+
+
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
@@ -102,7 +103,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
-        GenomicAssembly hg38 =  GenomicAssemblyProvider.hg38();
+        GenomicAssembly hg38 =  GenomicAssemblies.GRCh38p13();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
         PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
@@ -132,7 +133,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         data.put("n_dasdge", hbago.dasDgeCount());
         data.put("n_dasdge_unmapped", hbago.unmappedDasDgeCount());
         data.put("unmappable_dasdge_list", Util.fromList(hbago.unmappedDasDgeSymbols(), "Unmappable DAS/DGE Gene Symbols"));
-        data.put("probability_threshold", thresholder.getProbabilityThreshold());
+        data.put("probability_threshold", thresholder.getFdrThreshold());
         data.put("expression_threshold", thresholder.getExpressionThreshold());
         data.put("splicing_threshold", thresholder.getSplicingThreshold());
         List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();

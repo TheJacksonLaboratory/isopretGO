@@ -42,7 +42,8 @@ public class ProteinLengthCalculatorTest extends TestBase {
     public void testENST00000368474() {
         // len 1226 aa
         Transcript ENST00000368474 = map.get("ENST00000368474");
-        assertEquals(1226, ENST00000368474.getProteinLength());
+        int len = ENST00000368474.getProteinLength();
+        assertEquals(1226, len);
     }
 
     @Test
