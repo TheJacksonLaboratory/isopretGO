@@ -25,4 +25,4 @@ hs_err_pid*
 /dependency-reduced-pom.xml
 /prositometry.iml
 /isopret.iml
-/isopret.html
+/*.html

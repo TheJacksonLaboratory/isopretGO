@@ -7,6 +7,8 @@ import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.svart.Contig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.*;
@@ -17,7 +19,7 @@ import java.util.*;
  * @author Peter N Robinson
  */
 public class EnsemblVisualizable implements Visualizable {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnsemblVisualizable.class);
 
      /** Number of all annotated transcripts of some gene */
     private final int totalTranscriptCount;
@@ -119,6 +121,10 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public String getProteinSvg(Map<String, String> prositeIdToName) {
         try {
+            // Return a message only if we cannot find prosite domains.
+            if (agene.getPrositeHitMap().isEmpty()) {
+                return ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
+            }
             AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene, prositeIdToName);
             return svggen.getSvg();
         } catch (Exception e) {

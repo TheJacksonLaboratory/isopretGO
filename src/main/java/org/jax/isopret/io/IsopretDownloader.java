@@ -2,6 +2,8 @@ package org.jax.isopret.io;
 
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +21,7 @@ import java.util.zip.GZIPInputStream;
  * @author Peter N Robinson
  */
 public class IsopretDownloader {
-    //private static final Logger logger = LoggerFactory.getLogger(PrositometryDownloader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsopretDownloader.class);
     /** Directory to which we will download the files. */
     private final String downloadDirectory;
     /** If true, download new version whether or not the file is already present. */
@@ -98,7 +100,7 @@ public class IsopretDownloader {
     private void downloadFileIfNeeded(String filename, String webAddress) {
         File f = new File(String.format("%s%s%s",downloadDirectory,File.separator,filename));
         if (f.exists() && (! overwrite)) {
-            System.out.printf("Cowardly refusing to download %s since we found it at %s.\n",
+            LOGGER.info("Cowardly refusing to download {} since we found it at {}.\n",
                     filename,
                     f.getAbsolutePath());
             return;
@@ -108,11 +110,11 @@ public class IsopretDownloader {
             URL url = new URL(webAddress);
             downloader.copyURLToFile(url, new File(f.getAbsolutePath()));
         } catch (MalformedURLException e) {
-            System.err.printf("Malformed URL for %s [%s]: %s",filename, webAddress,e.getMessage());
+            LOGGER.error("Malformed URL for {} [{}]: {}",filename, webAddress,e.getMessage());
         } catch (FileDownloadException e) {
-            System.err.printf("Error downloading %s from %s: %s\"" ,filename, webAddress,e.getMessage());
+            LOGGER.error("Error downloading {} from {}: {}\"" ,filename, webAddress,e.getMessage());
         }
-        System.out.println("[INFO] Downloaded " + filename);
+        LOGGER.trace("[INFO] Downloaded " + filename);
     }
 
 }

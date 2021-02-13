@@ -7,6 +7,7 @@ import org.jax.isopret.prosite.PrositeHit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AnnotatedGene {
@@ -42,6 +43,25 @@ public class AnnotatedGene {
     public List<Transcript> getExpressedTranscripts() {
         return expressedTranscripts;
     }
+
+    public int getTranscriptCount() {
+        return expressedTranscripts.size();
+    }
+
+    public int getCodingTranscriptCount() {
+        return (int) this.expressedTranscripts
+                .stream()
+                .filter(Transcript::isCoding)
+                .count();
+    }
+
+    public int getNoncodingTranscriptCount() {
+        return (int) this.expressedTranscripts
+                .stream()
+                .filter(Predicate.not(Transcript::isCoding))
+                .count();
+    }
+
 
     public List<Transcript> getTranscripts() {
         return transcripts;

@@ -247,9 +247,7 @@ public class HbaDealsGoAnalysis {
                 TermId goId = a.getGoId();
                 if (einrichedGoTermIdSet.contains(goId)) {
                     Optional<String> labelOpt = ontology.getTermLabel(goId);
-                    if (labelOpt.isPresent()) {
-                        symbolToGoTermResults.get(symbol).add(new GoTermIdPlusLabel(goId, labelOpt.get()));
-                    }
+                    labelOpt.ifPresent(s -> symbolToGoTermResults.get(symbol).add(new GoTermIdPlusLabel(goId, s)));
                 }
             }
         }

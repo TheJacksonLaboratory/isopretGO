@@ -22,6 +22,8 @@ import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.svart.*;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
@@ -38,6 +40,7 @@ import java.util.stream.Stream;
         mixinStandardHelpOptions = true,
         description = "Analyze HBA-DEALS files")
 public class HbaDealsCommand implements Callable<Integer> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsCommand.class);
 
     @CommandLine.Option(names={"-b","--hbadeals"}, description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
@@ -48,7 +51,7 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String fastaFile = "data/Homo_sapiens.GRCh38.cdna.all.fa.gz";
     @CommandLine.Option(names={"-p","--prosite"}, description ="prosite.dat file")
     private String prositeDataFile = "data/prosite.dat";
-    @CommandLine.Option(names={"--prositemap"}, description = "prosite mape file", required = true)
+    @CommandLine.Option(names={"--prositemap"}, description = "prosite map file", required = true)
     private String prositeMapFile;
     @CommandLine.Option(names={"-g","--go"}, description ="go.obo file")
     private String goOboFile = "data/go.obo";
@@ -87,8 +90,8 @@ public class HbaDealsCommand implements Callable<Integer> {
         data.put("annotation_term_count", goAssociationContainer.getOntologyTermCount());
         data.put("annotation_count", goAssociationContainer.getRawAssociations().size());
         data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
-        System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
-        System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
+        LOGGER.trace("We got {} GO terms.", ontology.countNonObsoleteTerms());
+        LOGGER.trace("We got {} term to annotation list mappings.",goAssociationContainer.getRawAssociations().size());
         MtcMethod mtc = MtcMethod.fromString(this.mtc);
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
         // ----------  2. HGNC Mapping from accession numbers to gene symbols -------------
@@ -177,7 +180,7 @@ public class HbaDealsCommand implements Callable<Integer> {
                 .collect(Collectors.toSet());
         Map<String, Set<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
 
-        System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
+        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
         List<String> dasAndDgeVisualizations = new ArrayList<>();
         List<String> dasVisualizations = new ArrayList<>();
@@ -201,7 +204,7 @@ public class HbaDealsCommand implements Callable<Integer> {
             final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
             Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
             if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
-                System.err.printf("[WARN] Could not identify prosite Mapping for %s.\n", geneSymbol);
+                LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);
                 prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
             } else {
                 PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
@@ -210,7 +213,6 @@ public class HbaDealsCommand implements Callable<Integer> {
             }
 
             AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
-            System.out.printf("[INFO] processing %s: ", geneSymbol);
             if (result.isDASandDGE()) {
                 Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
                 dasAndDgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
@@ -242,8 +244,8 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         HtmlTemplate template = new HtmlTemplate(data, this.outprefix);
         template.outputFile();
-        System.out.println("[INFO] Total unidentified genes:"+ unidentifiedSymbols.size());
-        System.out.printf("[INFO] Total HBADEALS results: %d, found transcripts %d, also significant %d, also prosite: %d\n",
+        LOGGER.trace("Total unidentified genes:"+ unidentifiedSymbols.size());
+        LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also prosite: {}",
                 hbadeals, foundTranscripts, hbadealSig, foundProsite);
         return 0;
     }

@@ -145,7 +145,7 @@ public class HgncParser {
             }
         }
         if (notMapped > 0) {
-            LOGGER.trace("Retrieving %d ENSG mappings; could not map %d HGNS entries.\n", ensmap.size(), notMapped);
+            LOGGER.trace("Retrieving {} ENSG mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
         }
         return ensmap;
     }
@@ -162,7 +162,7 @@ public class HgncParser {
             }
         }
         if (notMapped > 0) {
-            LOGGER.trace("Retrieving %d UCSC mappings; could not map %d HGNS entries.\n", ensmap.size(), notMapped);
+            LOGGER.trace("Retrieving {} UCSC mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
         }
         return ensmap;
     }
@@ -179,7 +179,7 @@ public class HgncParser {
             }
         }
         if (notMapped > 0) {
-            LOGGER.trace("Retrieving %d RefSeq mappings; could not map %d HGNS entries.\n", ensmap.size(), notMapped);
+            LOGGER.trace("Retrieving {} RefSeq mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
         }
         return ensmap;
     }
