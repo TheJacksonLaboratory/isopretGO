@@ -15,7 +15,7 @@ public class HbaDealsParserTest extends TestBase {
     private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
     private static final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString(), hgncParser.ensemblMap());
     private static final Map<String, HbaDealsResult> hbaDealsResultMap = parser.getHbaDealsResultMap();
-
+    private final double THRESHOLD = 0.05;
     @Test
     public void if_hbadeals_adar_results_retrieved_then_ok() {
         assertTrue(hbaDealsResultMap.containsKey("ADAR"));
@@ -33,7 +33,7 @@ public class HbaDealsParserTest extends TestBase {
     @Test
     public void if_adar_has_significant_dge_then_ok() {
         HbaDealsResult adar = hbaDealsResultMap.get("ADAR");
-        assertTrue(adar.hasSignificantExpressionResult());
+        assertTrue(adar.hasDifferentialExpressionResult(THRESHOLD));
         double p = adar.getExpressionP();
         assertTrue(p<0.0000001); // represented as p=0 in our test file
     }
@@ -47,7 +47,7 @@ public class HbaDealsParserTest extends TestBase {
     public void if_adar_has_significant_das_then_ok() {
         final double EPSILON = 0.0001;
         HbaDealsResult adar = hbaDealsResultMap.get("ADAR");
-        assertTrue(adar.hasaSignificantSplicingResult());
+        assertTrue(adar.hasDifferentialSplicingResult(THRESHOLD));
         double pva = adar.getMostSignificantSplicingPval();
         assertEquals(1e-05, pva, EPSILON);
         Map<String, HbaDealsTranscriptResult> transcriptMap = adar.getTranscriptMap();

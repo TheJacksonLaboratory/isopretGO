@@ -11,7 +11,6 @@ public class HbaDealsResult {
     private double expressionP;
     private final Map<String, HbaDealsTranscriptResult> transcriptMap;
 
-    private final double DEFAULT_THRESHOLD = 0.1;
 
 
     public HbaDealsResult(String geneAccession, String sym) {
@@ -64,28 +63,25 @@ public class HbaDealsResult {
         return transcriptMap;
     }
 
-    public boolean hasSignificantResult() {
-        if (this.expressionP <= 0.05) {
-            return true;
-        }
-        return this.transcriptMap
-                .values()
-                .stream()
-                .anyMatch(HbaDealsTranscriptResult::isSignificant);
+    public boolean hasDifferentialExpressionResult(double threshold) { return this.expressionP < threshold; }
+
+
+    public boolean hasDifferentialSplicingResult(double threshold) {
+        return this.transcriptMap.values().stream().anyMatch(r -> r.getP() <= threshold);
     }
 
-    public boolean hasSignificantExpressionResult(double threshold) { return this.expressionP < threshold; }
-
-    public boolean hasSignificantExpressionResult() {
-        return hasSignificantExpressionResult(DEFAULT_THRESHOLD);
+    /**
+     *
+     * @param splicing adjusted probability threshold
+     * @param expression adjusted probability threshold
+     * @return true if this gene has a differential expression OR splicing result
+     */
+    public boolean hasDifferentialSplicingOrExpressionResult(double splicing, double expression) {
+        return hasDifferentialSplicingResult(splicing) || hasDifferentialExpressionResult(expression);
     }
 
-    public boolean hasaSignificantSplicingResult() {
-        return this.transcriptMap
-                .values()
-                .stream()
-                .anyMatch(HbaDealsTranscriptResult::isSignificant);
-    }
+
+
 
     public double getMostSignificantSplicingPval() {
         return this.transcriptMap
@@ -96,16 +92,4 @@ public class HbaDealsResult {
                 .orElse(1.0);
     }
 
-
-    public boolean isDAS() {
-        return hasaSignificantSplicingResult() && (! hasSignificantExpressionResult());
-    }
-
-    public boolean isDGE() {
-        return  hasSignificantExpressionResult() && (! hasaSignificantSplicingResult());
-    }
-
-    public boolean isDASandDGE() {
-        return hasaSignificantSplicingResult() && hasSignificantExpressionResult();
-    }
 }

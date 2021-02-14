@@ -26,7 +26,6 @@ public class HbaDealsGoAnalysis {
 
     private final StudySet dge;
     private final StudySet das;
-    private final StudySet dasDge;
     private final StudySet population;
     private final GoMethod goMethod;
     private final MultipleTestingCorrection mtc;
@@ -67,10 +66,8 @@ public class HbaDealsGoAnalysis {
         Set<String> population = thresholder.population();
         Set<String> dgeGenes = thresholder.dgeGeneSymbols();
         Set<String> dasGenes = thresholder.dasGeneSymbols();
-        Set<String> dasDgeGenes = thresholder.dasDgeGeneSymbols();
         this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge");
         this.das = associationContainer.fromGeneSymbols(dasGenes, "das");
-        this.dasDge = associationContainer.fromGeneSymbols(dasDgeGenes, "dasdge");
         this.population = associationContainer.fromGeneSymbols(population, "population");
     }
 
@@ -101,18 +98,6 @@ public class HbaDealsGoAnalysis {
 
     public List<String> unmappedDgeSymbols() {
         return this.dge.getSortedUnmappedGeneSymbols();
-    }
-
-    public int dasDgeCount() {
-        return this.dasDge.getAnnotatedItemCount();
-    }
-
-    public int unmappedDasDgeCount() {
-        return this.dasDge.getUnmappedGeneSymbolCount();
-    }
-
-    public List<String> unmappedDasDgeSymbols() {
-        return this.dasDge.getSortedUnmappedGeneSymbols();
     }
 
 
@@ -186,21 +171,6 @@ public class HbaDealsGoAnalysis {
         }
     }
 
-    public List<GoTerm2PValAndCounts> dasDgeOverrepresetationAnalysis() {
-        switch (this.goMethod) {
-            case TFT:
-                return termForTerm(this.dasDge);
-            case PCunion:
-                return parentChildUnion(this.dasDge);
-            case PCintersect:
-                return parentChildIntersect(this.dasDge);
-            case MGSA:
-                return mgsa(this.das);
-            default:
-                // should never happen
-                throw new IsopretRuntimeException("Unrecognized method");
-        }
-    }
 
 
     public static HbaDealsGoAnalysis termForTerm(HbaDealsThresholder thresholder,

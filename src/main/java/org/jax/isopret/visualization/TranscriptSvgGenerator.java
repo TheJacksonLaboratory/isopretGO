@@ -27,7 +27,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     static final int SVG_WIDTH = 1400;
 
     static final int HEIGHT_FOR_SV_DISPLAY = 200;
-    static final int HEIGHT_PER_DISPLAY_ITEM = 80;
+    static final int HEIGHT_PER_DISPLAY_ITEM = 100;
 
     /**
      * Canvas height of the SVG.
@@ -488,7 +488,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         int y = 50;
         try {
             writeGeneExpression(writer, y);
-            y += 50;
+            y += 100;
             for (var tmod : this.affectedTranscripts) {
                 if (tmod.isCoding()) {
                     writeCodingTranscript(tmod, y, writer);

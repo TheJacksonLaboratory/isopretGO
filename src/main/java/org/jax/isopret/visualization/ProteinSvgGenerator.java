@@ -139,7 +139,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                         "style=\"fill:#%s;stroke:black;stroke-width:1\" />\n",
                 x1, ypos, exonwidth, ISOFORM_HEIGHT, JAMA_BLUE);
         writer.write(rect);
-        final double digitWidth = 5;
+        final double digitWidth = 4;
         if (exonwidth > 20) {
             double text_x = x1 + exonwidth/2;
             text_x -= exonNum>9 ? 2*digitWidth : digitWidth;
@@ -299,8 +299,8 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                 "                        \"xmlns:svg=\\\"http://www.w3.org/2000/svg\\\">\\n" +
                 "<style> text { font: 14px; } </style>\n" +
                 "<text x=\"20\" y=\"20\">" +
-                "No protein domains for available" + symbol +
-                "  </text>\n</svg>";
+                "No protein domains available for " + symbol +
+                ".</text>\n</svg>";
     }
 
 

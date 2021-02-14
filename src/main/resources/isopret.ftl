@@ -424,8 +424,7 @@ a.svg:hover, a.svg:active {
       <h2>Isopret &mdash; Isoform interpretation.</h2>
       <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
       <p>${n_population} genes were included in the analysis. ${n_das} had one or more differentially spliced isoforms.
-            ${n_dge} were differentially expressed. ${n_dasdge} were both differentially spliced and
-            differentially expressed.</p>
+            ${n_dge} were differentially expressed.</p>
       <p>Using a desired FDR threshold of ${probability_threshold}, a probability threshold of
           ${expression_threshold} was calculated for differential expression, and a threshold of
           ${splicing_threshold} was calculated for differential splicing.</p>
@@ -438,14 +437,6 @@ a.svg:hover, a.svg:active {
       <h2>Gene Ontology Overrepresentation Analysis.</h2>
       <p>Gene Ontology <tt>go.obo</tt> file: ${go_version} with ${n_go_terms} terms.</p>
       <p>${annotation_term_count} terms used for a total of ${annotation_count} annotations for ${annotated_genes} genes.</p>
-      <h4>Differentially expressed and differentially spliced genes (n=${n_dasdge})</h4>
-       <p>${n_dasdge_unmapped} of the ${n_dasdge} genes could not be mapped to gene ids for GO analysis
-            <div class="tooltip">(Hover here for details)
-              <span class="tooltiptext">${unmappable_dasdge_list}</span>
-            </div>.</p>
-      <a id="show-dasdgego-table" class="table-btn" onclick="showDasDgeGoTable()">Show Table</a>
-      <a id="hide-dasdgego-table" class="table-btn" onclick="hideDasDgeGoTable()">Hide Table</a>
-      ${dasDgeTable}
       <h4>Differentially expressed genes (n=${n_dge})</h4>
        <p>${n_dge_unmapped} of the ${n_dge} genes could not be mapped to gene ids for GO analysis
        <div class="tooltip">(Hover here for details)
@@ -463,18 +454,6 @@ a.svg:hover, a.svg:active {
       <a id="hide-dasgo-table" class="table-btn" onclick="hideDasGoTable()">Hide Table</a>
       ${dasTable}
     </article>
-  </section>
-
-  <section>
-    <a name="dasdge"></a>
-    <h1>Genes displaying both differential expression and differential alternative splicing (DAS/DGE)</h1>
-    <p>A total of ${n_dasdge} out of ${populationCount} genes in the population showed both differential alternative splicing (DAS) and
-        differential gene expression (DGE).</p>
-    <#list dgedaslist as gene>
-      <article>
-        ${gene}
-      </article>
-    </#list>
   </section>
 
   <section>
@@ -565,24 +544,6 @@ a.svg:hover, a.svg:active {
     var showtablebtn = document.getElementById("show-dasgo-table");
     showtablebtn.style.display = "block";
     var hidetablebtn = document.getElementById("hide-dasgo-table");
-    hidetablebtn.style.display = "none";
-  }
-
-  function showDasDgeGoTable() {
-    var table = document.getElementById("dasdgego-table");
-    table.style.display = "block";
-    var showtablebtn = document.getElementById("show-dasdgego-table");
-    showtablebtn.style.display = "none";
-    var hidetablebtn = document.getElementById("hide-dasdgego-table");
-    hidetablebtn.style.display = "block";
-  }
-
-  function hideDasDgeGoTable() {
-    var table = document.getElementById("dasdgego-table");
-    table.style.display = "none";
-    var showtablebtn = document.getElementById("show-dasdgego-table");
-    showtablebtn.style.display = "block";
-    var hidetablebtn = document.getElementById("hide-dasdgego-table");
     hidetablebtn.style.display = "none";
   }
 </script>

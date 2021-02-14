@@ -136,7 +136,7 @@ public class HbaDealsThresholder {
         return this.rawResults
                 .values()
                 .stream()
-                .filter(r -> r.getExpressionP() < this.expressionThreshold)
+                .filter(r -> r.getExpressionP() <= this.expressionThreshold)
                 .map(HbaDealsResult::getSymbol)
                 .collect(Collectors.toSet());
     }
@@ -145,20 +145,12 @@ public class HbaDealsThresholder {
         return this.rawResults
                 .values()
                 .stream()
-                .filter(r -> r.getMostSignificantSplicingPval() < this.splicingThreshold)
+                .filter(r -> r.getMostSignificantSplicingPval() <= this.splicingThreshold)
                 .map(HbaDealsResult::getSymbol)
                 .collect(Collectors.toSet());
     }
 
-    public Set<String> dasDgeGeneSymbols() {
-        return this.rawResults
-                .values()
-                .stream()
-                .filter(r -> r.getExpressionP() < this.expressionThreshold)
-                .filter(r -> r.getMostSignificantSplicingPval() < this.splicingThreshold)
-                .map(HbaDealsResult::getSymbol)
-                .collect(Collectors.toSet());
-    }
+
 
     public Set<String> population() {
         return this.rawResults.keySet();
