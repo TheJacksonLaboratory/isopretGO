@@ -37,5 +37,12 @@ public interface Visualizable {
 
    List<GoTermIdPlusLabel> getGoTerms();
 
+   boolean isDifferentiallyExpressed();
+
+   boolean isDifferentiallySpliced();
+
+
+    int getI();
+
 
 }

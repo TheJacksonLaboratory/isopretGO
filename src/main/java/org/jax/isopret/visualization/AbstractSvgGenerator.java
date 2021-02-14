@@ -31,7 +31,7 @@ public abstract class AbstractSvgGenerator {
     }
 
     abstract void write(Writer writer);
-    abstract String getSvg();
+    abstract public String getSvg();
 
 
     /**
@@ -69,7 +69,7 @@ public abstract class AbstractSvgGenerator {
     }
 
     protected void writeHeader(Writer writer) throws IOException {
-        writeHeader(writer, false);
+        writeHeader(writer, true);
     }
 
     /**

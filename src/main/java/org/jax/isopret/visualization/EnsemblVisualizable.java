@@ -7,6 +7,8 @@ import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.svart.Contig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.*;
@@ -17,7 +19,7 @@ import java.util.*;
  * @author Peter N Robinson
  */
 public class EnsemblVisualizable implements Visualizable {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnsemblVisualizable.class);
 
      /** Number of all annotated transcripts of some gene */
     private final int totalTranscriptCount;
@@ -35,8 +37,14 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final List<GoTermIdPlusLabel> goterms;
 
+    private final boolean differentiallyExpressed;
 
-    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms) {
+    private final boolean differentiallySpliced;
+
+
+    private final int i;
+
+    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms, int i) {
         this.agene = agene;
         List<GoTermIdPlusLabel> golist = new ArrayList<>(goterms);
         Collections.sort(golist);
@@ -47,7 +55,12 @@ public class EnsemblVisualizable implements Visualizable {
         this.hbaDealsResult = agene.getHbaDealsResult();
         String chr = this.expressedTranscripts.stream().map(Transcript::contig).map(Contig::name).findAny().orElse("n/a");
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
+        differentiallyExpressed = agene.passesExpressionThreshold();
+        differentiallySpliced = agene.passesSplicingThreshold();
+        this.i = i;
     }
+
+    public int getI() { return i; }
 
     @Override
     public String getGeneSymbol() {
@@ -95,7 +108,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public double getMostSignificantSplicingPval() {
-        return this.hbaDealsResult.getMostSignificantSplicingPval();
+        return this.hbaDealsResult.getSmallestSplicingP();
     }
 
     @Override
@@ -119,6 +132,10 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public String getProteinSvg(Map<String, String> prositeIdToName) {
         try {
+            // Return a message only if we cannot find prosite domains.
+            if (agene.getPrositeHitMap().isEmpty()) {
+                return ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
+            }
             AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene, prositeIdToName);
             return svggen.getSvg();
         } catch (Exception e) {
@@ -190,5 +207,15 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public List<GoTermIdPlusLabel> getGoTerms() {
         return this.goterms;
+    }
+
+    @Override
+    public boolean isDifferentiallyExpressed() {
+        return this.differentiallyExpressed;
+    }
+
+    @Override
+    public boolean isDifferentiallySpliced(){
+        return this.differentiallySpliced;
     }
 }

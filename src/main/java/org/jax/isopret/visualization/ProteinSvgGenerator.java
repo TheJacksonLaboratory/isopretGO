@@ -11,11 +11,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
 
-
+/**
+ * Write an SVG representing the protein domains and corresponding exon structure.
+ * @author Peter N Robinson
+ */
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
     static final int SVG_WIDTH = 1400;
     static final int HEIGHT_FOR_SV_DISPLAY = 100;
-    static final int HEIGHT_PER_DISPLAY_ITEM = 60;
+    static final int HEIGHT_PER_DISPLAY_ITEM = 90;
     private static final int ISOFORM_HEIGHT = 20;
     private final static String[] colors = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF", "F7DC6F", "CFFF98", "A1D6E2",
             "EC96A4", "E6DF44", "F76FDA", "FFCCE5", "E4EA8C", "F1F76F", "FDD2D6", "F76F7F", "DAF7A6", "FFC300", "F76FF5", "FFFF99",
@@ -41,6 +44,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private final int proteinMaxSvgPos;
     private final int keyMinSvgPos;
     private final int keyMaxSvgPos;
+
+    private final static String JAMA_BLUE = "00b2e2";
+
 
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
         super(SVG_WIDTH, height);
@@ -92,12 +98,12 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      * Write a box for the entire transcript
      *
      * @param ypos SVG Y coordinate to write the protein box
+     * @param xend end popsition of this protein in SVG coordinates.
      * @param writer file handle
      * @throws IOException if we cannot write the box
      */
-    protected void writeProteinBox(Transcript transcript, int ypos, Writer writer) throws IOException {
+    protected void writeProteinBox(Transcript transcript, double xend, int ypos, Writer writer) throws IOException {
         double xstart = this.proteinMinSvgPos;
-        double xend = translateProteinToSvgCoordinate(transcript.getProteinLength());
         double width = xend - xstart;
         double Y = ypos - 0.5 * ISOFORM_HEIGHT;
         String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%d\" " +
@@ -107,8 +113,39 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         double midishpoint = this.proteinMinSvgPos + 0.4 * (this.proteinMaxSvgPos - this.proteinMinSvgPos);
         Y = ypos - 0.55 * ISOFORM_HEIGHT;
         String label = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
-                midishpoint, Y, PURPLE, transcript.accessionId());
+                xstart+5, Y-5, PURPLE, transcript.accessionId());
         writer.write(label);
+    }
+
+    private void writeExons(Transcript transcript, double xend, int ypos, Writer writer) throws IOException{
+        double xstart = this.proteinMinSvgPos;
+        double width = xend - xstart;
+        List<Integer> codingExonLengths = transcript.codingExonLengths();
+        int cdnalen = codingExonLengths.stream().mapToInt(Integer::intValue).sum();
+        double widthPerBp = width/cdnalen;
+        int i = 0;
+        double x1 = xstart;
+        for (int cdsLen : codingExonLengths) {
+            i++;
+            if (cdsLen == 0) continue;
+            double exonwidth =  cdsLen * widthPerBp;
+            writeExon(x1,exonwidth,i, ypos, writer);
+            x1 += exonwidth;
+        }
+    }
+
+    private void writeExon(double x1, double exonwidth , int exonNum, int ypos, Writer writer) throws IOException {
+        String rect = String.format("<rect x=\"%f\" y=\"%d\" width=\"%f\" height=\"%d\" " +
+                        "style=\"fill:#%s;stroke:black;stroke-width:1\" />\n",
+                x1, ypos, exonwidth, ISOFORM_HEIGHT, JAMA_BLUE);
+        writer.write(rect);
+        final double digitWidth = 4;
+        if (exonwidth > 20) {
+            double text_x = x1 + exonwidth/2;
+            text_x -= exonNum>9 ? 2*digitWidth : digitWidth;
+            double text_y = ypos + 0.75*ISOFORM_HEIGHT;
+            writer.write(String.format("<text x=\"%f\" y=\"%f\" fill=\"white\">%d</text>\n",text_x, text_y, exonNum));
+        }
     }
 
 
@@ -134,7 +171,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         String svg = String.format("<text x=\"%d\" y=\"%d\" fill=\"%s\">Domains and Motifs</text>\n",
                 startx, y, BLACK);
         writer.write(svg);
-        y += 100;
+        y += 40;
         int Y_INTERVAL = 60;
         for (var entry : sortedPrositeIdMap.entrySet()) {
             String accession = entry.getKey();
@@ -194,8 +231,11 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
 
     private void writeIsoform(int ypos, Transcript transcript, Writer writer) throws IOException {
-        writeProteinBox(transcript, ypos, writer);
+        final int EXON_CARTOON_YSKIP = 15;
+        double xend = translateProteinToSvgCoordinate(transcript.getProteinLength());
+        writeProteinBox(transcript, xend, ypos, writer);
         writeDomains(transcript, ypos, writer);
+        writeExons(transcript, xend, ypos+EXON_CARTOON_YSKIP,writer);
     }
 
     private void writeNoncodingIsoform(int ypos, Transcript transcript, Writer writer) throws IOException {
@@ -225,10 +265,17 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             for (var transcript : this.expressedTranscriptList) {
                 if (transcript.isCoding()) {
                     writeIsoform(y, transcript, writer);
-                } else {
-                    writeNoncodingIsoform(y, transcript, writer);
+                    y += HEIGHT_PER_DISPLAY_ITEM;
                 }
-                y += HEIGHT_PER_DISPLAY_ITEM;
+            }
+            int nonCodingTranscripts = this.annotatedGene.getNoncodingTranscriptCount();
+            if (nonCodingTranscripts>0) {
+                int xpos = this.proteinMinSvgPos + 10;
+                writer.write(String.format("<text x=\"%d\" y=\"%d\">%s has %d non-coding %s with non-zero read counts</text>\n",
+                        xpos, y,
+                        this.annotatedGene.getHbaDealsResult().getSymbol(),
+                        nonCodingTranscripts,
+                        nonCodingTranscripts>1 ? "transcripts" : "transcript"));
             }
             writeKey(writer);
         } catch (IOException e) {
@@ -237,11 +284,25 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
 
-    public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript, Map<String, String> id2nameMap) {
-        List<Transcript> affectedTranscripts = annotatedTranscript.getExpressedTranscripts();
-        int height = HEIGHT_PER_DISPLAY_ITEM * affectedTranscripts.size() + HEIGHT_FOR_SV_DISPLAY;
+    public static AbstractSvgGenerator factory(AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
+        int height = HEIGHT_PER_DISPLAY_ITEM * annotatedGene.getCodingTranscriptCount() + HEIGHT_FOR_SV_DISPLAY;
+        if (annotatedGene.getNoncodingTranscriptCount()>0) {
+            height += HEIGHT_FOR_SV_DISPLAY;
+        }
         return new ProteinSvgGenerator(height,
-                annotatedTranscript,
+                annotatedGene,
                 id2nameMap);
     }
+
+    public static String empty(String symbol) {
+        return  "<svg width=\"" + SVG_WIDTH + "\" height=\"" + 50+ "\" \nxmlns=\\\"http://www.w3.org/2000/svg\\\" \" +\n" +
+                "                        \"xmlns:svg=\\\"http://www.w3.org/2000/svg\\\">\\n" +
+                "<style> text { font: 14px; } </style>\n" +
+                "<text x=\"20\" y=\"20\">" +
+                "No protein domains available for " + symbol +
+                ".</text>\n</svg>";
+    }
+
+
+
 }
