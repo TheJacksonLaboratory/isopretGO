@@ -37,6 +37,10 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final List<GoTermIdPlusLabel> goterms;
 
+    private final boolean differentiallyExpressed;
+
+    private final boolean differentiallySpliced;
+
 
     public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms) {
         this.agene = agene;
@@ -49,6 +53,8 @@ public class EnsemblVisualizable implements Visualizable {
         this.hbaDealsResult = agene.getHbaDealsResult();
         String chr = this.expressedTranscripts.stream().map(Transcript::contig).map(Contig::name).findAny().orElse("n/a");
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
+        differentiallyExpressed = agene.passesExpressionThreshold();
+        differentiallySpliced = agene.passesSplicingThreshold();
     }
 
     @Override
@@ -196,5 +202,15 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public List<GoTermIdPlusLabel> getGoTerms() {
         return this.goterms;
+    }
+
+    @Override
+    public boolean isDifferentiallyExpressed() {
+        return this.differentiallyExpressed;
+    }
+
+    @Override
+    public boolean isDifferentiallySpliced(){
+        return this.differentiallySpliced;
     }
 }

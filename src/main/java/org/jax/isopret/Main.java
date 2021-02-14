@@ -16,7 +16,6 @@ public class Main implements Callable<Integer> {
             args = new String[]{"-h"};
         }
         CommandLine cline = new CommandLine(new Main())
-                .addSubcommand("biomart", new BiomartCommand())
                 .addSubcommand("download", new DownloadCommand())
                 .addSubcommand("hbadeals", new HbaDealsCommand())
                 .addSubcommand("svg", new SvgCommand())

@@ -173,8 +173,8 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
-        List<String> dasVisualizations = new ArrayList<>();
-        List<String> dgeVisualizations = new ArrayList<>();
+        List<String> geneVisualizations = new ArrayList<>();
+
         HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
         for (var entry : hbaDealsResults.entrySet()) {
             String geneSymbol = entry.getKey();
@@ -202,21 +202,20 @@ public class HbaDealsCommand implements Callable<Integer> {
                 foundProsite++;
             }
 
-            AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
-            if (result.hasDifferentialSplicingResult(splicingThreshold)) {
+            if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
+                AnnotatedGene agene = new AnnotatedGene(transcripts,
+                        prositeHitsForCurrentGene,
+                        result,
+                        expressionThreshold,
+                        splicingThreshold);
                 Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
-                dasVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
-            } else if (result.hasDifferentialExpressionResult(expressionThreshold)) {
-                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
-                dgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
-            } else {
-                // should never get here, sanity check
-                throw new IsopretRuntimeException("Neither DAS, nor DGE, not DAS/DGE, nor non-significant");
+                geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
             }
+
+            Collections.sort(geneVisualizations);
         }
 
-        data.put("daslist", dasVisualizations);
-        data.put("dgelist", dgeVisualizations);
+        data.put("genelist", geneVisualizations);
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();
         for (var v : dgeGoTerms) {

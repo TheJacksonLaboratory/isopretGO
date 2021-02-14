@@ -117,10 +117,34 @@ public class HtmlVisualizer implements Visualizer {
         return sb.toString();
     }
 
+
+    public String getGeneNameAndBadges(Visualizable vis) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h1>").append(vis.getGeneSymbol());
+       if (vis.isDifferentiallyExpressed()) {
+           sb.append(" <span class=\"badge\">DGE</span> ");
+       }
+       if (vis.isDifferentiallySpliced()) {
+           sb.append(" <span class=\"badge\">DAS</span>");
+       }
+       sb.append("</h1>\n");
+      return sb.toString();
+    }
+
+
+    /*
+      Create the HTML which will go here in the FreeMarker template
+      <article>
+        ${gene}
+      </article>
+     */
+
     @Override
     public String getHtml(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h1>").append(vis.getGeneSymbol()).append(" &emsp; ").append("</h1>\n");
+       // sb.append("<h1>").append(vis.getGeneSymbol()).append(" &emsp; ").append("</h1>\n");
+        sb.append(getGeneNameAndBadges(vis));
+        sb.append("<article>\n");
         sb.append("<div class=\"generow\">\n");
         sb.append("<div class=\"column\" style=\"background-color:#F8F8F8;\">\n");
         sb.append(getGeneBox(vis)).append("\n");
@@ -138,6 +162,7 @@ public class HtmlVisualizer implements Visualizer {
         sb.append("<div class=\"svgrow\">\n");
         sb.append(vis.getProteinSvg(this.prositeIdToName));
         sb.append("</div>\n");
+        sb.append("</article>\n");
         return sb.toString();
     }
 
