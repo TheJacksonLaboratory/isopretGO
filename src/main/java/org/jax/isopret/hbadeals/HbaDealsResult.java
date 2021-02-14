@@ -83,7 +83,7 @@ public class HbaDealsResult {
 
 
 
-    public double getMostSignificantSplicingPval() {
+    public double getSmallestSplicingP() {
         return this.transcriptMap
                 .values()
                 .stream()

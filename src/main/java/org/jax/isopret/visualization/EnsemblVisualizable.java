@@ -42,7 +42,9 @@ public class EnsemblVisualizable implements Visualizable {
     private final boolean differentiallySpliced;
 
 
-    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms) {
+    private final int i;
+
+    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms, int i) {
         this.agene = agene;
         List<GoTermIdPlusLabel> golist = new ArrayList<>(goterms);
         Collections.sort(golist);
@@ -55,7 +57,10 @@ public class EnsemblVisualizable implements Visualizable {
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
         differentiallyExpressed = agene.passesExpressionThreshold();
         differentiallySpliced = agene.passesSplicingThreshold();
+        this.i = i;
     }
+
+    public int getI() { return i; }
 
     @Override
     public String getGeneSymbol() {
@@ -103,7 +108,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public double getMostSignificantSplicingPval() {
-        return this.hbaDealsResult.getMostSignificantSplicingPval();
+        return this.hbaDealsResult.getSmallestSplicingP();
     }
 
     @Override

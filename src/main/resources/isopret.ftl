@@ -420,8 +420,7 @@ a.svg:hover, a.svg:active {
     <ul>
       <li><a href="#sample">Sample</a></li>
       <li><a href="#go">GO analysis</a></li>
-      <li><a href="#das">DAS</a></li>
-      <li><a href="#dge">DGE</a></li>
+      <li><a href="#dgedas">DGE/DAS</a></li>
       <li><a href="#about">About</a></li>
     </ul>
   </div>
@@ -461,9 +460,10 @@ a.svg:hover, a.svg:active {
     </article>
   </section>
 
+ <a name="dgedas"></a>
  <#list genelist as gene>
   <section>
-         ${gene}
+    ${gene}
   </section>
   </#list>
 
@@ -476,8 +476,7 @@ a.svg:hover, a.svg:active {
     </article>
   </section>
 
-      <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
-
+  <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
 </main>
 <footer>
   <p>Isopret &copy; 2021</p>

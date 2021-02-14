@@ -120,7 +120,8 @@ public class HtmlVisualizer implements Visualizer {
 
     public String getGeneNameAndBadges(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h1>").append(vis.getGeneSymbol());
+        int i = vis.getI();
+        sb.append("<h1>").append(i).append(") ").append(vis.getGeneSymbol());
        if (vis.isDifferentiallyExpressed()) {
            sb.append(" <span class=\"badge\">DGE</span> ");
        }

@@ -127,10 +127,10 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         int populationSize = hbago.populationCount();
         data.put("n_population", populationSize);
-        data.put("n_das", hbago.dasCount());
+        data.put("n_das",thresholder.getDasGeneCount());
         data.put("n_das_unmapped", hbago.unmappedDasCount());
         data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
-        data.put("n_dge", hbago.dgeCount());
+        data.put("n_dge", thresholder.getDgeGeneCount());
         data.put("n_dge_unmapped", hbago.unmappedDgeCount());
         data.put("unmappable_dge_list", Util.fromList(hbago.unmappedDgeSymbols(), "Unmappable DGE Gene Symbols"));
         data.put("probability_threshold", thresholder.getFdrThreshold());
@@ -176,6 +176,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         List<String> geneVisualizations = new ArrayList<>();
 
         HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
+        List<AnnotatedGene> annotatedGeneList = new ArrayList<>();
         for (var entry : hbaDealsResults.entrySet()) {
             String geneSymbol = entry.getKey();
             hbadeals++;
@@ -208,13 +209,16 @@ public class HbaDealsCommand implements Callable<Integer> {
                         result,
                         expressionThreshold,
                         splicingThreshold);
-                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
-                geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
+                annotatedGeneList.add(agene);
             }
-
-            Collections.sort(geneVisualizations);
         }
-
+        Collections.sort(annotatedGeneList);
+        int i = 0;
+        for (AnnotatedGene annotatedGene : annotatedGeneList) {
+            i++;
+            Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
+            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene, goTerms, i)));
+        }
         data.put("genelist", geneVisualizations);
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();

@@ -48,7 +48,7 @@ public class HbaDealsParserTest extends TestBase {
         final double EPSILON = 0.0001;
         HbaDealsResult adar = hbaDealsResultMap.get("ADAR");
         assertTrue(adar.hasDifferentialSplicingResult(THRESHOLD));
-        double pva = adar.getMostSignificantSplicingPval();
+        double pva = adar.getSmallestSplicingP();
         assertEquals(1e-05, pva, EPSILON);
         Map<String, HbaDealsTranscriptResult> transcriptMap = adar.getTranscriptMap();
         assertEquals(5, transcriptMap.size());

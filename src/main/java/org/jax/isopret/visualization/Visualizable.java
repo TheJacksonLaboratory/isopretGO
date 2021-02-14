@@ -42,4 +42,7 @@ public interface Visualizable {
    boolean isDifferentiallySpliced();
 
 
+    int getI();
+
+
 }

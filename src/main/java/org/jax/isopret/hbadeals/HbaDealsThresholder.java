@@ -33,6 +33,10 @@ public class HbaDealsThresholder {
     /** Probability threshold for splicing results that attains {@link #fdrThreshold} FDR for splicing. */
     private final double splicingThreshold;
 
+    private final Set<String> dgeGeneSymbols;
+
+    private final Set<String> dasGeneSymbols;
+
     /**
      * Find the FDR thresholds for splicing and expression
      * @param results Map of HBA-DEALS analysis results (key: gene symbol)
@@ -50,6 +54,18 @@ public class HbaDealsThresholder {
         fdrThreshold = probThres;
         this.expressionThreshold = calculateExpressionThreshold();
         this.splicingThreshold = calculateSplicingThreshold();
+        this.dgeGeneSymbols = this.rawResults
+                .values()
+                .stream()
+                .filter(r -> r.getExpressionP() <= this.expressionThreshold)
+                .map(HbaDealsResult::getSymbol)
+                .collect(Collectors.toSet());
+        this.dasGeneSymbols = this.rawResults
+                .values()
+                .stream()
+                .filter(r -> r.getSmallestSplicingP() <= this.splicingThreshold)
+                .map(HbaDealsResult::getSymbol)
+                .collect(Collectors.toSet());
     }
 
 
@@ -133,21 +149,19 @@ public class HbaDealsThresholder {
     }
 
     public Set<String> dgeGeneSymbols() {
-        return this.rawResults
-                .values()
-                .stream()
-                .filter(r -> r.getExpressionP() <= this.expressionThreshold)
-                .map(HbaDealsResult::getSymbol)
-                .collect(Collectors.toSet());
+        return this.dgeGeneSymbols;
     }
 
     public Set<String> dasGeneSymbols() {
-        return this.rawResults
-                .values()
-                .stream()
-                .filter(r -> r.getMostSignificantSplicingPval() <= this.splicingThreshold)
-                .map(HbaDealsResult::getSymbol)
-                .collect(Collectors.toSet());
+        return this.dasGeneSymbols;
+    }
+
+    public int getDgeGeneCount() {
+        return this.dgeGeneSymbols.size();
+    }
+
+    public int getDasGeneCount() {
+        return this.dasGeneSymbols.size();
     }
 
 

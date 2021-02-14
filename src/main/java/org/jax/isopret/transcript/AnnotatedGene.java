@@ -27,6 +27,12 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     private final Optional<Boolean> differentiallySpliced;
 
+    private final Optional<Double> expressionThreshold;
+
+    private final Optional<Double> splicingThreshold;
+
+
+
     /**
      *
      * @param transcripts transcripts encoded by this gene
@@ -45,6 +51,8 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                     .collect(Collectors.toList());
         this.differentiallySpliced = Optional.empty();
         this.differentiallyExpressed = Optional.empty();
+        this.expressionThreshold = Optional.empty();
+        this.splicingThreshold = Optional.empty();
     }
 
     public AnnotatedGene(List<Transcript> transcripts,
@@ -63,6 +71,8 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 .collect(Collectors.toList());
         this.differentiallyExpressed = Optional.of(result.hasDifferentialExpressionResult(expressionThreshold));
         this.differentiallySpliced = Optional.of(result.hasDifferentialSplicingResult(splicingThreshold));
+        this.expressionThreshold = Optional.of(expressionThreshold);
+        this.splicingThreshold = Optional.of(splicingThreshold);
     }
 
 
@@ -73,6 +83,8 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     public int getTranscriptCount() {
         return expressedTranscripts.size();
     }
+
+    public String getSymbol() { return this.hbaDealsResult.getSymbol(); }
 
     public int getCodingTranscriptCount() {
         return (int) this.expressedTranscripts
@@ -120,6 +132,18 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         return this.differentiallySpliced.orElse(true);
     }
 
+    public boolean passesSplicingAndExpressionThreshold() {
+        return passesExpressionThreshold() && passesSplicingThreshold();
+    }
+
+    public double getSplicingThreshold() {
+        if (this.splicingThreshold.isPresent()) {
+            return this.splicingThreshold.get();
+        } else {
+            return 1.0;
+        }
+    }
+
 
     /**
      * We are sort by whether a gene is differentially spliced and then alphabetically
@@ -129,10 +153,14 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     @Override
     public int compareTo(AnnotatedGene that) {
         if (that==null) return 0;
-        if (this.passesSplicingThreshold() && (!that.passesSplicingThreshold())) {
-            return 1;
-        } else if (that.passesSplicingThreshold() && (!passesSplicingThreshold())) {
+        if (this.passesSplicingAndExpressionThreshold() && (!that.passesSplicingAndExpressionThreshold())) {
             return -1;
+        }  else if (this.passesSplicingThreshold() && (!that.passesSplicingThreshold())) {
+            return -1;
+        } else if (that.passesSplicingAndExpressionThreshold() && (!this.passesSplicingAndExpressionThreshold())) {
+            return 1;
+        } else if (that.passesSplicingThreshold() && (!this.passesSplicingThreshold())) {
+            return 1;
         } else {
             return this.getHbaDealsResult().getSymbol().compareTo(that.getHbaDealsResult().getSymbol());
         }

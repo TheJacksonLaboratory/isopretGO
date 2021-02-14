@@ -94,17 +94,14 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * Y skip to put text underneath transcripts. Works with {@link #writeTranscriptName}
      */
     protected final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
-    /**
-     * Height of the symbol that represents the structural variant.
-     */
-    protected final double SV_HEIGHT = 30;
-
 
     private final HbaDealsResult hbaDealsResult;
 
+    private final boolean differentiallyExpressed;
+
+    private final double splicingThreshold;
+
     /**
-     * TODO -- make sure we deal with version numbers in a uniform way. Now, we
-     * are assuming that the HBADeals object does NOT use a version number.
      *
      * @param annotatedGene an object with all information about a gene that is relevant for making the SVG/HTML output
      * @return list of transcripts
@@ -150,7 +147,8 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         this.scaleBasePairs = 1 + this.genomicMaxPos - this.genomicMinPos;
         this.scaleMinPos = translateGenomicToSvg(genomicMinPos);
         this.scaleMaxPos = translateGenomicToSvg(genomicMaxPos);
-
+        this.differentiallyExpressed = annotatedGene.passesExpressionThreshold();
+        this.splicingThreshold = annotatedGene.getSplicingThreshold();
     }
 
 
@@ -289,16 +287,20 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         double logFC = getLogFoldChage(id);
         if (!transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
         double p = transcriptResultMap.get(id).getP();
-        return getFormatedPvalue(logFC, p);
+        boolean differential = p < this.splicingThreshold;
+        return getFormatedPvalue(logFC, p, differential);
     }
 
-    private String getFormatedPvalue(double logFc, double pval) {
-        if (pval >= 0.05) {
-            return String.format("%.2f (n.s.)", logFc);
+    private String getFormatedPvalue(double logFc, double pval, boolean differential) {
+        if (! differential) {
+            return String.format("%.2f", logFc);
         } else if (pval > 0.001) {
-            return String.format("%.2f (p=%.4f)", logFc, pval);
+            return String.format("%.2f; p=%.4f (*)", logFc, pval);
+        } else if (pval == 0.0) {
+            return String.format("%.2f; p=0.00 (*)", logFc);
+        } else {
+            return String.format("%.2f; p=%.2E (*)", logFc, pval);
         }
-        return String.format("%.2f (p=%.2E)", logFc, pval);
     }
 
 
@@ -332,8 +334,16 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
     }
 
-
-    private void writeFoldChange(double logFc, double pval, int ypos, Writer writer) throws IOException {
+    /**
+     * Differential can be used buy expression or isoform to indicated if we show n.s. for the probability.
+     * @param logFc
+     * @param pval
+     * @param differential
+     * @param ypos
+     * @param writer
+     * @throws IOException
+     */
+    private void writeFoldChange(double logFc, double pval, boolean differential, int ypos, Writer writer) throws IOException {
         double startpos = translateGenomicToSvg(this.genomicMaxPos) + 25.0;
         double y = ypos;
         writer.write(String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\"/>\n",
@@ -357,7 +367,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         writer.write(rect);
         double xpos = startpos + width + 15;
         String txt = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
-                xpos, y, PURPLE, getFormatedPvalue(logFc, pval));
+                xpos, y, PURPLE, getFormatedPvalue(logFc, pval, differential));
         writer.write(txt);
 
     }
@@ -473,7 +483,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         int xpos = 1050;
         String txt = String.format("<text font-style=\"italic\" font-weight=\"bold\" font-size=\"1.2em\" x=\"%d\" y=\"%d\" fill=\"%s\">Expression:</text>\n",
                 xpos, ypos, DARKBLUE);
-        writeFoldChange(this.expressionLog2FoldChange, this.expressionPval, ypos, writer);
+        writeFoldChange(this.expressionLog2FoldChange, this.expressionPval, this.differentiallyExpressed, ypos, writer);
         writer.write(txt);
     }
 
@@ -485,7 +495,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     @Override
     public void write(Writer writer) {
-        int y = 50;
+        int y = 80;
         try {
             writeGeneExpression(writer, y);
             y += 100;
