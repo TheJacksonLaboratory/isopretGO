@@ -1,9 +1,6 @@
 package org.jax.isopret;
 
-import org.jax.isopret.command.BiomartCommand;
-import org.jax.isopret.command.DownloadCommand;
-import org.jax.isopret.command.DumpStatsCommand;
-import org.jax.isopret.command.HbaDealsCommand;
+import org.jax.isopret.command.*;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -19,9 +16,9 @@ public class Main implements Callable<Integer> {
             args = new String[]{"-h"};
         }
         CommandLine cline = new CommandLine(new Main())
-                .addSubcommand("biomart", new BiomartCommand())
                 .addSubcommand("download", new DownloadCommand())
                 .addSubcommand("hbadeals", new HbaDealsCommand())
+                .addSubcommand("svg", new SvgCommand())
                 .addSubcommand("stats", new DumpStatsCommand());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);

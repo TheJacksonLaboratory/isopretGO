@@ -392,6 +392,17 @@ a.svg:hover, a.svg:active {
   display: none;
 }
 
+.badge{
+  font:  Arial, Helvetica, sans-serif;
+  font-size: x-large;
+  font-weight: bolder;
+  line-height: 1;
+  color: #f4f4f4;
+  background-color: #214fe0;
+  padding:0.25rem;
+}
+
+
 
 </style>
 </head>
@@ -409,9 +420,7 @@ a.svg:hover, a.svg:active {
     <ul>
       <li><a href="#sample">Sample</a></li>
       <li><a href="#go">GO analysis</a></li>
-      <li><a href="#dasdge">DAS/DGE</a></li>
-      <li><a href="#das">DAS</a></li>
-      <li><a href="#dge">DGE</a></li>
+      <li><a href="#dgedas">DGE/DAS</a></li>
       <li><a href="#about">About</a></li>
     </ul>
   </div>
@@ -424,8 +433,7 @@ a.svg:hover, a.svg:active {
       <h2>Isopret &mdash; Isoform interpretation.</h2>
       <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
       <p>${n_population} genes were included in the analysis. ${n_das} had one or more differentially spliced isoforms.
-            ${n_dge} were differentially expressed. ${n_dasdge} were both differentially spliced and
-            differentially expressed.</p>
+            ${n_dge} were differentially expressed.</p>
       <p>Using a desired FDR threshold of ${probability_threshold}, a probability threshold of
           ${expression_threshold} was calculated for differential expression, and a threshold of
           ${splicing_threshold} was calculated for differential splicing.</p>
@@ -438,69 +446,27 @@ a.svg:hover, a.svg:active {
       <h2>Gene Ontology Overrepresentation Analysis.</h2>
       <p>Gene Ontology <tt>go.obo</tt> file: ${go_version} with ${n_go_terms} terms.</p>
       <p>${annotation_term_count} terms used for a total of ${annotation_count} annotations for ${annotated_genes} genes.</p>
-      <h4>Differentially expressed and differentially spliced genes (n=${n_dasdge})</h4>
-       <p>${n_dasdge_unmapped} of the ${n_dasdge} genes could not be mapped to gene ids for GO analysis
-            <div class="tooltip">(Hover here for details)
-              <span class="tooltiptext">${unmappable_dasdge_list}</span>
-            </div>.</p>
-      <a id="show-dasdgego-table" class="table-btn" onclick="showDasDgeGoTable()">Show Table</a>
-      <a id="hide-dasdgego-table" class="table-btn" onclick="hideDasDgeGoTable()">Hide Table</a>
-      ${dasDgeTable}
       <h4>Differentially expressed genes (n=${n_dge})</h4>
        <p>${n_dge_unmapped} of the ${n_dge} genes could not be mapped to gene ids for GO analysis
-       <div class="tooltip">(Hover here for details)
-              <span class="tooltiptext">${unmappable_dge_list}</span>
-            </div>.</p>
       <a id="show-dgego-table" class="table-btn" onclick="showDgeGoTable()">Show Table</a>
       <a id="hide-dgego-table" class="table-btn" onclick="hideDgeGoTable()">Hide Table</a>
       ${dgeTable}
       <h4>Differentially spliced genes (n=${n_das?string})</h4>
-      <p>${n_das_unmapped} of the ${n_das} genes could not be mapped to gene ids for GO analysis
-      <div class="tooltip">(Hover here for details)
-        <span class="tooltiptext">${unmappable_das_list}</span>
-      </div>.</p>
+      <p>${n_das_unmapped} of the ${n_das} genes could not be mapped to gene ids for GO analysis.</p>
       <a id="show-dasgo-table" class="table-btn" onclick="showDasGoTable()">Show Table</a>
       <a id="hide-dasgo-table" class="table-btn" onclick="hideDasGoTable()">Hide Table</a>
       ${dasTable}
+       <p>A total of ${n_das} out of ${populationCount} genes in the population showed differential alternative splicing (DAS).</p>
     </article>
   </section>
 
+ <a name="dgedas"></a>
+ <#list genelist as gene>
   <section>
-    <a name="dasdge"></a>
-    <h1>Genes displaying both differential expression and differential alternative splicing (DAS/DGE)</h1>
-    <p>A total of ${n_dasdge} out of ${populationCount} genes in the population showed both differential alternative splicing (DAS) and
-        differential gene expression (DGE).</p>
-    <#list dgedaslist as gene>
-      <article>
-        ${gene}
-      </article>
-    </#list>
+    ${gene}
   </section>
+  </#list>
 
-  <section>
-    <a name="das"></a>
-    <h1>Genes displaying differential alternative splicing (DAS)</h1>
-    <p>A total of ${n_das} out of ${populationCount} genes in the population showed differential alternative splicing (DAS).
-    <div class="tooltip">(Details)
-      <span class="tooltiptext">${unmappable_das_list}</span>
-    </div> </p>
-    <#list daslist as gene>
-      <article>
-        ${gene}
-      </article>
-    </#list>
-  </section>
-
-  <section>
-    <a name="dge"></a>
-    <h1>Genes displaying differential expression (DGE)</h1>
-    <p>A total of ${n_dge} out of ${populationCount} genes in the population showed  differential gene expression (DGE).</pb>
-    <#list dgelist as gene>
-      <article>
-        ${gene}
-      </article>
-    </#list>
-  </section>
 
   <section>
     <a name="about"></a>
@@ -510,8 +476,7 @@ a.svg:hover, a.svg:active {
     </article>
   </section>
 
-      <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
-
+  <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
 </main>
 <footer>
   <p>Isopret &copy; 2021</p>
@@ -565,24 +530,6 @@ a.svg:hover, a.svg:active {
     var showtablebtn = document.getElementById("show-dasgo-table");
     showtablebtn.style.display = "block";
     var hidetablebtn = document.getElementById("hide-dasgo-table");
-    hidetablebtn.style.display = "none";
-  }
-
-  function showDasDgeGoTable() {
-    var table = document.getElementById("dasdgego-table");
-    table.style.display = "block";
-    var showtablebtn = document.getElementById("show-dasdgego-table");
-    showtablebtn.style.display = "none";
-    var hidetablebtn = document.getElementById("hide-dasdgego-table");
-    hidetablebtn.style.display = "block";
-  }
-
-  function hideDasDgeGoTable() {
-    var table = document.getElementById("dasdgego-table");
-    table.style.display = "none";
-    var showtablebtn = document.getElementById("show-dasdgego-table");
-    showtablebtn.style.display = "block";
-    var hidetablebtn = document.getElementById("hide-dasdgego-table");
     hidetablebtn.style.display = "none";
   }
 </script>

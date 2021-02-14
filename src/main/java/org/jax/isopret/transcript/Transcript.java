@@ -1,7 +1,8 @@
 package org.jax.isopret.transcript;
 
-import org.jax.isopret.except.IsopretRuntimeException;
 import org.monarchinitiative.svart.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class Transcript extends BaseGenomicRegion<Transcript> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Transcript.class);
 
     private final String accessionId;
     /**
@@ -114,6 +116,21 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         return exons;
     }
 
+    /**
+     * Returns an array whose entries correspond to the lengths of exons that are part of the CDS.
+     * All entries are zero for non-coding genes.
+     * @return an array of the length of the CDS portions of exons (individual entries can be zero).
+     */
+    public List<Integer> codingExonLengths() {
+        List<Integer> cdsExonLengths = new ArrayList<>();
+        for (GenomicRegion exon : exons) {
+            cdsExonLengths.add(exon.overlapLength(this.cdsRegion));
+        }
+        return cdsExonLengths;
+    }
+
+
+
     public String getAccessionIdNoVersion() {
         return accessionIdNoVersion;
     }
@@ -144,6 +161,13 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         }
     }
 
+    public int getMrnaLength() {
+        return this.exons
+                .stream()
+                .mapToInt(GenomicRegion::length)
+                .sum();
+    }
+
     public int getProteinLength() {
         if (!this.isCoding) {
             return 0;
@@ -154,31 +178,18 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         } else {
             t = this;
         }
-        int cdsStart = cdsRegion.startWithCoordinateSystem(CoordinateSystem.oneBased());
-        int cdsEnd = cdsRegion.endWithCoordinateSystem(CoordinateSystem.oneBased());
         int cdsNtCount = 0;
+        int i=0;
         for (GenomicRegion exon : t.exons()) {
-            int exonStart = exon.startWithCoordinateSystem(CoordinateSystem.oneBased());
-            int exonEnd = exon.endWithCoordinateSystem(CoordinateSystem.oneBased());
-            if (cdsRegion.contains(exon)) {
-                cdsNtCount += exon.length();
-            } else if (!cdsRegion.overlapsWith(exon)) {
-                continue;
-                // completely non-coding exon
-                // past this point, either an exon is partially 5UTR or partially 3UTR
-            } else if (exonStart < cdsStart) {
-                // start coding located in this exon
-                cdsNtCount += exon.overlapLength(cdsRegion);
-            } else if (exonEnd > cdsEnd) {
-                cdsNtCount += exon.overlapLength(cdsRegion);
-            }
+            cdsNtCount += exon.overlapLength(cdsRegion);
         }
         if (cdsNtCount % 3 != 0) {
             // should never happen
-            throw new IsopretRuntimeException("Invalid amino acid length determined for " + t.accessionId() + ": " + cdsNtCount);
-        } else {
-            return cdsNtCount / 3 - 1;
+            // a small number of Ensembl entries seem to be 3n+1 or 3n+2
+            // this should not matter fo visualization but log the error
+            LOGGER.error("Invalid CDS length determined for " + t.accessionId() + ": " + cdsNtCount + " (bp not a multiple of 3)");
         }
+        return cdsNtCount / 3 - 1; // remove one aa so we do not count the stop codon
     }
 
     @Override

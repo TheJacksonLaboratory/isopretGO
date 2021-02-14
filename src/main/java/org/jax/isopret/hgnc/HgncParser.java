@@ -124,8 +124,8 @@ public class HgncParser {
         } catch (IOException e) {
             throw new IsopretRuntimeException("Could not parse the HGNC file: " + e.getMessage());
         }
-        LOGGER.info("{} HGNC lines with less than 24 fields skipped.", less_than_24_fields);
-        LOGGER.info("{} valid HGNC lines successsfully parsed.", well_formed_lines);
+        LOGGER.trace("{} HGNC lines with less than 24 fields skipped.", less_than_24_fields);
+        LOGGER.trace("{} valid HGNC lines successsfully parsed.", well_formed_lines);
         return items;
     }
 
@@ -138,14 +138,14 @@ public class HgncParser {
         int notMapped = 0;
         for (HgncItem item : itemList) {
             String ens = item.getEnsemblGeneId();
-            if (ens != null && ens.startsWith("ENS")) {
+            if (ens != null && ens.startsWith("ENSG")) {
                 ensmap.put(ens, item);
             } else {
                 notMapped++;
             }
         }
         if (notMapped > 0) {
-            System.out.printf("[INFO] Retrieving %d ENSG mappings; could not map %d HGNS entries.\n", ensmap.size(), notMapped);
+            LOGGER.trace("Retrieving {} ENSG mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
         }
         return ensmap;
     }
@@ -162,7 +162,7 @@ public class HgncParser {
             }
         }
         if (notMapped > 0) {
-            System.out.printf("[INFO] Retrieving %d UCSC mappings; could not map %d HGNS entries.\n", ensmap.size(), notMapped);
+            LOGGER.trace("Retrieving {} UCSC mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
         }
         return ensmap;
     }
@@ -179,7 +179,7 @@ public class HgncParser {
             }
         }
         if (notMapped > 0) {
-            System.out.printf("[INFO] Retrieving %d RefSeq mappings; could not map %d HGNS entries.\n", ensmap.size(), notMapped);
+            LOGGER.trace("Retrieving {} RefSeq mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
         }
         return ensmap;
     }

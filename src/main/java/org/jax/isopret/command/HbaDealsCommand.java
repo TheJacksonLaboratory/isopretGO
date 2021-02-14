@@ -8,6 +8,7 @@ import org.jax.isopret.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.hgnc.HgncItem;
 import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.html.HtmlTemplate;
+import org.jax.isopret.html.TsvWriter;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
@@ -22,15 +23,13 @@ import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.svart.*;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,6 +37,7 @@ import java.util.stream.Stream;
         mixinStandardHelpOptions = true,
         description = "Analyze HBA-DEALS files")
 public class HbaDealsCommand implements Callable<Integer> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsCommand.class);
 
     @CommandLine.Option(names={"-b","--hbadeals"}, description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
@@ -48,7 +48,7 @@ public class HbaDealsCommand implements Callable<Integer> {
     private String fastaFile = "data/Homo_sapiens.GRCh38.cdna.all.fa.gz";
     @CommandLine.Option(names={"-p","--prosite"}, description ="prosite.dat file")
     private String prositeDataFile = "data/prosite.dat";
-    @CommandLine.Option(names={"--prositemap"}, description = "prosite mape file", required = true)
+    @CommandLine.Option(names={"--prositemap"}, description = "prosite map file", required = true)
     private String prositeMapFile;
     @CommandLine.Option(names={"-g","--go"}, description ="go.obo file")
     private String goOboFile = "data/go.obo";
@@ -87,8 +87,8 @@ public class HbaDealsCommand implements Callable<Integer> {
         data.put("annotation_term_count", goAssociationContainer.getOntologyTermCount());
         data.put("annotation_count", goAssociationContainer.getRawAssociations().size());
         data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
-        System.out.printf("[INFO] We got %d GO terms.\n", ontology.countNonObsoleteTerms());
-        System.out.printf("[INFO] We got %d term to annotation list mappings\n",goAssociationContainer.getRawAssociations().size());
+        LOGGER.trace("We got {} GO terms.", ontology.countNonObsoleteTerms());
+        LOGGER.trace("We got {} term to annotation list mappings.",goAssociationContainer.getRawAssociations().size());
         MtcMethod mtc = MtcMethod.fromString(this.mtc);
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
         // ----------  2. HGNC Mapping from accession numbers to gene symbols -------------
@@ -113,6 +113,9 @@ public class HbaDealsCommand implements Callable<Integer> {
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         HbaDealsThresholder thresholder = new HbaDealsThresholder(hbaDealsResults);
 
+        double expressionThreshold = thresholder.getExpressionThreshold();
+        double splicingThreshold = thresholder.getSplicingThreshold();
+
         HbaDealsGoAnalysis hbago;
         if (goMethod == GoMethod.PCunion) {
             hbago = HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
@@ -124,32 +127,34 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         int populationSize = hbago.populationCount();
         data.put("n_population", populationSize);
-        data.put("n_das", hbago.dasCount());
+        data.put("n_das",thresholder.getDasGeneCount());
         data.put("n_das_unmapped", hbago.unmappedDasCount());
         data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
-        data.put("n_dge", hbago.dgeCount());
+        data.put("n_dge", thresholder.getDgeGeneCount());
         data.put("n_dge_unmapped", hbago.unmappedDgeCount());
         data.put("unmappable_dge_list", Util.fromList(hbago.unmappedDgeSymbols(), "Unmappable DGE Gene Symbols"));
-        data.put("n_dasdge", hbago.dasDgeCount());
-        data.put("n_dasdge_unmapped", hbago.unmappedDasDgeCount());
-        data.put("unmappable_dasdge_list", Util.fromList(hbago.unmappedDasDgeSymbols(), "Unmappable DAS/DGE Gene Symbols"));
         data.put("probability_threshold", thresholder.getFdrThreshold());
         data.put("expression_threshold", thresholder.getExpressionThreshold());
         data.put("splicing_threshold", thresholder.getSplicingThreshold());
         List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
         List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
-        List<GoTerm2PValAndCounts> dasDgeGoTerms = hbago.dasDgeOverrepresetationAnalysis();
         dasGoTerms.sort(new SortByPvalue());
         dgeGoTerms.sort(new SortByPvalue());
-        dasDgeGoTerms.sort(new SortByPvalue());
+
         if (outputTsv) {
-            outputGoResultsTable(dasGoTerms, "das", ontology);
-            outputGoResultsTable(dgeGoTerms, "dge", ontology);
-            outputGoResultsTable(dasDgeGoTerms, "dasdge", ontology);
-            outputStudySet(thresholder.dasGeneSymbols(), "das");
-            outputStudySet(thresholder.dgeGeneSymbols(), "dge");
-            outputStudySet(thresholder.dasDgeGeneSymbols(), "dasdge");
-            outputStudySet(thresholder.population(), "population");
+            LOGGER.trace("TSV output");
+            TsvWriter tsvWriter = new TsvWriter.Builder()
+                    .thresholder(thresholder)
+                    .dasGoTerms(dasGoTerms)
+                    .dgeGoTerms(dgeGoTerms)
+                    .prefix(outprefix)
+                    .hbadeals(hbaDealsResults)
+                    .ontologizerCalculation(this.ontologizerCalculation)
+                    .mtc(this.mtc)
+                    .ontology(ontology)
+                    .build();
+            tsvWriter.write();
+            return 0;
         }
         // Add differentially expressed genes/GO analysis
         String dgeTable = getGoHtmlTable(dgeGoTerms, ontology, "dgego-table");
@@ -157,32 +162,21 @@ public class HbaDealsCommand implements Callable<Integer> {
         // Same for DAS (note -- in this application, DAS may overlap with DAS/DGE)
         String dasTable = getGoHtmlTable(dasGoTerms, ontology, "dasgo-table");
         data.put("dasTable", dasTable);
-        // Same for DAS+DGE
-        String dasDgeTable = getGoHtmlTable(dasDgeGoTerms, ontology, "dasdgego-table");
-        data.put("dasDgeTable", dasDgeTable);
-        // The following sets are used for the HTML output to mark genes
-        // that are annotated to a significant GO term.
-        Predicate<HbaDealsResult> diffExpressed = HbaDealsResult::hasSignificantExpressionResult;
-        Predicate<HbaDealsResult> diffSpliced = HbaDealsResult::hasaSignificantSplicingResult;
-        // Set of all gene symbols for gene with significant expression OR splicing
-        Set<String> significantGeneSymbols = hbaDealsResults
-                .values()
-                .stream()
-                .filter(diffExpressed.or(diffSpliced))
-                .map(HbaDealsResult::getSymbol)
-                .collect(Collectors.toSet());
+        // genes symbols differential  for significant expression OR splicing
+        Set<String> significantGeneSymbols = thresholder.dasGeneSymbols();
+        significantGeneSymbols.addAll(thresholder.dgeGeneSymbols());
         // Set of all enriched GO Terms Ids for significant expression OR splicing
-        Set<TermId> einrichedGoTermIdSet = Stream.concat(dasDgeGoTerms.stream(), dgeGoTerms.stream())
+        Set<TermId> einrichedGoTermIdSet = Stream.concat(dasGoTerms.stream(), dgeGoTerms.stream())
                 .map(GoTerm2PValAndCounts::getItem)
                 .collect(Collectors.toSet());
         Map<String, Set<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
 
-        System.out.printf("[INFO] Analyzing %d genes.\n", hbaDealsResults.size());
+        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         List<String> unidentifiedSymbols = new ArrayList<>();
-        List<String> dasAndDgeVisualizations = new ArrayList<>();
-        List<String> dasVisualizations = new ArrayList<>();
-        List<String> dgeVisualizations = new ArrayList<>();
+        List<String> geneVisualizations = new ArrayList<>();
+
         HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
+        List<AnnotatedGene> annotatedGeneList = new ArrayList<>();
         for (var entry : hbaDealsResults.entrySet()) {
             String geneSymbol = entry.getKey();
             hbadeals++;
@@ -192,7 +186,7 @@ public class HbaDealsCommand implements Callable<Integer> {
             }
             foundTranscripts++;
             HbaDealsResult result = entry.getValue();
-            if (! result.hasSignificantResult()) {
+            if (! result.hasDifferentialExpressionResult(expressionThreshold)) {
                 continue;
             }
             hbadealSig++;
@@ -201,7 +195,7 @@ public class HbaDealsCommand implements Callable<Integer> {
             final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
             Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
             if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
-                System.err.printf("[WARN] Could not identify prosite Mapping for %s.\n", geneSymbol);
+                LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);
                 prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
             } else {
                 PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
@@ -209,26 +203,23 @@ public class HbaDealsCommand implements Callable<Integer> {
                 foundProsite++;
             }
 
-            AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
-            System.out.printf("[INFO] processing %s: ", geneSymbol);
-            if (result.isDASandDGE()) {
-                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
-                dasAndDgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
-            } else if (result.isDAS()) {
-                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
-                dasVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
-            } else if (result.isDGE()) {
-                Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(result.getSymbol(), new HashSet<>());
-                dgeVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(agene, goTerms)));
-            } else {
-                // should never get here, sanity check
-                throw new IsopretRuntimeException("Neither DAS, nor DGE, not DAS/DGE, nor non-significant");
+            if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
+                AnnotatedGene agene = new AnnotatedGene(transcripts,
+                        prositeHitsForCurrentGene,
+                        result,
+                        expressionThreshold,
+                        splicingThreshold);
+                annotatedGeneList.add(agene);
             }
         }
-
-        data.put("dgedaslist", dasAndDgeVisualizations);
-        data.put("daslist", dasVisualizations);
-        data.put("dgelist", dgeVisualizations);
+        Collections.sort(annotatedGeneList);
+        int i = 0;
+        for (AnnotatedGene annotatedGene : annotatedGeneList) {
+            i++;
+            Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
+            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene, goTerms, i)));
+        }
+        data.put("genelist", geneVisualizations);
         data.put("populationCount", populationSize);
         List<GoVisualizable> govis = new ArrayList<>();
         for (var v : dgeGoTerms) {
@@ -242,44 +233,11 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         HtmlTemplate template = new HtmlTemplate(data, this.outprefix);
         template.outputFile();
-        System.out.println("[INFO] Total unidentified genes:"+ unidentifiedSymbols.size());
-        System.out.printf("[INFO] Total HBADEALS results: %d, found transcripts %d, also significant %d, also prosite: %d\n",
+        LOGGER.trace("Total unidentified genes:"+ unidentifiedSymbols.size());
+        LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also prosite: {}",
                 hbadeals, foundTranscripts, hbadealSig, foundProsite);
         return 0;
     }
-
-    /**
-     * Out put an Ontologizer-like output file with a name such as
-     * table-mason_latest_de-Term-For-Term-Bonferroni.txt
-     * @param goTerms List of {@link GoTerm2PValAndCounts} objects, assumed to be presorted
-     * @param nameComponent one of DAS, DGE, DASDGE
-     */
-    private void outputGoResultsTable(List<GoTerm2PValAndCounts> goTerms, String nameComponent, Ontology ontology) {
-        String fname = String.format("table-%s_%s-%s-%s.txt", outprefix, nameComponent, this.ontologizerCalculation, this.mtc);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fname))) {
-            writer.write(GoTerm2PValAndCounts.header() + "\n");
-            for (GoTerm2PValAndCounts pval : goTerms) {
-                writer.write(pval.getRow(ontology) + "\n");
-            }
-        } catch (IOException e ) {
-            e.printStackTrace();
-        }
-    }
-
-    private void outputStudySet(Set<String> geneSymbols, String nameComponent) {
-        String fname = String.format("symbols-%s_%s.txt", outprefix, nameComponent);
-        List<String> geneList = new ArrayList<>(geneSymbols);
-        Collections.sort(geneList);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fname))) {
-            writer.write(GoTerm2PValAndCounts.header() + "\n");
-            for (String symbol: geneList) {
-                writer.write(symbol + "\n");
-            }
-        } catch (IOException e ) {
-            e.printStackTrace();
-        }
-    }
-
 
 
     /**

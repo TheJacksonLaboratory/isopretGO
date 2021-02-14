@@ -2,6 +2,8 @@ package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hgnc.HgncItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,12 +13,15 @@ import java.util.*;
 /**
  * Parse the HBA-DEALS output file, e.g.,
  * Gene	Isoform	ExplogFC/FC	P
- * AC016831.6	ENST00000659385	1.04449971508812	0.61019
- * POLR2J3	Expression	0.301337111501297	0.10708
- * POLR2J3	ENST00000504157	1.01818551579155	0.73892
- * POLR2J3	ENST00000511313	0.998158250064647	0.74954
+ * ENSG00000160710	Expression	1.54770825394965	0
+ * ENSG00000160710	ENST00000368471	0.563281823470453	1e-05
+ * ENSG00000160710	ENST00000368474	1.45668870537677	0.00192
+ * ENSG00000160710	ENST00000463920	0.84541220998081	0.7134
+ * ENSG00000160710	ENST00000529168	1.05034162415497	0.9602
+ * ENSG00000160710	ENST00000649021	0.833370141719852	0.66569
  */
 public class HbaDealsParser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsParser.class);
     /**
      * Path to an output file from HBA-DEALS
      */
@@ -45,10 +50,14 @@ public class HbaDealsParser {
         }
     }
 
+    /**
+     *
+     * @param fname Path to an HBA-DEALS output file
+     * @param hgncMap Map from
+     */
     public HbaDealsParser(String fname, Map<String, HgncItem> hgncMap) {
         hbadealsFile = fname;
         this.hbaDealsResultMap = new HashMap<>();
-        //this.uncorrectedPvals = new ArrayList<>();
         int n_lines = 0;
         List<HbaLine> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(this.hbadealsFile))) {
@@ -63,11 +72,16 @@ public class HbaDealsParser {
         } catch (IOException e) {
             throw new IsopretRuntimeException("Could not read HBA-DEALS file: " + e.getMessage());
         }
-
+        int found_symbol = 0;
+        int missed_symbol = 0;
         for (HbaLine hline : lines) {
             String symbol = hline.geneAccession; // if we cannot find symbol, just show the accession
             if (hgncMap.containsKey(hline.geneAccession)) {
                 symbol = hgncMap.get(hline.geneAccession).getGeneSymbol();
+                found_symbol++;
+            } else {
+                LOGGER.warn("Could not find symbol for " + hline.geneAccession);
+                missed_symbol++;
             }
             this.hbaDealsResultMap.putIfAbsent(symbol, new HbaDealsResult(hline.geneAccession, symbol));
             HbaDealsResult hbaresult = this.hbaDealsResultMap.get(symbol);
@@ -77,11 +91,13 @@ public class HbaDealsParser {
                 hbaresult.addExpressionResult(hline.expFC, hline.raw_p);
             }
         }
-
-
-
-        System.out.printf("[INFO] We parsed %d lines from %s.\n", n_lines, this.hbadealsFile);
-        System.out.printf("[INFO] We got %d genes with HBA DEALS results\n", hbaDealsResultMap.size());
+        if (missed_symbol > found_symbol) {
+            LOGGER.error("We could not map {} accession numbers and could map {} accession numbers", missed_symbol, found_symbol);
+            throw new IsopretRuntimeException("Could not map most accession numbers/identifiers. Terminating program because this will invalidate downstream analysis.");
+        }
+        LOGGER.trace("We found gene symbols {} times and missed it {} times.\n", found_symbol, missed_symbol);
+        LOGGER.trace("We parsed {} lines from {}.\n", n_lines, this.hbadealsFile);
+        LOGGER.trace("We got {} genes with HBA DEALS results\n", hbaDealsResultMap.size());
     }
 
     public Map<String, HbaDealsResult> getHbaDealsResultMap() {
