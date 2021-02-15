@@ -7,7 +7,7 @@ import picocli.CommandLine.Command;
 import java.util.concurrent.Callable;
 
 
-@Command(name = "isopret", mixinStandardHelpOptions = true, version = "isopret 0.1.7",
+@Command(name = "isopret", mixinStandardHelpOptions = true, version = "isopret 0.6.3",
         description = "Isoform interpretation tool.")
 public class Main implements Callable<Integer> {
   public static void main(String[] args) {
