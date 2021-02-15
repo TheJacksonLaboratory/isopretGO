@@ -456,7 +456,7 @@ a.svg:hover, a.svg:active {
       <a id="show-dasgo-table" class="table-btn" onclick="showDasGoTable()">Show Table</a>
       <a id="hide-dasgo-table" class="table-btn" onclick="hideDasGoTable()">Hide Table</a>
       ${dasTable}
-       <p>A total of ${n_das} out of ${populationCount} genes in the population showed differential alternative splicing (DAS).</p>
+       <p>A total of ${n_das} out of ${n_population} genes in the population showed differential alternative splicing (DAS).</p>
     </article>
   </section>
 
