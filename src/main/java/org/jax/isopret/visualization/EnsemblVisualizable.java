@@ -41,6 +41,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final boolean differentiallySpliced;
 
+    private final double splicingThreshold;
 
     private final int i;
 
@@ -55,8 +56,9 @@ public class EnsemblVisualizable implements Visualizable {
         this.hbaDealsResult = agene.getHbaDealsResult();
         String chr = this.expressedTranscripts.stream().map(Transcript::contig).map(Contig::name).findAny().orElse("n/a");
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
-        differentiallyExpressed = agene.passesExpressionThreshold();
-        differentiallySpliced = agene.passesSplicingThreshold();
+        this.differentiallyExpressed = agene.passesExpressionThreshold();
+        this.differentiallySpliced = agene.passesSplicingThreshold();
+        this.splicingThreshold = agene.getSplicingThreshold();
         this.i = i;
     }
 
@@ -74,6 +76,11 @@ public class EnsemblVisualizable implements Visualizable {
 
     private String getEnsemblUrl(String accession) {
         return String.format("https://ensembl.org/Homo_sapiens/Gene/Summary?db=core;g=%s", accession);
+    }
+
+    private String getEnsemblTranscriptUrl(String accession) {
+        //https://useast.ensembl.org/Homo_sapiens/Transcript/Summary?db=core;g=ENSG00000181026;r=15:88626612-88632281;t=ENST00000557927
+        return String.format("https://ensembl.org/Homo_sapiens/Gene/Summary?db=core;t=%s", accession);
     }
 
     private String getHtmlAnchor(String accession) {
@@ -145,9 +152,12 @@ public class EnsemblVisualizable implements Visualizable {
 
     private List<String> getIsoformRow(HbaDealsTranscriptResult transcriptResult) {
         List<String> row = new ArrayList<>();
-        row.add(getHtmlAnchor(transcriptResult.getTranscript()));
+        String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
+        String a =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());
+        row.add(a);
         row.add(String.format("%.3f",transcriptResult.getLog2FoldChange()));
-        row.add(String.valueOf(transcriptResult.getP()));
+        String prob = String.format("%.2f", transcriptResult.getP()) + (transcriptResult.getP() <= splicingThreshold ? " (*)" : "");
+        row.add(prob);
         return row;
     }
 

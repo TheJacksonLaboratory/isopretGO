@@ -4,10 +4,8 @@ import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -17,6 +15,8 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     /** All annotated transcripts of some gene that were expressed according to HBA deals */
     private final List<Transcript> expressedTranscripts;
+    /** Key, a transcript object for an expressed transcript. Value -- corresponding log2 fold change. */
+    private final Map<Transcript, Double> expressedTranscriptMap;
 
     private final Map<String, List<PrositeHit>> transcriptToHitMap;
 
@@ -48,6 +48,14 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                     .stream()
                     .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
                     .collect(Collectors.toList());
+        expressedTranscriptMap = new HashMap<>();
+        for (Transcript t: transcripts) {
+            String accession = t.getAccessionIdNoVersion();
+            if (transcriptMap.containsKey(accession)) {
+                double logFC = transcriptMap.get(accession).getLog2FoldChange();
+                expressedTranscriptMap.put(t, logFC);
+            }
+        }
         this.differentiallySpliced = Optional.empty();
         this.differentiallyExpressed = Optional.empty();
         this.expressionThreshold = Optional.empty();
@@ -72,11 +80,24 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         this.differentiallySpliced = Optional.of(result.hasDifferentialSplicingResult(splicingThreshold));
         this.expressionThreshold = Optional.of(expressionThreshold);
         this.splicingThreshold = Optional.of(splicingThreshold);
+        expressedTranscriptMap = new HashMap<>();
+        for (Transcript t: transcripts) {
+            String accession = t.getAccessionIdNoVersion();
+            if (transcriptMap.containsKey(accession)) {
+                double logFC = transcriptMap.get(accession).getLog2FoldChange();
+                expressedTranscriptMap.put(t, logFC);
+            }
+        }
     }
 
 
     public List<Transcript> getExpressedTranscripts() {
         return expressedTranscripts;
+    }
+
+    public Map<Transcript, Double> getExpressedTranscriptMap() {
+
+        return null;
     }
 
     public int getTranscriptCount() {
@@ -137,6 +158,22 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     public double getSplicingThreshold() {
         return this.splicingThreshold.orElse(1.0);
+    }
+
+    public Map<Transcript, Double> getUpregulatedExpressedTranscripts() {
+        return this.expressedTranscriptMap
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() >= 0)
+                .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
+    }
+
+    public Map<Transcript, Double> getDownregulatedExpressedTranscripts() {
+        return this.expressedTranscriptMap
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() < 0)
+                .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
     }
 
 

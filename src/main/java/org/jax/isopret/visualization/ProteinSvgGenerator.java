@@ -1,6 +1,7 @@
 package org.jax.isopret.visualization;
 
 
+import org.ini4j.Reg;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Write an SVG representing the protein domains and corresponding exon structure.
@@ -17,7 +19,7 @@ import java.util.*;
  */
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
     static final int SVG_WIDTH = 1400;
-    static final int HEIGHT_FOR_SV_DISPLAY = 100;
+    static final int HEIGHT_FOR_SV_DISPLAY = 120;
     static final int HEIGHT_PER_DISPLAY_ITEM = 90;
     private static final int ISOFORM_HEIGHT = 20;
     private final static String[] colors = {"F08080", "CCE5FF", "ABEBC6", "FFA07A", "C39BD3", "FEA6FF", "F7DC6F", "CFFF98", "A1D6E2",
@@ -37,7 +39,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
     private final AnnotatedGene annotatedGene;
 
-    private final int minProteinLength = 0;
     private final int maxProteinLength;
 
     private final int proteinMinSvgPos;
@@ -46,6 +47,8 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private final int keyMaxSvgPos;
 
     private final static String JAMA_BLUE = "00b2e2";
+
+    private static enum Regulation {UP, DOWN};
 
 
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
@@ -102,7 +105,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      * @param writer file handle
      * @throws IOException if we cannot write the box
      */
-    protected void writeProteinBox(Transcript transcript, double xend, int ypos, Writer writer) throws IOException {
+    protected void writeProteinBox(Transcript transcript, double xend, int ypos, double logFC, Writer writer) throws IOException {
         double xstart = this.proteinMinSvgPos;
         double width = xend - xstart;
         double Y = ypos - 0.5 * ISOFORM_HEIGHT;
@@ -112,8 +115,8 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         writer.write(rect);
         double midishpoint = this.proteinMinSvgPos + 0.4 * (this.proteinMaxSvgPos - this.proteinMinSvgPos);
         Y = ypos - 0.55 * ISOFORM_HEIGHT;
-        String label = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
-                xstart+5, Y-5, PURPLE, transcript.accessionId());
+        String label = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s (log-fold change: %.2f)</text>\n",
+                xstart+5, Y-5, PURPLE, transcript.accessionId(), logFC);
         writer.write(label);
     }
 
@@ -229,10 +232,11 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
 
-    private void writeIsoform(int ypos, Transcript transcript, Writer writer) throws IOException {
+    private void writeIsoform(int ypos, Transcript transcript, double logFC, Writer writer) throws IOException {
         final int EXON_CARTOON_YSKIP = 15;
         double xend = translateProteinToSvgCoordinate(transcript.getProteinLength());
-        writeProteinBox(transcript, xend, ypos, writer);
+
+        writeProteinBox(transcript, xend, ypos, logFC, writer);
         writeDomains(transcript, ypos, writer);
         writeExons(transcript, xend, ypos+EXON_CARTOON_YSKIP,writer);
     }
@@ -258,14 +262,32 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      */
     @Override
     public void write(Writer writer) {
-        int y = 70;
+        int y = 40;
         try {
-            for (var transcript : this.expressedTranscriptList) {
+            Map<Transcript, Double> upreg = annotatedGene.getUpregulatedExpressedTranscripts();
+            Map<Transcript, Double> downreg = annotatedGene.getDownregulatedExpressedTranscripts();
+            writer.write(String.format("<text x=\"%d\" y=\"%d\">Upregulated:</text>\n", 20, y));
+            y+= 40;
+            for (var e : upreg.entrySet()) {
+                Transcript transcript = e.getKey();
+                double logFC = e.getValue();
                 if (transcript.isCoding()) {
-                    writeIsoform(y, transcript, writer);
+                    writeIsoform(y, transcript, logFC, writer);
                     y += HEIGHT_PER_DISPLAY_ITEM;
                 }
             }
+            y+= 20;
+            writer.write(String.format("<text x=\"%d\" y=\"%d\">Downregulated:</text>\n", 20, y));
+            y+= 40;
+            for (var e : downreg.entrySet()) {
+                Transcript transcript = e.getKey();
+                double logFC = e.getValue();
+                if (transcript.isCoding()) {
+                    writeIsoform(y, transcript, logFC, writer);
+                    y += HEIGHT_PER_DISPLAY_ITEM;
+                }
+            }
+
             int nonCodingTranscripts = this.annotatedGene.getNoncodingTranscriptCount();
             if (nonCodingTranscripts>0) {
                 int xpos = this.proteinMinSvgPos + 10;

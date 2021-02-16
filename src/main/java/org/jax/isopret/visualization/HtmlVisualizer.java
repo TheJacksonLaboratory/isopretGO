@@ -40,7 +40,8 @@ public class HtmlVisualizer implements Visualizer {
         sb.append("<tr><td>").append(a).append("</td>");
         sb.append("<td>").append(vis.getChromosome()).append("</td>\n");
         sb.append(String.format("<td>%.2f</td>",  vis.getExpressionLogFoldChange()));
-        sb.append("<td>").append(vis.getExpressionPval()).append("</td></tr>\n");
+        String prob = String.format("%.2f", vis.getExpressionPval()) + (vis.isDifferentiallyExpressed() ? " (*)" : "");
+        sb.append("<td>").append(prob).append("</td></tr>\n");
         sb.append("</table>\n");
         List<GoTermIdPlusLabel> goterms = vis.getGoTerms();
         if (goterms.size() > 0) {
