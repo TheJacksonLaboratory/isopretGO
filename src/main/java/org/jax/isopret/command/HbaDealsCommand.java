@@ -223,15 +223,22 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
         // record source of analysis
         File f = new File(hbadealsFile);
-        data.put("hbadealsFile", f.getName());
+        data.put("hbadealsFile", f.getAbsolutePath());
+        if (outprefix!=null && ! outprefix.isEmpty()) {
+            data.put("prefix", outprefix);
+        } else {
+            data.put("prefix", f.getName());
+        }
         if (geneVisualizations.size() > chunkSize+100) {
-            Partition partition = Partition.ofSize(geneVisualizations, chunkSize);
-            for (int j=0;j<partition.size();j++) {
+            Partition<String> partition = Partition.ofSize(geneVisualizations, chunkSize);
+            int n_partitions = partition.size();
+            for (int j=0;j<n_partitions;j++) {
                 LOGGER.trace("Output of part {} of HTML file", (j+1));
                 List<String> geneVisualizationSublist = partition.get(j);
                 data.put("genelist", geneVisualizations);
                 String outFileName = "isopret-" + this.outprefix + "-part-" + (j+1);
                 data.put("genelist", geneVisualizationSublist);
+                data.put("parts_info", String.format("Part %d of %d", (j+1), n_partitions));
                 HtmlTemplate template = new HtmlTemplate(data, outFileName);
                 template.outputFile();
             }

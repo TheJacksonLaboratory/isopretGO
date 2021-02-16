@@ -430,13 +430,13 @@ a.svg:hover, a.svg:active {
   <section>
     <a name="sample"></a>
     <article>
-      <h2>Isopret &mdash; Isoform interpretation.</h2>
-      <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
+      <h2>Isopret &mdash; Isoform interpretation &mdash;  ${prefix}. <#if parts_info?has_content>${parts_info}</#if></h2>
       <p>${n_population} genes were included in the analysis. ${n_das} had one or more differentially spliced isoforms.
             ${n_dge} were differentially expressed.</p>
       <p>Using a desired FDR threshold of ${probability_threshold}, a probability threshold of
           ${expression_threshold} was calculated for differential expression, and a threshold of
           ${splicing_threshold} was calculated for differential splicing.</p>
+          <p>HBA-DEALS analysis file: ${hbadealsFile}.</p>
     </article>
   </section>
 
