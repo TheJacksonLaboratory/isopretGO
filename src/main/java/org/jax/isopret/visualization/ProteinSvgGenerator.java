@@ -165,8 +165,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
     private void writeKey(Writer writer) throws IOException {
-        int starty = 20;
-        int y = starty;
+        int y = 20;
         int startx = this.keyMinSvgPos;
         String svg = String.format("<text x=\"%d\" y=\"%d\" fill=\"%s\">Domains and Motifs</text>\n",
                 startx, y, BLACK);
@@ -259,8 +258,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      */
     @Override
     public void write(Writer writer) {
-        int starty = 70;
-        int y = starty;
+        int y = 70;
         try {
             for (var transcript : this.expressedTranscriptList) {
                 if (transcript.isCoding()) {

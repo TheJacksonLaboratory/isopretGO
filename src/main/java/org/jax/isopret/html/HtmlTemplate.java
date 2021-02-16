@@ -26,11 +26,11 @@ public class HtmlTemplate {
     /**
      *
      * @param data data for freemarker template.
-     * @param outprefix Name of output file (without .html file ending)
+     * @param outFileName Name of output file (without .html file ending)
      */
-    public HtmlTemplate(Map<String, Object> data, String outprefix) {
+    public HtmlTemplate(Map<String, Object> data, String outFileName) {
         this.templateData = data;
-        this.outpath = outprefix + ".html";
+        this.outpath = outFileName + ".html";
         this.cfg = new Configuration(new Version("2.3.23"));
         cfg.setDefaultEncoding("UTF-8");
         ClassLoader classLoader = HtmlTemplate.class.getClassLoader();

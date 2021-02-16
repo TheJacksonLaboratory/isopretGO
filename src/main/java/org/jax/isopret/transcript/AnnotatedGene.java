@@ -1,6 +1,5 @@
 package org.jax.isopret.transcript;
 
-import com.fasterxml.jackson.databind.introspect.Annotated;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
@@ -119,14 +118,14 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     /**
      * If a differential expression threshold was provided, return its value. Otherwise we are not thresholding, return true
-     * @return
+     * @return true if this gene is differentially expression
      */
     public boolean passesExpressionThreshold() {
         return this.differentiallyExpressed.orElse(true);
     }
     /**
      * If a differential expression threshold was provided, return its value. Otherwise we are not thresholding, return true
-     * @return
+     * @return true if this gene is differentially spliced
      */
     public boolean passesSplicingThreshold() {
         return this.differentiallySpliced.orElse(true);
@@ -137,18 +136,12 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     }
 
     public double getSplicingThreshold() {
-        if (this.splicingThreshold.isPresent()) {
-            return this.splicingThreshold.get();
-        } else {
-            return 1.0;
-        }
+        return this.splicingThreshold.orElse(1.0);
     }
 
 
     /**
      * We are sort by whether a gene is differentially spliced and then alphabetically
-     * @param that
-     * @return
      */
     @Override
     public int compareTo(AnnotatedGene that) {

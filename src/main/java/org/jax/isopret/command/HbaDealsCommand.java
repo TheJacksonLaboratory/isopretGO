@@ -1,5 +1,6 @@
 package org.jax.isopret.command;
 
+import org.jax.isopret.analysis.Partition;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.*;
 import org.jax.isopret.hbadeals.HbaDealsParser;
@@ -62,6 +63,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     private boolean outputTsv = false;
     @CommandLine.Option(names={"-n", "--namespace"}, required = true, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
     private String namespace = "ensembl";
+    @CommandLine.Option(names={"--chunk"}, description = "Chunk size (how many results to show per HTML file; default: ${DEFAULT-VALUE}")
+    int chunkSize = 500;
 
 
     private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();
@@ -124,9 +127,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         } else {
             hbago = HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
         }
-
-        int populationSize = hbago.populationCount();
-        data.put("n_population", populationSize);
+        data.put("n_population", hbago.populationCount());
         data.put("n_das",thresholder.getDasGeneCount());
         data.put("n_das_unmapped", hbago.unmappedDasCount());
         data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
@@ -186,7 +187,8 @@ public class HbaDealsCommand implements Callable<Integer> {
             }
             foundTranscripts++;
             HbaDealsResult result = entry.getValue();
-            if (! result.hasDifferentialExpressionResult(expressionThreshold)) {
+
+            if (! result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
                 continue;
             }
             hbadealSig++;
@@ -219,20 +221,34 @@ public class HbaDealsCommand implements Callable<Integer> {
             Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
             geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene, goTerms, i)));
         }
-        data.put("genelist", geneVisualizations);
-        data.put("populationCount", populationSize);
-        List<GoVisualizable> govis = new ArrayList<>();
-        for (var v : dgeGoTerms) {
-            govis.add(new HtmlGoVisualizable(v, ontology));
-        }
-
         // record source of analysis
         File f = new File(hbadealsFile);
-        data.put("hbadealsFile", f.getName());
+        data.put("hbadealsFile", f.getAbsolutePath());
+        if (outprefix!=null && ! outprefix.isEmpty()) {
+            data.put("prefix", outprefix);
+        } else {
+            data.put("prefix", f.getName());
+        }
+        if (geneVisualizations.size() > chunkSize+100) {
+            Partition<String> partition = Partition.ofSize(geneVisualizations, chunkSize);
+            int n_partitions = partition.size();
+            for (int j=0;j<n_partitions;j++) {
+                LOGGER.trace("Output of part {} of HTML file", (j+1));
+                List<String> geneVisualizationSublist = partition.get(j);
+                data.put("genelist", geneVisualizations);
+                String outFileName = "isopret-" + this.outprefix + "-part-" + (j+1);
+                data.put("genelist", geneVisualizationSublist);
+                data.put("parts_info", String.format("Part %d of %d", (j+1), n_partitions));
+                HtmlTemplate template = new HtmlTemplate(data, outFileName);
+                template.outputFile();
+            }
+        } else {
+            data.put("genelist", geneVisualizations);
+            String outFileName = "isopret-" + this.outprefix;
+            HtmlTemplate template = new HtmlTemplate(data, outFileName);
+            template.outputFile();
+        }
 
-
-        HtmlTemplate template = new HtmlTemplate(data, this.outprefix);
-        template.outputFile();
         LOGGER.trace("Total unidentified genes:"+ unidentifiedSymbols.size());
         LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also prosite: {}",
                 hbadeals, foundTranscripts, hbadealSig, foundProsite);
