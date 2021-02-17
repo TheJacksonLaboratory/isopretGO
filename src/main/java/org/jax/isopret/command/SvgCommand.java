@@ -44,8 +44,6 @@ public class SvgCommand implements Callable<Integer> {
     private String jannovarPath = "data/hg38_ensembl.ser";
     @CommandLine.Option(names={"--prefix"}, description = "Name of output file (without .html ending)")
     private String outprefix = "isopret";
-    @CommandLine.Option(names={"--tsv"}, description = "Output TSV files with ontology results and study sets")
-    private boolean outputTsv = false;
     @CommandLine.Option(names={"-n", "--namespace"}, required = true, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
     private String namespace = "ensembl";
     @CommandLine.Option(names={"-g","--gene"}, required = true, description = "Gene symbol")
