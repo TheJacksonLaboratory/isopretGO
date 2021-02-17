@@ -5,7 +5,6 @@ import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.prosite.PrositeHit;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -165,7 +164,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 .entrySet()
                 .stream()
                 .filter(e -> e.getValue() >= 0)
-                .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public Map<Transcript, Double> getDownregulatedExpressedTranscripts() {
@@ -173,7 +172,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 .entrySet()
                 .stream()
                 .filter(e -> e.getValue() < 0)
-                .collect(Collectors.toMap(e->e.getKey(),e->e.getValue()));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 

@@ -1,7 +1,6 @@
 package org.jax.isopret.visualization;
 
 
-import org.ini4j.Reg;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Write an SVG representing the protein domains and corresponding exon structure.
@@ -48,7 +46,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
     private final static String JAMA_BLUE = "00b2e2";
 
-    private static enum Regulation {UP, DOWN};
+    private enum Regulation {UP, DOWN}
 
 
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {

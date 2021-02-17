@@ -137,8 +137,7 @@ public class OrfFinder {
         if (startToLenMap.isEmpty()) {
             return Optional.empty();
         } else {
-            int maxStartPos = getMax(startToLenMap);
-            i = maxStartPos;
+            i = getMax(startToLenMap);
             String codon = this.cDNA.substring(i, i+3);
             StringBuilder aaSeq = new StringBuilder();
             while (! stopCodons.contains(codon)) {
