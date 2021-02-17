@@ -4,17 +4,6 @@ Isoform Interpretation (isopret) is (will be) a tool to help interpret the poten
 functions that are affected by differential alternative splicing.  Isopret is in a very early stage
 right now...
 
-## Prerequisites
-
-### svart
-We will use the svart library to work with the transcript data
-Please install the library locally (soon, it will go into maven central)
-```
-git clone https://github.com/exomiser/svart
-cd svart
-mvn install
-```
-
 ## Building isopret
 isopret was developed under Java 11. To build the app, clone this repository and
 build the executable with maven.
@@ -32,9 +21,9 @@ Isoform interpretation tool.
   -h, --help      Show this help message and exit.
   -V, --version   Print version information and exit.
 Commands:
-  biomart, B   Fetch data from biomart
   download, D  Download files for prositometry
   hbadeals, H  Analyze HBA-DEALS files
+  svg, V       Create SVG/PDF files for a specific gene
   stats, S     Show descriptive statistics about data
 ```
 
@@ -77,3 +66,21 @@ Analyze HBA-DEALS files
 To get these files note the following
 
 1. HBADEALS output -- please use with format that includes the ENSEMBL id in the first column (gene accession number).
+
+
+### SVG
+
+This is a convenience command that writes SVG files to disk for a specific gene. For instance,
+
+```bazaar
+java -jar target/isopret.jar svg -b <HBA-DEALS file>
+--prositemap all_prosite_motifs.txt
+--namespace ensembl
+--prefix SMAD3 --gene SMAD3
+```
+This produces four files
+ * SMAD3-isoforms.svg and SMAD3-isoforms.pdf    
+ * SMAD3-protein.svg and SMAD3-protein.pdf  
+
+THe PDF files are generated from the SVG files by running a system command with the ``rsvg-convert`` tool (which must be availble on the
+system path for this to work. Otherwise, just SVG files will be generated).
