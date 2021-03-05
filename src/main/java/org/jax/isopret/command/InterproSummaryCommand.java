@@ -5,6 +5,7 @@ import org.jax.isopret.interpro.*;
 import picocli.CommandLine;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -31,8 +32,8 @@ public class InterproSummaryCommand implements Callable<Integer>  {
         Map<Integer, InterproEntry> interproDescriptionMap = interproDomainDescParser.getInterproDescriptionMap();
         summarizeDomains(interproDescriptionMap);
         InterproDomainParser domainParser = new InterproDomainParser(this.interproDomainsFile);
-        Map<Integer, InterproAnnotation> transcriptIdToInterproAnnotationMap = domainParser.getTranscriptIdToInterproAnnotationMap();
-
+        Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap = domainParser.getTranscriptIdToInterproAnnotationMap();
+        summarizeAnnotations(transcriptIdToInterproAnnotationMap);
         return 0;
     }
 
@@ -45,6 +46,17 @@ public class InterproSummaryCommand implements Callable<Integer>  {
         for (var entry : counts.entrySet()) {
             System.out.printf("%s: %d.\n", entry.getKey().name(), entry.getValue());
         }
+    }
+
+    private void summarizeAnnotations(Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap) {
+        System.out.printf("[INFO] Total annotated transcripts: %d\n", transcriptIdToInterproAnnotationMap.size());
+        long totalAnnotations =
+                transcriptIdToInterproAnnotationMap
+                .values()
+                .stream()
+                .mapToInt(List::size)
+                .sum();
+        System.out.printf("[INFO] Total annotations: %d\n", totalAnnotations);
     }
 
 

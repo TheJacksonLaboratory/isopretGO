@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.jax.isopret.interpro.EnsemblStringToInt.geneStringToInt;
@@ -16,7 +18,7 @@ import static org.jax.isopret.interpro.EnsemblStringToInt.transcriptStringToInt;
 public class InterproDomainParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproDomainParser.class);
 
-    private final Map<Integer, InterproAnnotation> transcriptIdToInterproAnnotationMap;
+    private final Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap;
 
     public InterproDomainParser(String path) {
         transcriptIdToInterproAnnotationMap = new HashMap<>();
@@ -39,7 +41,8 @@ public class InterproDomainParser {
                     int start = Integer.parseInt(fields[3]);
                     int end = Integer.parseInt(fields[4]);
                     InterproAnnotation annotation = new InterproAnnotation(enst, ensg, interpro, start, end);
-                    this.transcriptIdToInterproAnnotationMap.put(annotation.getEnst(), annotation);
+                    this.transcriptIdToInterproAnnotationMap.putIfAbsent(annotation.getEnst(), new ArrayList<>());
+                    this.transcriptIdToInterproAnnotationMap.get(annotation.getEnst()).add(annotation);
                 } catch (Exception e) {
                     // should never happen
                     throw new IsopretRuntimeException("Malformed interpro domain line: \"" + line + "\"");
@@ -53,7 +56,7 @@ public class InterproDomainParser {
         }
     }
 
-    public Map<Integer, InterproAnnotation> getTranscriptIdToInterproAnnotationMap() {
+    public Map<Integer, List<InterproAnnotation>> getTranscriptIdToInterproAnnotationMap() {
         return transcriptIdToInterproAnnotationMap;
     }
 }
