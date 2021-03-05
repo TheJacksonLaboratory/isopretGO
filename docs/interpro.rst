@@ -64,4 +64,5 @@ Run interpro scan with nucleic acid sequences as follows.
 
 .. code-block:: bash
   :linenos:
-./interproscan.sh -t n -i /path/to/nucleic_acid_sequences.fasta
+
+  ./interproscan.sh -t n -i /path/to/nucleic_acid_sequences.fasta
