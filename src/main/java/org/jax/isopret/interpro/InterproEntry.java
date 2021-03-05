@@ -49,7 +49,7 @@ public class InterproEntry {
 
     public static int integerPart(String id) {
         if (! id.startsWith("IPR")) {
-            throw new IsopretRuntimeException("Malformed interpro id:" + id);
+            throw new IsopretRuntimeException("Malformed interpro id: \"" + id + "\"");
         }
         return Integer.parseInt(id.substring(3));
     }
