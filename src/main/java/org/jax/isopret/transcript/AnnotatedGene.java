@@ -2,6 +2,8 @@ package org.jax.isopret.transcript;
 
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproAnnotation;
 import org.jax.isopret.prosite.PrositeHit;
 
 import java.util.*;
@@ -18,6 +20,8 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     private final Map<Transcript, Double> expressedTranscriptMap;
 
     private final Map<String, List<PrositeHit>> transcriptToHitMap;
+
+    private final Map<Integer, List<DisplayInterproAnnotation>> transcriptToInterproHitMap;
 
     private final HbaDealsResult hbaDealsResult;
 
@@ -37,9 +41,13 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      * @param transcriptToHitMap Prosite hits for the transcripts
      * @param result result of HBA-DEALS analysis for this gene.
      */
-    public AnnotatedGene(List<Transcript> transcripts, Map<String, List<PrositeHit>> transcriptToHitMap, HbaDealsResult result) {
+    public AnnotatedGene(List<Transcript> transcripts,
+                         Map<String, List<PrositeHit>> transcriptToHitMap,
+                         Map<Integer, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
+                         HbaDealsResult result) {
         this.transcripts = transcripts;
         this.transcriptToHitMap = transcriptToHitMap;
+        this.transcriptToInterproHitMap = transcriptToInterproHitMap;
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
         Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
@@ -63,11 +71,13 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     public AnnotatedGene(List<Transcript> transcripts,
                          Map<String, List<PrositeHit>> transcriptToHitMap,
+                         Map<Integer, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
                          HbaDealsResult result,
                          double expressionThreshold,
                          double splicingThreshold) {
         this.transcripts = transcripts;
         this.transcriptToHitMap = transcriptToHitMap;
+        this.transcriptToInterproHitMap = transcriptToInterproHitMap;
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
         Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
@@ -97,6 +107,10 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     public Map<Transcript, Double> getExpressedTranscriptMap() {
 
         return null;
+    }
+
+    public Map<Integer, List<DisplayInterproAnnotation>> getTranscriptToInterproHitMap() {
+        return transcriptToInterproHitMap;
     }
 
     public int getTranscriptCount() {

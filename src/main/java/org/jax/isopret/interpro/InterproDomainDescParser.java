@@ -16,7 +16,7 @@ public class InterproDomainDescParser {
 
     final Map<Integer, InterproEntry> interproDescriptionMap;
 
-    public InterproDomainDescParser(String path) {
+    private InterproDomainDescParser(String path) {
         interproDescriptionMap = getDescriptions(path);
         System.out.println("Got " + interproDescriptionMap.size());
     }
@@ -44,7 +44,8 @@ public class InterproDomainDescParser {
         return interpromap;
     }
 
-    public Map<Integer, InterproEntry> getInterproDescriptionMap() {
-        return interproDescriptionMap;
+    public static Map<Integer, InterproEntry> getInterproDescriptionMap(String path) {
+        InterproDomainDescParser parser = new InterproDomainDescParser(path);
+        return parser.interproDescriptionMap;
     }
 }

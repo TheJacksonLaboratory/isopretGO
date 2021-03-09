@@ -3,6 +3,8 @@ package org.jax.isopret.visualization;
 import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproEntry;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
@@ -133,7 +135,6 @@ public class EnsemblVisualizable implements Visualizable {
     public String getIsoformSvg() {
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         return svggen.getSvg();
-
     }
 
     @Override
@@ -212,6 +213,22 @@ public class EnsemblVisualizable implements Visualizable {
             prositeLinks.add(row);
         }
         return prositeLinks;
+    }
+
+    @Override
+    public List<DisplayInterproAnnotation> getInterproForExpressedTranscripts() {
+        Map<Integer, List<DisplayInterproAnnotation>> interproMap = this.agene.getTranscriptToInterproHitMap();
+        Set<DisplayInterproAnnotation> interpro = new HashSet<>();
+        for (var entry: this.hbaDealsResult.getTranscriptMap2().entrySet()) {
+            int transcriptId = entry.getKey();
+            HbaDealsTranscriptResult result = entry.getValue();
+            if (interproMap.containsKey(transcriptId)) {
+                interpro.addAll(interproMap.get(transcriptId));
+            }
+        }
+        List<DisplayInterproAnnotation> sortedList = new ArrayList<>(interpro);
+        Collections.sort(sortedList);
+        return sortedList;
     }
 
     @Override

@@ -2,6 +2,8 @@ package org.jax.isopret.visualization;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.GoTermIdPlusLabel;
+import org.jax.isopret.interpro.InterproDomain;
+import org.jax.isopret.interpro.InterproEntry;
 
 import java.util.List;
 import java.util.Map;
@@ -9,6 +11,8 @@ import java.util.Map;
 public class HtmlVisualizer implements Visualizer {
 
     private final Map<String, String> prositeIdToName;
+
+
 
     public HtmlVisualizer(Map<String, String> prositeIdToName) {
         this.prositeIdToName = prositeIdToName;
@@ -64,6 +68,26 @@ public class HtmlVisualizer implements Visualizer {
             "  </thead>\n";
 
     public String getPrositeBox(Visualizable vis) {
+        StringBuilder sb = new StringBuilder();
+        List<List<String>> prositeLinks = vis.getPrositeModuleLinks(this.prositeIdToName);
+        if (prositeLinks.isEmpty()) {
+            return "<p><i>No protein domains found.</i></p>\n";
+        }
+        sb.append(PROSITE_TABLE_HEADER);
+        for (var row : prositeLinks) {
+            if (row.size() != 2) {
+                // should never happen!
+                throw new IsopretRuntimeException("Malformed prosite row: " + row);
+            }
+            sb.append("<tr><td>").append(row.get(0)).append("</td>");
+            sb.append("<td>").append(row.get(1)).append("</td></tr>\n");
+        }
+        sb.append("</table>\n");
+        return sb.toString();
+    }
+
+
+    public String getInterproBox(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
         List<List<String>> prositeLinks = vis.getPrositeModuleLinks(this.prositeIdToName);
         if (prositeLinks.isEmpty()) {

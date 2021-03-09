@@ -1,11 +1,15 @@
 package org.jax.isopret.hbadeals;
 
+import org.jax.isopret.transcript.AccessionNumber;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class HbaDealsResult {
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final String geneAccession;
+    /** Integer representing Accession number of the gene, e.g., 1167 for ENSG00000001167. */
+    private final int ensemblId;
     private final String symbol;
     private double expressionFoldChange;
     private double expressionP;
@@ -15,6 +19,7 @@ public class HbaDealsResult {
 
     public HbaDealsResult(String geneAccession, String sym) {
         this.geneAccession = geneAccession;
+        this.ensemblId = AccessionNumber.ensgAccessionToInt(geneAccession);
         this.symbol = sym;
         transcriptMap = new HashMap<>();
     }
@@ -36,6 +41,12 @@ public class HbaDealsResult {
 
     public String getGeneAccession() {
         return geneAccession;
+    }
+
+    /**
+     * @return an int representing Accession number of the gene, e.g., 1167 for ENSG00000001167. */
+    public int getEnsgId() {
+        return this.ensemblId;
     }
 
     public String getSymbol() {
@@ -61,6 +72,14 @@ public class HbaDealsResult {
 
     public Map<String, HbaDealsTranscriptResult> getTranscriptMap() {
         return transcriptMap;
+    }
+
+    public Map<Integer, HbaDealsTranscriptResult> getTranscriptMap2() {
+        Map<Integer, HbaDealsTranscriptResult> transcriptmap = new HashMap<>();
+        for (HbaDealsTranscriptResult res : this.transcriptMap.values()) {
+            transcriptmap.put(res.getTranscriptId(), res);
+        }
+        return transcriptmap;
     }
 
     public boolean hasDifferentialExpressionResult(double threshold) { return this.expressionP < threshold; }

@@ -1,8 +1,9 @@
 package org.jax.isopret.visualization;
 
+
 import java.util.List;
 
-public class Util {
+public class VisualizationUtil {
 
 
     public static String fromList(List<String> genes, String title) {

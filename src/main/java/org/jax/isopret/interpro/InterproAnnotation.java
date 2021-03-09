@@ -17,6 +17,15 @@ public class InterproAnnotation {
         this.end = end;
     }
 
+    public InterproAnnotation(InterproAnnotation that) {
+        this.enst = that.enst;
+        this.ensg = that.ensg;
+        this.interpro = that.interpro;
+        this.start = that.start;
+        this.end = that.end;
+    }
+
+
     public int getEnst() {
         return enst;
     }

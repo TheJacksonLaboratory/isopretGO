@@ -20,7 +20,7 @@ public class InterproDomainParser {
 
     private final Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap;
 
-    public InterproDomainParser(String path) {
+    private InterproDomainParser(String path) {
         transcriptIdToInterproAnnotationMap = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
@@ -56,7 +56,11 @@ public class InterproDomainParser {
         }
     }
 
-    public Map<Integer, List<InterproAnnotation>> getTranscriptIdToInterproAnnotationMap() {
-        return transcriptIdToInterproAnnotationMap;
+
+
+
+    public static Map<Integer, List<InterproAnnotation>> getInterproAnnotationMap(String path) {
+        InterproDomainParser parser = new InterproDomainParser(path);
+        return parser.transcriptIdToInterproAnnotationMap;
     }
 }

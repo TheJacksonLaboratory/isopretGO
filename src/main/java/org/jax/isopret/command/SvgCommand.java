@@ -6,6 +6,8 @@ import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hgnc.HgncItem;
 import org.jax.isopret.hgnc.HgncParser;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproAnnotation;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
@@ -94,7 +96,8 @@ public class SvgCommand implements Callable<Integer> {
             PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
             prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
         }
-        AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
+        Map<Integer, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
+        AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, annotList,result);
 
 
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);

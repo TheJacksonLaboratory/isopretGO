@@ -1,5 +1,7 @@
 package org.jax.isopret.hbadeals;
 
+import org.jax.isopret.transcript.AccessionNumber;
+
 public class HbaDealsTranscriptResult {
     private final String transcript;
     private final double foldChange;
@@ -17,6 +19,10 @@ public class HbaDealsTranscriptResult {
 
     public String getTranscript() {
         return transcript;
+    }
+    // TODO REFACTOR
+    public int getTranscriptId() {
+        return AccessionNumber.ensemblTranscript(transcript).getAccessionNumber();
     }
 
     public double getFoldChange() {

@@ -1,0 +1,6 @@
+IPR000607	Repeat	Double-stranded RNA-specific adenosine deaminase (DRADA) repeat
+IPR002466	Domain	Adenosine deaminase/editase
+IPR014720	Domain	Double-stranded RNA-binding domain
+IPR036388	Homologous_superfamily	Winged helix-like DNA-binding domain superfamily
+IPR036390	Homologous_superfamily	Winged helix DNA-binding domain superfamily
+IPR042371	Domain	Z-alpha domain

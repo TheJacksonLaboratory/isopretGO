@@ -1,6 +1,8 @@
 package org.jax.isopret.visualization;
 
 import org.jax.isopret.go.GoTermIdPlusLabel;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproEntry;
 
 import java.util.List;
 import java.util.Map;
@@ -41,8 +43,9 @@ public interface Visualizable {
 
    boolean isDifferentiallySpliced();
 
+   List<DisplayInterproAnnotation>  getInterproForExpressedTranscripts();
 
-    int getI();
+   int getI();
 
 
 }

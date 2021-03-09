@@ -4,7 +4,6 @@ package org.jax.isopret.command;
 import org.jax.isopret.interpro.*;
 import picocli.CommandLine;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -28,11 +27,9 @@ public class InterproSummaryCommand implements Callable<Integer>  {
 
     @Override
     public Integer call() {
-        InterproDomainDescParser interproDomainDescParser = new InterproDomainDescParser(this.prositeDataFile);
-        Map<Integer, InterproEntry> interproDescriptionMap = interproDomainDescParser.getInterproDescriptionMap();
+        Map<Integer, InterproEntry> interproDescriptionMap = InterproDomainDescParser.getInterproDescriptionMap(this.prositeDataFile);
         summarizeDomains(interproDescriptionMap);
-        InterproDomainParser domainParser = new InterproDomainParser(this.interproDomainsFile);
-        Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap = domainParser.getTranscriptIdToInterproAnnotationMap();
+        Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap = InterproDomainParser.getInterproAnnotationMap(this.interproDomainsFile);
         summarizeAnnotations(transcriptIdToInterproAnnotationMap);
         return 0;
     }

@@ -2,6 +2,7 @@ package org.jax.isopret.ensembl;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.orf.OrfFinder;
+import org.jax.isopret.transcript.AccessionNumber;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,6 +20,8 @@ public class EnsemblTranscript {
     /** Ensembl transcript id without version number. */
     private final String transcriptId;
     private final int transcriptVersion;
+    /** intger representation of transcript id (without version): 560355for ENST00000560355.1 */
+    private final AccessionNumber acccession;
     private final String geneId;
     private final int geneVersion;
 
@@ -48,6 +51,7 @@ public class EnsemblTranscript {
         if (! transcript_id.startsWith("ENST")) {
             throw new IsopretRuntimeException("Malformed Ensembl transcript id: " + transcript_id);
         }
+        this.acccession = AccessionNumber.ensemblTranscript(fields[0]);
         i = transcript_id.indexOf(".");
         if (i > 0) {
             this.transcriptId = transcript_id.substring(0,i); // removes the version number
@@ -110,6 +114,10 @@ public class EnsemblTranscript {
 
     public String getTranscriptId() {
         return transcriptId;
+    }
+
+    public int getEnstId() {
+        return this.acccession.getAccessionNumber();
     }
 
     public int getTranscriptVersion() {
