@@ -69,7 +69,7 @@ public class TranscriptTest extends TestBase {
 
         PrositeMapping psm = prositeMappingMap.get(adarGeneId);
         Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
-        AnnotatedGene atranscript = new AnnotatedGene(adarTranscripts, psm.getTranscriptToPrositeListMap(),annotList, adarResult);
+        AnnotatedGene atranscript = new AnnotatedGene(adarTranscripts, annotList, adarResult);
 
     }
 

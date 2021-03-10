@@ -3,17 +3,14 @@ package org.jax.isopret.visualization;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.interpro.InterproDomain;
 import org.jax.isopret.interpro.InterproEntry;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HtmlVisualizer implements Visualizer {
 
     private final Map<String, String> prositeIdToName;
-
-
 
     public HtmlVisualizer(Map<String, String> prositeIdToName) {
         this.prositeIdToName = prositeIdToName;
@@ -60,33 +57,6 @@ public class HtmlVisualizer implements Visualizer {
         return sb.toString();
     }
 
-    private final static String PROSITE_TABLE_HEADER = "<table>\n" +
-            "  <thead>\n" +
-            "    <tr>\n" +
-            "      <th>Prosite id</th>\n" +
-            "      <th>Name</th>\n" +
-            "    </tr>\n" +
-            "  </thead>\n";
-
-    public String getPrositeBox(Visualizable vis) {
-        StringBuilder sb = new StringBuilder();
-        List<List<String>> prositeLinks = vis.getPrositeModuleLinks(this.prositeIdToName);
-        if (prositeLinks.isEmpty()) {
-            return "<p><i>No protein domains found.</i></p>\n";
-        }
-        sb.append(PROSITE_TABLE_HEADER);
-        for (var row : prositeLinks) {
-            if (row.size() != 2) {
-                // should never happen!
-                throw new IsopretRuntimeException("Malformed prosite row: " + row);
-            }
-            sb.append("<tr><td>").append(row.get(0)).append("</td>");
-            sb.append("<td>").append(row.get(1)).append("</td></tr>\n");
-        }
-        sb.append("</table>\n");
-        return sb.toString();
-    }
-
     private final static String INTERPRO_TABLE_HEADER = "<table>\n" +
             "  <thead>\n" +
             "    <tr>\n" +
@@ -95,17 +65,21 @@ public class HtmlVisualizer implements Visualizer {
             "      <th>Type</th>\n" +
             "    </tr>\n" +
             "  </thead>\n";
+
     public String getInterproBox(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
         List<DisplayInterproAnnotation> introProAnnotations = vis.getInterproForExpressedTranscripts();
+        Set<InterproEntry> entrySet = introProAnnotations.stream().map(DisplayInterproAnnotation::getInterproEntry).collect(Collectors.toSet());
+        List<InterproEntry> entryList = new ArrayList<>(entrySet);
+        Collections.sort(entryList);
         if (introProAnnotations.isEmpty()) {
             return "<p><i>No interpro domains found.</i></p>\n";
         }
         sb.append(INTERPRO_TABLE_HEADER);
-        for (DisplayInterproAnnotation interpro : introProAnnotations) {
-            InterproEntry entry = interpro.getInterproEntry();
-
-            sb.append("<tr><td>").append(entry.getIntroproAccession()).append("</td>");
+        for (InterproEntry entry : entryList) {
+            String interproUrl = String.format("https://www.ebi.ac.uk/interpro/entry/InterPro/%s/", entry.getIntroproAccession());
+            String interproAnchor = String.format("<a href=\"%s\" target=\"_blank\">%s</a>", interproUrl, entry.getIntroproAccession());
+            sb.append("<tr><td>").append(interproAnchor).append("</td>");
             sb.append("<td>").append(entry.getDescription()).append("</td>\n");
             sb.append("<td>").append(entry.getEntryType()).append("</td></tr>\n");
         }
@@ -175,7 +149,6 @@ public class HtmlVisualizer implements Visualizer {
     @Override
     public String getHtml(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
-       // sb.append("<h1>").append(vis.getGeneSymbol()).append(" &emsp; ").append("</h1>\n");
         sb.append(getGeneNameAndBadges(vis));
         sb.append("<article>\n");
         sb.append("<div class=\"generow\">\n");
@@ -187,13 +160,13 @@ public class HtmlVisualizer implements Visualizer {
         sb.append("</div>\n");
         sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
         sb.append(getTranscriptBox(vis)).append("\n");
-       sb.append("</div>\n");
+        sb.append("</div>\n");
         sb.append("</div>\n");
         sb.append("<div class=\"svgrow\">\n");
-       sb.append(vis.getIsoformSvg());
+        sb.append(vis.getIsoformSvg());
         sb.append("</div>\n");
         sb.append("<div class=\"svgrow\">\n");
-        sb.append(vis.getProteinSvg(this.prositeIdToName));
+        sb.append(vis.getProteinSvg());
         sb.append("</div>\n");
         sb.append("</article>\n");
         return sb.toString();

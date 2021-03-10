@@ -87,8 +87,8 @@ public class TestBase {
         Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
         HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes
         PrositeMapping adarPrositeMapping = prositeMappingMap.get(adarGeneId);
-        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of();
-        return new AnnotatedGene(adarTranscripts,  adarPrositeMapping.getTranscriptToPrositeListMap(), annotList,adarResult);
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
+        return new AnnotatedGene(adarTranscripts, annotList,adarResult);
     }
 
 }

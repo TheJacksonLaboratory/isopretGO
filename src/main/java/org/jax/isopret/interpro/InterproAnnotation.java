@@ -3,17 +3,18 @@ package org.jax.isopret.interpro;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.transcript.AccessionNumber;
 
+import java.util.Objects;
 import java.util.Optional;
 
 
 
 public class InterproAnnotation {
 
-    private final AccessionNumber enst;
-    private final AccessionNumber ensg ;
-    private final int interpro;
-    private final int start;
-    private final int end;
+    protected final AccessionNumber enst;
+    protected final AccessionNumber ensg ;
+    protected final int interpro;
+    protected final int start;
+    protected final int end;
 
 
     public InterproAnnotation(AccessionNumber enst, AccessionNumber ensg, int interpro, int start, int end) {
@@ -51,6 +52,23 @@ public class InterproAnnotation {
 
     public int getEnd() {
         return end;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.enst, this.ensg, this.interpro, this.start, this.end);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (! (obj instanceof InterproAnnotation)) return false;
+        InterproAnnotation that = (InterproAnnotation) obj;
+        return this.ensg.equals(that.ensg) &&
+                this.enst.equals(that.enst) &&
+                this.interpro == that.interpro &&
+                this.start == that.start &&
+                this.end == that.end;
     }
 
 

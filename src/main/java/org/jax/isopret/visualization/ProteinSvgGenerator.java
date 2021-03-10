@@ -1,7 +1,11 @@
 package org.jax.isopret.visualization;
 
 
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproAnnotation;
+import org.jax.isopret.interpro.InterproEntry;
 import org.jax.isopret.prosite.PrositeHit;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 
@@ -10,6 +14,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Write an SVG representing the protein domains and corresponding exon structure.
@@ -27,13 +33,10 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
    private final List<Transcript> expressedTranscriptList;
 
-    private final Map<String, String> prositeId2nameMap;
-    /**
-     * Map of the prosite IDs and name that we actually used.
-     */
-    private final SortedMap<String, String> sortedPrositeIdMap;
 
-    private final Map<String, String> prositeIdToColorMap;
+    private final SortedMap<InterproEntry, String> interproEntryColorMap;
+
+   // private final Map<String, String> prositeIdToColorMap;
 
     private final AnnotatedGene annotatedGene;
 
@@ -49,26 +52,25 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private enum Regulation {UP, DOWN}
 
 
-    private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
+    private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene) {
         super(SVG_WIDTH, height);
         // get prosite data if possible
         this.annotatedGene = annotatedGene;
-        this.prositeId2nameMap = id2nameMap;
         this.expressedTranscriptList = annotatedGene.getExpressedTranscripts();
-        this.sortedPrositeIdMap = new TreeMap<>();
-        for (var hitlist : this.annotatedGene.getPrositeHitMap().values()) {
-            for (var hit : hitlist) {
-                String id = hit.getAccession();
-                String label = this.prositeId2nameMap.getOrDefault(id, id); // if we cannot find the label, just use the id
-                this.sortedPrositeIdMap.put(id, label);
-            }
-        }
-        // get colors -- start from a random index
-        prositeIdToColorMap = new HashMap<>();
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> interpromap = annotatedGene.getTranscriptToInterproHitMap();
+        interproEntryColorMap = new TreeMap<>();
+        Set<InterproEntry> interproEntries = interpromap
+                .values()
+                .stream()
+                .flatMap(x -> x.stream())
+                .map(DisplayInterproAnnotation::getInterproEntry)
+                .collect(Collectors.toSet());
+        List<InterproEntry> entryList = new ArrayList<>(interproEntries);
+        Collections.sort(entryList);
         Random random = new Random();
         int i = random.nextInt(colors.length);
-        for (var id : sortedPrositeIdMap.keySet()) {
-            prositeIdToColorMap.put(id, colors[i]);
+        for (var entry : entryList) {
+            interproEntryColorMap.put(entry,colors[i]);
             i = i + 1 == colors.length ? 0 : i + 1;
         }
         this.maxProteinLength = this.expressedTranscriptList
@@ -114,7 +116,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         double midishpoint = this.proteinMinSvgPos + 0.4 * (this.proteinMaxSvgPos - this.proteinMinSvgPos);
         Y = ypos - 0.55 * ISOFORM_HEIGHT;
         String label = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s (log-fold change: %.2f)</text>\n",
-                xstart+5, Y-5, PURPLE, transcript.accessionId(), logFC);
+                xstart+5, Y-5, PURPLE, transcript.accessionId().getAccessionString(), logFC);
         writer.write(label);
     }
 
@@ -151,11 +153,12 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
 
     private void writeDomains(Transcript transcript, int ypos, Writer writer) throws IOException {
-        List<PrositeHit> hits = this.annotatedGene.getPrositeHitMap().getOrDefault(transcript.accessionId().getAccessionString(), new ArrayList<>());
-        for (PrositeHit hit : hits) {
-            String color = this.prositeIdToColorMap.get(hit.getAccession());
-            double xstart = translateProteinToSvgCoordinate(hit.getStartAminoAcidPos());
-            double xend = translateProteinToSvgCoordinate(hit.getEndAminoAcidPos());
+        List<DisplayInterproAnnotation> hits =
+                this.annotatedGene.getTranscriptToInterproHitMap().getOrDefault(transcript.accessionId(), new ArrayList<>());
+        for (DisplayInterproAnnotation hit : hits) {
+            String color = this.interproEntryColorMap.get(hit.getInterproEntry());
+            double xstart = translateProteinToSvgCoordinate(hit.getStart());
+            double xend = translateProteinToSvgCoordinate(hit.getEnd());
             double width = xend - xstart;
             double Y = ypos - 0.5 * ISOFORM_HEIGHT;
             String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%d\" " +
@@ -173,10 +176,10 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         writer.write(svg);
         y += 40;
         int Y_INTERVAL = 60;
-        for (var entry : sortedPrositeIdMap.entrySet()) {
-            String accession = entry.getKey();
-            String label = entry.getValue();
-            String color = this.prositeIdToColorMap.get(accession);
+        for (var entry : interproEntryColorMap.entrySet()) {
+            InterproEntry accession = entry.getKey();
+            String label = accession.getDescription();
+            String color = this.interproEntryColorMap.get(accession);
             int boxDimension = 20;
             String rect = String.format("<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" " +
                             "style=\"fill:#%s;stroke:black;stroke-width:1\" />\n",
@@ -189,7 +192,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             writer.write(svg);
             ybox += boxDimension;
             svg = String.format("<text x=\"%d\" y=\"%d\" fill=\"%s\">%s</text>\n",
-                    x, ybox, BLACK, accession);
+                    x, ybox, BLACK, accession.getIntroproAccession());
             writer.write(svg);
             y += Y_INTERVAL;
         }
@@ -226,7 +229,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
     private boolean hasVisualizableDomains() {
-        return ! this.annotatedGene.getPrositeHitMap().isEmpty();
+        return this.annotatedGene.hasInterproAnnotations();
     }
 
 
@@ -302,14 +305,12 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
 
-    public static AbstractSvgGenerator factory(AnnotatedGene annotatedGene, Map<String, String> id2nameMap) {
+    public static AbstractSvgGenerator factory(AnnotatedGene annotatedGene) {
         int height = HEIGHT_PER_DISPLAY_ITEM * annotatedGene.getCodingTranscriptCount() + HEIGHT_FOR_SV_DISPLAY;
         if (annotatedGene.getNoncodingTranscriptCount()>0) {
             height += HEIGHT_FOR_SV_DISPLAY;
         }
-        return new ProteinSvgGenerator(height,
-                annotatedGene,
-                id2nameMap);
+        return new ProteinSvgGenerator(height, annotatedGene);
     }
 
     public static String empty(String symbol) {

@@ -198,7 +198,6 @@ public class HbaDealsCommand implements Callable<Integer> {
 
             if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
                 AnnotatedGene agene = new AnnotatedGene(transcripts,
-                        prositeHitsForCurrentGene,
                         transcriptToInterproHitMap,
                         result,
                         expressionThreshold,

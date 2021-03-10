@@ -21,8 +21,8 @@ public class HbaDealsTranscriptResult {
         return transcript.getAccessionString();
     }
 
-    public int getTranscriptId() {
-        return transcript.getAccessionNumber();
+    public AccessionNumber getTranscriptId() {
+        return transcript;
     }
 
     public double getFoldChange() {

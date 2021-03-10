@@ -30,8 +30,6 @@ public class EnsemblVisualizable implements Visualizable {
     /** All annotated transcripts of some gene that were expressed according to HBA deals */
     private final List<Transcript> expressedTranscripts;
 
-    private final Map<String, List<PrositeHit>> transcriptToHitMap;
-
     private final HbaDealsResult hbaDealsResult;
 
     private final String chromosome;
@@ -55,7 +53,6 @@ public class EnsemblVisualizable implements Visualizable {
         this.goterms = golist;
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
-        this.transcriptToHitMap = agene.getPrositeHitMap();
         this.hbaDealsResult = agene.getHbaDealsResult();
         String chr = this.expressedTranscripts.stream().map(Transcript::contig).map(Contig::name).findAny().orElse("n/a");
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
@@ -139,13 +136,14 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
-    public String getProteinSvg(Map<String, String> prositeIdToName) {
+    public String getProteinSvg() {
         try {
             // Return a message only if we cannot find prosite domains.
-            if (agene.getPrositeHitMap().isEmpty()) {
+           // if (agene.getPrositeHitMap().isEmpty()) {
+           if (! agene.hasInterproAnnotations()) {
                 return ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
             }
-            AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene, prositeIdToName);
+            AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene);
             return svggen.getSvg();
         } catch (Exception e) {
             return "<p>Could not generate protein SVG because: " + e.getMessage() + "</p>";
@@ -183,39 +181,6 @@ public class EnsemblVisualizable implements Visualizable {
         return rows;
     }
 
-
-    private String getPrositeHtmlAnchor(String id, String label) {
-        String url = "https://prosite.expasy.org/cgi-bin/prosite/prosite-search-ac?" + id;
-        return "<a href=\"" + url +"\" target=\"__blank\">" + label +"</a>\n";
-    }
-
-
-    @Override
-    public List<List<String>> getPrositeModuleLinks(Map<String, String> prositeIdToName) {
-        var prositeHitMap = this.agene.getPrositeHitMap();
-        SortedMap<String,String> uniqueHitsMap = new TreeMap<>();
-        for (List<PrositeHit> hits : prositeHitMap.values()) {
-            for (PrositeHit hit : hits) {
-                String acc = hit.getAccession();
-                if (prositeIdToName.containsKey(acc)) {
-                    uniqueHitsMap.putIfAbsent(acc, prositeIdToName.get(acc));
-                }
-            }
-        }
-        List<List<String>> prositeLinks = new ArrayList<>();
-        for (var entry : uniqueHitsMap.entrySet()) {
-            String id = entry.getKey();
-            String label = entry.getValue();
-            String anchor = getPrositeHtmlAnchor(id, label);
-            List<String> row = new ArrayList<>();
-            row.add(id);
-           // row.add(label);
-            row.add(anchor);
-            prositeLinks.add(row);
-        }
-        return prositeLinks;
-    }
-
     /**
      * @return a list of interpro annotations that cover the isoforms of the gene that are expressed in our data
      */
@@ -223,9 +188,7 @@ public class EnsemblVisualizable implements Visualizable {
     public List<DisplayInterproAnnotation> getInterproForExpressedTranscripts() {
         Map<AccessionNumber, List<DisplayInterproAnnotation>> interproMap = this.agene.getTranscriptToInterproHitMap();
         Set<DisplayInterproAnnotation> interpro = new HashSet<>();
-        for (var entry: this.hbaDealsResult.getTranscriptMap2().entrySet()) {
-            int transcriptId = entry.getKey();
-            HbaDealsTranscriptResult result = entry.getValue();
+        for (AccessionNumber transcriptId : this.hbaDealsResult.getTranscriptMap().keySet()) {
             if (interproMap.containsKey(transcriptId)) {
                 interpro.addAll(interproMap.get(transcriptId));
             }

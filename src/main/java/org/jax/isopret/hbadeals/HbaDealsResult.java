@@ -66,14 +66,6 @@ public class HbaDealsResult {
         return transcriptMap;
     }
 
-    public Map<Integer, HbaDealsTranscriptResult> getTranscriptMap2() {
-        Map<Integer, HbaDealsTranscriptResult> transcriptmap = new HashMap<>();
-        for (HbaDealsTranscriptResult res : this.transcriptMap.values()) {
-            transcriptmap.put(res.getTranscriptId(), res);
-        }
-        return transcriptmap;
-    }
-
     public boolean hasDifferentialExpressionResult(double threshold) { return this.expressionP < threshold; }
 
 
@@ -91,7 +83,9 @@ public class HbaDealsResult {
         return hasDifferentialSplicingResult(splicing) || hasDifferentialExpressionResult(expression);
     }
 
-
+    public boolean transcriptExpressed(AccessionNumber acc) {
+        return this.transcriptMap.containsKey(acc);
+    }
 
 
     public double getSmallestSplicingP() {

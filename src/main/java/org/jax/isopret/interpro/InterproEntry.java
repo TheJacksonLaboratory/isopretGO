@@ -4,7 +4,7 @@ import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.util.Objects;
 
-public class InterproEntry {
+public class InterproEntry implements Comparable<InterproEntry> {
     private final int id;
 
     private final InterproEntryType entryType;
@@ -59,4 +59,8 @@ public class InterproEntry {
     }
 
 
+    @Override
+    public int compareTo(InterproEntry that) {
+        return this.description.compareTo(that.description);
+    }
 }

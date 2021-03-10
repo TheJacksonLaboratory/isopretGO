@@ -98,12 +98,12 @@ public class SvgCommand implements Callable<Integer> {
             prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
         }
         Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
-        AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, annotList,result);
+        AnnotatedGene agene = new AnnotatedGene(transcripts, annotList,result);
 
 
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         String isoformSvg = svggen.getSvg();
-        svggen = ProteinSvgGenerator.factory(agene, prositeIdToName);
+        svggen = ProteinSvgGenerator.factory(agene);
         String proteinSvg = svggen.getSvg();
         String isoformFilename = String.format("%s-isoforms.svg", geneSymbol);
         String proteinFilename = String.format("%s-protein.svg", geneSymbol);
