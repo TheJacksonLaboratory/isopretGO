@@ -1,6 +1,8 @@
 package org.jax.isopret.interpro;
 
 import org.checkerframework.checker.units.qual.A;
+import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +14,7 @@ import java.util.Map;
 public class InterproMapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproMapper.class);
     private final Map<Integer, InterproEntry> interproDescription;
-    private final Map<Integer, List<InterproAnnotation>> interproAnnotation;
+    private final Map<AccessionNumber, List<InterproAnnotation>> interproAnnotation;
 
 
     public InterproMapper(String interproDescriptionFile, String interproDomainsFile) {
@@ -21,12 +23,17 @@ public class InterproMapper {
     }
 
 
-    public Map<Integer, List<DisplayInterproAnnotation>> transcriptToInterproHitMap(int geneAccession) {
+    public Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap(AccessionNumber geneAccession) {
+       if (! geneAccession.isGene()) {
+           throw new IsopretRuntimeException("transcriptToInterproHitMap can only be called with gene ids but wew got " + geneAccession);
+       }
+
         if (! this.interproAnnotation.containsKey(geneAccession)) {
             return Map.of(); // no hits
         }
+
         List<InterproAnnotation> hits = this.interproAnnotation.get(geneAccession);
-        Map<Integer, List<DisplayInterproAnnotation>> hitmap = new HashMap<>();
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> hitmap = new HashMap<>();
         for (InterproAnnotation annot : hits) {
             if (! this.interproDescription.containsKey(annot.getInterpro())) {
                 LOGGER.error("Could not find interpro Description for {}", annot);

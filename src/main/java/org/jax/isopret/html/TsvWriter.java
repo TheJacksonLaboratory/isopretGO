@@ -71,7 +71,7 @@ public class TsvWriter {
             for (HbaDealsResult result : this.hbaDealsResults.values()) {
                 if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
                     String symbol = result.getSymbol();
-                    String geneAccession = result.getGeneAccession();
+                    String geneAccession = result.getGeneAccession().getAccessionString();
                     double expressionP = result.getExpressionP();
                     double expressionFc = result.getExpressionFoldChange();
                     String line = String.format("%s\t%s\texpression\t%f\t%f\t%f\n", symbol, geneAccession, expressionP, expressionThreshold, expressionFc);

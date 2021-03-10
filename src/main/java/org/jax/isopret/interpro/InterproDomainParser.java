@@ -1,27 +1,23 @@
 package org.jax.isopret.interpro;
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.jax.isopret.interpro.EnsemblStringToInt.geneStringToInt;
-import static org.jax.isopret.interpro.EnsemblStringToInt.transcriptStringToInt;
 
 public class InterproDomainParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproDomainParser.class);
 
-    private final Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap;
+    private final Map<AccessionNumber, List<InterproAnnotation>> geneIdToAnnotationMap;
 
     private InterproDomainParser(String path) {
-        transcriptIdToInterproAnnotationMap = new HashMap<>();
+        geneIdToAnnotationMap = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
             br.readLine(); // header
@@ -30,27 +26,22 @@ public class InterproDomainParser {
                 //System.out.println(line);
                 String [] fields = line.split("\t");
                 try {
-                    int enst = transcriptStringToInt(fields[0]);
-                    int ensg = geneStringToInt(fields[1]);
-                    String interproId = fields[2];
-                    if (interproId == null || interproId.isEmpty() ) {
+                    Optional<InterproAnnotation> opt = InterproAnnotation.fromLine(line);
+                    if (opt.isEmpty()) {
                         noInterproId++;
                         continue;
                     }
-                    int interpro = InterproEntry.integerPart(interproId);
-                    int start = Integer.parseInt(fields[3]);
-                    int end = Integer.parseInt(fields[4]);
-                    InterproAnnotation annotation = new InterproAnnotation(enst, ensg, interpro, start, end);
-                    this.transcriptIdToInterproAnnotationMap.putIfAbsent(annotation.getEnst(), new ArrayList<>());
-                    this.transcriptIdToInterproAnnotationMap.get(annotation.getEnst()).add(annotation);
+                    InterproAnnotation annotation = opt.get();
+                    this.geneIdToAnnotationMap.putIfAbsent(annotation.getEnsg(), new ArrayList<>());
+                    this.geneIdToAnnotationMap.get(annotation.getEnsg()).add(annotation);
                 } catch (Exception e) {
                     // should never happen
-                    throw new IsopretRuntimeException("Malformed interpro domain line: \"" + line + "\"");
+                    throw new IsopretRuntimeException("Malformed interpro domain line: \"" + line + "\": " + e.getMessage());
                 }
 
             }
             LOGGER.trace("Lines with missing interpro id (skipped): {}", noInterproId);
-            LOGGER.trace("Number of interpro annotations identified: {}", this.transcriptIdToInterproAnnotationMap.size());
+            LOGGER.trace("Number of interpro annotations identified: {}", this.geneIdToAnnotationMap.size());
         } catch (IOException e) {
             throw new IsopretRuntimeException(e.getMessage());
         }
@@ -59,8 +50,8 @@ public class InterproDomainParser {
 
 
 
-    public static Map<Integer, List<InterproAnnotation>> getInterproAnnotationMap(String path) {
+    public static Map<AccessionNumber, List<InterproAnnotation>> getInterproAnnotationMap(String path) {
         InterproDomainParser parser = new InterproDomainParser(path);
-        return parser.transcriptIdToInterproAnnotationMap;
+        return parser.geneIdToAnnotationMap;
     }
 }

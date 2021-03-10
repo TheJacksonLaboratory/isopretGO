@@ -3,14 +3,14 @@ package org.jax.isopret.hbadeals;
 import org.jax.isopret.transcript.AccessionNumber;
 
 public class HbaDealsTranscriptResult {
-    private final String transcript;
+    private final AccessionNumber transcript;
     private final double foldChange;
     private final double P;
 
     private final double DEFAULT_THRESHOLD = 0.13;
 
 
-    public HbaDealsTranscriptResult(String transcript, double fc, double p) {
+    public HbaDealsTranscriptResult(AccessionNumber transcript, double fc, double p) {
         this.transcript = transcript;
         this.foldChange = fc;
         this.P = p;
@@ -18,11 +18,11 @@ public class HbaDealsTranscriptResult {
 
 
     public String getTranscript() {
-        return transcript;
+        return transcript.getAccessionString();
     }
-    // TODO REFACTOR
+
     public int getTranscriptId() {
-        return AccessionNumber.ensemblTranscript(transcript).getAccessionNumber();
+        return transcript.getAccessionNumber();
     }
 
     public double getFoldChange() {

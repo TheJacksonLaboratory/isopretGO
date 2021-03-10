@@ -5,6 +5,7 @@ import org.jax.isopret.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ public class TranscriptTest extends TestBase {
         HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes
 
         PrositeMapping psm = prositeMappingMap.get(adarGeneId);
-        Map<Integer, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
         AnnotatedGene atranscript = new AnnotatedGene(adarTranscripts, psm.getTranscriptToPrositeListMap(),annotList, adarResult);
 
     }

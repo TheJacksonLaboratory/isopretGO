@@ -20,6 +20,10 @@ public class InterproEntry {
         return id;
     }
 
+    public String getIntroproAccession() {
+        return String.format("IPR%06d", id);
+    }
+
     public InterproEntryType getEntryType() {
         return entryType;
     }

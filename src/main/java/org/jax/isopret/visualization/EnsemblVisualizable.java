@@ -6,6 +6,7 @@ import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.interpro.InterproEntry;
 import org.jax.isopret.prosite.PrositeHit;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.svart.Contig;
@@ -73,7 +74,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getGeneAccession() {
-        return this.hbaDealsResult.getGeneAccession();
+        return this.hbaDealsResult.getGeneAccession().getAccessionString();
     }
 
     private String getEnsemblUrl(String accession) {
@@ -171,10 +172,10 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public List<List<String>> getIsoformTableData() {
         List<List<String>> rows = new ArrayList<>();
-        Map<String, HbaDealsTranscriptResult> transcriptMap = this.hbaDealsResult.getTranscriptMap();
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = this.hbaDealsResult.getTranscriptMap();
         for (Transcript transcript : this.expressedTranscripts) {
-            if (transcriptMap.containsKey(transcript.getAccessionIdNoVersion())) {
-                HbaDealsTranscriptResult transcriptResult = transcriptMap.get(transcript.getAccessionIdNoVersion());
+            if (transcriptMap.containsKey(transcript.accessionId())) {
+                HbaDealsTranscriptResult transcriptResult = transcriptMap.get(transcript.accessionId());
                 var row = getIsoformRow(transcriptResult);
                 rows.add(row);
             }
@@ -215,9 +216,12 @@ public class EnsemblVisualizable implements Visualizable {
         return prositeLinks;
     }
 
+    /**
+     * @return a list of interpro annotations that cover the isoforms of the gene that are expressed in our data
+     */
     @Override
     public List<DisplayInterproAnnotation> getInterproForExpressedTranscripts() {
-        Map<Integer, List<DisplayInterproAnnotation>> interproMap = this.agene.getTranscriptToInterproHitMap();
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> interproMap = this.agene.getTranscriptToInterproHitMap();
         Set<DisplayInterproAnnotation> interpro = new HashSet<>();
         for (var entry: this.hbaDealsResult.getTranscriptMap2().entrySet()) {
             int transcriptId = entry.getKey();

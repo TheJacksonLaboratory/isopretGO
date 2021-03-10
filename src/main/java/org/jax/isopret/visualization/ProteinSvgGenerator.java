@@ -151,7 +151,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
 
     private void writeDomains(Transcript transcript, int ypos, Writer writer) throws IOException {
-        List<PrositeHit> hits = this.annotatedGene.getPrositeHitMap().getOrDefault(transcript.getAccessionIdNoVersion(), new ArrayList<>());
+        List<PrositeHit> hits = this.annotatedGene.getPrositeHitMap().getOrDefault(transcript.accessionId().getAccessionString(), new ArrayList<>());
         for (PrositeHit hit : hits) {
             String color = this.prositeIdToColorMap.get(hit.getAccession());
             double xstart = translateProteinToSvgCoordinate(hit.getStartAminoAcidPos());

@@ -11,6 +11,7 @@ import org.jax.isopret.interpro.InterproAnnotation;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
@@ -57,14 +58,14 @@ public class SvgCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Map<String, HgncItem> hgncMap;
+        Map<AccessionNumber, HgncItem> hgncMap;
         HgncParser hgncParser = new HgncParser();
         if (this.namespace.equalsIgnoreCase("ensembl")) {
             hgncMap = hgncParser.ensemblMap();
-        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
-            hgncMap = hgncParser.ucscMap();
-        } else if (this.namespace.equalsIgnoreCase("refseq")) {
-            hgncMap = hgncParser.refseqMap();
+//        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
+//            hgncMap = hgncParser.ucscMap();
+//        } else if (this.namespace.equalsIgnoreCase("refseq")) {
+//            hgncMap = hgncParser.refseqMap();
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
@@ -96,7 +97,7 @@ public class SvgCommand implements Callable<Integer> {
             PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
             prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
         }
-        Map<Integer, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
         AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, annotList,result);
 
 

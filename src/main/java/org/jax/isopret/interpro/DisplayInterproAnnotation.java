@@ -13,7 +13,7 @@ public class DisplayInterproAnnotation extends InterproAnnotation implements Com
         this.interproEntry = entry;
     }
 
-    public InterproEntry getLabel() {
+    public InterproEntry getInterproEntry() {
         return this.interproEntry;
     }
 

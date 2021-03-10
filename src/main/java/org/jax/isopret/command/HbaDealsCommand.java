@@ -14,6 +14,7 @@ import org.jax.isopret.interpro.*;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
@@ -92,7 +93,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
 
         // ----------  3. HGNC Mapping from accession numbers to gene symbols -------------
-        Map<String, HgncItem> hgncMap = initializeHgncMapper();
+        Map<AccessionNumber, HgncItem> hgncMap = initializeHgncMapper();
 
 
         MtcMethod mtc = MtcMethod.fromString(this.mtc);
@@ -158,6 +159,8 @@ public class HbaDealsCommand implements Callable<Integer> {
 
         HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
         List<AnnotatedGene> annotatedGeneList = new ArrayList<>();
+        int foundInterpor = 0;
+        int missed = 0;
         for (var entry : thresholder.getRawResults().entrySet()) {
             String geneSymbol = entry.getKey();
             hbadeals++;
@@ -177,17 +180,21 @@ public class HbaDealsCommand implements Callable<Integer> {
             final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
 
             Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
-            Map<String, List<InterproAnnotation>> interproHitsForCurrentGene;
-            if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
+            //Map<String, List<InterproAnnotation>> interproHitsForCurrentGene;
+            if (! prositeMappingMap.containsKey(result.getGeneAccession().getAccessionString())) {
                 LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);
                 prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
             } else {
-                PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
+                PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession().getAccessionString());
                 prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
                 foundProsite++;
             }
 
-            Map<Integer, List<DisplayInterproAnnotation>> transcriptToInterproHitMap = interproMapper.transcriptToInterproHitMap(result.getEnsgId());
+            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap = interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+            if (transcriptToInterproHitMap.isEmpty())
+                missed++;
+            else
+                foundInterpor++;
 
             if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
                 AnnotatedGene agene = new AnnotatedGene(transcripts,
@@ -226,6 +233,7 @@ public class HbaDealsCommand implements Callable<Integer> {
                 data.put("parts_info", String.format("Part %d of %d", (j+1), n_partitions));
                 HtmlTemplate template = new HtmlTemplate(data, outFileName);
                 template.outputFile();
+                LOGGER.trace("Output HTML file: {}", outFileName);
             }
         } else {
             data.put("genelist", geneVisualizations);
@@ -237,6 +245,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         LOGGER.trace("Total unidentified genes:"+ unidentifiedSymbols.size());
         LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also prosite: {}",
                 hbadeals, foundTranscripts, hbadealSig, foundProsite);
+        System.out.printf("FOUND %d MISSED %d\n",foundInterpor, missed);
         return 0;
     }
 
@@ -306,14 +315,15 @@ public class HbaDealsCommand implements Callable<Integer> {
     }
 
 
-    private Map<String, HgncItem> initializeHgncMapper() {
+    private Map<AccessionNumber, HgncItem> initializeHgncMapper() {
         HgncParser hgncParser = new HgncParser();
         if (this.namespace.equalsIgnoreCase("ensembl")) {
             return hgncParser.ensemblMap();
-        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
-            return hgncParser.ucscMap();
-        } else if (this.namespace.equalsIgnoreCase("refseq")) {
-            return hgncParser.refseqMap();
+//        }
+//        else if (this.namespace.equalsIgnoreCase("ucsc")) {
+//            //return hgncParser.ucscMap();
+//        } else if (this.namespace.equalsIgnoreCase("refseq")) {
+//            // return hgncParser.refseqMap();
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
@@ -344,7 +354,7 @@ public class HbaDealsCommand implements Callable<Integer> {
     }
 
 
-    private HbaDealsThresholder initializeHbaDealsThresholder(Map<String, HgncItem> hgncMap, String hbadealsPath) {
+    private HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, HgncItem> hgncMap, String hbadealsPath) {
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsPath, hgncMap);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());

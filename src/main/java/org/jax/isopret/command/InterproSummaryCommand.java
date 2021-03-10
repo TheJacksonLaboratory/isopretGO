@@ -2,6 +2,7 @@ package org.jax.isopret.command;
 
 
 import org.jax.isopret.interpro.*;
+import org.jax.isopret.transcript.AccessionNumber;
 import picocli.CommandLine;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class InterproSummaryCommand implements Callable<Integer>  {
     public Integer call() {
         Map<Integer, InterproEntry> interproDescriptionMap = InterproDomainDescParser.getInterproDescriptionMap(this.prositeDataFile);
         summarizeDomains(interproDescriptionMap);
-        Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap = InterproDomainParser.getInterproAnnotationMap(this.interproDomainsFile);
+        Map<AccessionNumber, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap = InterproDomainParser.getInterproAnnotationMap(this.interproDomainsFile);
         summarizeAnnotations(transcriptIdToInterproAnnotationMap);
         return 0;
     }
@@ -45,7 +46,7 @@ public class InterproSummaryCommand implements Callable<Integer>  {
         }
     }
 
-    private void summarizeAnnotations(Map<Integer, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap) {
+    private void summarizeAnnotations(Map<AccessionNumber, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap) {
         System.out.printf("[INFO] Total annotated transcripts: %d\n", transcriptIdToInterproAnnotationMap.size());
         long totalAnnotations =
                 transcriptIdToInterproAnnotationMap

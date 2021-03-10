@@ -2,9 +2,10 @@ package org.jax.isopret.transcript;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 
+import java.util.Objects;
+
 
 public class AccessionNumber {
-
     enum Database {ENSEMBL, REFSEQ, NCBIGENE}
 
     enum Category { GENE, TRANSCRIPT }
@@ -51,6 +52,24 @@ public class AccessionNumber {
         }
     }
 
+    public boolean isGene() {
+        return this.category == Category.GENE;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.accession, this.database, this.category);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof AccessionNumber)) return false;
+        AccessionNumber that = (AccessionNumber) obj;
+        return this.database == that.database &&
+                this.category == that.category &&
+                this.accession == that.accession;
+    }
 
     public static AccessionNumber ensemblGene(String ensg) {
         return new AccessionNumber(Database.ENSEMBL, Category.GENE,ensgAccessionToInt(ensg));

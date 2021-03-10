@@ -2,6 +2,7 @@ package org.jax.isopret.visualization;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.GoTermIdPlusLabel;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.interpro.InterproDomain;
 import org.jax.isopret.interpro.InterproEntry;
 
@@ -86,21 +87,27 @@ public class HtmlVisualizer implements Visualizer {
         return sb.toString();
     }
 
-
+    private final static String INTERPRO_TABLE_HEADER = "<table>\n" +
+            "  <thead>\n" +
+            "    <tr>\n" +
+            "      <th>Interpro id</th>\n" +
+            "      <th>Name</th>\n" +
+            "      <th>Type</th>\n" +
+            "    </tr>\n" +
+            "  </thead>\n";
     public String getInterproBox(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
-        List<List<String>> prositeLinks = vis.getPrositeModuleLinks(this.prositeIdToName);
-        if (prositeLinks.isEmpty()) {
-            return "<p><i>No protein domains found.</i></p>\n";
+        List<DisplayInterproAnnotation> introProAnnotations = vis.getInterproForExpressedTranscripts();
+        if (introProAnnotations.isEmpty()) {
+            return "<p><i>No interpro domains found.</i></p>\n";
         }
-        sb.append(PROSITE_TABLE_HEADER);
-        for (var row : prositeLinks) {
-            if (row.size() != 2) {
-                // should never happen!
-                throw new IsopretRuntimeException("Malformed prosite row: " + row);
-            }
-            sb.append("<tr><td>").append(row.get(0)).append("</td>");
-            sb.append("<td>").append(row.get(1)).append("</td></tr>\n");
+        sb.append(INTERPRO_TABLE_HEADER);
+        for (DisplayInterproAnnotation interpro : introProAnnotations) {
+            InterproEntry entry = interpro.getInterproEntry();
+
+            sb.append("<tr><td>").append(entry.getIntroproAccession()).append("</td>");
+            sb.append("<td>").append(entry.getDescription()).append("</td>\n");
+            sb.append("<td>").append(entry.getEntryType()).append("</td></tr>\n");
         }
         sb.append("</table>\n");
         return sb.toString();
@@ -176,7 +183,7 @@ public class HtmlVisualizer implements Visualizer {
         sb.append(getGeneBox(vis)).append("\n");
         sb.append("</div>\n");
         sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
-        sb.append(getPrositeBox(vis)).append("\n");
+        sb.append(getInterproBox(vis)).append("\n");
         sb.append("</div>\n");
         sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
         sb.append(getTranscriptBox(vis)).append("\n");
