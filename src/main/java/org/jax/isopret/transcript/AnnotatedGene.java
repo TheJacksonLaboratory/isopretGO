@@ -35,7 +35,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     /**
      *
      * @param transcripts transcripts encoded by this gene
-     * @param transcriptToHitMap Prosite hits for the transcripts
+     * @param transcriptToInterproHitMap Interpro hits for the transcripts
      * @param result result of HBA-DEALS analysis for this gene.
      */
     public AnnotatedGene(List<Transcript> transcripts,

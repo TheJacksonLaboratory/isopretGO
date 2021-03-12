@@ -62,7 +62,7 @@ public class IsopretDownloader {
      * Download the files unless they are already present.
      */
     public void download() {
-        downloadFileIfNeeded(PROSITE_DAT, PROSITE_DAT_URL);
+        //downloadFileIfNeeded(PROSITE_DAT, PROSITE_DAT_URL);
         downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
         downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
         downloadFileIfNeeded(GO_OBO,GO_OBO_URL);

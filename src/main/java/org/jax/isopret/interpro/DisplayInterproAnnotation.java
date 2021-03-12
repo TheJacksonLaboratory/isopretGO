@@ -4,9 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.Set;
 
 public class DisplayInterproAnnotation extends InterproAnnotation implements Comparable<DisplayInterproAnnotation> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DisplayInterproAnnotation.class);
+
+    private final Set<InterproEntryType> sites = Set.of(InterproEntryType.ACTIVE_SITE,
+            InterproEntryType.BINDING_SITE,
+            InterproEntryType.CONSERVED_SITE,
+            InterproEntryType.PTM);
+
 
     private final InterproEntry interproEntry;
 
@@ -17,6 +24,26 @@ public class DisplayInterproAnnotation extends InterproAnnotation implements Com
 
     public InterproEntry getInterproEntry() {
         return this.interproEntry;
+    }
+
+    public boolean isDomain() {
+        return this.interproEntry.getEntryType() == InterproEntryType.DOMAIN;
+    }
+
+    public boolean isFamily() {
+        return this.interproEntry.getEntryType() == InterproEntryType.FAMILY;
+    }
+
+    public boolean isSuperFamily() {
+        return this.interproEntry.getEntryType() == InterproEntryType.HOMOLOGOUS_SUPERFAMILY;
+    }
+
+    public boolean isRepeat() {
+        return this.interproEntry.getEntryType() == InterproEntryType.REPEAT;
+    }
+
+    public boolean isSite() {
+        return this.sites.contains(this.interproEntry.getEntryType());
     }
 
 

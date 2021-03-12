@@ -4,16 +4,15 @@ import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.interpro.InterproEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class HtmlVisualizer implements Visualizer {
-
-    private final Map<String, String> prositeIdToName;
-
-    public HtmlVisualizer(Map<String, String> prositeIdToName) {
-        this.prositeIdToName = prositeIdToName;
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlVisualizer.class);
+    public HtmlVisualizer() {
     }
 
 
@@ -28,7 +27,6 @@ public class HtmlVisualizer implements Visualizer {
             "  </thead>\n";
 
 
-
     private String getGoAnchor(GoTermIdPlusLabel go) {
         //QuickGO - https://www.ebi.ac.uk/QuickGO/term/GO:0006915
         String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getId();
@@ -41,7 +39,7 @@ public class HtmlVisualizer implements Visualizer {
         String a = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", vis.getGeneUrl(), vis.getGeneSymbol());
         sb.append("<tr><td>").append(a).append("</td>");
         sb.append("<td>").append(vis.getChromosome()).append("</td>\n");
-        sb.append(String.format("<td>%.2f</td>",  vis.getExpressionLogFoldChange()));
+        sb.append(String.format("<td>%.2f</td>", vis.getExpressionLogFoldChange()));
         String prob = String.format("%.2f", vis.getExpressionPval()) + (vis.isDifferentiallyExpressed() ? " (*)" : "");
         sb.append("<td>").append(prob).append("</td></tr>\n");
         sb.append("</table>\n");
@@ -88,7 +86,6 @@ public class HtmlVisualizer implements Visualizer {
     }
 
 
-
     private final static String ISOFORM_TABLE_HEADER = "<table>\n" +
             "  <thead>\n" +
             "    <tr>\n" +
@@ -128,14 +125,14 @@ public class HtmlVisualizer implements Visualizer {
         StringBuilder sb = new StringBuilder();
         int i = vis.getI();
         sb.append("<h1>").append(i).append(") ").append(vis.getGeneSymbol());
-       if (vis.isDifferentiallyExpressed()) {
-           sb.append(" <span class=\"badge\">DGE</span> ");
-       }
-       if (vis.isDifferentiallySpliced()) {
-           sb.append(" <span class=\"badge\">DAS</span>");
-       }
-       sb.append("</h1>\n");
-      return sb.toString();
+        if (vis.isDifferentiallyExpressed()) {
+            sb.append(" <span class=\"badge\">DGE</span> ");
+        }
+        if (vis.isDifferentiallySpliced()) {
+            sb.append(" <span class=\"badge\">DAS</span>");
+        }
+        sb.append("</h1>\n");
+        return sb.toString();
     }
 
 

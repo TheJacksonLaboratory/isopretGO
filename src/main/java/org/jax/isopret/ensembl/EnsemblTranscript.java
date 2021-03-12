@@ -34,7 +34,7 @@ public class EnsemblTranscript {
     private final String cDNA;
     private final String longestAaSequence;
     private final boolean hasOrf;
-    private final Map<String, List<Integer>> motifMap;
+   // private final Map<String, List<Integer>> motifMap;
 
 
     public EnsemblTranscript(String header, String sequence) {
@@ -105,7 +105,7 @@ public class EnsemblTranscript {
             this.longestAaSequence = "";
             this.hasOrf = false;
         }
-        motifMap = new HashMap<>();
+        //motifMap = new HashMap<>();
     }
 
     public String getDescription() {
@@ -164,30 +164,30 @@ public class EnsemblTranscript {
         return longestAaSequence;
     }
 
-    public void addMotif(String prositeId, List<Integer> positionList) {
-        motifMap.put(prositeId, positionList);
-    }
+//    public void addMotif(String prositeId, List<Integer> positionList) {
+//        motifMap.put(prositeId, positionList);
+//    }
+//
+//    public Map<String, List<Integer>> getMotifMap() {
+//        return motifMap;
+//    }
 
-    public Map<String, List<Integer>> getMotifMap() {
-        return motifMap;
-    }
-
-    public String getHtmlMotifString() {
-        StringBuilder sb = new StringBuilder();
-        boolean notFirst = false;
-        for (var entry : this.motifMap.entrySet()) {
-            if (notFirst) {
-                sb.append("<br/>&nbsp;&nbsp;");
-            } else {
-                sb.append("&nbsp;&nbsp;");
-                notFirst = true;
-            }
-            sb.append(entry.getKey()).append(": ");
-            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
-            sb.append("pos:").append(positions);
-        }
-        return sb.toString();
-    }
+//    public String getHtmlMotifString() {
+//        StringBuilder sb = new StringBuilder();
+//        boolean notFirst = false;
+//        for (var entry : this.motifMap.entrySet()) {
+//            if (notFirst) {
+//                sb.append("<br/>&nbsp;&nbsp;");
+//            } else {
+//                sb.append("&nbsp;&nbsp;");
+//                notFirst = true;
+//            }
+//            sb.append(entry.getKey()).append(": ");
+//            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
+//            sb.append("pos:").append(positions);
+//        }
+//        return sb.toString();
+//    }
 
     public int cDNAlen() {
         return this.cDNA.length();
@@ -204,11 +204,6 @@ public class EnsemblTranscript {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.geneSymbol).append(": ").append(this.transcriptId);
-        for (var entry : this.motifMap.entrySet()) {
-            sb.append("\n\t").append(entry.getKey());
-            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
-            sb.append("pos:").append(positions);
-        }
         return sb.toString();
     }
 }

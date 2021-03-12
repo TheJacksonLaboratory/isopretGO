@@ -11,9 +11,6 @@ import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.html.HtmlTemplate;
 import org.jax.isopret.html.TsvWriter;
 import org.jax.isopret.interpro.*;
-import org.jax.isopret.prosite.PrositeHit;
-import org.jax.isopret.prosite.PrositeMapParser;
-import org.jax.isopret.prosite.PrositeMapping;
 import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
@@ -49,10 +46,6 @@ public class HbaDealsCommand implements Callable<Integer> {
     @CommandLine.Option(names={"--mtc"}, description="Multiple-Testing-Correction for GO analysis")
     public String mtc = "Bonferroni";
     private String fastaFile = "data/Homo_sapiens.GRCh38.cdna.all.fa.gz";
-    @CommandLine.Option(names={"-p","--prosite"}, description ="prosite.dat file")
-    private String prositeDataFile = "data/prosite.dat";
-    @CommandLine.Option(names={"--prositemap"}, description = "prosite map file", required = true)
-    private String prositeMapFile;
     @CommandLine.Option(names={"--desc"}, description ="interpro_domain_desc.txt file", required = true)
     private String interproDescriptionFile;
     @CommandLine.Option(names={"--domains"}, description ="interpro_domains.txt", required = true)
@@ -70,10 +63,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     @CommandLine.Option(names={"-n", "--namespace"}, required = true, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
     private String namespace = "ensembl";
     @CommandLine.Option(names={"--chunk"}, description = "Chunk size (how many results to show per HTML file; default: ${DEFAULT-VALUE}")
-    int chunkSize = 500;
+    int chunkSize = 50;
 
-
-    private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();
 
     public HbaDealsCommand() {
 
@@ -85,7 +76,6 @@ public class HbaDealsCommand implements Callable<Integer> {
         int hbadeals = 0;
         int hbadealSig = 0;
         int foundTranscripts = 0;
-        int foundProsite = 0;
         Map<String, Object> data = new HashMap<>(); // for the HTML template engine
         // ----------  1. Gene Ontology -------------------
         GoParser goParser = new GoParser(goOboFile, goGafFile);
@@ -100,12 +90,7 @@ public class HbaDealsCommand implements Callable<Integer> {
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
 
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = getTranscriptMap(GenomicAssemblies.GRCh38p13());
-        PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
-        Map<String, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
-        Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
-
         InterproMapper interproMapper = new InterproMapper(this.interproDescriptionFile, this.interproDomainsFile);
-
         HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
 
         double expressionThreshold = thresholder.getExpressionThreshold();
@@ -157,9 +142,9 @@ public class HbaDealsCommand implements Callable<Integer> {
         List<String> unidentifiedSymbols = new ArrayList<>();
         List<String> geneVisualizations = new ArrayList<>();
 
-        HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
+        HtmlVisualizer visualizer = new HtmlVisualizer();
         List<AnnotatedGene> annotatedGeneList = new ArrayList<>();
-        int foundInterpor = 0;
+        int foundInterPro = 0;
         int missed = 0;
         for (var entry : thresholder.getRawResults().entrySet()) {
             String geneSymbol = entry.getKey();
@@ -177,24 +162,12 @@ public class HbaDealsCommand implements Callable<Integer> {
             hbadealSig++;
             List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
 
-            final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
-
-            Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
-            //Map<String, List<InterproAnnotation>> interproHitsForCurrentGene;
-            if (! prositeMappingMap.containsKey(result.getGeneAccession().getAccessionString())) {
-                LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);
-                prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
-            } else {
-                PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession().getAccessionString());
-                prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
-                foundProsite++;
-            }
 
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap = interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
             if (transcriptToInterproHitMap.isEmpty())
                 missed++;
             else
-                foundInterpor++;
+                foundInterPro++;
 
             if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
                 AnnotatedGene agene = new AnnotatedGene(transcripts,
@@ -242,9 +215,9 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
 
         LOGGER.trace("Total unidentified genes:"+ unidentifiedSymbols.size());
-        LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also prosite: {}",
-                hbadeals, foundTranscripts, hbadealSig, foundProsite);
-        System.out.printf("FOUND %d MISSED %d\n",foundInterpor, missed);
+        LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also interpro: {}",
+                hbadeals, foundTranscripts, hbadealSig, foundInterPro);
+
         return 0;
     }
 
