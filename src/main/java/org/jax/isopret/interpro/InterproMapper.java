@@ -1,6 +1,5 @@
 package org.jax.isopret.interpro;
 
-import org.checkerframework.checker.units.qual.A;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.transcript.AccessionNumber;
 import org.slf4j.Logger;

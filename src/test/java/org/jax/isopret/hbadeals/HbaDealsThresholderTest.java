@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 /**
- * Conveniece to run tests, not an actual unit test at this time.
+ * Convenience method to run tests, not an actual unit test at this time.
  */
 public class HbaDealsThresholderTest {
 
     private final static HgncParser hgncParser = new HgncParser();
     private final static Map<AccessionNumber, HgncItem> hgncMap = hgncParser.ensemblMap();
-
+    @Deprecated
     private double getDgeThreshold(String name) {
         String hbadealsFile = "/home/peter/GIT/covidASmanuscript/data/HBA-DEALS-files/" + name;
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);

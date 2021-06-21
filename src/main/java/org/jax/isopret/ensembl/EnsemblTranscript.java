@@ -4,9 +4,6 @@ import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.orf.OrfFinder;
 import org.jax.isopret.transcript.AccessionNumber;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * Extract information from the header line, which has the following format. Note that we can
  * split on space for everything before the description element.

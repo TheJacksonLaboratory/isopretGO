@@ -32,6 +32,11 @@ public class InterproEntry implements Comparable<InterproEntry> {
         return description;
     }
 
+    public boolean isFamilyOrSuperfamily() {
+        return (this.getEntryType() == InterproEntryType.FAMILY ||
+                this.getEntryType() == InterproEntryType.HOMOLOGOUS_SUPERFAMILY);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, entryType, description);

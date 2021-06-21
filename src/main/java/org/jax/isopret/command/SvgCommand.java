@@ -7,10 +7,7 @@ import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hgnc.HgncItem;
 import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.interpro.InterproAnnotation;
-import org.jax.isopret.prosite.PrositeHit;
-import org.jax.isopret.prosite.PrositeMapParser;
-import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.interpro.InterproMapper;
 import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
@@ -31,26 +28,26 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "svg", aliases = {"V"},
         mixinStandardHelpOptions = true,
         description = "Create SVG/PDF files for a specific gene")
 public class SvgCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SvgCommand.class);
+
     @CommandLine.Option(names={"-b","--hbadeals"}, description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
-    @CommandLine.Option(names={"-p","--prosite"}, description ="prosite.dat file")
-    private String prositeDataFile = "data/prosite.dat";
-    @CommandLine.Option(names={"--prositemap"}, description = "prosite map file", required = true)
-    private String prositeMapFile;
     @CommandLine.Option(names = {"-j", "--jannovar"}, description = "Path to Jannovar transcript file")
     private String jannovarPath = "data/hg38_ensembl.ser";
-    @CommandLine.Option(names={"--prefix"}, description = "Name of output file (without .html ending)")
-    private String outprefix = "isopret";
-    @CommandLine.Option(names={"-n", "--namespace"}, required = true, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
+    @CommandLine.Option(names={"-n", "--namespace"}, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
     private String namespace = "ensembl";
     @CommandLine.Option(names={"-g","--gene"}, required = true, description = "Gene symbol")
     private String geneSymbol;
+    @CommandLine.Option(names={"--desc"}, description ="interpro_domain_desc.txt file", required = true)
+    private String interproDescriptionFile;
+    @CommandLine.Option(names={"--domains"}, description ="interpro_domains.txt", required = true)
+    private String interproDomainsFile;
 
     public SvgCommand() {
 
@@ -69,16 +66,18 @@ public class SvgCommand implements Callable<Integer> {
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
+        Map<String, AccessionNumber> geneSymbolToAccessionMap =
+                hgncMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(e -> e.getValue().getGeneSymbol(), Map.Entry::getKey));
         LOGGER.trace("SVG command");
         LOGGER.trace("jannovar path: {}", jannovarPath);
-        LOGGER.trace("prositeMapFile: {}", prositeMapFile);
-        LOGGER.trace("prositeDataFile: {}", prositeDataFile);
+        LOGGER.trace("interpro: {}", interproDomainsFile);
+        LOGGER.trace("interpro Desc: {}", interproDescriptionFile);
         GenomicAssembly hg38 =  GenomicAssemblies.GRCh38p13();
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
-        PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
-        Map<String, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
-        Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
+        InterproMapper interproMapper = new InterproMapper(this.interproDescriptionFile, this.interproDomainsFile);
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         if (! hbaDealsResults.containsKey(this.geneSymbol)) {
@@ -88,16 +87,12 @@ public class SvgCommand implements Callable<Integer> {
         LOGGER.trace("Get HBA-DEALS result for: {}", this.geneSymbol);
         HbaDealsResult result = hbaDealsResults.get(this.geneSymbol);
         List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
-        final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
-        Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
-        if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
-            LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);
-            prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
-        } else {
-            PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
-            prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
-        }
-        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
+        // Get AccessionNumber object corresponding to gene symbol
+        AccessionNumber geneAccession = geneSymbolToAccessionMap.get(this.geneSymbol);
+        LOGGER.trace("Accession {} found for gene symbol {}", geneAccession.getAccessionString(), this.geneSymbol);
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = interproMapper.transcriptToInterproHitMap(geneAccession);
+        LOGGER.trace("Got {} transcripts with annotations for gene accession {} found for gene symbol {}",
+                annotList.size(), geneAccession.getAccessionString(), this.geneSymbol);
         AnnotatedGene agene = new AnnotatedGene(transcripts, annotList,result);
 
 

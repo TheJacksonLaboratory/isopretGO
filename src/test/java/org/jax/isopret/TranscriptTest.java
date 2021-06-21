@@ -46,7 +46,7 @@ public class TranscriptTest extends TestBase {
         List<Transcript> adarTranscripts = symbolToTranscriptMap.get("ADAR");
         PrositeMapParser prositeMapParser = getPrositeMapParser();
         // Get the relevant transcript
-        String transcriptIDWithVersion = "ENST00000368474.8";
+        AccessionNumber transcriptIDWithVersion = AccessionNumber.ensemblTranscript("ENST00000368474.8");
         String transcriptIDWithoutVersion = "ENST00000368474";
         String adarGeneId = "ENSG00000160710";
         Transcript enst00000368474 = adarTranscripts

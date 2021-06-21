@@ -1,7 +1,5 @@
 package org.jax.isopret.command;
 
-
-
 import org.jax.isopret.io.IsopretDownloader;
 import picocli.CommandLine;
 
@@ -25,8 +23,6 @@ public class DownloadCommand implements Callable<Integer> {
 
     public DownloadCommand() {
     }
-
-
 
 
     @Override

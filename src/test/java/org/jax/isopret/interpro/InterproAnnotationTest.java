@@ -15,8 +15,8 @@ public class InterproAnnotationTest {
         Optional<InterproAnnotation> opt = InterproAnnotation.fromLine(line);
         assertTrue(opt.isPresent());
         InterproAnnotation annot = opt.get();
-        assertEquals(641515, annot.getEnst());
-        assertEquals(186092, annot.getEnsg());
+        assertEquals(641515, annot.getEnst().getAccessionNumber());
+        assertEquals(186092, annot.getEnsg().getAccessionNumber());
         assertEquals(276, annot.getInterpro());
         assertEquals(40, annot.getStart());
         assertEquals(64, annot.getEnd());

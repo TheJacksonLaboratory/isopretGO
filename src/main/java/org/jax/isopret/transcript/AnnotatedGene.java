@@ -42,7 +42,12 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                          Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
                          HbaDealsResult result) {
         this.transcripts = transcripts;
-        this.transcriptToInterproHitMap = transcriptToInterproHitMap;
+        // restrict the transcript/interpro map to transcripts that are actually expressed.
+        this.transcriptToInterproHitMap = transcriptToInterproHitMap
+                .entrySet()
+                .stream()
+                .filter(e -> result.transcriptExpressed(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
         Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
@@ -58,6 +63,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 expressedTranscriptMap.put(t, logFC);
             }
         }
+
         this.differentiallySpliced = Optional.empty();
         this.differentiallyExpressed = Optional.empty();
         this.expressionThreshold = Optional.empty();
@@ -70,7 +76,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                          double expressionThreshold,
                          double splicingThreshold) {
         this.transcripts = transcripts;
-        this.transcriptToInterproHitMap = transcriptToInterproHitMap;
+
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
         Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
@@ -78,6 +84,12 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))
                 .collect(Collectors.toList());
+        // restrict the transcript/interpro map to transcripts that are actually expressed.
+        this.transcriptToInterproHitMap = transcriptToInterproHitMap
+                .entrySet()
+                .stream()
+                .filter(e -> result.transcriptExpressed(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         this.differentiallyExpressed = Optional.of(result.hasDifferentialExpressionResult(expressionThreshold));
         this.differentiallySpliced = Optional.of(result.hasDifferentialSplicingResult(splicingThreshold));
         this.expressionThreshold = Optional.of(expressionThreshold);
