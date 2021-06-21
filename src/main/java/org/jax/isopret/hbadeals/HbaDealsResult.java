@@ -1,19 +1,21 @@
 package org.jax.isopret.hbadeals;
 
+import org.jax.isopret.transcript.AccessionNumber;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class HbaDealsResult {
     /** Accession number of the gene, e.g., ENSG00000001167. */
-    private final String geneAccession;
+    private final AccessionNumber geneAccession;
     private final String symbol;
     private double expressionFoldChange;
     private double expressionP;
-    private final Map<String, HbaDealsTranscriptResult> transcriptMap;
+    private final Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap;
 
 
 
-    public HbaDealsResult(String geneAccession, String sym) {
+    public HbaDealsResult(AccessionNumber geneAccession, String sym) {
         this.geneAccession = geneAccession;
         this.symbol = sym;
         transcriptMap = new HashMap<>();
@@ -24,18 +26,19 @@ public class HbaDealsResult {
         this.expressionP = p;
     }
 
-    public void addTranscriptResult(String isoform, double expFC, double P) {
-        int i = isoform.indexOf(".");
-        if (i>0) {
-            // remove version
-            isoform = isoform.substring(0,i);
-        }
+    public void addTranscriptResult(AccessionNumber isoform, double expFC, double P) {
         HbaDealsTranscriptResult tresult = new HbaDealsTranscriptResult(isoform, expFC, P);
         transcriptMap.putIfAbsent(isoform, tresult);
     }
 
-    public String getGeneAccession() {
+    public AccessionNumber getGeneAccession() {
         return geneAccession;
+    }
+
+    /**
+     * @return an int representing Accession number of the gene, e.g., 1167 for ENSG00000001167. */
+    public int getEnsgId() {
+        return this.geneAccession.getAccessionNumber();
     }
 
     public String getSymbol() {
@@ -59,7 +62,7 @@ public class HbaDealsResult {
     }
 
 
-    public Map<String, HbaDealsTranscriptResult> getTranscriptMap() {
+    public Map<AccessionNumber, HbaDealsTranscriptResult> getTranscriptMap() {
         return transcriptMap;
     }
 
@@ -80,7 +83,9 @@ public class HbaDealsResult {
         return hasDifferentialSplicingResult(splicing) || hasDifferentialExpressionResult(expression);
     }
 
-
+    public boolean transcriptExpressed(AccessionNumber acc) {
+        return this.transcriptMap.containsKey(acc);
+    }
 
 
     public double getSmallestSplicingP() {

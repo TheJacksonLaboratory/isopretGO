@@ -6,9 +6,12 @@ import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hgnc.HgncItem;
 import org.jax.isopret.hgnc.HgncParser;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproAnnotation;
 import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.prosite.PrositeMapParser;
 import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
@@ -44,8 +47,6 @@ public class SvgCommand implements Callable<Integer> {
     private String jannovarPath = "data/hg38_ensembl.ser";
     @CommandLine.Option(names={"--prefix"}, description = "Name of output file (without .html ending)")
     private String outprefix = "isopret";
-    @CommandLine.Option(names={"--tsv"}, description = "Output TSV files with ontology results and study sets")
-    private boolean outputTsv = false;
     @CommandLine.Option(names={"-n", "--namespace"}, required = true, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
     private String namespace = "ensembl";
     @CommandLine.Option(names={"-g","--gene"}, required = true, description = "Gene symbol")
@@ -57,14 +58,14 @@ public class SvgCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Map<String, HgncItem> hgncMap;
+        Map<AccessionNumber, HgncItem> hgncMap;
         HgncParser hgncParser = new HgncParser();
         if (this.namespace.equalsIgnoreCase("ensembl")) {
             hgncMap = hgncParser.ensemblMap();
-        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
-            hgncMap = hgncParser.ucscMap();
-        } else if (this.namespace.equalsIgnoreCase("refseq")) {
-            hgncMap = hgncParser.refseqMap();
+//        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
+//            hgncMap = hgncParser.ucscMap();
+//        } else if (this.namespace.equalsIgnoreCase("refseq")) {
+//            hgncMap = hgncParser.refseqMap();
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
@@ -96,12 +97,13 @@ public class SvgCommand implements Callable<Integer> {
             PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
             prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
         }
-        AnnotatedGene agene = new AnnotatedGene(transcripts, prositeHitsForCurrentGene, result);
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
+        AnnotatedGene agene = new AnnotatedGene(transcripts, annotList,result);
 
 
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         String isoformSvg = svggen.getSvg();
-        svggen = ProteinSvgGenerator.factory(agene, prositeIdToName);
+        svggen = ProteinSvgGenerator.factory(agene);
         String proteinSvg = svggen.getSvg();
         String isoformFilename = String.format("%s-isoforms.svg", geneSymbol);
         String proteinFilename = String.format("%s-protein.svg", geneSymbol);

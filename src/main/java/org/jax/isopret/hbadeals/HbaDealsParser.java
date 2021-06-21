@@ -2,6 +2,7 @@ package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hgnc.HgncItem;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class HbaDealsParser {
      * @param fname Path to an HBA-DEALS output file
      * @param hgncMap Map from
      */
-    public HbaDealsParser(String fname, Map<String, HgncItem> hgncMap) {
+    public HbaDealsParser(String fname, Map<AccessionNumber, HgncItem> hgncMap) {
         hbadealsFile = fname;
         this.hbaDealsResultMap = new HashMap<>();
         int n_lines = 0;
@@ -64,8 +65,8 @@ public class HbaDealsParser {
             String line;
             checkHeader(br.readLine()); // skip header
             while ((line = br.readLine()) != null) {
-                //System.out.println(line);
-                HbaLine hline = new HbaLine(line);
+                //TODO -- allow parsing with other accessions
+                HbaLine hline = HbaLine.fromEnsembl(line);
                 lines.add(hline);
                 n_lines++;
             }
@@ -75,7 +76,7 @@ public class HbaDealsParser {
         int found_symbol = 0;
         int missed_symbol = 0;
         for (HbaLine hline : lines) {
-            String symbol = hline.geneAccession; // if we cannot find symbol, just show the accession
+            String symbol = hline.geneAccession.getAccessionString(); // if we cannot find symbol, just show the accession
             if (hgncMap.containsKey(hline.geneAccession)) {
                 symbol = hgncMap.get(hline.geneAccession).getGeneSymbol();
                 found_symbol++;
@@ -109,30 +110,45 @@ public class HbaDealsParser {
      * To do so, we sort these lines by raw p value
      */
     static class HbaLine {
-        final static String UNINITIALIZED = "";
-        final String geneAccession;
+        final AccessionNumber geneAccession;
         final boolean isIsoform;
-        final String isoform;
+        final AccessionNumber isoform;
         final double expFC;
         final double raw_p;
 
-        public HbaLine(String line) {
+        public HbaLine(AccessionNumber geneAcc, AccessionNumber transcriptAcc, double expFC, double raw_p) {
+            geneAccession = geneAcc;
+            isoform = transcriptAcc;
+            if (isoform == null) {
+                isIsoform = false;
+            } else {
+                isIsoform = true;
+            }
+            this.expFC = expFC;
+            this.raw_p = raw_p;
+        }
+
+        /**
+         * @param line an HBA-DEALS file with Ensem data
+         * @return an {@link HbaLine} object with Ensembl {@link AccessionNumber} object
+         */
+        public static HbaLine fromEnsembl(String line) {
             String [] fields = line.split("\t");
             if (fields.length != 4) {
                 String msg = String.format("[ERROR] Malformed line with %d fields: %s\n", fields.length, line);
                 throw new IsopretRuntimeException(msg);
             }
-            geneAccession = fields[0];
-            if (fields[1].equalsIgnoreCase("Expression")) {
-                isIsoform = false;
-                isoform = UNINITIALIZED; // gene expression entry
-            } else {
-                isIsoform = true;
-                isoform = fields[1];
+            AccessionNumber geneAcc = AccessionNumber.ensemblGene(fields[0]);
+            AccessionNumber transcriptAcc = null;
+            if (! fields[1].equalsIgnoreCase("Expression")) {
+                transcriptAcc = AccessionNumber.ensemblTranscript(fields[1]);
             }
-            this.expFC = Double.parseDouble(fields[2]);
-            this.raw_p = Double.parseDouble(fields[3]);
+            double expFC = Double.parseDouble(fields[2]);
+            double raw_p = Double.parseDouble(fields[3]);
+            return new HbaLine(geneAcc, transcriptAcc, expFC, raw_p);
         }
+
+
     }
 
 }

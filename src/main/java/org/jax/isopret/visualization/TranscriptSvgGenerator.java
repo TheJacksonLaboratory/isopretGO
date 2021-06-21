@@ -4,6 +4,7 @@ package org.jax.isopret.visualization;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.svart.*;
@@ -91,10 +92,10 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private List<Transcript> getAffectedTranscripts(AnnotatedGene annotatedGene) {
         List<Transcript> transcripts = annotatedGene.getTranscripts();
         HbaDealsResult result = annotatedGene.getHbaDealsResult();
-        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
         return transcripts
                 .stream()
-                .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
+                .filter(t -> transcriptMap.containsKey(t.accessionId()))
                 .collect(Collectors.toList());
     }
 
@@ -218,7 +219,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         }
         writeIntrons(exons, ypos, writer);
         writeTranscriptName(tmod, minX, ypos, writer);
-        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
+        writeFoldChange(transcript.accessionId(), ypos, writer);
     }
 
     private void writeNonCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
@@ -234,19 +235,19 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         }
         writeIntrons(exons, ypos, writer);
         writeTranscriptName(transcript, minX, ypos, writer);
-        writeFoldChange(transcript.getAccessionIdNoVersion(), ypos, writer);
+        writeFoldChange(transcript.accessionId(), ypos, writer);
     }
 
 
-    private double getLogFoldChage(String id) {
-        Map<String, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+    private double getLogFoldChage(AccessionNumber id) {
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         if (!transcriptResultMap.containsKey(id)) return 0.0;
         double fc = transcriptResultMap.get(id).getFoldChange();
         return Math.log(fc) / Math.log(2);
     }
 
-    private String getFormatedPvalue(String id) {
-        Map<String, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+    private String getFormatedPvalue(AccessionNumber id) {
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         double logFC = getLogFoldChage(id);
         if (!transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
         double p = transcriptResultMap.get(id).getP();
@@ -267,7 +268,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     }
 
 
-    private void writeFoldChange(String id, int ypos, Writer writer) throws IOException {
+    private void writeFoldChange(AccessionNumber id, int ypos, Writer writer) throws IOException {
         double fc = getLogFoldChage(id);
         double startpos = translateGenomicToSvg(this.genomicMaxPos) + 25.0;
         writer.write(String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\"/>\n",
@@ -367,14 +368,14 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
     private void writeTranscriptName(Transcript tmod, double xpos, int ypos, Writer writer) throws IOException {
         String symbol = tmod.hgvsSymbol();
-        String accession = tmod.accessionId();
+        AccessionNumber accession = tmod.accessionId();
         String chrom = tmod.contigName();
         Transcript txOnFwdStrand = tmod.withStrand(Strand.POSITIVE);
         int start = txOnFwdStrand.start();
         int end = txOnFwdStrand.end();
         String strand = tmod.strand().toString();
         String positionString = String.format("%s:%d-%d (%s strand)", chrom, start, end, strand);
-        String geneName = String.format("%s (%s)", symbol, accession);
+        String geneName = String.format("%s (%s)", symbol, accession.getAccessionString());
         double y = Y_SKIP_BENEATH_TRANSCRIPTS + ypos;
         String txt = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s</text>\n",
                 xpos, y, PURPLE, String.format("%s  %s", geneName, positionString));
@@ -484,10 +485,10 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript) {
         List<Transcript> transcripts = annotatedTranscript.getTranscripts();
         HbaDealsResult result = annotatedTranscript.getHbaDealsResult();
-        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
         List<Transcript> affectedTranscripts = transcripts
                 .stream()
-                .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
+                .filter(t -> transcriptMap.containsKey(t.accessionId()))
                 .collect(Collectors.toList());
         int height = HEIGHT_FOR_SV_DISPLAY + affectedTranscripts.size() * HEIGHT_PER_DISPLAY_ITEM;
         return new TranscriptSvgGenerator(height,

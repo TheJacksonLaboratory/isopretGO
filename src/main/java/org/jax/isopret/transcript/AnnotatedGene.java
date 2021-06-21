@@ -2,12 +2,9 @@ package org.jax.isopret.transcript;
 
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
-import org.jax.isopret.prosite.PrositeHit;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -17,8 +14,11 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     /** All annotated transcripts of some gene that were expressed according to HBA deals */
     private final List<Transcript> expressedTranscripts;
+    /** Key, a transcript object for an expressed transcript. Value -- corresponding log2 fold change. */
+    private final Map<Transcript, Double> expressedTranscriptMap;
 
-    private final Map<String, List<PrositeHit>> transcriptToHitMap;
+    /** Key -- accession number of a transcript; value -- corresponding Interpro annotations .*/
+    private final Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap;
 
     private final HbaDealsResult hbaDealsResult;
 
@@ -35,19 +35,29 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     /**
      *
      * @param transcripts transcripts encoded by this gene
-     * @param transcriptToHitMap Prosite hits for the transcripts
+     * @param transcriptToInterproHitMap Interpro hits for the transcripts
      * @param result result of HBA-DEALS analysis for this gene.
      */
-    public AnnotatedGene(List<Transcript> transcripts, Map<String, List<PrositeHit>> transcriptToHitMap, HbaDealsResult result) {
+    public AnnotatedGene(List<Transcript> transcripts,
+                         Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
+                         HbaDealsResult result) {
         this.transcripts = transcripts;
-        this.transcriptToHitMap = transcriptToHitMap;
+        this.transcriptToInterproHitMap = transcriptToInterproHitMap;
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
-        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
         expressedTranscripts = transcripts
                     .stream()
-                    .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
+                    .filter(t -> transcriptMap.containsKey(t.accessionId()))
                     .collect(Collectors.toList());
+        expressedTranscriptMap = new HashMap<>();
+        for (Transcript t: transcripts) {
+            AccessionNumber accession = t.accessionId();
+            if (transcriptMap.containsKey(accession)) {
+                double logFC = transcriptMap.get(accession).getLog2FoldChange();
+                expressedTranscriptMap.put(t, logFC);
+            }
+        }
         this.differentiallySpliced = Optional.empty();
         this.differentiallyExpressed = Optional.empty();
         this.expressionThreshold = Optional.empty();
@@ -55,28 +65,41 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     }
 
     public AnnotatedGene(List<Transcript> transcripts,
-                         Map<String, List<PrositeHit>> transcriptToHitMap,
+                         Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
                          HbaDealsResult result,
                          double expressionThreshold,
                          double splicingThreshold) {
         this.transcripts = transcripts;
-        this.transcriptToHitMap = transcriptToHitMap;
+        this.transcriptToInterproHitMap = transcriptToInterproHitMap;
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
-        Map<String, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
         expressedTranscripts = transcripts
                 .stream()
-                .filter(t -> transcriptMap.containsKey(t.getAccessionIdNoVersion()))
+                .filter(t -> transcriptMap.containsKey(t.accessionId()))
                 .collect(Collectors.toList());
         this.differentiallyExpressed = Optional.of(result.hasDifferentialExpressionResult(expressionThreshold));
         this.differentiallySpliced = Optional.of(result.hasDifferentialSplicingResult(splicingThreshold));
         this.expressionThreshold = Optional.of(expressionThreshold);
         this.splicingThreshold = Optional.of(splicingThreshold);
+        expressedTranscriptMap = new HashMap<>();
+        for (Transcript t: transcripts) {
+            AccessionNumber accession = t.accessionId();
+            if (transcriptMap.containsKey(accession)) {
+                double logFC = transcriptMap.get(accession).getLog2FoldChange();
+                expressedTranscriptMap.put(t, logFC);
+            }
+        }
     }
 
 
     public List<Transcript> getExpressedTranscripts() {
         return expressedTranscripts;
+    }
+
+
+    public Map<AccessionNumber, List<DisplayInterproAnnotation>> getTranscriptToInterproHitMap() {
+        return transcriptToInterproHitMap;
     }
 
     public int getTranscriptCount() {
@@ -102,14 +125,6 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     public List<Transcript> getTranscripts() {
         return transcripts;
-    }
-
-    public List<PrositeHit> getPrositeHits(String id) {
-        return transcriptToHitMap.getOrDefault(id, new ArrayList<>());
-    }
-
-    public Map<String, List<PrositeHit>> getPrositeHitMap() {
-        return this.transcriptToHitMap;
     }
 
     public HbaDealsResult getHbaDealsResult() {
@@ -139,6 +154,22 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         return this.splicingThreshold.orElse(1.0);
     }
 
+    public Map<Transcript, Double> getUpregulatedExpressedTranscripts() {
+        return this.expressedTranscriptMap
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() >= 0)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public Map<Transcript, Double> getDownregulatedExpressedTranscripts() {
+        return this.expressedTranscriptMap
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() < 0)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
 
     /**
      * We are sort by whether a gene is differentially spliced and then alphabetically
@@ -158,4 +189,15 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
             return this.getHbaDealsResult().getSymbol().compareTo(that.getHbaDealsResult().getSymbol());
         }
     }
+
+    public boolean hasInterproAnnotations() {
+        for (AccessionNumber transcriptId : this.transcriptToInterproHitMap.keySet()) {
+            if (this.hbaDealsResult.getTranscriptMap().containsKey(transcriptId)) {
+                return true;
+            }
+        }
+       return false;
+    }
+
+
 }

@@ -2,6 +2,7 @@ package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.hgnc.HgncItem;
 import org.jax.isopret.hgnc.HgncParser;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -12,7 +13,7 @@ import java.util.*;
 public class HbaDealsThresholderTest {
 
     private final static HgncParser hgncParser = new HgncParser();
-    private final static Map<String, HgncItem> hgncMap = hgncParser.ensemblMap();
+    private final static Map<AccessionNumber, HgncItem> hgncMap = hgncParser.ensemblMap();
 
     private double getDgeThreshold(String name) {
         String hbadealsFile = "/home/peter/GIT/covidASmanuscript/data/HBA-DEALS-files/" + name;

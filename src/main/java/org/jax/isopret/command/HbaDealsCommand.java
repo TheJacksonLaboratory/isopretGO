@@ -10,9 +10,8 @@ import org.jax.isopret.hgnc.HgncItem;
 import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.html.HtmlTemplate;
 import org.jax.isopret.html.TsvWriter;
-import org.jax.isopret.prosite.PrositeHit;
-import org.jax.isopret.prosite.PrositeMapParser;
-import org.jax.isopret.prosite.PrositeMapping;
+import org.jax.isopret.interpro.*;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
@@ -47,10 +46,10 @@ public class HbaDealsCommand implements Callable<Integer> {
     @CommandLine.Option(names={"--mtc"}, description="Multiple-Testing-Correction for GO analysis")
     public String mtc = "Bonferroni";
     private String fastaFile = "data/Homo_sapiens.GRCh38.cdna.all.fa.gz";
-    @CommandLine.Option(names={"-p","--prosite"}, description ="prosite.dat file")
-    private String prositeDataFile = "data/prosite.dat";
-    @CommandLine.Option(names={"--prositemap"}, description = "prosite map file", required = true)
-    private String prositeMapFile;
+    @CommandLine.Option(names={"--desc"}, description ="interpro_domain_desc.txt file", required = true)
+    private String interproDescriptionFile;
+    @CommandLine.Option(names={"--domains"}, description ="interpro_domains.txt", required = true)
+    private String interproDomainsFile;
     @CommandLine.Option(names={"-g","--go"}, description ="go.obo file")
     private String goOboFile = "data/go.obo";
     @CommandLine.Option(names={"-a","--gaf"}, description ="goa_human.gaf.gz file")
@@ -64,10 +63,8 @@ public class HbaDealsCommand implements Callable<Integer> {
     @CommandLine.Option(names={"-n", "--namespace"}, required = true, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
     private String namespace = "ensembl";
     @CommandLine.Option(names={"--chunk"}, description = "Chunk size (how many results to show per HTML file; default: ${DEFAULT-VALUE}")
-    int chunkSize = 500;
+    int chunkSize = 50;
 
-
-    private final static Map<String, PrositeMapping> EMPTY_PROSITE_MAP = Map.of();
 
     public HbaDealsCommand() {
 
@@ -79,64 +76,34 @@ public class HbaDealsCommand implements Callable<Integer> {
         int hbadeals = 0;
         int hbadealSig = 0;
         int foundTranscripts = 0;
-        int foundProsite = 0;
         Map<String, Object> data = new HashMap<>(); // for the HTML template engine
         // ----------  1. Gene Ontology -------------------
         GoParser goParser = new GoParser(goOboFile, goGafFile);
         final Ontology ontology = goParser.getOntology();
         final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
-        data.put("go_version", ontology.getMetaInfo().getOrDefault("data-version", "unknown"));
-        data.put("n_go_terms", ontology.getNonObsoleteTermIds().size());
-        data.put("annotation_term_count", goAssociationContainer.getOntologyTermCount());
-        data.put("annotation_count", goAssociationContainer.getRawAssociations().size());
-        data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
-        LOGGER.trace("We got {} GO terms.", ontology.countNonObsoleteTerms());
-        LOGGER.trace("We got {} term to annotation list mappings.",goAssociationContainer.getRawAssociations().size());
+
+        // ----------  3. HGNC Mapping from accession numbers to gene symbols -------------
+        Map<AccessionNumber, HgncItem> hgncMap = initializeHgncMapper();
+
+
         MtcMethod mtc = MtcMethod.fromString(this.mtc);
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
-        // ----------  2. HGNC Mapping from accession numbers to gene symbols -------------
-        Map<String, HgncItem> hgncMap;
-        HgncParser hgncParser = new HgncParser();
-        if (this.namespace.equalsIgnoreCase("ensembl")) {
-            hgncMap = hgncParser.ensemblMap();
-        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
-            hgncMap = hgncParser.ucscMap();
-        } else if (this.namespace.equalsIgnoreCase("refseq")) {
-            hgncMap = hgncParser.refseqMap();
-        } else {
-            throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
-        }
-        GenomicAssembly hg38 =  GenomicAssemblies.GRCh38p13();
-        JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
-        Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
-        PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
-        Map<String, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
-        Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
-        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
-        HbaDealsThresholder thresholder = new HbaDealsThresholder(hbaDealsResults);
+
+        Map<String, List<Transcript>> geneSymbolToTranscriptMap = getTranscriptMap(GenomicAssemblies.GRCh38p13());
+        InterproMapper interproMapper = new InterproMapper(this.interproDescriptionFile, this.interproDomainsFile);
+        HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
 
         double expressionThreshold = thresholder.getExpressionThreshold();
         double splicingThreshold = thresholder.getSplicingThreshold();
+        /* ----------  Set up HbaDeal GO analysis ------------------------- */
+        HbaDealsGoAnalysis hbago =  getHbaDealsGoAnalysis(goMethod,
+                thresholder,
+                 ontology,
+                 goAssociationContainer,
+                 mtc);
+        // ----------   2. Add some data for the output template.
+        addOntologyDataToTemplate(data, ontology,goAssociationContainer,thresholder, hbago);
 
-        HbaDealsGoAnalysis hbago;
-        if (goMethod == GoMethod.PCunion) {
-            hbago = HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
-        } else if (goMethod == GoMethod.PCintersect) {
-            hbago = HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
-        } else {
-            hbago = HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
-        }
-        data.put("n_population", hbago.populationCount());
-        data.put("n_das",thresholder.getDasGeneCount());
-        data.put("n_das_unmapped", hbago.unmappedDasCount());
-        data.put("unmappable_das_list", Util.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
-        data.put("n_dge", thresholder.getDgeGeneCount());
-        data.put("n_dge_unmapped", hbago.unmappedDgeCount());
-        data.put("unmappable_dge_list", Util.fromList(hbago.unmappedDgeSymbols(), "Unmappable DGE Gene Symbols"));
-        data.put("probability_threshold", thresholder.getFdrThreshold());
-        data.put("expression_threshold", thresholder.getExpressionThreshold());
-        data.put("splicing_threshold", thresholder.getSplicingThreshold());
         List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
         List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
         dasGoTerms.sort(new SortByPvalue());
@@ -149,7 +116,6 @@ public class HbaDealsCommand implements Callable<Integer> {
                     .dasGoTerms(dasGoTerms)
                     .dgeGoTerms(dgeGoTerms)
                     .prefix(outprefix)
-                    .hbadeals(hbaDealsResults)
                     .ontologizerCalculation(this.ontologizerCalculation)
                     .mtc(this.mtc)
                     .ontology(ontology)
@@ -172,13 +138,15 @@ public class HbaDealsCommand implements Callable<Integer> {
                 .collect(Collectors.toSet());
         Map<String, Set<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
 
-        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
+
         List<String> unidentifiedSymbols = new ArrayList<>();
         List<String> geneVisualizations = new ArrayList<>();
 
-        HtmlVisualizer visualizer = new HtmlVisualizer(prositeIdToName);
+        HtmlVisualizer visualizer = new HtmlVisualizer();
         List<AnnotatedGene> annotatedGeneList = new ArrayList<>();
-        for (var entry : hbaDealsResults.entrySet()) {
+        int foundInterPro = 0;
+        int missed = 0;
+        for (var entry : thresholder.getRawResults().entrySet()) {
             String geneSymbol = entry.getKey();
             hbadeals++;
             if (!geneSymbolToTranscriptMap.containsKey(geneSymbol)) {
@@ -194,20 +162,16 @@ public class HbaDealsCommand implements Callable<Integer> {
             hbadealSig++;
             List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
 
-            final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
-            Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
-            if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
-                LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);
-                prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
-            } else {
-                PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
-                prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
-                foundProsite++;
-            }
+
+            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap = interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+            if (transcriptToInterproHitMap.isEmpty())
+                missed++;
+            else
+                foundInterPro++;
 
             if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
                 AnnotatedGene agene = new AnnotatedGene(transcripts,
-                        prositeHitsForCurrentGene,
+                        transcriptToInterproHitMap,
                         result,
                         expressionThreshold,
                         splicingThreshold);
@@ -241,6 +205,7 @@ public class HbaDealsCommand implements Callable<Integer> {
                 data.put("parts_info", String.format("Part %d of %d", (j+1), n_partitions));
                 HtmlTemplate template = new HtmlTemplate(data, outFileName);
                 template.outputFile();
+                LOGGER.trace("Output HTML file: {}", outFileName);
             }
         } else {
             data.put("genelist", geneVisualizations);
@@ -250,8 +215,9 @@ public class HbaDealsCommand implements Callable<Integer> {
         }
 
         LOGGER.trace("Total unidentified genes:"+ unidentifiedSymbols.size());
-        LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also prosite: {}",
-                hbadeals, foundTranscripts, hbadealSig, foundProsite);
+        LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also interpro: {}",
+                hbadeals, foundTranscripts, hbadealSig, foundInterPro);
+
         return 0;
     }
 
@@ -288,6 +254,83 @@ public class HbaDealsCommand implements Callable<Integer> {
                 return 0;
             }
         }
+    }
+
+    /**
+     * Convenience method to add data for output to the HTML template.
+     * @param data map with data for template
+     * @param ontology Reference to Gene Ontology object
+     * @param goAssociationContainer GO associations.
+     */
+    private void addOntologyDataToTemplate(Map<String, Object> data,
+                                           Ontology ontology,
+                                           GoAssociationContainer goAssociationContainer,
+                                           HbaDealsThresholder thresholder,
+                                           HbaDealsGoAnalysis hbago) {
+        data.put("go_version", ontology.getMetaInfo().getOrDefault("data-version", "unknown"));
+        data.put("n_go_terms", ontology.getNonObsoleteTermIds().size());
+        data.put("annotation_term_count", goAssociationContainer.getOntologyTermCount());
+        data.put("annotation_count", goAssociationContainer.getRawAssociations().size());
+        data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
+        LOGGER.trace("We got {} GO terms.", ontology.countNonObsoleteTerms());
+        LOGGER.trace("We got {} term to annotation list mappings.",goAssociationContainer.getRawAssociations().size());
+        data.put("n_population", hbago.populationCount());
+        data.put("n_das",thresholder.getDasGeneCount());
+        data.put("n_das_unmapped", hbago.unmappedDasCount());
+        data.put("unmappable_das_list", VisualizationUtil.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
+        data.put("n_dge", thresholder.getDgeGeneCount());
+        data.put("n_dge_unmapped", hbago.unmappedDgeCount());
+        data.put("unmappable_dge_list", VisualizationUtil.fromList(hbago.unmappedDgeSymbols(), "Unmappable DGE Gene Symbols"));
+        data.put("probability_threshold", thresholder.getFdrThreshold());
+        data.put("expression_threshold", thresholder.getExpressionThreshold());
+        data.put("splicing_threshold", thresholder.getSplicingThreshold());
+    }
+
+
+    private Map<AccessionNumber, HgncItem> initializeHgncMapper() {
+        HgncParser hgncParser = new HgncParser();
+        if (this.namespace.equalsIgnoreCase("ensembl")) {
+            return hgncParser.ensemblMap();
+//        }
+//        else if (this.namespace.equalsIgnoreCase("ucsc")) {
+//            //return hgncParser.ucscMap();
+//        } else if (this.namespace.equalsIgnoreCase("refseq")) {
+//            // return hgncParser.refseqMap();
+        } else {
+            throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
+        }
+    }
+
+    /**
+     * Get a map of transcripts. The key is a gene symbol, the value is a list of Svart transcript obejcts
+     * @param assembly The genome assembly (Only hg38 is supperted for now)
+     * @return  map of transcripts
+     */
+    private Map<String, List<Transcript>> getTranscriptMap(GenomicAssembly assembly) {
+        JannovarReader jreader = new JannovarReader(this.jannovarPath, assembly);
+        return jreader.getSymbolToTranscriptListMap();
+    }
+
+    private HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
+                                             HbaDealsThresholder thresholder,
+                                             Ontology ontology,
+                                             GoAssociationContainer goAssociationContainer,
+                                             MtcMethod mtc) {
+        if (goMethod == GoMethod.PCunion) {
+            return HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
+        } else if (goMethod == GoMethod.PCintersect) {
+            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
+        } else {
+            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
+        }
+    }
+
+
+    private HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, HgncItem> hgncMap, String hbadealsPath) {
+        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsPath, hgncMap);
+        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
+        return new HbaDealsThresholder(hbaDealsResults);
     }
 
 }

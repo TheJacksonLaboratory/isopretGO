@@ -1,6 +1,7 @@
 package org.jax.isopret.hgnc;
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,13 +134,13 @@ public class HgncParser {
         return this.itemList.size();
     }
 
-    public Map<String, HgncItem> ensemblMap() {
-        Map<String, HgncItem> ensmap = new HashMap<>();
+    public Map<AccessionNumber, HgncItem> ensemblMap() {
+        Map<AccessionNumber, HgncItem> ensmap = new HashMap<>();
         int notMapped = 0;
         for (HgncItem item : itemList) {
             String ens = item.getEnsemblGeneId();
             if (ens != null && ens.startsWith("ENSG")) {
-                ensmap.put(ens, item);
+                ensmap.put(AccessionNumber.ensemblGene(ens), item);
             } else {
                 notMapped++;
             }

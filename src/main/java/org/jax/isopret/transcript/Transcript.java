@@ -12,11 +12,7 @@ import java.util.Optional;
 public class Transcript extends BaseGenomicRegion<Transcript> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Transcript.class);
 
-    private final String accessionId;
-    /**
-     * e.g., if {@link #accessionId} is ENST0000064021.6 then this would be ENST0000064021
-     */
-    private final String accessionIdNoVersion;
+    private final AccessionNumber accessionId;
 
     private final String hgvsSymbol;
 
@@ -31,7 +27,7 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
                        CoordinateSystem coordinateSystem,
                        Position start,
                        Position end,
-                       String accessionId,
+                       AccessionNumber accessionId,
                        String hgvsSymbol,
                        boolean isCoding,
                        GenomicRegion cds,
@@ -43,12 +39,6 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
             this.cdsRegion = null;
         }
         this.accessionId = accessionId;
-        int i = this.accessionId.indexOf(".");
-        if (i < 0) {
-            this.accessionIdNoVersion = this.accessionId;
-        } else {
-            this.accessionIdNoVersion = this.accessionId.substring(0, i);
-        }
         this.hgvsSymbol = hgvsSymbol;
         this.isCoding = isCoding;
         this.exons = exons;
@@ -60,7 +50,7 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
                                 int start,
                                 int end,
                                 GenomicRegion cds,
-                                String accessionId,
+                                AccessionNumber accessionId,
                                 String hgvsSymbol,
                                 boolean isCoding,
                                 List<GenomicRegion> exons) {
@@ -76,7 +66,7 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
                 exons);
     }
 
-    public String accessionId() {
+    public AccessionNumber accessionId() {
         return accessionId;
     }
 
@@ -129,11 +119,6 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         return cdsExonLengths;
     }
 
-
-
-    public String getAccessionIdNoVersion() {
-        return accessionIdNoVersion;
-    }
 
     @Override
     public Transcript withStrand(Strand other) {
@@ -232,7 +217,6 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         Transcript that = (Transcript) o;
         return isCoding == that.isCoding &&
                 accessionId.equals(that.accessionId) &&
-                accessionIdNoVersion.equals(that.accessionIdNoVersion) &&
                 hgvsSymbol.equals(that.hgvsSymbol) &&
                 exons.equals(that.exons) &&
                 Objects.equals(cdsRegion, that.cdsRegion);
@@ -240,13 +224,13 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), accessionId, accessionIdNoVersion, hgvsSymbol, isCoding, exons, cdsRegion);
+        return Objects.hash(super.hashCode(), accessionId, hgvsSymbol, isCoding, exons, cdsRegion);
     }
 
     @Override
     public String toString() {
         return "Transcript{" +
-                "accessionId='" + accessionId + '\'' +
+                "accessionId='" + accessionId.getAccessionString() + '\'' +
                 ", hgvsSymbol='" + hgvsSymbol + '\'' +
                 ", isCoding=" + isCoding +
                 ", exons=" + exons +
