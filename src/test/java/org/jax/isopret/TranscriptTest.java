@@ -46,9 +46,10 @@ public class TranscriptTest extends TestBase {
         List<Transcript> adarTranscripts = symbolToTranscriptMap.get("ADAR");
         PrositeMapParser prositeMapParser = getPrositeMapParser();
         // Get the relevant transcript
-        String transcriptIDWithVersion = "ENST00000368474.8";
+        AccessionNumber transcriptIDWithVersion = AccessionNumber.ensemblTranscript("ENST00000368474.8");
         String transcriptIDWithoutVersion = "ENST00000368474";
         String adarGeneId = "ENSG00000160710";
+        AccessionNumber adarGeneAccession = AccessionNumber.ensemblGene(adarGeneId);
         Transcript enst00000368474 = adarTranscripts
                 .stream()
                 .filter(t->t.accessionId().equals(transcriptIDWithVersion))
@@ -56,9 +57,9 @@ public class TranscriptTest extends TestBase {
                 .get();
         assertNotNull(enst00000368474);
         // get the relevant prosite mappings
-        Map<String, PrositeMapping> prositeMappingMap = prositeMapParser.getPrositeMappingMap();
-        assertTrue(prositeMappingMap.containsKey(adarGeneId));
-        PrositeMapping enst00000368474Prosite = prositeMappingMap.get(adarGeneId);
+        Map<AccessionNumber, PrositeMapping> prositeMappingMap = prositeMapParser.getPrositeMappingMap();
+        assertTrue(prositeMappingMap.containsKey(adarGeneAccession));
+        PrositeMapping enst00000368474Prosite = prositeMappingMap.get(adarGeneAccession);
         List<PrositeHit> hits = enst00000368474Prosite.getHits(transcriptIDWithoutVersion);
         // This transcript has 6 prosite motifs in our test file
         assertEquals(6, hits.size());
@@ -70,7 +71,7 @@ public class TranscriptTest extends TestBase {
         PrositeMapping psm = prositeMappingMap.get(adarGeneId);
         Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
         AnnotatedGene atranscript = new AnnotatedGene(adarTranscripts, annotList, adarResult);
-
+        assertEquals(atranscript.getSymbol(), "ADAR");
     }
 
 }

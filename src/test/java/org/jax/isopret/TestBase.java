@@ -82,7 +82,7 @@ public class TestBase {
         Map<String, List<Transcript>> adarSymbolToTranscriptMap = getADARToTranscriptMap();
           List<Transcript> adarTranscripts = adarSymbolToTranscriptMap.get("ADAR");
         PrositeMapParser prositeMapParser = getPrositeMapParser();
-        Map<String, PrositeMapping> prositeMappingMap = prositeMapParser.getPrositeMappingMap();
+        Map<AccessionNumber, PrositeMapping> prositeMappingMap = prositeMapParser.getPrositeMappingMap();
         Map<String,String> prositeIdMap = prositeMapParser.getPrositeNameMap();
         Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
         HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes

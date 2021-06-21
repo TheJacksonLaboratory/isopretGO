@@ -62,10 +62,12 @@ public class SvgCommand implements Callable<Integer> {
         HgncParser hgncParser = new HgncParser();
         if (this.namespace.equalsIgnoreCase("ensembl")) {
             hgncMap = hgncParser.ensemblMap();
-//        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
-//            hgncMap = hgncParser.ucscMap();
-//        } else if (this.namespace.equalsIgnoreCase("refseq")) {
-//            hgncMap = hgncParser.refseqMap();
+        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
+            //hgncMap = hgncParser.ucscMap();
+            throw new UnsupportedOperationException("UCSC not supported");
+        } else if (this.namespace.equalsIgnoreCase("refseq")) {
+            //hgncMap = hgncParser.refseqMap();
+            throw new UnsupportedOperationException("refseq not supported");
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
@@ -77,7 +79,7 @@ public class SvgCommand implements Callable<Integer> {
         JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
         Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
         PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
-        Map<String, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
+        Map<AccessionNumber, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
         Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
@@ -88,7 +90,7 @@ public class SvgCommand implements Callable<Integer> {
         LOGGER.trace("Get HBA-DEALS result for: {}", this.geneSymbol);
         HbaDealsResult result = hbaDealsResults.get(this.geneSymbol);
         List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
-        final Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
+        Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
         Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
         if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
             LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);

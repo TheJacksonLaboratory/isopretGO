@@ -1,14 +1,13 @@
 package org.jax.isopret.prosite;
 
 import org.jax.isopret.TestBase;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PrositeMapParserTest extends TestBase {
     /**
@@ -42,11 +41,13 @@ public class PrositeMapParserTest extends TestBase {
     @Test
     public void testPrositeHitParser() {
         PrositeMapParser parser = getPrositeMapParser();
-        Map<String, PrositeMapping> prositeMappingMap = parser.getPrositeMappingMap();
+        Map<AccessionNumber, PrositeMapping> prositeMappingMap = parser.getPrositeMappingMap();
         String enstId = "ENST00000648231";
         String ensGeneId = "ENSG00000160710";
-        assertTrue(prositeMappingMap.containsKey(ensGeneId));
-        PrositeMapping prositeMapping = prositeMappingMap.get(ensGeneId);
+        AccessionNumber ensGeneAccession = AccessionNumber.ensemblGene(ensGeneId);
+        assertTrue(prositeMappingMap.containsKey(ensGeneAccession));
+        PrositeMapping prositeMapping = prositeMappingMap.get(ensGeneAccession);
+        assertNotNull(prositeMapping);
         assertEquals(ensGeneId, prositeMapping.getGeneID());
         List<PrositeHit> hitList = prositeMapping.getHits(enstId);
         assertEquals(5, hitList.size());
