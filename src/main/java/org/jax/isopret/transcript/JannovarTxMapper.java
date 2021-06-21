@@ -50,8 +50,10 @@ class JannovarTxMapper {
             exons.add(GenomicRegion.of(contig, strand, CoordinateSystem.zeroBased(), Position.of(exon.getBeginPos()), Position.of(exon.getEndPos())));
         }
 
+        AccessionNumber transcriptAccession = AccessionNumber.ensemblTranscript(tm.getAccession());
+
         return Optional.of(Transcript.of(contig, strand, CoordinateSystem.zeroBased(), txRegion.getBeginPos(), txRegion.getEndPos(),
-                cds, tm.getAccession(), tm.getGeneSymbol(), tm.isCoding(),
+                cds, transcriptAccession, tm.getGeneSymbol(), tm.isCoding(),
                 exons));
     }
 }

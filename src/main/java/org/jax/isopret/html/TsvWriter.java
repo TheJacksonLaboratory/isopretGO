@@ -33,15 +33,14 @@ public class TsvWriter {
                       HbaDealsThresholder thresholder,
                       List<GoTerm2PValAndCounts> das,
                       List<GoTerm2PValAndCounts> dge,
-                      Map<String, HbaDealsResult> results,
-                        String calc,
+                      String calc,
                       String mtc,
                       Ontology ontology) {
         this.outprefix = prefix;
         this.thresholder = thresholder;
         this.dasGoTerms = das;
         this.dgeGoTerms = dge;
-        this.hbaDealsResults = results;
+        this.hbaDealsResults = thresholder.getRawResults();
         this.ontologizerCalculation = calc;
         this.mtc = mtc;
         this.geneOntology = ontology;
@@ -72,7 +71,7 @@ public class TsvWriter {
             for (HbaDealsResult result : this.hbaDealsResults.values()) {
                 if (result.hasDifferentialSplicingOrExpressionResult(splicingThreshold, expressionThreshold)) {
                     String symbol = result.getSymbol();
-                    String geneAccession = result.getGeneAccession();
+                    String geneAccession = result.getGeneAccession().getAccessionString();
                     double expressionP = result.getExpressionP();
                     double expressionFc = result.getExpressionFoldChange();
                     String line = String.format("%s\t%s\texpression\t%f\t%f\t%f\n", symbol, geneAccession, expressionP, expressionThreshold, expressionFc);
@@ -134,7 +133,6 @@ public class TsvWriter {
         private HbaDealsThresholder thresholder;
         private List<GoTerm2PValAndCounts> dasGoTerms;
         private List<GoTerm2PValAndCounts> dgeGoTerms;
-        private Map<String, HbaDealsResult> hbaDealsResults;
         private String ontologizerCalculation;
         private String mtc;
         private Ontology ontology;
@@ -161,10 +159,6 @@ public class TsvWriter {
             return this;
         }
 
-        public Builder hbadeals( Map<String, HbaDealsResult> results) {
-            this.hbaDealsResults = results;
-            return this;
-        }
 
         public Builder ontologizerCalculation(String calc) {
             this.ontologizerCalculation = calc;
@@ -186,10 +180,9 @@ public class TsvWriter {
             Objects.requireNonNull(thresholder);
             Objects.requireNonNull(dasGoTerms);
             Objects.requireNonNull(dgeGoTerms);
-            Objects.requireNonNull(hbaDealsResults);
             Objects.requireNonNull(ontologizerCalculation);
             Objects.requireNonNull(mtc);
-            return new TsvWriter(outprefix, thresholder, dasGoTerms, dgeGoTerms,hbaDealsResults, ontologizerCalculation, mtc, ontology);
+            return new TsvWriter(outprefix, thresholder, dasGoTerms, dgeGoTerms, ontologizerCalculation, mtc, ontology);
         }
     }
 

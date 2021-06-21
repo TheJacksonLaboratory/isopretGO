@@ -18,6 +18,7 @@ public class Main implements Callable<Integer> {
         CommandLine cline = new CommandLine(new Main())
                 .addSubcommand("download", new DownloadCommand())
                 .addSubcommand("hbadeals", new HbaDealsCommand())
+                .addSubcommand("interpro", new InterproSummaryCommand())
                 .addSubcommand("svg", new SvgCommand())
                 .addSubcommand("stats", new DumpStatsCommand());
         cline.setToggleBooleanFlags(false);

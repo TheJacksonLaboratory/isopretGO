@@ -1,6 +1,7 @@
 package org.jax.isopret.visualization;
 
 import org.jax.isopret.go.GoTermIdPlusLabel;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
 
 import java.util.List;
 import java.util.Map;
@@ -29,11 +30,10 @@ public interface Visualizable {
 
     String getIsoformSvg();
 
-   String getProteinSvg(Map<String, String> prositeIdToName);
+   String getProteinSvg();
 
    List<List<String>> getIsoformTableData();
 
-   List<List<String>> getPrositeModuleLinks(Map<String, String> prositeIdToName);
 
    List<GoTermIdPlusLabel> getGoTerms();
 
@@ -41,8 +41,9 @@ public interface Visualizable {
 
    boolean isDifferentiallySpliced();
 
+   List<DisplayInterproAnnotation>  getInterproForExpressedTranscripts();
 
-    int getI();
+   int getI();
 
 
 }

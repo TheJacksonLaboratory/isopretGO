@@ -2,6 +2,7 @@ package org.jax.isopret.ensembl;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.orf.OrfFinder;
+import org.jax.isopret.transcript.AccessionNumber;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,6 +20,8 @@ public class EnsemblTranscript {
     /** Ensembl transcript id without version number. */
     private final String transcriptId;
     private final int transcriptVersion;
+    /** intger representation of transcript id (without version): 560355for ENST00000560355.1 */
+    private final AccessionNumber acccession;
     private final String geneId;
     private final int geneVersion;
 
@@ -31,7 +34,7 @@ public class EnsemblTranscript {
     private final String cDNA;
     private final String longestAaSequence;
     private final boolean hasOrf;
-    private final Map<String, List<Integer>> motifMap;
+   // private final Map<String, List<Integer>> motifMap;
 
 
     public EnsemblTranscript(String header, String sequence) {
@@ -48,6 +51,7 @@ public class EnsemblTranscript {
         if (! transcript_id.startsWith("ENST")) {
             throw new IsopretRuntimeException("Malformed Ensembl transcript id: " + transcript_id);
         }
+        this.acccession = AccessionNumber.ensemblTranscript(fields[0]);
         i = transcript_id.indexOf(".");
         if (i > 0) {
             this.transcriptId = transcript_id.substring(0,i); // removes the version number
@@ -101,7 +105,7 @@ public class EnsemblTranscript {
             this.longestAaSequence = "";
             this.hasOrf = false;
         }
-        motifMap = new HashMap<>();
+        //motifMap = new HashMap<>();
     }
 
     public String getDescription() {
@@ -110,6 +114,10 @@ public class EnsemblTranscript {
 
     public String getTranscriptId() {
         return transcriptId;
+    }
+
+    public int getEnstId() {
+        return this.acccession.getAccessionNumber();
     }
 
     public int getTranscriptVersion() {
@@ -156,30 +164,30 @@ public class EnsemblTranscript {
         return longestAaSequence;
     }
 
-    public void addMotif(String prositeId, List<Integer> positionList) {
-        motifMap.put(prositeId, positionList);
-    }
+//    public void addMotif(String prositeId, List<Integer> positionList) {
+//        motifMap.put(prositeId, positionList);
+//    }
+//
+//    public Map<String, List<Integer>> getMotifMap() {
+//        return motifMap;
+//    }
 
-    public Map<String, List<Integer>> getMotifMap() {
-        return motifMap;
-    }
-
-    public String getHtmlMotifString() {
-        StringBuilder sb = new StringBuilder();
-        boolean notFirst = false;
-        for (var entry : this.motifMap.entrySet()) {
-            if (notFirst) {
-                sb.append("<br/>&nbsp;&nbsp;");
-            } else {
-                sb.append("&nbsp;&nbsp;");
-                notFirst = true;
-            }
-            sb.append(entry.getKey()).append(": ");
-            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
-            sb.append("pos:").append(positions);
-        }
-        return sb.toString();
-    }
+//    public String getHtmlMotifString() {
+//        StringBuilder sb = new StringBuilder();
+//        boolean notFirst = false;
+//        for (var entry : this.motifMap.entrySet()) {
+//            if (notFirst) {
+//                sb.append("<br/>&nbsp;&nbsp;");
+//            } else {
+//                sb.append("&nbsp;&nbsp;");
+//                notFirst = true;
+//            }
+//            sb.append(entry.getKey()).append(": ");
+//            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
+//            sb.append("pos:").append(positions);
+//        }
+//        return sb.toString();
+//    }
 
     public int cDNAlen() {
         return this.cDNA.length();
@@ -196,11 +204,6 @@ public class EnsemblTranscript {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.geneSymbol).append(": ").append(this.transcriptId);
-        for (var entry : this.motifMap.entrySet()) {
-            sb.append("\n\t").append(entry.getKey());
-            String positions = entry.getValue().stream().map(String::valueOf).collect(Collectors.joining(";"));
-            sb.append("pos:").append(positions);
-        }
         return sb.toString();
     }
 }

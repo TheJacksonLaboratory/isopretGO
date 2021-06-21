@@ -2,16 +2,17 @@ package org.jax.isopret.visualization;
 
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.GoTermIdPlusLabel;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HtmlVisualizer implements Visualizer {
-
-    private final Map<String, String> prositeIdToName;
-
-    public HtmlVisualizer(Map<String, String> prositeIdToName) {
-        this.prositeIdToName = prositeIdToName;
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlVisualizer.class);
+    public HtmlVisualizer() {
     }
 
 
@@ -26,7 +27,6 @@ public class HtmlVisualizer implements Visualizer {
             "  </thead>\n";
 
 
-
     private String getGoAnchor(GoTermIdPlusLabel go) {
         //QuickGO - https://www.ebi.ac.uk/QuickGO/term/GO:0006915
         String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getId();
@@ -39,7 +39,7 @@ public class HtmlVisualizer implements Visualizer {
         String a = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", vis.getGeneUrl(), vis.getGeneSymbol());
         sb.append("<tr><td>").append(a).append("</td>");
         sb.append("<td>").append(vis.getChromosome()).append("</td>\n");
-        sb.append(String.format("<td>%.2f</td>",  vis.getExpressionLogFoldChange()));
+        sb.append(String.format("<td>%.2f</td>", vis.getExpressionLogFoldChange()));
         String prob = String.format("%.2f", vis.getExpressionPval()) + (vis.isDifferentiallyExpressed() ? " (*)" : "");
         sb.append("<td>").append(prob).append("</td></tr>\n");
         sb.append("</table>\n");
@@ -55,33 +55,35 @@ public class HtmlVisualizer implements Visualizer {
         return sb.toString();
     }
 
-    private final static String PROSITE_TABLE_HEADER = "<table>\n" +
+    private final static String INTERPRO_TABLE_HEADER = "<table>\n" +
             "  <thead>\n" +
             "    <tr>\n" +
-            "      <th>Prosite id</th>\n" +
+            "      <th>Interpro id</th>\n" +
             "      <th>Name</th>\n" +
+            "      <th>Type</th>\n" +
             "    </tr>\n" +
             "  </thead>\n";
 
-    public String getPrositeBox(Visualizable vis) {
+    public String getInterproBox(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
-        List<List<String>> prositeLinks = vis.getPrositeModuleLinks(this.prositeIdToName);
-        if (prositeLinks.isEmpty()) {
-            return "<p><i>No protein domains found.</i></p>\n";
+        List<DisplayInterproAnnotation> introProAnnotations = vis.getInterproForExpressedTranscripts();
+        Set<InterproEntry> entrySet = introProAnnotations.stream().map(DisplayInterproAnnotation::getInterproEntry).collect(Collectors.toSet());
+        List<InterproEntry> entryList = new ArrayList<>(entrySet);
+        Collections.sort(entryList);
+        if (introProAnnotations.isEmpty()) {
+            return "<p><i>No interpro domains found.</i></p>\n";
         }
-        sb.append(PROSITE_TABLE_HEADER);
-        for (var row : prositeLinks) {
-            if (row.size() != 2) {
-                // should never happen!
-                throw new IsopretRuntimeException("Malformed prosite row: " + row);
-            }
-            sb.append("<tr><td>").append(row.get(0)).append("</td>");
-            sb.append("<td>").append(row.get(1)).append("</td></tr>\n");
+        sb.append(INTERPRO_TABLE_HEADER);
+        for (InterproEntry entry : entryList) {
+            String interproUrl = String.format("https://www.ebi.ac.uk/interpro/entry/InterPro/%s/", entry.getIntroproAccession());
+            String interproAnchor = String.format("<a href=\"%s\" target=\"_blank\">%s</a>", interproUrl, entry.getIntroproAccession());
+            sb.append("<tr><td>").append(interproAnchor).append("</td>");
+            sb.append("<td>").append(entry.getDescription()).append("</td>\n");
+            sb.append("<td>").append(entry.getEntryType()).append("</td></tr>\n");
         }
         sb.append("</table>\n");
         return sb.toString();
     }
-
 
 
     private final static String ISOFORM_TABLE_HEADER = "<table>\n" +
@@ -123,14 +125,14 @@ public class HtmlVisualizer implements Visualizer {
         StringBuilder sb = new StringBuilder();
         int i = vis.getI();
         sb.append("<h1>").append(i).append(") ").append(vis.getGeneSymbol());
-       if (vis.isDifferentiallyExpressed()) {
-           sb.append(" <span class=\"badge\">DGE</span> ");
-       }
-       if (vis.isDifferentiallySpliced()) {
-           sb.append(" <span class=\"badge\">DAS</span>");
-       }
-       sb.append("</h1>\n");
-      return sb.toString();
+        if (vis.isDifferentiallyExpressed()) {
+            sb.append(" <span class=\"badge\">DGE</span> ");
+        }
+        if (vis.isDifferentiallySpliced()) {
+            sb.append(" <span class=\"badge\">DAS</span>");
+        }
+        sb.append("</h1>\n");
+        return sb.toString();
     }
 
 
@@ -144,7 +146,6 @@ public class HtmlVisualizer implements Visualizer {
     @Override
     public String getHtml(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
-       // sb.append("<h1>").append(vis.getGeneSymbol()).append(" &emsp; ").append("</h1>\n");
         sb.append(getGeneNameAndBadges(vis));
         sb.append("<article>\n");
         sb.append("<div class=\"generow\">\n");
@@ -152,17 +153,17 @@ public class HtmlVisualizer implements Visualizer {
         sb.append(getGeneBox(vis)).append("\n");
         sb.append("</div>\n");
         sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
-        sb.append(getPrositeBox(vis)).append("\n");
+        sb.append(getInterproBox(vis)).append("\n");
         sb.append("</div>\n");
         sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
         sb.append(getTranscriptBox(vis)).append("\n");
-       sb.append("</div>\n");
+        sb.append("</div>\n");
         sb.append("</div>\n");
         sb.append("<div class=\"svgrow\">\n");
-       sb.append(vis.getIsoformSvg());
+        sb.append(vis.getIsoformSvg());
         sb.append("</div>\n");
         sb.append("<div class=\"svgrow\">\n");
-        sb.append(vis.getProteinSvg(this.prositeIdToName));
+        sb.append(vis.getProteinSvg());
         sb.append("</div>\n");
         sb.append("</article>\n");
         return sb.toString();

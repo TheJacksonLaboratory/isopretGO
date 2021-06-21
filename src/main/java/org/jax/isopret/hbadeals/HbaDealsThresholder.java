@@ -181,4 +181,8 @@ public class HbaDealsThresholder {
     public double getSplicingThreshold() {
         return splicingThreshold;
     }
+
+    public Map<String, HbaDealsResult> getRawResults() {
+        return rawResults;
+    }
 }

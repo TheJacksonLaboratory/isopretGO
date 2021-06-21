@@ -33,8 +33,7 @@ public class SvgGeneratorTest extends TestBase {
 
     @Test
     public void testWriteProteinSvg() {
-        Map<String,String> id2nameMap = getPrositeMapParser().getPrositeNameMap();
-        AbstractSvgGenerator gen = ProteinSvgGenerator.factory(adarAnnotated,id2nameMap);
+        AbstractSvgGenerator gen = ProteinSvgGenerator.factory(adarAnnotated);
         String svg = gen.getSvg();
         assertNotNull(svg);
         System.out.println(svg);

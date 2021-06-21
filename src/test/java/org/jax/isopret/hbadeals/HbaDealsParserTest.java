@@ -1,6 +1,7 @@
 package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.TestBase;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -50,26 +51,31 @@ public class HbaDealsParserTest extends TestBase {
         assertTrue(adar.hasDifferentialSplicingResult(THRESHOLD));
         double pva = adar.getSmallestSplicingP();
         assertEquals(1e-05, pva, EPSILON);
-        Map<String, HbaDealsTranscriptResult> transcriptMap = adar.getTranscriptMap();
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = adar.getTranscriptMap();
         assertEquals(5, transcriptMap.size());
-        HbaDealsTranscriptResult ENST00000368471 = transcriptMap.get("ENST00000368471");
-        assertTrue(ENST00000368471.isSignificant());
-        assertEquals(1e-05, ENST00000368471.getP(), EPSILON);
-        HbaDealsTranscriptResult ENST00000368474 = transcriptMap.get("ENST00000368474");
-        assertEquals(1.45668870537677, ENST00000368474.getFoldChange(), EPSILON);
-        assertEquals(0.00192, ENST00000368474.getP(), EPSILON);
+        AccessionNumber ENST00000368471 = AccessionNumber.ensemblTranscript("ENST00000368471");
+        HbaDealsTranscriptResult ENST00000368471result = transcriptMap.get(ENST00000368471);
+        assertTrue(ENST00000368471result.isSignificant());
+        assertEquals(1e-05, ENST00000368471result.getP(), EPSILON);
+        var ENST00000368474 = AccessionNumber.ensemblTranscript("ENST00000368474");
+        HbaDealsTranscriptResult ENST00000368474result = transcriptMap.get(ENST00000368474);
+        assertEquals(1.45668870537677, ENST00000368474result.getFoldChange(), EPSILON);
+        assertEquals(0.00192, ENST00000368474result.getP(), EPSILON);
         //	ENST00000463920	0.84541220998081
-        HbaDealsTranscriptResult ENST00000463920 = transcriptMap.get("ENST00000463920");
-        assertEquals(0.84541220998081, ENST00000463920.getFoldChange(), EPSILON);
-        assertEquals(0.7134, ENST00000463920.getP(), EPSILON);
+        var ENST00000463920 = AccessionNumber.ensemblTranscript("ENST00000463920");
+        HbaDealsTranscriptResult ENST00000463920result = transcriptMap.get(ENST00000463920);
+        assertEquals(0.84541220998081, ENST00000463920result.getFoldChange(), EPSILON);
+        assertEquals(0.7134, ENST00000463920result.getP(), EPSILON);
         //ENST00000529168	1.05034162415497	0.9602
-        HbaDealsTranscriptResult ENST00000529168 = transcriptMap.get("ENST00000529168");
-        assertEquals(1.05034162415497, ENST00000529168.getFoldChange(), EPSILON);
-        assertEquals(0.9602, ENST00000529168.getP(), EPSILON);
+        var ENST00000529168 = AccessionNumber.ensemblTranscript("ENST00000529168");
+        HbaDealsTranscriptResult ENST00000529168result = transcriptMap.get(ENST00000529168);
+        assertEquals(1.05034162415497, ENST00000529168result.getFoldChange(), EPSILON);
+        assertEquals(0.9602, ENST00000529168result.getP(), EPSILON);
         // ENST00000649021	0.833370141719852	0.66569
-        HbaDealsTranscriptResult ENST00000649021 = transcriptMap.get("ENST00000649021");
-        assertEquals(0.833370141719852, ENST00000649021.getFoldChange(), EPSILON);
-        assertEquals(0.66569, ENST00000649021.getP(), EPSILON);
+        var ENST00000649021 = AccessionNumber.ensemblTranscript("ENST00000649021");
+        HbaDealsTranscriptResult ENST00000649021result = transcriptMap.get(ENST00000649021);
+        assertEquals(0.833370141719852, ENST00000649021result.getFoldChange(), EPSILON);
+        assertEquals(0.66569, ENST00000649021result.getP(), EPSILON);
     }
 
 

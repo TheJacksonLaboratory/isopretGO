@@ -3,7 +3,10 @@ package org.jax.isopret.visualization;
 import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.interpro.InterproEntry;
 import org.jax.isopret.prosite.PrositeHit;
+import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
 import org.monarchinitiative.svart.Contig;
@@ -26,8 +29,6 @@ public class EnsemblVisualizable implements Visualizable {
 
     /** All annotated transcripts of some gene that were expressed according to HBA deals */
     private final List<Transcript> expressedTranscripts;
-
-    private final Map<String, List<PrositeHit>> transcriptToHitMap;
 
     private final HbaDealsResult hbaDealsResult;
 
@@ -52,7 +53,6 @@ public class EnsemblVisualizable implements Visualizable {
         this.goterms = golist;
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
-        this.transcriptToHitMap = agene.getPrositeHitMap();
         this.hbaDealsResult = agene.getHbaDealsResult();
         String chr = this.expressedTranscripts.stream().map(Transcript::contig).map(Contig::name).findAny().orElse("n/a");
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
@@ -71,7 +71,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getGeneAccession() {
-        return this.hbaDealsResult.getGeneAccession();
+        return this.hbaDealsResult.getGeneAccession().getAccessionString();
     }
 
     private String getEnsemblUrl(String accession) {
@@ -133,17 +133,17 @@ public class EnsemblVisualizable implements Visualizable {
     public String getIsoformSvg() {
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         return svggen.getSvg();
-
     }
 
     @Override
-    public String getProteinSvg(Map<String, String> prositeIdToName) {
+    public String getProteinSvg() {
         try {
             // Return a message only if we cannot find prosite domains.
-            if (agene.getPrositeHitMap().isEmpty()) {
+           // if (agene.getPrositeHitMap().isEmpty()) {
+           if (! agene.hasInterproAnnotations()) {
                 return ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
             }
-            AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene, prositeIdToName);
+            AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene);
             return svggen.getSvg();
         } catch (Exception e) {
             return "<p>Could not generate protein SVG because: " + e.getMessage() + "</p>";
@@ -170,10 +170,10 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public List<List<String>> getIsoformTableData() {
         List<List<String>> rows = new ArrayList<>();
-        Map<String, HbaDealsTranscriptResult> transcriptMap = this.hbaDealsResult.getTranscriptMap();
+        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = this.hbaDealsResult.getTranscriptMap();
         for (Transcript transcript : this.expressedTranscripts) {
-            if (transcriptMap.containsKey(transcript.getAccessionIdNoVersion())) {
-                HbaDealsTranscriptResult transcriptResult = transcriptMap.get(transcript.getAccessionIdNoVersion());
+            if (transcriptMap.containsKey(transcript.accessionId())) {
+                HbaDealsTranscriptResult transcriptResult = transcriptMap.get(transcript.accessionId());
                 var row = getIsoformRow(transcriptResult);
                 rows.add(row);
             }
@@ -181,37 +181,21 @@ public class EnsemblVisualizable implements Visualizable {
         return rows;
     }
 
-
-    private String getPrositeHtmlAnchor(String id, String label) {
-        String url = "https://prosite.expasy.org/cgi-bin/prosite/prosite-search-ac?" + id;
-        return "<a href=\"" + url +"\" target=\"__blank\">" + label +"</a>\n";
-    }
-
-
+    /**
+     * @return a list of interpro annotations that cover the isoforms of the gene that are expressed in our data
+     */
     @Override
-    public List<List<String>> getPrositeModuleLinks(Map<String, String> prositeIdToName) {
-        var prositeHitMap = this.agene.getPrositeHitMap();
-        SortedMap<String,String> uniqueHitsMap = new TreeMap<>();
-        for (List<PrositeHit> hits : prositeHitMap.values()) {
-            for (PrositeHit hit : hits) {
-                String acc = hit.getAccession();
-                if (prositeIdToName.containsKey(acc)) {
-                    uniqueHitsMap.putIfAbsent(acc, prositeIdToName.get(acc));
-                }
+    public List<DisplayInterproAnnotation> getInterproForExpressedTranscripts() {
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> interproMap = this.agene.getTranscriptToInterproHitMap();
+        Set<DisplayInterproAnnotation> interpro = new HashSet<>();
+        for (AccessionNumber transcriptId : this.hbaDealsResult.getTranscriptMap().keySet()) {
+            if (interproMap.containsKey(transcriptId)) {
+                interpro.addAll(interproMap.get(transcriptId));
             }
         }
-        List<List<String>> prositeLinks = new ArrayList<>();
-        for (var entry : uniqueHitsMap.entrySet()) {
-            String id = entry.getKey();
-            String label = entry.getValue();
-            String anchor = getPrositeHtmlAnchor(id, label);
-            List<String> row = new ArrayList<>();
-            row.add(id);
-           // row.add(label);
-            row.add(anchor);
-            prositeLinks.add(row);
-        }
-        return prositeLinks;
+        List<DisplayInterproAnnotation> sortedList = new ArrayList<>(interpro);
+        Collections.sort(sortedList);
+        return sortedList;
     }
 
     @Override
