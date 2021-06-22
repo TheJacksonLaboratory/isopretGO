@@ -126,7 +126,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
                 .orElse(this.genomicMinPos + 1000); // We should never actually need the orElse
         this.genomicSpan = this.genomicMaxPos - this.genomicMinPos;
         this.paddedGenomicMinPos = genomicMinPos - (int) (0.05 * (this.genomicSpan));
-        this.paddedGenomicMaxPos = genomicMaxPos + (int) (0.23 * (this.genomicSpan));
+        this.paddedGenomicMaxPos = genomicMaxPos + (int) (0.3 * (this.genomicSpan));
         this.paddedGenomicSpan = this.paddedGenomicMaxPos - this.paddedGenomicMinPos;
         this.scaleBasePairs = 1 + this.genomicMaxPos - this.genomicMinPos;
         this.scaleMinPos = translateGenomicToSvg(genomicMinPos);
@@ -483,13 +483,18 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @throws IOException if we cannot write
      */
     private void writeGeneExpression(Writer writer, int ypos) throws IOException {
-        int xpos = 1050;
-        String txt = String.format("<text font-style=\"italic\" font-weight=\"bold\" font-size=\"1.2em\" x=\"%d\" y=\"%d\" style=\"fill:%s;font-size:24px;\">Expression:</text>\n",
-                xpos, ypos, DARKBLUE);
+        int xpos = 950;
+        ypos = 100;
+        writer.write(SvgUtil.boldItalicText(xpos, ypos, DARKBLUE, 24, "Expression"));
+        String roundedBox = String.format("<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"40.000000\" rx=\"15\" style=\"border:solid 1px;stroke:#000000;fill:%s;fill-opacity:.25;text-align:center\"/>",
+                    xpos-20,ypos-27, 150, "#E0FFFF");
+        writer.write(roundedBox);
+
+        ypos += 20;
+
         double expressionLog2FoldChange = this.hbaDealsResult.getExpressionFoldChange();
         double expressionPval = this.hbaDealsResult.getExpressionP();
         writeFoldChange(expressionLog2FoldChange, expressionPval, this.differentiallyExpressed, ypos, writer);
-        writer.write(txt);
     }
 
     /**

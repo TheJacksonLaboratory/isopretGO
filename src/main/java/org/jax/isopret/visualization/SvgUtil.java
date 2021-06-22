@@ -13,4 +13,10 @@ public class SvgUtil {
         return String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-size:%dpx\">%s</text>\n",
                 x, y, textColor, textPx, message);
     }
+    public static String boldItalicText(double x, double y, String textColor, int textPx, String message) {
+        return String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-style:italic;font-weight:bold;font-size:%dpx\">%s</text>\n",
+                x, y, textColor, textPx, message);
+    }
+
+
 }
