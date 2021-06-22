@@ -3,12 +3,15 @@ package org.jax.isopret.transcript;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AnnotatedGene implements Comparable<AnnotatedGene> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotatedGene.class);
     /** All annotated transcripts of some gene */
     private final List<Transcript> transcripts;
 
@@ -63,7 +66,6 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 expressedTranscriptMap.put(t, logFC);
             }
         }
-
         this.differentiallySpliced = Optional.empty();
         this.differentiallyExpressed = Optional.empty();
         this.expressionThreshold = Optional.empty();
@@ -210,6 +212,5 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         }
        return false;
     }
-
 
 }

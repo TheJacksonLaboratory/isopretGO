@@ -19,8 +19,7 @@ public class Main implements Callable<Integer> {
                 .addSubcommand("download", new DownloadCommand())
                 .addSubcommand("hbadeals", new HbaDealsCommand())
                 .addSubcommand("interpro", new InterproSummaryCommand())
-                .addSubcommand("svg", new SvgCommand())
-                .addSubcommand("stats", new DumpStatsCommand());
+                .addSubcommand("svg", new SvgCommand());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);
         System.exit(exitCode);

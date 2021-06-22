@@ -144,6 +144,7 @@ public class EnsemblVisualizable implements Visualizable {
             AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene);
             return svggen.getSvg();
         } catch (Exception e) {
+            LOGGER.error("Could not generate protein SVG: {}", e.getMessage());
             return "<p>Could not generate protein SVG because: " + e.getMessage() + "</p>";
         }
     }
