@@ -16,7 +16,6 @@ import org.jax.isopret.visualization.AbstractSvgGenerator;
 import org.jax.isopret.visualization.ProteinSvgGenerator;
 import org.jax.isopret.visualization.TranscriptSvgGenerator;
 import org.monarchinitiative.svart.GenomicAssemblies;
-import org.monarchinitiative.svart.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -55,47 +54,21 @@ public class SvgCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
+        JannovarReader jreader = new JannovarReader(this.jannovarPath, GenomicAssemblies.GRCh38p13());
+        Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
         Map<AccessionNumber, HgncItem> hgncMap;
         HgncParser hgncParser = new HgncParser();
         if (this.namespace.equalsIgnoreCase("ensembl")) {
             hgncMap = hgncParser.ensemblMap();
-//        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
-//            hgncMap = hgncParser.ucscMap();
-//        } else if (this.namespace.equalsIgnoreCase("refseq")) {
-//            hgncMap = hgncParser.refseqMap();
         } else {
-            throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
+            throw new IsopretRuntimeException("Only ensembl supported but you entered " + this.namespace);
         }
-        Map<String, AccessionNumber> geneSymbolToAccessionMap =
-                hgncMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(e -> e.getValue().getGeneSymbol(), Map.Entry::getKey));
-        LOGGER.trace("SVG command");
-        LOGGER.trace("jannovar path: {}", jannovarPath);
-        LOGGER.trace("interpro: {}", interproDomainsFile);
-        LOGGER.trace("interpro Desc: {}", interproDescriptionFile);
-        GenomicAssembly hg38 =  GenomicAssemblies.GRCh38p13();
-        JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
-        Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
-        InterproMapper interproMapper = new InterproMapper(this.interproDescriptionFile, this.interproDomainsFile);
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
-        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
-        if (! hbaDealsResults.containsKey(this.geneSymbol)) {
-            System.out.printf("[ERROR] Could not find HBA-DEALS result for %s\n", this.geneSymbol);
-            return 1;
-        }
-        LOGGER.trace("Get HBA-DEALS result for: {}", this.geneSymbol);
-        HbaDealsResult result = hbaDealsResults.get(this.geneSymbol);
-        List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
-        // Get AccessionNumber object corresponding to gene symbol
-        AccessionNumber geneAccession = geneSymbolToAccessionMap.get(this.geneSymbol);
-        LOGGER.trace("Accession {} found for gene symbol {}", geneAccession.getAccessionString(), this.geneSymbol);
-        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = interproMapper.transcriptToInterproHitMap(geneAccession);
-        LOGGER.trace("Got {} transcripts with annotations for gene accession {} found for gene symbol {}",
-                annotList.size(), geneAccession.getAccessionString(), this.geneSymbol);
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = gettranscriptToInterproHitMap(hgncMap);
+
+        // Get HBADEALS result for one gene (this.geneSymbol)
+        HbaDealsResult result = getHbaDealsResultForGene(hgncMap);
+        List<Transcript> transcripts = geneSymbolToTranscriptMap.get(this.geneSymbol);
         AnnotatedGene agene = new AnnotatedGene(transcripts, annotList,result);
-
-
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         String isoformSvg = svggen.getSvg();
         svggen = ProteinSvgGenerator.factory(agene);
@@ -118,11 +91,54 @@ public class SvgCommand implements Callable<Integer> {
         return 0;
     }
 
+    /**
+     * This command extracts a result for a single gene (this.geneSymbol) from the HBADEALS file in the input.
+     * If it cannot find the gene, it throws a runtime exception
+     * @param hgncMap Map between ensembl accession numbers and {@link HgncItem} objects.
+     * @return {@link HbaDealsResult} object corresponding to {@link #geneSymbol}
+     */
+    private HbaDealsResult getHbaDealsResultForGene(Map<AccessionNumber, HgncItem> hgncMap) {
+        LOGGER.trace("SVG-jannovar path: {}, interpro: {}, nterpro Desc: {}", jannovarPath, interproDomainsFile, interproDescriptionFile);
+        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
+        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        if (! hbaDealsResults.containsKey(this.geneSymbol)) {
+            throw new IsopretRuntimeException(String.format("[ERROR] Could not find HBA-DEALS result for %s\n", this.geneSymbol));
+        }
+        LOGGER.trace("Get HBA-DEALS result for: {}", this.geneSymbol);
+        HbaDealsResult result = hbaDealsResults.get(this.geneSymbol);
+        return result;
+    }
+
+    /**
+     * Parse the two interpro files and extract all entries that relate to {@link #geneSymbol}
+     * @param hgncMap map of {@link HgncItem} objects
+     * @return a map with key: Ensembl transcript, value: list of interpro annotations for display.
+     */
+    private Map<AccessionNumber, List<DisplayInterproAnnotation>> gettranscriptToInterproHitMap(Map<AccessionNumber, HgncItem> hgncMap) {
+        InterproMapper interproMapper = new InterproMapper(this.interproDescriptionFile, this.interproDomainsFile);
+        Map<String, AccessionNumber> geneSymbolToAccessionMap =
+                hgncMap.entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(e -> e.getValue().getGeneSymbol(), Map.Entry::getKey));
+        // Get AccessionNumber object corresponding to gene symbol
+        AccessionNumber geneAccession = geneSymbolToAccessionMap.get(this.geneSymbol);
+        LOGGER.trace("Accession {} found for gene symbol {}", geneAccession.getAccessionString(), this.geneSymbol);
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = interproMapper.transcriptToInterproHitMap(geneAccession);
+        LOGGER.trace("Got {} transcripts with annotations for gene accession {} found for gene symbol {}",
+                annotList.size(), geneAccession.getAccessionString(), this.geneSymbol);
+        return annotList;
+    }
+
+
+    /**
+     * This is a convenience function that runs {@code rsvg-convert} to convert the SVG files it writes into corresponding
+     * PDF graphic files.
+     * @param svgFileName name of the input SVG file (which is created by this program in a first step).
+     */
     private void convertToPdf(String svgFileName) {
         /*
          -f pdf -o mygraph.pdf mygraph.svg
          */
-
         String pdfFileName = svgFileName.replace(".svg", ".pdf");
         Runtime rt = Runtime.getRuntime();
 

@@ -64,7 +64,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      *
      * @return coordinate of a given protein amino acid position in SVG space
      */
-    protected double translateProteinToSvgCoordinate(int aminoAcidPosition) {
+    private double translateProteinToSvgCoordinate(int aminoAcidPosition) {
         final double span = this.proteinMaxSvgPos - this.proteinMinSvgPos;
         double prop = (double) aminoAcidPosition / (double) maxProteinLength;
         return this.proteinMinSvgPos + prop * span;
@@ -78,14 +78,11 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      * @param writer file handle
      * @throws IOException if we cannot write the box
      */
-    protected void writeProteinBox(Transcript transcript, double xend, int ypos, double logFC, Writer writer) throws IOException {
+    private void writeProteinBox(Transcript transcript, double xend, int ypos, double logFC, Writer writer) throws IOException {
         double xstart = this.proteinMinSvgPos;
         double width = xend - xstart;
         double Y = ypos - 0.5 * ISOFORM_HEIGHT;
-        String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%d\" " +
-                        "style=\"stroke:%s; fill:none \" />\n",
-                xstart, Y, width, ISOFORM_HEIGHT, BLACK);
-        writer.write(rect);
+        writer.write(SvgUtil.unfilledBox(xstart, Y, width, ISOFORM_HEIGHT));
         Y = ypos - 0.55 * ISOFORM_HEIGHT;
         String payload = String.format("%s (log-fold change: %.2f)",transcript.accessionId().getAccessionString(), logFC);
         String label = SvgUtil.text(xstart+5, Y-5, PURPLE, 24, payload);
@@ -144,18 +141,18 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                 double Xmiddle = xstart + 0.5*width;
                 double Xend = xstart + width;
                 System.out.println("SITE-" + hit.getInterproEntry().getDescription() + ":" + hit.getStart() + "-" + hit.getEnd());
-                String line = String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"%s\" />",
-                Xmiddle, Y, Xmiddle, Y2, color);
+//                String line = String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"%s\" />",
+//                Xmiddle, Y, Xmiddle, Y2, color);
                 //writer.write(line);
                 String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
                         "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, xstart, Ytop, xend, Ytop, color);
-                String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" " +
-                                "style=\"fill:%s;stroke:black;stroke-width:1\" />\n",
-                        xstart, Y2, width, 0.25*ISOFORM_HEIGHT, color);
+//                String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" " +
+//                                "style=\"fill:%s;stroke:black;stroke-width:1\" />\n",
+//                        xstart, Y2, width, 0.25*ISOFORM_HEIGHT, color);
                 writer.write(triangle);
             } else {
                 String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%d\" " +
-                                "style=\"fill:%s;stroke:black;stroke-width:1\" />\n",
+                                "style=\"fill:%s;fill-opacity:0.9;stroke:black;stroke-width:1\" />\n",
                         xstart, Y, width, ISOFORM_HEIGHT, color);
                 writer.write(rect);
             }

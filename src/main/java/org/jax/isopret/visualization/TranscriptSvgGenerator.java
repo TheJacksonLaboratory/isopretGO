@@ -19,20 +19,22 @@ import java.util.stream.Collectors;
 
 
 /**
- * Structural variant (SV) Scalar Vector Graphic (SVG) generator.
+ * Structural variant (SV) Scalar Vector Graphic (SVG) generator for genes/isoforms.
+ * The differential gene expression as well as differential alternative splicing is
+ * visualized for all isoforms reported by HBADEALS analysis.
  *
  * @author Peter N Robinson
  */
 public class TranscriptSvgGenerator extends AbstractSvgGenerator {
-    static final int SVG_WIDTH = 1400;
+    private static final int SVG_WIDTH = 1400;
 
-    static final int HEIGHT_FOR_SV_DISPLAY = 200;
-    static final int HEIGHT_PER_DISPLAY_ITEM = 100;
+    private static final int HEIGHT_FOR_SV_DISPLAY = 150;
+    private static final int HEIGHT_PER_DISPLAY_ITEM = 100;
 
     /**
      * List of transcripts that are affected by the SV and that are to be shown in the SVG.
      */
-    protected final List<Transcript> affectedTranscripts;
+    private final List<Transcript> affectedTranscripts;
 
     /**
      * Number of base pairs from left to right boundary of the display area
@@ -41,19 +43,19 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * Leftmost position (most 5' on chromosome).
      */
-    protected final int genomicMinPos;
+    private final int genomicMinPos;
     /**
      * Rightmost position (most 3' on chromosome).
      */
-    protected final int genomicMaxPos;
+    private final int genomicMaxPos;
     /**
      * Equivalent to {@link #genomicMinPos} minus an offset so that the display items are not at the very edge.
      */
-    protected final int paddedGenomicMinPos;
+    private final int paddedGenomicMinPos;
     /**
      * Equivalent to {@link #genomicMaxPos} plus an offset so that the display items are not at the very edge.
      */
-    protected final int paddedGenomicMaxPos;
+    private final int paddedGenomicMaxPos;
     /**
      * Number of base pairs from left to right boundary of the entire canvas
      */
@@ -68,7 +70,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private final int scaleBasePairs;
 
 
-    protected final double INTRON_MIDPOINT_ELEVATION = 10.0;
+    private final double INTRON_MIDPOINT_ELEVATION = 10.0;
     /**
      * Height of the symbols that represent the transcripts
      */
@@ -76,7 +78,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * Y skip to put text underneath transcripts. Works with {@link #writeTranscriptName}
      */
-    protected final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
+    private final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
 
     private final HbaDealsResult hbaDealsResult;
 
@@ -139,7 +141,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * @return SVG coordinate that corresponds to a genomic position.
      */
-    protected double translateGenomicToSvg(int genomicCoordinate) {
+    private double translateGenomicToSvg(int genomicCoordinate) {
         double pos = genomicCoordinate - paddedGenomicMinPos;
         if (pos < 0) {
             throw new IsopretRuntimeException("Bad left boundary (genomic coordinate-"); // should never happen
@@ -152,13 +154,13 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * Write a coding exon
      *
-     * @param start start position in SVG sapce of a CDS exon
-     * @param end end position in SVG sapce of a CDS exon
+     * @param start start position in SVG space of a CDS exon
+     * @param end end position in SVG space of a CDS exon
      * @param ypos vertical position to draw exon
      * @param writer file handle
      * @throws IOException if we cannot write the exon
      */
-    protected void writeCdsExon(double start, double end, int ypos, Writer writer) throws IOException {
+    private void writeCdsExon(double start, double end, int ypos, Writer writer) throws IOException {
         double width = end - start;
         double Y = ypos - 0.5 * EXON_HEIGHT;
         String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
@@ -176,7 +178,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @param writer file handle
      * @throws IOException if we cannot write
      */
-    protected void writeUtrExon(double start, double end, int ypos, Writer writer) throws IOException {
+    private void writeUtrExon(double start, double end, int ypos, Writer writer) throws IOException {
         double width = end - start;
         double Y = ypos - 0.5 * EXON_HEIGHT;
         String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\"  " +
@@ -306,42 +308,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
     }
 
-    /**
-     * Differential can be used buy expression or isoform to indicated if we show n.s. for the probability.
-     * @param logFc log fold change
-     * @param prob probability
-     * @param differential is this element differentially expressed/spliced?
-     * @param ypos vertical position to draw
-     * @param writer file handle
-     * @throws IOException if we cannot write
-     */
-    private void writeFoldChange(double logFc, double prob, boolean differential, int ypos, Writer writer) throws IOException {
-        double startpos = translateGenomicToSvg(this.genomicMaxPos) + 25.0;
-        writer.write(String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\"/>\n",
-                startpos, (double) ypos, startpos + 30, (double) ypos));
-        double width = 20.0;
-        double boxstart = startpos + 5.0;
-        double factor = 25; // multiple logFC by this to get height
-        String rect;
-        if (logFc > 0.0) {
-            double height = logFc * factor;
-            double ybase = (double) ypos - height;
-            rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
-                            "style=\"stroke:%s;font-size:24px; fill: %s\" />\n",
-                    boxstart, ybase, width, height, BLACK, GREEN);
-        } else {
-            double height = logFc * -factor;
-            rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"2\" " +
-                            "style=\"stroke:%s;fill:%s\" />\n",
-                    boxstart, (double) ypos, width, height, BLACK, RED);
-        }
-        writer.write(rect);
-        double xpos = startpos + width + 15;
-        String txt = String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-size:24px;\">%s</text>\n",
-                xpos, (double) ypos, PURPLE, getFormatedPvalue(logFc, prob, differential));
-        writer.write(txt);
 
-    }
 
 
     /**
@@ -419,7 +386,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     }
 
 
-    protected void writeScale(Writer writer, int ypos) throws IOException {
+    private void writeScale(Writer writer, int ypos) throws IOException {
         int verticalOffset = 10;
         String line = String.format("<line x1=\"%f\" y1=\"%d\"  x2=\"%f\"  y2=\"%d\" style=\"stroke: #000000; fill:none;" +
                 " stroke-width: 1px;" +
@@ -446,7 +413,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @param seqlen number of base bairs
      * @return String such as 432 bp, 4.56 kb or 1.23 Mb
      */
-    protected String getSequenceLengthString(int seqlen) {
+    private String getSequenceLengthString(int seqlen) {
         if (seqlen < 1_000) {
             return String.format("%d bp", seqlen);
         } else if (seqlen < 1_000_000) {
@@ -483,18 +450,59 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @throws IOException if we cannot write
      */
     private void writeGeneExpression(Writer writer, int ypos) throws IOException {
-        int xpos = 950;
-        ypos = 100;
-        writer.write(SvgUtil.boldItalicText(xpos, ypos, DARKBLUE, 24, "Expression"));
-        String roundedBox = String.format("<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"40.000000\" rx=\"15\" style=\"border:solid 1px;stroke:#000000;fill:%s;fill-opacity:.25;text-align:center\"/>",
-                    xpos-20,ypos-27, 150, "#E0FFFF");
-        writer.write(roundedBox);
-
-        ypos += 20;
-
-        double expressionLog2FoldChange = this.hbaDealsResult.getExpressionFoldChange();
+        double xpos = this.scaleMaxPos/2.0;
+        String symbol = this.hbaDealsResult.getSymbol();
+        double boxlen = 15 * symbol.length();
+        writer.write(SvgUtil.boldItalicText(xpos, ypos, DARKBLUE, 24, symbol));
+       // ypos += 20;
+        double logFc = this.hbaDealsResult.getExpressionFoldChange();
         double expressionPval = this.hbaDealsResult.getExpressionP();
-        writeFoldChange(expressionLog2FoldChange, expressionPval, this.differentiallyExpressed, ypos, writer);
+        xpos += 20 * symbol.length();
+        writer.write(SvgUtil.line(xpos, ypos, xpos+30, ypos));
+        double width = 20.0;
+        double factor = 25; // multiple logFC by this to get height
+        double boxstart = xpos + 5.0;
+        if (logFc > 0.0) {
+            double height = logFc * factor;
+            double ybase = (double) ypos - height;
+            writer.write(SvgUtil.filledBox(boxstart, ybase, width, height, BLACK, GREEN));
+        } else {
+            double height = logFc * -factor;
+            writer.write(SvgUtil.filledBox(boxstart, ypos, width, height, BLACK, RED));
+        }
+
+        xpos += 50;
+        String pvalTxt = SvgUtil.text(xpos, ypos,PURPLE, 24, getFormatedPvalue(logFc, expressionPval, this.differentiallyExpressed));
+        writer.write(pvalTxt);
+    }
+
+    /**
+     * Differential can be used buy expression or isoform to indicated if we show n.s. for the probability.
+     * @param logFc log fold change
+     * @param prob probability
+     * @param differential is this element differentially expressed/spliced?
+     * @param ypos vertical position to draw
+     * @param writer file handle
+     * @throws IOException if we cannot write
+     */
+    private void writeFoldChange(double logFc, double prob, boolean differential, double xpos, double ypos, Writer writer) throws IOException {
+        writer.write(SvgUtil.line(xpos, ypos, xpos+30, ypos));
+        double width = 20.0;
+        double factor = 25; // multiple logFC by this to get height
+        double boxstart = xpos + 5.0;
+        if (logFc > 0.0) {
+            double height = logFc * factor;
+            double ybase = (double) ypos - height;
+            writer.write(SvgUtil.filledBox(boxstart, ybase, width, height, BLACK, GREEN));
+        } else {
+            double height = logFc * -factor;
+            writer.write(SvgUtil.filledBox(boxstart, ypos, width, height, BLACK, RED));
+        }
+        String txt = String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-size:24px;\">%s</text>\n",
+                xpos, ypos, PURPLE, getFormatedPvalue(logFc, prob, differential));
+        txt = SvgUtil.text(xpos, ypos,PURPLE, 12, getFormatedPvalue(logFc, prob, differential));
+        writer.write(txt);
+
     }
 
     /**
@@ -505,10 +513,10 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     @Override
     public void write(Writer writer) {
-        int y = 80;
+        int y = 50;
         try {
             writeGeneExpression(writer, y);
-            y += 100;
+            y += 60;
             for (var tmod : this.affectedTranscripts) {
                 if (tmod.isCoding()) {
                     writeCodingTranscript(tmod, y, writer);

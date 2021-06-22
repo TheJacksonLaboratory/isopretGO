@@ -136,8 +136,7 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public String getProteinSvg() {
         try {
-            // Return a message only if we cannot find prosite domains.
-           // if (agene.getPrositeHitMap().isEmpty()) {
+            // Return a message if there are no prosite domains to display for this protein/gene.
            if (! agene.hasInterproAnnotations()) {
                 return ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
             }
