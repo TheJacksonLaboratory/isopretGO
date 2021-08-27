@@ -3,7 +3,7 @@
 # for adding an edge between two isoforms (1) the genes containing them share a function/GO term 
 # (2) they share at least one domain.   The weight of an edge is the size of the intersection of the
 # isoforms' domains divided by the size of the untion of the isoform's domains
-# (i.e. a value between 0 and 1).  The isoforms are then clustered into communities using the Louvain 
+# (i.e. a value between 0 and 1).  The isoforms are then clustered into communities using the infomap 
 # algorithm.  The community membership is then used by the script predict_funtion.R to predict isoform
 # functions.
 
@@ -152,7 +152,7 @@ save.image('function_2.RData')
 
 #Run the Louvain algorithm on the graph:
 
-res=cluster_louvain(g)
+res=cluster_infomap(g)
 
 save.image('function_2.RData')
 

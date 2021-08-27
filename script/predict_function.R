@@ -1,6 +1,6 @@
 # This script is runafter fast_function.R and uses data structures created there, therefore it is loading
 # an .RData file.   The prediction proceeds as follows:  For each isoform, look at the distribution 
-# of GO terms of other isoforms in its community (communities are assigned by the Louvain algorithm in
+# of GO terms of other isoforms in its community (communities are assigned by the infomap algorithm in
 # the script faster_function.R). Go terms that appear more than expected by chance(with respect to their
 # frequency in the population, i.e all the genes in the data), and also belong to the gene that contains the
 # isoform, are selected as the isoform's functions.
@@ -40,7 +40,7 @@ isoform.functions=do.call(rbind,mclapply(isoforms,function(isoform)
   
   if (length(unlist(cur.funcs))==0)
     
-    return(matrix(nrow=0,ncol=4))
+    return(matrix(nrow=0,ncol=3))
   
   #Use the binomial test to get a p-value for each term to assess its over-representation:
   
@@ -57,12 +57,12 @@ isoform.functions=do.call(rbind,mclapply(isoforms,function(isoform)
   
   #return the p-values found for this isoforms and the GO terms
   
-  matrix(c(rep(isoform,length(cur.counts)),names(cur.counts),p.vals,p.adjust(p.vals,method='BH')),ncol=4)
+  matrix(c(rep(isoform,length(cur.counts)),names(cur.counts),p.vals),ncol=3)
   
 },mc.cores=n.cores))
 
-colnames(isoform.functions)=c('Ensembl ID','Go Terms','P.Val','P.adjusted')
+isoform.functions=cbind(isoform.functions,p.adjust(isoform.functions[,3]))
 
-#isoform.functions=isoform.functions[isoform.functions[,4]<=0.05,]
+colnames(isoform.functions)=c('Ensembl ID','Go Terms','P.Val','P.adjusted')
 
 write.table(isoform.functions,'predicted_isoform_functions.txt',sep='\t',quote=F,row.names=F,col.names=T)
