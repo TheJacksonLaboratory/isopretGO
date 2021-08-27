@@ -148,12 +148,12 @@ for (i in 1:slice.num)
   
 }
 
-save.image('function_2.RData')
+save.image('function.RData')
 
 #Run the Louvain algorithm on the graph:
 
 res=cluster_infomap(g)
 
-save.image('function_2.RData')
+save.image('function.RData')
 
 
