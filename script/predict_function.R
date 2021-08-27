@@ -28,7 +28,7 @@ isoform.functions=do.call(rbind,mclapply(isoforms,function(isoform)
   
   if (length(unlist(cur.funcs))==0)
     
-    return(matrix(nrow=0,ncol=4))
+    return(matrix(nrow=0,ncol=3))
   
   #Count the number of times each GO term appears in other community members:
    
