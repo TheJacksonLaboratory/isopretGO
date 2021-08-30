@@ -1,15 +1,15 @@
-#use after fast_function.R,  this scripts uses data structures from the previous script
+#use after faster_function.R,  this scripts uses data structures from the previous script
 library(parallel)
 
 library(igraph)
 
-library(goseq)
+load('function_2.RData')
 
-load('function.RData')
+res=cluster_infomap(g)
 
 gene.functions=getgo(unique(interpro.tab$ensembl_gene_id),'hg38','ensGene',fetch.cats="GO:BP")
 
-n.cores=32
+n.cores=4
 
 function.counts=table(unlist(gene.functions))
 
@@ -23,13 +23,13 @@ isoform.functions=do.call(rbind,mclapply(isoforms,function(isoform)
  
   if (length(unlist(cur.funcs))==0)
     
-    return(matrix(nrow=0,ncol=4))
+    return(matrix(nrow=0,ncol=3))
    
   adj.vtx=ends(g, E(g)[from(which(isoforms==isoform))])[,1]
   
   if (length(adj.vtx)==0)
     
-    return(matrix(nrow=0,ncol=4))
+    return(matrix(nrow=0,ncol=3))
   
   if (adj.vtx[1]==which(isoforms==isoform))
     
@@ -43,7 +43,7 @@ isoform.functions=do.call(rbind,mclapply(isoforms,function(isoform)
     
   if (length(unlist(adj.vtx))==0)
     
-    return(matrix(nrow=0,ncol=4))
+    return(matrix(nrow=0,ncol=3))
   
   cur.counts=unlist(lapply(unlist(cur.funcs),function(x)sum(unlist(lapply(1:length(adj.vtx),function(i)sum(e.weights[i]*gene.functions[[genes[adj.vtx[i]]]] %in% unlist(x)))))))
     
@@ -53,7 +53,7 @@ isoform.functions=do.call(rbind,mclapply(isoforms,function(isoform)
   
   if (length(unlist(cur.funcs))==0)
     
-    return(matrix(nrow=0,ncol=4))
+    return(matrix(nrow=0,ncol=3))
   
   p.vals=c()
   
@@ -66,12 +66,12 @@ isoform.functions=do.call(rbind,mclapply(isoforms,function(isoform)
     
   }
   
-  matrix(c(rep(isoform,length(cur.counts)),names(cur.counts),p.vals,p.adjust(p.vals,method='BH')),ncol=4)
+  matrix(c(rep(isoform,length(cur.counts)),names(cur.counts),p.vals),ncol=3)
   
 },mc.cores=n.cores))
 
-colnames(isoform.functions)=c('Ensembl ID','Go Terms','P.Val','P.adjusted')
+isoform.functions=cbind(isoform.functions,p.adjust(isoform.functions[,3]))
 
-#isoform.functions=isoform.functions[isoform.functions[,4]<=0.05,]
+colnames(isoform.functions)=c('Ensembl ID','Go Terms','P.Val','P.adjusted')
 
 write.table(isoform.functions,'predicted_isoform_functions.txt',sep='\t',quote=F,row.names=F,col.names=T)
