@@ -3,9 +3,9 @@ library(parallel)
 
 library(igraph)
 
-load('function_2.RData')
+library(goseq)
 
-res=cluster_infomap(g)
+load('function.RData')
 
 gene.functions=getgo(unique(interpro.tab$ensembl_gene_id),'hg38','ensGene',fetch.cats="GO:BP")
 
