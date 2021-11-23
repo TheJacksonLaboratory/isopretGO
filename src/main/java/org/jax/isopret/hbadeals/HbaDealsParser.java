@@ -81,7 +81,7 @@ public class HbaDealsParser {
                 symbol = hgncMap.get(hline.geneAccession).getGeneSymbol();
                 found_symbol++;
             } else {
-                LOGGER.warn("Could not find symbol for " + hline.geneAccession);
+                LOGGER.warn("Could not find symbol for " + hline.geneAccession.getAccessionString());
                 missed_symbol++;
             }
             this.hbaDealsResultMap.putIfAbsent(symbol, new HbaDealsResult(hline.geneAccession, symbol));

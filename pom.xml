@@ -5,7 +5,7 @@
 
     <groupId>org.jax</groupId>
     <artifactId>isopret</artifactId>
-    <version>0.6.6</version>
+    <version>0.6.7</version>
     <packaging>jar</packaging>
 
     <name>isopret</name>
@@ -16,12 +16,12 @@
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <junit.version>5.7.0</junit.version>
+        <junit.version>5.8.1</junit.version>
         <junit.platform.version>1.7.0</junit.platform.version>
-        <slf4j.version>1.7.30</slf4j.version>
-        <phenol.version>1.6.2</phenol.version>
+        <slf4j.version>1.7.32</slf4j.version>
+        <phenol.version>1.6.3</phenol.version>
         <jannovar.version>0.36</jannovar.version>
-        <svart.version>1.0.0</svart.version>
+        <svart.version>1.0.1</svart.version>
     </properties>
 
 
@@ -82,13 +82,13 @@
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.8.0</version>
+            <version>20030805.205232</version>
         </dependency>
 
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
-            <version>4.6.1</version>
+            <version>4.6.2</version>
         </dependency>
 
         <dependency>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>3.11.1</version>
+            <version>4.0.0</version>
             <scope>test</scope>
         </dependency>
 
