@@ -2,8 +2,11 @@ package org.jax.isopret.prosite;
 
 
 import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.transcript.AccessionNumber;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,7 +23,7 @@ public class PrositeMapParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrositeMapParser.class);
     private final Map<String,String> prositeNameMap;
 
-    private final  Map<String, PrositeMapping> prositeMappingMap;
+    private final  Map<AccessionNumber, PrositeMapping> prositeMappingMap;
 
     public PrositeMapParser(String prositeMapFile, String prositeDatFile) {
         prositeNameMap = getPrositeEntryNames(prositeDatFile);
@@ -41,23 +44,27 @@ public class PrositeMapParser {
      * @param prositeMapFile Our mapping of prosite modules to transcript locations
      * @return map with key=gene ID, value {@link PrositeMapping} object with prosite hits for the transcripts of the gene
      */
-    private Map<String, PrositeMapping> getPrositeMappings(String prositeMapFile) {
-        Map<String, PrositeMapping> prositeMappingMap = new HashMap<>();
+    private Map<AccessionNumber, PrositeMapping> getPrositeMappings(String prositeMapFile) {
+        Map<AccessionNumber, PrositeMapping> prositeMappingMap = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(prositeMapFile))) {
             String line;
             while ((line = br.readLine()) != null) {
+                if (line.startsWith("ensembl_transcript_id")) {
+                    continue;
+                }
                 String [] fields = line.split("\t");
                 if (fields.length != 5) {
                     throw new IsopretRuntimeException("Malformed prosite map file line: " + line);
                 }
                 String transcriptID = fields[0];
                 String geneID = fields[1];
+                AccessionNumber geneAccession = AccessionNumber.ensemblGene(geneID);
                 String prositeAc = fields[2];
                try {
                    int begin = Integer.parseInt(fields[3]);
                    int end = Integer.parseInt(fields[4]);
-                   prositeMappingMap.putIfAbsent(geneID, new PrositeMapping(transcriptID, geneID));
-                   prositeMappingMap.get(geneID).addPrositeHit(transcriptID, prositeAc, begin, end);
+                   prositeMappingMap.putIfAbsent(geneAccession, new PrositeMapping(transcriptID, geneID));
+                   prositeMappingMap.get(geneAccession).addPrositeHit(transcriptID, prositeAc, begin, end);
                } catch (NumberFormatException e) {
                    LOGGER.error("[ERROR] Could not parse line in prosite map ({}): {}.\n", line, e.getMessage());
                }
@@ -107,7 +114,7 @@ public class PrositeMapParser {
         return prositeNameMap;
     }
 
-    public Map<String, PrositeMapping> getPrositeMappingMap() {
+    public Map<AccessionNumber, PrositeMapping> getPrositeMappingMap() {
         return prositeMappingMap;
     }
 }

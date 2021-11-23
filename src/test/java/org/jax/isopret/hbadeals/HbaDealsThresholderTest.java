@@ -3,6 +3,7 @@ package org.jax.isopret.hbadeals;
 import org.jax.isopret.hgnc.HgncItem;
 import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.transcript.AccessionNumber;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -10,24 +11,26 @@ import java.util.*;
 /**
  * Convenience method to run tests, not an actual unit test at this time.
  */
+@Disabled
 public class HbaDealsThresholderTest {
-
-    private final static HgncParser hgncParser = new HgncParser();
+/*
+   private final static HgncParser hgncParser = new HgncParser();
     private final static Map<AccessionNumber, HgncItem> hgncMap = hgncParser.ensemblMap();
     @Deprecated
+
     private double getDgeThreshold(String name) {
-        String hbadealsFile = "/home/peter/GIT/covidASmanuscript/data/HBA-DEALS-files/" + name;
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
+        //String hbadealsFile = "/home/peter/GIT/covidASmanuscript/data/HBA-DEALS-files/" + name;
+        HbaDealsParser hbaParser = new HbaDealsParser(name, hgncMap);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         HbaDealsThresholder thresholder = new HbaDealsThresholder(hbaDealsResults);
         double dgeThreshold = thresholder.getExpressionThreshold();
         int n_dge = thresholder.dgeGeneSymbols().size();
         double dasThreshold = thresholder.getSplicingThreshold();
         int n_das = thresholder.dasGeneSymbols().size();
-        System.out.printf("%s: DGE: %f (%d genes) // DAS: %f (%d genes)\n", name, dgeThreshold, n_dge, dasThreshold, n_das);
+        //System.out.printf("%s: DGE: %f (%d genes) // DAS: %f (%d genes)\n", name, dgeThreshold, n_dge, dasThreshold, n_das);
         return dgeThreshold;
     }
-
+ */
 /*
 
 mason_latest.txt dge 0.25, n dge=445; das 0.13 n_das=1
@@ -93,8 +96,8 @@ SRP227272_38.txt: DGE: 0.249023 (6142 genes) // DAS: 0.190430 (2141 genes)
 SRP278618_58.txt: DGE: 0.249023 (31 genes) // DAS: 0.157227 (2 genes)
 SRP284977_77.txt: DGE: 0.249023 (153 genes) // DAS: 0.165039 (144 genes)
 
- */
-    @Test
+
+@Disabled
     public void test() {
         getDgeThreshold("SRP040070_3.txt");
         getDgeThreshold("SRP040070_7.txt");
@@ -117,7 +120,7 @@ SRP284977_77.txt: DGE: 0.249023 (153 genes) // DAS: 0.165039 (144 genes)
         getDgeThreshold("SRP284977_77.txt");
     }
 
-    @Test
+    @Disabled
     public void test54() {
         String name = "SRP222569_54.txt";
         String hbadealsFile = "/home/peter/GIT/covidASmanuscript/data/HBA-DEALS-files/" + name;
@@ -131,12 +134,12 @@ SRP284977_77.txt: DGE: 0.249023 (153 genes) // DAS: 0.165039 (144 genes)
         Set<String> das = thresholder.dgeGeneSymbols();
         List<String> dasg = new ArrayList<>(das);
         Collections.sort(dasg);
-        for (var s : dasg) {
-            System.out.println(s);
-        }
+//        for (var s : dasg) {
+//            System.out.println(s);
+//        }
 
     }
-
+*/
 
     /*
     DAS for 54

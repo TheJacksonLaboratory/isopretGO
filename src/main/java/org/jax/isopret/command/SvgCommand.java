@@ -60,11 +60,45 @@ public class SvgCommand implements Callable<Integer> {
         HgncParser hgncParser = new HgncParser();
         if (this.namespace.equalsIgnoreCase("ensembl")) {
             hgncMap = hgncParser.ensemblMap();
+        } else if (this.namespace.equalsIgnoreCase("ucsc")) {
+            //hgncMap = hgncParser.ucscMap();
+            throw new UnsupportedOperationException("UCSC not supported");
+        } else if (this.namespace.equalsIgnoreCase("refseq")) {
+            //hgncMap = hgncParser.refseqMap();
+            throw new UnsupportedOperationException("refseq not supported");
         } else {
-            throw new IsopretRuntimeException("Only ensembl supported but you entered " + this.namespace);
+            throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
-        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = gettranscriptToInterproHitMap(hgncMap);
-
+        LOGGER.trace("SVG command");
+        LOGGER.trace("jannovar path: {}", jannovarPath);
+        LOGGER.trace("prositeMapFile: {}", prositeMapFile);
+        LOGGER.trace("prositeDataFile: {}", prositeDataFile);
+        GenomicAssembly hg38 =  GenomicAssemblies.GRCh38p13();
+        JannovarReader jreader = new JannovarReader(this.jannovarPath, hg38);
+        Map<String, List<Transcript>> geneSymbolToTranscriptMap = jreader.getSymbolToTranscriptListMap();
+        PrositeMapParser pmparser = new PrositeMapParser(prositeMapFile, prositeDataFile);
+        Map<AccessionNumber, PrositeMapping> prositeMappingMap = pmparser.getPrositeMappingMap();
+        Map<String, String> prositeIdToName = pmparser.getPrositeNameMap();
+        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
+        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        if (! hbaDealsResults.containsKey(this.geneSymbol)) {
+            System.out.printf("[ERROR] Could not find HBA-DEALS result for %s\n", this.geneSymbol);
+            return 1;
+        }
+        LOGGER.trace("Get HBA-DEALS result for: {}", this.geneSymbol);
+        HbaDealsResult result = hbaDealsResults.get(this.geneSymbol);
+        List<Transcript> transcripts = geneSymbolToTranscriptMap.get(geneSymbol);
+        Map<String, List<PrositeHit>> EMPTY_PROSITE_HIT_MAP = Map.of();
+        Map<String, List<PrositeHit>> prositeHitsForCurrentGene;
+        if (! prositeMappingMap.containsKey(result.getGeneAccession())) {
+            LOGGER.trace("Could not identify prosite Mapping for {}.\n", geneSymbol);
+            prositeHitsForCurrentGene = EMPTY_PROSITE_HIT_MAP;
+        } else {
+            PrositeMapping pmapping = prositeMappingMap.get(result.getGeneAccession());
+            prositeHitsForCurrentGene = pmapping.getTranscriptToPrositeListMap();
+        }
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
+        AnnotatedGene agene = new AnnotatedGene(transcripts, annotList,result);
         // Get HBADEALS result for one gene (this.geneSymbol)
         HbaDealsResult result = getHbaDealsResultForGene(hgncMap);
         List<Transcript> transcripts = geneSymbolToTranscriptMap.get(this.geneSymbol);

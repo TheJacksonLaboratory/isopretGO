@@ -8,14 +8,15 @@ import java.util.List;
 /**
  * Usage
  * <pre>
- * final List<Somthing> myList = ....
+ * final List<Something> myList = ....
  * int chunk = 250;
  * Partition partition = Partition.ofSize(myList, chunk);
  * for (int i=0; i<partition.size(); i++) {
- *     List<Somthing> mySubList = parition.get(i);
+ *     List<Something> mySubList = parition.get(i);
  *     // ....
  * }
  * </pre>
+ * @author Peter Robinson
  * @param <T>
  */
 public final class Partition<T> extends AbstractList<List<T>> {
