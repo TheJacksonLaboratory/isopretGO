@@ -1,8 +1,5 @@
 package org.jax.isopret.ensembl;
 
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
-
 import java.util.*;
 
 public class EnsemblGene {

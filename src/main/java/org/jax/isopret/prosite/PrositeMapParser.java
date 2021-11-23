@@ -4,6 +4,10 @@ package org.jax.isopret.prosite;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.transcript.AccessionNumber;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,7 +20,7 @@ import java.util.Map;
  * get the names of the prosite entries
  */
 public class PrositeMapParser {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(PrositeMapParser.class);
     private final Map<String,String> prositeNameMap;
 
     private final  Map<AccessionNumber, PrositeMapping> prositeMappingMap;
@@ -62,7 +66,7 @@ public class PrositeMapParser {
                    prositeMappingMap.putIfAbsent(geneAccession, new PrositeMapping(transcriptID, geneID));
                    prositeMappingMap.get(geneAccession).addPrositeHit(transcriptID, prositeAc, begin, end);
                } catch (NumberFormatException e) {
-                   System.err.printf("[ERROR] Could not parse line in prosite map (%s): %s.\n", line, e.getMessage());
+                   LOGGER.error("[ERROR] Could not parse line in prosite map ({}): {}.\n", line, e.getMessage());
                }
             }
 
@@ -101,7 +105,7 @@ public class PrositeMapParser {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return Map.copyOf(mp); // make immutable
     }

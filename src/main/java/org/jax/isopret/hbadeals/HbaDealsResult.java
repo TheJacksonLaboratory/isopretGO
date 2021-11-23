@@ -5,6 +5,9 @@ import org.jax.isopret.transcript.AccessionNumber;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class encapsulates the results of HBADEALS for one gene and all of the isoforms of that gene that were
+ */
 public class HbaDealsResult {
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final AccessionNumber geneAccession;
@@ -63,7 +66,7 @@ public class HbaDealsResult {
 
 
     public Map<AccessionNumber, HbaDealsTranscriptResult> getTranscriptMap() {
-        return transcriptMap;
+        return Collections.unmodifiableMap(transcriptMap);
     }
 
     public boolean hasDifferentialExpressionResult(double threshold) { return this.expressionP < threshold; }

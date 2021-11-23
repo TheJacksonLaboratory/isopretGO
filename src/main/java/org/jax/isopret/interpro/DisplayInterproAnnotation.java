@@ -38,6 +38,11 @@ public class DisplayInterproAnnotation extends InterproAnnotation implements Com
         return this.interproEntry.getEntryType() == InterproEntryType.HOMOLOGOUS_SUPERFAMILY;
     }
 
+    public boolean isFamilyOrSuperfamily() {
+        return (this.interproEntry.getEntryType() == InterproEntryType.FAMILY ||
+                this.interproEntry.getEntryType() == InterproEntryType.HOMOLOGOUS_SUPERFAMILY);
+    }
+
     public boolean isRepeat() {
         return this.interproEntry.getEntryType() == InterproEntryType.REPEAT;
     }

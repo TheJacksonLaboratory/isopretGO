@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -19,11 +20,11 @@ import java.util.stream.Collectors;
  * @author Peter N Robinson
  */
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
-    static final int SVG_WIDTH = 1400;
-    static final int HEIGHT_FOR_SV_DISPLAY = 120;
-    static final int HEIGHT_PER_DISPLAY_ITEM = 90;
+    private static final int SVG_WIDTH = 1050;
+    private static final int HEIGHT_FOR_SV_DISPLAY = 160;
+    private static final int HEIGHT_PER_DISPLAY_ITEM = 90;
     private static final int ISOFORM_HEIGHT = 20;
-    private final static String[] colors = {"#F08080", "#CCE5FF", "#ABEBC6", "#FFA07A", "#C39BD3", "#FEA6FF", "#F7DC6F",
+    private static final String[] colors = {"#F08080", "#CCE5FF", "#ABEBC6", "#FFA07A", "#C39BD3", "#FEA6FF", "#F7DC6F",
             "#CFFF98", "#A1D6E2", "#EC96A4", "#E6DF44", "#F76FDA", "#FFCCE5", "#E4EA8C", "#F1F76F", "vFDD2D6", "#F76F7F",
             "#DAF7A6", "#FFC300", "#F76FF5", "#FFFF99", "#FF99FF", "#99FFFF", "#CCFF99", "#FFE5CC", "#FFD700", "#9ACD32",
             "#7FFFD4", "#FFB6C1", "#FFFACD", "#FFE4E1", "#F0FFF0", "#F0FFFF"};
@@ -40,26 +41,12 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     /** Color used for exon boxes. */
     private final static String JAMA_BLUE = "#00b2e2";
 
+    private final static int HEIGHT_PER_INTERPRO_ROW = 30;
 
-    private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene) {
+    private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, SortedMap<InterproEntry, String> colorMap) {
         super(SVG_WIDTH, height);
         this.annotatedGene = annotatedGene;
-        Map<AccessionNumber, List<DisplayInterproAnnotation>> interpromap = annotatedGene.getTranscriptToInterproHitMap();
-        this.interproEntryColorMap = new TreeMap<>();
-        List<InterproEntry> entryList = interpromap
-                .values()
-                .stream()
-                .flatMap(Collection::stream)
-                .map(DisplayInterproAnnotation::getInterproEntry)
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
-        Random random = new Random();
-        int i = random.nextInt(colors.length);
-        for (var entry : entryList) {
-            this.interproEntryColorMap.put(entry,String.format("%s",colors[i]));
-            i = i + 1 == colors.length ? 0 : i + 1;
-        }
+        this.interproEntryColorMap = colorMap;
         this.maxProteinLength = annotatedGene
                 .getExpressedTranscripts()
                 .stream()
@@ -77,7 +64,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      *
      * @return coordinate of a given protein amino acid position in SVG space
      */
-    protected double translateProteinToSvgCoordinate(int aminoAcidPosition) {
+    private double translateProteinToSvgCoordinate(int aminoAcidPosition) {
         final double span = this.proteinMaxSvgPos - this.proteinMinSvgPos;
         double prop = (double) aminoAcidPosition / (double) maxProteinLength;
         return this.proteinMinSvgPos + prop * span;
@@ -91,17 +78,14 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
      * @param writer file handle
      * @throws IOException if we cannot write the box
      */
-    protected void writeProteinBox(Transcript transcript, double xend, int ypos, double logFC, Writer writer) throws IOException {
+    private void writeProteinBox(Transcript transcript, double xend, int ypos, double logFC, Writer writer) throws IOException {
         double xstart = this.proteinMinSvgPos;
         double width = xend - xstart;
         double Y = ypos - 0.5 * ISOFORM_HEIGHT;
-        String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%d\" " +
-                        "style=\"stroke:%s; fill:none \" />\n",
-                xstart, Y, width, ISOFORM_HEIGHT, BLACK);
-        writer.write(rect);
+        writer.write(SvgUtil.unfilledBox(xstart, Y, width, ISOFORM_HEIGHT));
         Y = ypos - 0.55 * ISOFORM_HEIGHT;
-        String label = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s (log-fold change: %.2f)</text>\n",
-                xstart+5, Y-5, PURPLE, transcript.accessionId().getAccessionString(), logFC);
+        String payload = String.format("%s (log-fold change: %.2f)",transcript.accessionId().getAccessionString(), logFC);
+        String label = SvgUtil.text(xstart+5, Y-5, PURPLE, 24, payload);
         writer.write(label);
     }
 
@@ -157,53 +141,25 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                 double Xmiddle = xstart + 0.5*width;
                 double Xend = xstart + width;
                 System.out.println("SITE-" + hit.getInterproEntry().getDescription() + ":" + hit.getStart() + "-" + hit.getEnd());
-                String line = String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"%s\" />",
-                Xmiddle, Y, Xmiddle, Y2, color);
+//                String line = String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"%s\" />",
+//                Xmiddle, Y, Xmiddle, Y2, color);
                 //writer.write(line);
                 String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
                         "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, xstart, Ytop, xend, Ytop, color);
-                String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" " +
-                                "style=\"fill:%s;stroke:black;stroke-width:1\" />\n",
-                        xstart, Y2, width, 0.25*ISOFORM_HEIGHT, color);
+//                String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" " +
+//                                "style=\"fill:%s;stroke:black;stroke-width:1\" />\n",
+//                        xstart, Y2, width, 0.25*ISOFORM_HEIGHT, color);
                 writer.write(triangle);
             } else {
                 String rect = String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%d\" " +
-                                "style=\"fill:%s;stroke:black;stroke-width:1\" />\n",
+                                "style=\"fill:%s;fill-opacity:0.9;stroke:black;stroke-width:1\" />\n",
                         xstart, Y, width, ISOFORM_HEIGHT, color);
                 writer.write(rect);
             }
         }
     }
 
-    private void writeKey(Writer writer) throws IOException {
-        int y = 20;
-        int startx = this.keyMinSvgPos;
-        String svg = String.format("<text x=\"%d\" y=\"%d\" fill=\"%s\">Domains and Motifs</text>\n",
-                startx, y, BLACK);
-        writer.write(svg);
-        y += 40;
-        int Y_INTERVAL = 60;
-        for (var entry : interproEntryColorMap.entrySet()) {
-            InterproEntry accession = entry.getKey();
-            String label = accession.getDescription();
-            String color = entry.getValue();
-            int boxDimension = 20;
-            String rect = String.format("<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" " +
-                            "style=\"fill:%s;stroke:black;stroke-width:1\" />\n",
-                    startx, y, boxDimension, boxDimension, color);
-            writer.write(rect);
-            int x = startx + 2*boxDimension;
-            int ybox = (int)(y + 0.5*boxDimension);
-            svg = String.format("<text x=\"%d\" y=\"%d\" fill=\"%s\">%s</text>\n",
-                    x, ybox, BLACK, label);
-            writer.write(svg);
-            ybox += boxDimension;
-            svg = String.format("<text x=\"%d\" y=\"%d\" fill=\"%s\">%s</text>\n",
-                    x, ybox, BLACK, accession.getIntroproAccession());
-            writer.write(svg);
-            y += Y_INTERVAL;
-        }
-    }
+
 
 
     /**
@@ -249,19 +205,6 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         writeExons(transcript, xend, ypos+EXON_CARTOON_YSKIP,writer);
     }
 
-    private void writeNoncodingIsoform(int ypos, Transcript transcript, Writer writer) throws IOException {
-        int inset = 50;
-        String svg = String.format("<g fill=\"none\" stroke=\"" + LIGHT_GREY + "\" stroke-width=\"2\">\n" +
-                "    <path stroke-dasharray=\"5,5\" d=\"M%d %d L%d %d\" />\n" +
-                "  </g>", this.proteinMinSvgPos + inset, ypos, this.proteinMaxSvgPos - inset, ypos);
-        writer.write(svg);
-        double midishpoint = this.proteinMinSvgPos + 0.4 * (this.proteinMaxSvgPos - this.proteinMinSvgPos);
-        svg = String.format("<text x=\"%f\" y=\"%f\" fill=\"%s\">%s (non-coding)</text>\n",
-                midishpoint, (double) ypos, PURPLE, transcript.accessionId());
-        writer.write(svg);
-    }
-
-
     /**
      * Wirte an SVG (without header) representing this SV. Not intended to be used to create a stand-alone
      * SVG (for this, user {@link #getSvg()}
@@ -274,7 +217,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         try {
             Map<Transcript, Double> upreg = annotatedGene.getUpregulatedExpressedTranscripts();
             Map<Transcript, Double> downreg = annotatedGene.getDownregulatedExpressedTranscripts();
-            writer.write(String.format("<text x=\"%d\" y=\"%d\">Upregulated:</text>\n", 20, y));
+            writer.write(SvgUtil.text(20,y, BLACK, 24, "Upregulated:"));
             y+= 40;
             for (var e : upreg.entrySet()) {
                 Transcript transcript = e.getKey();
@@ -285,7 +228,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                 }
             }
             y+= 20;
-            writer.write(String.format("<text x=\"%d\" y=\"%d\">Downregulated:</text>\n", 20, y));
+            writer.write(SvgUtil.text(20,y, BLACK, 24, "Downregulated:"));
             y+= 40;
             for (var e : downreg.entrySet()) {
                 Transcript transcript = e.getKey();
@@ -295,29 +238,52 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                     y += HEIGHT_PER_DISPLAY_ITEM;
                 }
             }
-
-            int nonCodingTranscripts = this.annotatedGene.getNoncodingTranscriptCount();
-            if (nonCodingTranscripts>0) {
-                int xpos = this.proteinMinSvgPos + 10;
-                writer.write(String.format("<text x=\"%d\" y=\"%d\">%s has %d non-coding %s with non-zero read counts</text>\n",
-                        xpos, y,
-                        this.annotatedGene.getHbaDealsResult().getSymbol(),
-                        nonCodingTranscripts,
-                        nonCodingTranscripts>1 ? "transcripts" : "transcript"));
-            }
-            writeKey(writer);
+            writeInterproLabelsWithColorBoxes(writer, y);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
 
+    private void writeInterproLabelsWithColorBoxes(Writer writer, double Y) throws IOException {
+        for (var entry : interproEntryColorMap.entrySet()) {
+            InterproEntry accession = entry.getKey();
+            String label = String.format("%s (%s)", accession.getDescription(), entry.getKey().getIntroproAccession());
+            String color = entry.getValue();
+            int boxDimension = 20;
+            double startx = 50;
+            writer.write(SvgUtil.square(startx, Y, boxDimension, color));
+            double x = startx + 2 * boxDimension;
+            double textY = Y + 0.9*boxDimension;
+            writer.write(SvgUtil.text(x, textY, BLACK, 24, label));
+            Y += HEIGHT_PER_INTERPRO_ROW;
+        }
+    }
+
+
     public static AbstractSvgGenerator factory(AnnotatedGene annotatedGene) {
         int height = HEIGHT_PER_DISPLAY_ITEM * annotatedGene.getCodingTranscriptCount() + HEIGHT_FOR_SV_DISPLAY;
-        if (annotatedGene.getNoncodingTranscriptCount()>0) {
-            height += HEIGHT_FOR_SV_DISPLAY;
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> interpromap = annotatedGene.getTranscriptToInterproHitMap();
+        SortedMap<InterproEntry, String>  interproEntryColorMap = new TreeMap<>();
+        List<InterproEntry> entryList = interpromap
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .map(DisplayInterproAnnotation::getInterproEntry)
+                .filter(Predicate.not(InterproEntry::isFamilyOrSuperfamily))
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+        Random random = new Random();
+        int i = random.nextInt(colors.length);
+        for (var entry : entryList) {
+            interproEntryColorMap.put(entry,String.format("%s",colors[i]));
+            i = i + 1 == colors.length ? 0 : i + 1;
         }
-        return new ProteinSvgGenerator(height, annotatedGene);
+        int n = interproEntryColorMap.size();
+        n = n%2 == 0 ? n : n+1;
+        height += n * HEIGHT_PER_INTERPRO_ROW;
+        return new ProteinSvgGenerator(height, annotatedGene, interproEntryColorMap);
     }
 
     public static String empty(String symbol) {

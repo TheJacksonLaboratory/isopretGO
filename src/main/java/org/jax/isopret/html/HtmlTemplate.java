@@ -4,6 +4,8 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -14,10 +16,11 @@ import java.util.Map;
 
 
 public class HtmlTemplate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlTemplate.class);
     /** Map of data that will be used for the FreeMark template. */
-    protected final Map<String, Object> templateData;
+    private final Map<String, Object> templateData;
     /** FreeMarker configuration object. */
-    protected final Configuration cfg;
+    private final Configuration cfg;
 
     protected static final String EMPTY_STRING="";
 
@@ -47,7 +50,7 @@ public class HtmlTemplate {
             Template template = cfg.getTemplate("isopret.ftl");
             template.process(templateData, out);
         } catch (TemplateException | IOException te) {
-            te.printStackTrace();
+            LOGGER.error(te.getMessage());
         }
     }
 }

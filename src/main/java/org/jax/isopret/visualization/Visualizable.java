@@ -4,7 +4,6 @@ import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
 
 import java.util.List;
-import java.util.Map;
 
 public interface Visualizable {
 

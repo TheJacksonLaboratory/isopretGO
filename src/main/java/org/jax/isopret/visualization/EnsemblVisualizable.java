@@ -4,8 +4,6 @@ import org.jax.isopret.go.GoTermIdPlusLabel;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.interpro.InterproEntry;
-import org.jax.isopret.prosite.PrositeHit;
 import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.Transcript;
@@ -138,14 +136,14 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public String getProteinSvg() {
         try {
-            // Return a message only if we cannot find prosite domains.
-           // if (agene.getPrositeHitMap().isEmpty()) {
+            // Return a message if there are no prosite domains to display for this protein/gene.
            if (! agene.hasInterproAnnotations()) {
                 return ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
             }
             AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene);
             return svggen.getSvg();
         } catch (Exception e) {
+            LOGGER.error("Could not generate protein SVG: {}", e.getMessage());
             return "<p>Could not generate protein SVG because: " + e.getMessage() + "</p>";
         }
     }

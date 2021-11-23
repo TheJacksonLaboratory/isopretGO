@@ -36,7 +36,7 @@ public class HbaDealsParser {
      * Sanity check that the header is correct.
      * @param header Header of the HBA-DEALS file
      */
-    public void checkHeader(String header) {
+    private void checkHeader(String header) {
         String [] headerFields = {"Gene",  "Isoform", "ExplogFC/FC","P"};
         String [] fields = header.split("\t");
         if (headerFields.length != fields.length) {
@@ -116,7 +116,7 @@ public class HbaDealsParser {
         final double expFC;
         final double raw_p;
 
-        public HbaLine(AccessionNumber geneAcc, AccessionNumber transcriptAcc, double expFC, double raw_p) {
+        HbaLine(AccessionNumber geneAcc, AccessionNumber transcriptAcc, double expFC, double raw_p) {
             geneAccession = geneAcc;
             isoform = transcriptAcc;
             if (isoform == null) {
@@ -132,7 +132,7 @@ public class HbaDealsParser {
          * @param line an HBA-DEALS file with Ensem data
          * @return an {@link HbaLine} object with Ensembl {@link AccessionNumber} object
          */
-        public static HbaLine fromEnsembl(String line) {
+        static HbaLine fromEnsembl(String line) {
             String [] fields = line.split("\t");
             if (fields.length != 4) {
                 String msg = String.format("[ERROR] Malformed line with %d fields: %s\n", fields.length, line);
