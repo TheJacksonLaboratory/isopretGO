@@ -82,8 +82,8 @@ public class AccessionNumber {
 
     /**
      * An ensembl gene id of the form ENSG00000139618 or ENSG00000139618.2
-     * @param ensg
-     * @return
+     * @param ensg Ensembl gene accession number
+     * @return integer part of the accession number
      */
     public static int ensgAccessionToInt(String ensg) {
         if (! ensg.startsWith("ENSG")) {
@@ -99,8 +99,8 @@ public class AccessionNumber {
 
     /**
      * Return original Ensembl string (without version number)
-     * @param ensg
-     * @return
+     * @param ensg integer part of the accession number
+     * @return corresponding Ensembl gene accession number
      */
     public static String ensgAccessionToString(int ensg) {
         if (ensg<1) {
@@ -111,8 +111,8 @@ public class AccessionNumber {
 
     /**
      * An ensembl transcript id of the form ENST00000560355 or ENST00000560355.1
-     * @param ensg
-     * @return
+     * @param ensg Ensembl transcript accession number
+     * @return integer part of the accession number
      */
     public static int enstAccessionToInt(String ensg) {
         if (! ensg.startsWith("ENST")) {
@@ -128,8 +128,8 @@ public class AccessionNumber {
 
     /**
      * Return original Ensembl string (without version number)
-     * @param enst
-     * @return
+     * @param enst integer part of Ensembl transcript number
+     * @return corresponding Ensembl transcript accession number
      */
     public static String enstAccessionToString(int enst) {
         if (enst<1) {

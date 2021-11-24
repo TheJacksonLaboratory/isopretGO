@@ -1,5 +1,5 @@
 .. _rstsetup:
-
+==================
 Setting up isopret
 ==================
 
@@ -54,15 +54,17 @@ The download command
 
 isopret requires some additional files to run.
 
-1. ``hp.obo``. The main Human Phenotype Ontology file
-2. ``phenotype.hpoa`` The main annotation file with all HPO disease models
-3. ``Homo_sapiens_gene_info.gz`` A file from NCBI Entrez Gene with information about human genes
-4. ``mim2gene_medgen`` A file from the NCBI medgen project with OMIM-derived links between genes and diseases
+1. ``go.json``. The main Gene Ontology file
+2. ``goa_human.gaf``. The Gene Ontology annotation file
+3. ``hg38_ensembl.ser`` The `Jannovar <https://github.com/charite/jannovar>`_ transcript information file
+4. ``hgnc_complete_set.txt`` A file from HGNC with information about human genes
+5. ``interpro_domains.txt`` A file from the isopret GitHub derived from interpro biomaRt data
+6. ``interpro_domain_desc.txt`` A file from the isopret GitHub derived from interpro biomaRt data
 
-isopret offers a convenience function to download all four files
-to a local directory. By default, isopret will download all four files into a newly created subdirectory
-called ``data`` in the current working directory. You can change this default with the ``-d`` or ``--data`` options
-(If you change this, then you will need to pass the location of your directory to all other LIRICAL commands
+isopret offers a convenience function to download all the files
+to a local directory (by default a subdirectory ``data`` is created in the current working directory).
+You can change this default with the ``-d`` or ``--data`` options
+(If you change this, then you will need to pass the location of your directory to all other isopret commands
 using the ``-d`` flag). Download the files automatically as follows. ::
 
     $ java -jar isopret.jar download

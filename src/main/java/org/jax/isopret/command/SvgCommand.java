@@ -9,19 +9,13 @@ import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.interpro.InterproMapper;
 import org.jax.isopret.transcript.AccessionNumber;
-import org.jax.isopret.transcript.AnnotatedGene;
 import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
-import org.jax.isopret.visualization.AbstractSvgGenerator;
-import org.jax.isopret.visualization.ProteinSvgGenerator;
-import org.jax.isopret.visualization.TranscriptSvgGenerator;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -32,7 +26,7 @@ import java.util.stream.Collectors;
 @CommandLine.Command(name = "svg", aliases = {"V"},
         mixinStandardHelpOptions = true,
         description = "Create SVG/PDF files for a specific gene")
-public class SvgCommand implements Callable<Integer> {
+public class SvgCommand extends IsopretCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SvgCommand.class);
 
     @CommandLine.Option(names={"-b","--hbadeals"}, description ="HBA-DEALS output file" , required = true)
@@ -69,6 +63,7 @@ public class SvgCommand implements Callable<Integer> {
         } else {
             throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
         }
+        /*
         LOGGER.trace("SVG command");
         LOGGER.trace("jannovar path: {}", jannovarPath);
         LOGGER.trace("prositeMapFile: {}", prositeMapFile);
@@ -121,7 +116,7 @@ public class SvgCommand implements Callable<Integer> {
         }
         convertToPdf(isoformFilename);
         convertToPdf(proteinFilename);
-
+    */
         return 0;
     }
 
@@ -149,7 +144,7 @@ public class SvgCommand implements Callable<Integer> {
      * @return a map with key: Ensembl transcript, value: list of interpro annotations for display.
      */
     private Map<AccessionNumber, List<DisplayInterproAnnotation>> gettranscriptToInterproHitMap(Map<AccessionNumber, HgncItem> hgncMap) {
-        InterproMapper interproMapper = new InterproMapper(this.interproDescriptionFile, this.interproDomainsFile);
+        InterproMapper interproMapper = loadInterproMapper();
         Map<String, AccessionNumber> geneSymbolToAccessionMap =
                 hgncMap.entrySet()
                         .stream()

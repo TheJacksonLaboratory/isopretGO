@@ -36,8 +36,8 @@ public class IsopretDownloader {
     /** Basename of the file with cDNA sequences for ensembl genes. */
     private final static String ENSEMBL_CDNA ="Homo_sapiens.GRCh38.cdna.all.fa.gz";
 
-    private final static String GO_OBO = "go.obo";
-    private final static String GO_OBO_URL = "http://purl.obolibrary.org/obo/go.obo";
+    private final static String GO_JSON = "go.json";
+    private final static String GO_JSON_URL = "http://purl.obolibrary.org/obo/go.json";
     private final static String GO_ANNOT = "goa_human.gaf";
     private final static String GO_ANNOT_GZ = "goa_human.gaf.gz";
     private final static String GO_ANNOT_URL = "http://geneontology.org/gene-associations/goa_human.gaf.gz";
@@ -63,9 +63,9 @@ public class IsopretDownloader {
      */
     public void download() {
         //downloadFileIfNeeded(PROSITE_DAT, PROSITE_DAT_URL);
-        downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
+       // downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
         downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
-        downloadFileIfNeeded(GO_OBO,GO_OBO_URL);
+        downloadFileIfNeeded(GO_JSON, GO_JSON_URL);
         downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
         downloadFileIfNeeded(HGNC_FILENAME, HGNC_URL);
     }

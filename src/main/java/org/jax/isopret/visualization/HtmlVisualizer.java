@@ -67,9 +67,11 @@ public class HtmlVisualizer implements Visualizer {
     public String getInterproBox(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
         List<DisplayInterproAnnotation> introProAnnotations = vis.getInterproForExpressedTranscripts();
-        Set<InterproEntry> entrySet = introProAnnotations.stream().map(DisplayInterproAnnotation::getInterproEntry).collect(Collectors.toSet());
-        List<InterproEntry> entryList = new ArrayList<>(entrySet);
-        Collections.sort(entryList);
+        List<InterproEntry> entryList = introProAnnotations.stream()
+                .map(DisplayInterproAnnotation::getInterproEntry)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
         if (introProAnnotations.isEmpty()) {
             return "<p><i>No interpro domains found.</i></p>\n";
         }

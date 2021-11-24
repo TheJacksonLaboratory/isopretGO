@@ -35,8 +35,8 @@ public class TestBase {
 
     protected static final Path INTERPRO_ADAR_PATH = Paths.get("src/test/resources/interpro/ADAR_interpro.txt");
     protected static final Path INTERPRO_ADAR_DOMAIN_DESC = Paths.get("src/test/resources/interpro/ADAR_interpro_domain_desc.txt");
-    private static final Map<Integer, InterproEntry> interproDomainMap = InterproDomainDescParser.getInterproDescriptionMap(INTERPRO_ADAR_DOMAIN_DESC.toAbsolutePath().toString());
-    private static final Map<AccessionNumber, List<InterproAnnotation>> annotationMap = InterproDomainParser.getInterproAnnotationMap(INTERPRO_ADAR_PATH.toString());
+    private static final Map<Integer, InterproEntry> interproDomainMap = InterproDomainDescParser.getInterproDescriptionMap(INTERPRO_ADAR_DOMAIN_DESC.toFile());
+    private static final Map<AccessionNumber, List<InterproAnnotation>> annotationMap = InterproDomainParser.getInterproAnnotationMap(INTERPRO_ADAR_PATH.toFile());
     private static final Path JANNOVAR_ADAR_PATH = Paths.get("src/test/resources/jannovar/hg38_ensembl_ADAR.ser");
     private static final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
     private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
