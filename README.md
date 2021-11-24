@@ -68,6 +68,20 @@ To get these files note the following
 1. HBADEALS output -- please use with format that includes the ENSEMBL id in the first column (gene accession number).
 
 
+### Documentation
+
+To generate the HTML (ReadTheDocs documentation), enter the following
+
+```bazaar
+cd docs
+virtualenv p3
+source p3/bin/activate
+pip install sphinx
+pip install sphinx_rtd_theme
+make html
+```
+This will generate a readthedocs site in the subdirectory docs/_build/html.
+
 ### SVG
 
 This is a convenience command that writes SVG files to disk for a specific gene. For instance,

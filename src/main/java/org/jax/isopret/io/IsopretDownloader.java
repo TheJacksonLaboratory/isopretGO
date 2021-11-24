@@ -63,7 +63,7 @@ public class IsopretDownloader {
      */
     public void download() {
         //downloadFileIfNeeded(PROSITE_DAT, PROSITE_DAT_URL);
-        downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
+       // downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
         downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
         downloadFileIfNeeded(GO_JSON, GO_JSON_URL);
         downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
