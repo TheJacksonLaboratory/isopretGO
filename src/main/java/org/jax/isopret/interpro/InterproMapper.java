@@ -5,26 +5,42 @@ import org.jax.isopret.transcript.AccessionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class coordinates the parsing of two interpro files from biomaRt that are available
+ * on the isopret GitHub site, {@code interpro_domains.txt} and
+ * {@code interpro_domain_desc.txt}, provides access to the maps representing these files
+ * and a function {@link #transcriptToInterproHitMap(AccessionNumber)} that gets all interpro
+ * hits that are mapped to a specific transcript.
+ * @author Peter N Robinson
+ */
 public class InterproMapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproMapper.class);
     private final Map<Integer, InterproEntry> interproDescription;
     private final Map<AccessionNumber, List<InterproAnnotation>> interproAnnotation;
 
 
-    public InterproMapper(String interproDescriptionFile, String interproDomainsFile) {
+    public InterproMapper(File interproDescriptionFile, File interproDomainsFile) {
         this.interproDescription = InterproDomainDescParser.getInterproDescriptionMap(interproDescriptionFile);
         this.interproAnnotation = InterproDomainParser.getInterproAnnotationMap(interproDomainsFile);
     }
 
+    public Map<Integer, InterproEntry> getInterproDescription() {
+        return interproDescription;
+    }
+
+    public Map<AccessionNumber, List<InterproAnnotation>> getInterproAnnotation() {
+        return interproAnnotation;
+    }
 
     public Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap(AccessionNumber geneAccession) {
        if (! geneAccession.isGene()) {
-           throw new IsopretRuntimeException("transcriptToInterproHitMap can only be called with gene ids but wew got " + geneAccession);
+           throw new IsopretRuntimeException("transcriptToInterproHitMap can only be called with gene ids but we got " + geneAccession);
        }
 
         if (! this.interproAnnotation.containsKey(geneAccession)) {

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -16,9 +17,9 @@ public class InterproDomainParser {
 
     private final Map<AccessionNumber, List<InterproAnnotation>> geneIdToAnnotationMap;
 
-    private InterproDomainParser(String path) {
+    private InterproDomainParser(File file) {
         geneIdToAnnotationMap = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             br.readLine(); // header
             int noInterproId = 0; // counts number of lines with biomart error
@@ -50,8 +51,8 @@ public class InterproDomainParser {
 
 
 
-    public static Map<AccessionNumber, List<InterproAnnotation>> getInterproAnnotationMap(String path) {
-        InterproDomainParser parser = new InterproDomainParser(path);
+    public static Map<AccessionNumber, List<InterproAnnotation>> getInterproAnnotationMap(File file) {
+        InterproDomainParser parser = new InterproDomainParser(file);
         return parser.geneIdToAnnotationMap;
     }
 }

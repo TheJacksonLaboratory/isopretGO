@@ -1,26 +1,22 @@
 package org.jax.isopret.command;
 
 import org.jax.isopret.analysis.Partition;
-import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.go.*;
 import org.jax.isopret.hbadeals.HbaDealsParser;
 import org.jax.isopret.hbadeals.HbaDealsResult;
 import org.jax.isopret.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.hgnc.HgncItem;
-import org.jax.isopret.hgnc.HgncParser;
 import org.jax.isopret.html.HtmlTemplate;
 import org.jax.isopret.html.TsvWriter;
 import org.jax.isopret.interpro.*;
 import org.jax.isopret.transcript.AccessionNumber;
 import org.jax.isopret.transcript.AnnotatedGene;
-import org.jax.isopret.transcript.JannovarReader;
 import org.jax.isopret.transcript.Transcript;
 import org.jax.isopret.visualization.*;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
-import org.monarchinitiative.svart.*;
 
 
 import org.slf4j.Logger;
@@ -36,40 +32,23 @@ import java.util.stream.Stream;
 @CommandLine.Command(name = "hbadeals", aliases = {"H"},
         mixinStandardHelpOptions = true,
         description = "Analyze HBA-DEALS files")
-public class HbaDealsCommand implements Callable<Integer> {
+public class HbaDealsCommand extends IsopretCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsCommand.class);
-
     @CommandLine.Option(names={"-b","--hbadeals"}, description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
     @CommandLine.Option(names={"-c","--calculation"}, description ="Ontologizer calculation (Term-for-Term, PC-Union, PC-Intersection)" )
     public String ontologizerCalculation = "Term-for-Term";
     @CommandLine.Option(names={"--mtc"}, description="Multiple-Testing-Correction for GO analysis")
     public String mtc = "Bonferroni";
-    private String fastaFile = "data/Homo_sapiens.GRCh38.cdna.all.fa.gz";
-    @CommandLine.Option(names={"--desc"}, description ="interpro_domain_desc.txt file", required = true)
-    private String interproDescriptionFile;
-    @CommandLine.Option(names={"--domains"}, description ="interpro_domains.txt", required = true)
-    private String interproDomainsFile;
-    @CommandLine.Option(names={"-g","--go"}, description ="go.obo file")
-    private String goOboFile = "data/go.obo";
-    @CommandLine.Option(names={"-a","--gaf"}, description ="goa_human.gaf.gz file")
-    private String goGafFile = "data/goa_human.gaf";
-    @CommandLine.Option(names = {"-j", "--jannovar"}, description = "Path to Jannovar transcript file")
-    private String jannovarPath = "data/hg38_ensembl.ser";
     @CommandLine.Option(names={"--prefix"}, description = "Name of output file (without .html ending)")
     private String outprefix = "isopret";
     @CommandLine.Option(names={"--tsv"}, description = "Output TSV files with ontology results and study sets")
     private boolean outputTsv = false;
-    @CommandLine.Option(names={"-n", "--namespace"}, description = "Namespace of gene identifiers (ENSG, ucsc, RefSeq)")
-    private String namespace = "ensembl";
     @CommandLine.Option(names={"--chunk"}, description = "Chunk size (how many results to show per HTML file; default: ${DEFAULT-VALUE}")
     int chunkSize = 50;
 
-
     public HbaDealsCommand() {
-
     }
-
 
     @Override
     public Integer call() {
@@ -78,21 +57,19 @@ public class HbaDealsCommand implements Callable<Integer> {
         int foundTranscripts = 0;
         Map<String, Object> data = new HashMap<>(); // for the HTML template engine
         // ----------  1. Gene Ontology -------------------
-        GoParser goParser = new GoParser(goOboFile, goGafFile);
-        final Ontology ontology = goParser.getOntology();
-        final GoAssociationContainer goAssociationContainer = goParser.getAssociationContainer();
-
-        // ----------  3. HGNC Mapping from accession numbers to gene symbols -------------
-        Map<AccessionNumber, HgncItem> hgncMap = initializeHgncMapper();
-
-
+        final Ontology ontology = loadGeneOntology();
+        final GoAssociationContainer goAssociationContainer = loadGoAssociationContainer();
+        // ----------  2. HGNC Mapping from accession numbers to gene symbols -------------
+        Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
+        // ----------  3. Transcript map from Jannovar ----------------
+        Map<String, List<Transcript>> geneSymbolToTranscriptMap = loadJannovarTranscriptMap();
+        // ----------  4. Interpro domain data ----------------
+        InterproMapper interproMapper = loadInterproMapper();
+        // ----------  5. GO overrepresentation method  ----------------
         MtcMethod mtc = MtcMethod.fromString(this.mtc);
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
-
-        Map<String, List<Transcript>> geneSymbolToTranscriptMap = getTranscriptMap(GenomicAssemblies.GRCh38p13());
-        InterproMapper interproMapper = new InterproMapper(this.interproDescriptionFile, this.interproDomainsFile);
+        // ----------  6. HBA-DEALS input file  ----------------
         HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
-
         double expressionThreshold = thresholder.getExpressionThreshold();
         double splicingThreshold = thresholder.getSplicingThreshold();
         /* ----------  Set up HbaDeal GO analysis ------------------------- */
@@ -287,29 +264,6 @@ public class HbaDealsCommand implements Callable<Integer> {
     }
 
 
-    private Map<AccessionNumber, HgncItem> initializeHgncMapper() {
-        HgncParser hgncParser = new HgncParser();
-        if (this.namespace.equalsIgnoreCase("ensembl")) {
-            return hgncParser.ensemblMap();
-//        }
-//        else if (this.namespace.equalsIgnoreCase("ucsc")) {
-//            //return hgncParser.ucscMap();
-//        } else if (this.namespace.equalsIgnoreCase("refseq")) {
-//            // return hgncParser.refseqMap();
-        } else {
-            throw new IsopretRuntimeException("Name space was " + namespace + " but must be one of ensembl, UCSC, refseq");
-        }
-    }
-
-    /**
-     * Get a map of transcripts. The key is a gene symbol, the value is a list of Svart transcript obejcts
-     * @param assembly The genome assembly (Only hg38 is supperted for now)
-     * @return  map of transcripts
-     */
-    private Map<String, List<Transcript>> getTranscriptMap(GenomicAssembly assembly) {
-        JannovarReader jreader = new JannovarReader(this.jannovarPath, assembly);
-        return jreader.getSymbolToTranscriptListMap();
-    }
 
     private HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
                                              HbaDealsThresholder thresholder,

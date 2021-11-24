@@ -1,12 +1,6 @@
 package org.jax.isopret.hbadeals;
 
-import org.jax.isopret.hgnc.HgncItem;
-import org.jax.isopret.hgnc.HgncParser;
-import org.jax.isopret.transcript.AccessionNumber;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import java.util.*;
 
 /**
  * Convenience method to run tests, not an actual unit test at this time.
