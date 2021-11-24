@@ -43,37 +43,37 @@ public class HgncParserTest extends TestBase {
         assertEquals("ENSG00000121410", item.getEnsemblGeneId());
     }
 
-//    @Test
-//    public void testUcscMap() {
-//        Map<String, HgncItem> ucscMap = hgncParser.ucscMap();
-//        assertEquals(6, ucscMap.size());
-//        for (String ens : ucscMap.keySet()) {
-//            assertTrue(ens.startsWith("uc"));
-//        }
-//        assertTrue(ucscMap.containsKey("uc002qsd.5"));
-//        assertTrue(ucscMap.containsKey("uc002qse.3"));
-//        assertTrue(ucscMap.containsKey("uc001zwx.3"));
-//        assertTrue(ucscMap.containsKey("uc002tyq.1"));
-//        assertTrue(ucscMap.containsKey("uc003ojn.3"));
-//        assertTrue(ucscMap.containsKey("uc001ffh.4"));
-//        HgncItem fbn1 = ucscMap.get("uc001zwx.3");
-//        assertEquals("FBN1", fbn1.getGeneSymbol());
-//    }
+    @Test
+    public void testUcscMap() {
+        Map<String, HgncItem> ucscMap = hgncParser.ucscMap();
+        assertEquals(6, ucscMap.size());
+        for (String ens : ucscMap.keySet()) {
+            assertTrue(ens.startsWith("uc"));
+        }
+        assertTrue(ucscMap.containsKey("uc002qsd.5"));
+        assertTrue(ucscMap.containsKey("uc002qse.3"));
+        assertTrue(ucscMap.containsKey("uc001zwx.3"));
+        assertTrue(ucscMap.containsKey("uc002tyq.1"));
+        assertTrue(ucscMap.containsKey("uc003ojn.3"));
+        assertTrue(ucscMap.containsKey("uc001ffh.4"));
+        HgncItem fbn1 = ucscMap.get("uc001zwx.3");
+        assertEquals("FBN1", fbn1.getGeneSymbol());
+    }
 
-//    @Test
-//    public void testRefseqMap() {
-//        Map<String, HgncItem> refseqMap = hgncParser.refseqMap();
-//        // one of the items does not have an NM accession number, soo we only get 5 of 6 items in this map
-//        assertEquals(5, refseqMap.size());
-//        for (String refseq : refseqMap.keySet()) {
-//            System.out.println(refseq);
-//            assertTrue(refseq.startsWith("NM_"));
-//        }
-//        assertTrue(refseqMap.containsKey("NM_019845"));
-//        assertTrue(refseqMap.containsKey("NM_130786"));
-//        assertTrue(refseqMap.containsKey("NM_000138"));
-//        assertTrue(refseqMap.containsKey("NM_001014"));
-//        assertTrue(refseqMap.containsKey("NM_001111"));
-//
-//    }
+    @Test
+    public void testRefseqMap() {
+        Map<String, HgncItem> refseqMap = hgncParser.refseqMap();
+        // one of the items does not have an NM accession number, soo we only get 5 of 6 items in this map
+        assertEquals(5, refseqMap.size());
+        for (String refseq : refseqMap.keySet()) {
+            System.out.println(refseq);
+            assertTrue(refseq.startsWith("NM_"));
+        }
+        assertTrue(refseqMap.containsKey("NM_019845"));
+        assertTrue(refseqMap.containsKey("NM_130786"));
+        assertTrue(refseqMap.containsKey("NM_000138"));
+        assertTrue(refseqMap.containsKey("NM_001014"));
+        assertTrue(refseqMap.containsKey("NM_001111"));
+
+    }
 }
