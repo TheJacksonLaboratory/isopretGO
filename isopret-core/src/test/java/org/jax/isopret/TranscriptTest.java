@@ -1,13 +1,13 @@
-package test.java.org.jax.isopret;
+package org.jax.isopret;
 
-import org.jax.core.hbadeals.HbaDealsResult;
-import org.jax.core.interpro.DisplayInterproAnnotation;
-import org.jax.core.prosite.PrositeHit;
-import org.jax.core.prosite.PrositeMapParser;
-import org.jax.core.prosite.PrositeMapping;
-import org.jax.core.transcript.AccessionNumber;
-import org.jax.core.transcript.AnnotatedGene;
-import org.jax.core.transcript.Transcript;
+import org.jax.isopret.core.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.prosite.PrositeHit;
+import org.jax.isopret.core.prosite.PrositeMapParser;
+import org.jax.isopret.core.prosite.PrositeMapping;
+import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.transcript.AnnotatedGene;
+import org.jax.isopret.core.transcript.Transcript;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

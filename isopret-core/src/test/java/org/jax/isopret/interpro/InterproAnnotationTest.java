@@ -1,6 +1,6 @@
-package test.java.org.jax.isopret.interpro;
+package org.jax.isopret.interpro;
 
-import org.jax.core.interpro.InterproAnnotation;
+import org.jax.isopret.core.interpro.InterproAnnotation;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

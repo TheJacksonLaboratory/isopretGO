@@ -1,10 +1,10 @@
-package test.java.org.jax.isopret.visualization;
+package org.jax.isopret.visualization;
 
-import org.jax.core.visualization.AbstractSvgGenerator;
-import org.jax.core.visualization.ProteinSvgGenerator;
-import org.jax.core.visualization.TranscriptSvgGenerator;
-import test.java.org.jax.isopret.TestBase;
-import org.jax.core.transcript.AnnotatedGene;
+import org.jax.isopret.core.visualization.AbstractSvgGenerator;
+import org.jax.isopret.core.visualization.ProteinSvgGenerator;
+import org.jax.isopret.core.visualization.TranscriptSvgGenerator;
+import org.jax.isopret.TestBase;
+import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;

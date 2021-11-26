@@ -1,4 +1,4 @@
-package test.java.org.jax.isopret.hbadeals;
+package org.jax.isopret.hbadeals;
 
 import org.junit.jupiter.api.Disabled;
 

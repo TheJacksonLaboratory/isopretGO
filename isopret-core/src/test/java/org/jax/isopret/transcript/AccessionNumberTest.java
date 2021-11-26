@@ -1,7 +1,7 @@
-package test.java.org.jax.isopret.transcript;
+package org.jax.isopret.transcript;
 
-import org.jax.core.except.IsopretRuntimeException;
-import org.jax.core.transcript.AccessionNumber;
+import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.core.transcript.AccessionNumber;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

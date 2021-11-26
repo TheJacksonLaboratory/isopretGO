@@ -1,15 +1,15 @@
-package test.java.org.jax.isopret;
+package org.jax.isopret;
 
-import main.java.org.jax.isopret.interpro.*;
-import org.jax.core.hbadeals.HbaDealsParser;
-import org.jax.core.hbadeals.HbaDealsResult;
-import org.jax.core.hgnc.HgncParser;
-import org.jax.core.prosite.PrositeMapParser;
-import org.jax.core.prosite.PrositeMapping;
-import org.jax.core.transcript.AccessionNumber;
-import org.jax.core.transcript.AnnotatedGene;
-import org.jax.core.transcript.JannovarReader;
-import org.jax.core.transcript.Transcript;
+import org.jax.isopret.core.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.hgnc.HgncParser;
+import org.jax.isopret.core.interpro.*;
+import org.jax.isopret.core.prosite.PrositeMapParser;
+import org.jax.isopret.core.prosite.PrositeMapping;
+import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.transcript.AnnotatedGene;
+import org.jax.isopret.core.transcript.JannovarReader;
+import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
 

@@ -1,10 +1,10 @@
-package test.java.org.jax.isopret.hgnc;
+package org.jax.isopret.hgnc;
 
-import org.jax.core.hgnc.HgncItem;
-import test.java.org.jax.isopret.TestBase;
+import org.jax.isopret.core.hgnc.HgncItem;
+import org.jax.isopret.TestBase;
 import java.util.Map;
 
-import org.jax.core.transcript.AccessionNumber;
+import org.jax.isopret.core.transcript.AccessionNumber;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

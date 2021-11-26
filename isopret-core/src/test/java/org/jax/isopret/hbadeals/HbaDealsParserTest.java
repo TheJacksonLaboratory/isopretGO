@@ -1,10 +1,10 @@
-package test.java.org.jax.isopret.hbadeals;
+package org.jax.isopret.hbadeals;
 
-import org.jax.core.hbadeals.HbaDealsParser;
-import org.jax.core.hbadeals.HbaDealsResult;
-import org.jax.core.hbadeals.HbaDealsTranscriptResult;
-import test.java.org.jax.isopret.TestBase;
-import org.jax.core.transcript.AccessionNumber;
+import org.jax.isopret.core.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.TestBase;
+import org.jax.isopret.core.transcript.AccessionNumber;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

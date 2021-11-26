@@ -1,10 +1,10 @@
-package test.java.org.jax.isopret.prosite;
+package org.jax.isopret.prosite;
 
-import org.jax.core.prosite.PrositeHit;
-import org.jax.core.prosite.PrositeMapParser;
-import org.jax.core.prosite.PrositeMapping;
-import test.java.org.jax.isopret.TestBase;
-import org.jax.core.transcript.AccessionNumber;
+import org.jax.isopret.core.prosite.PrositeHit;
+import org.jax.isopret.core.prosite.PrositeMapParser;
+import org.jax.isopret.core.prosite.PrositeMapping;
+import org.jax.isopret.TestBase;
+import org.jax.isopret.core.transcript.AccessionNumber;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -1,6 +1,6 @@
-package test.java.org.jax.isopret.prosite;
+package org.jax.isopret.prosite;
 
-import org.jax.core.prosite.PrositePattern;
+import org.jax.isopret.core.prosite.PrositePattern;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

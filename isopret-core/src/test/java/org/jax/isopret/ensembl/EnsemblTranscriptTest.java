@@ -1,6 +1,6 @@
-package test.java.org.jax.isopret.ensembl;
+package org.jax.isopret.ensembl;
 
-import org.jax.core.ensembl.EnsemblTranscript;
+import org.jax.isopret.core.ensembl.EnsemblTranscript;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

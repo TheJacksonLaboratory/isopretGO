@@ -1,8 +1,8 @@
-package test.java.org.jax.isopret.transcript;
+package org.jax.isopret.transcript;
 
-import org.jax.core.transcript.AccessionNumber;
-import org.jax.core.transcript.Transcript;
-import test.java.org.jax.isopret.TestBase;
+import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.TestBase;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

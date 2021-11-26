@@ -1,6 +1,6 @@
-package test.java.org.jax.isopret.orf;
+package org.jax.isopret.orf;
 
-import org.jax.core.orf.OrfFinder;
+import org.jax.isopret.core.orf.OrfFinder;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
