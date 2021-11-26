@@ -1,0 +1,14 @@
+ENTRY_AC	ENTRY_TYPE	ENTRY_NAME
+IPR000126	Active_site	Serine proteases, V8 family, serine active site
+IPR000138	Active_site	Hydroxymethylglutaryl-CoA lyase, active site
+IPR000169	Active_site	Cysteine peptidase, cysteine active site
+IPR000180	Active_site	Membrane dipeptidase, active site
+IPR000189	Active_site	Prokaryotic transglycosylase, active site
+IPR000590	Active_site	Hydroxymethylglutaryl-coenzyme A synthase, active site
+IPR001252	Active_site	Malate dehydrogenase, active site
+IPR000607	Repeat	Double-stranded RNA-specific adenosine deaminase (DRADA) repeat
+IPR002466	Domain	Adenosine deaminase/editase
+IPR014720	Domain	Double-stranded RNA-binding domain
+IPR036388	Homologous_superfamily	Winged helix-like DNA-binding domain superfamily
+IPR036390	Homologous_superfamily	Winged helix DNA-binding domain superfamily
+IPR042371	Domain	Z-alpha domain
