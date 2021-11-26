@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jax.isopret</groupId>
+        <artifactId>isopret</artifactId>
+        <version>0.7.0</version>
+    </parent>
+
+    <artifactId>isopret-cli</artifactId>
+    <packaging>jar</packaging>
+    <name>isopret-cli</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jax.isopret</groupId>
+            <artifactId>isopret-core</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.31</version>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.6.2</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <finalName>isopret</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
