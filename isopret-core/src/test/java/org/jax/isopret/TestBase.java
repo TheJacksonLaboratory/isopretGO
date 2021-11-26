@@ -13,6 +13,7 @@ import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,13 +21,26 @@ import java.util.List;
 import java.util.Map;
 
 public class TestBase {
-    private static final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-    private static final URL url = classloader.getResource("test/resources/hgnc/hgnc_complete_set_excerpt.txt");
+
     private static final String hgncPath;
+    protected static final String INTERPRO_ADAR_DOMAIN_DESC;
+
 
     static {
+        String cp = System.getProperty("java.class.path");
+        String [] resources = cp.split(":");
+        for (String r : resources) {
+            if (r.contains("isopret"))
+                System.out.println("classpath is: " + r);
+        }
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        final URL url = classloader.getResource("hgnc/hgnc_complete_set_excerpt.txt");
         assert url != null;
         hgncPath = url.getPath();
+        final URL url2 = classloader.getResource("interpro/ADAR_interpro_domain_desc.txt");
+        INTERPRO_ADAR_DOMAIN_DESC = url2.getPath();
+        File f = new File(INTERPRO_ADAR_DOMAIN_DESC);
+        System.out.println(INTERPRO_ADAR_DOMAIN_DESC + " :" + f.isFile());
     }
 
     protected static final Path PROSITE_MAP_PATH = Paths.get("src/test/resources/prosite/ADAR_prosite_profiles.txt");
@@ -34,8 +48,7 @@ public class TestBase {
     private static PrositeMapParser pmparser = null;
 
     protected static final Path INTERPRO_ADAR_PATH = Paths.get("src/test/resources/interpro/ADAR_interpro.txt");
-    protected static final Path INTERPRO_ADAR_DOMAIN_DESC = Paths.get("src/test/resources/interpro/ADAR_interpro_domain_desc.txt");
-    private static final Map<Integer, InterproEntry> interproDomainMap = InterproDomainDescParser.getInterproDescriptionMap(INTERPRO_ADAR_DOMAIN_DESC.toFile());
+    private static final Map<Integer, InterproEntry> interproDomainMap = InterproDomainDescParser.getInterproDescriptionMap(new File(INTERPRO_ADAR_DOMAIN_DESC));
     private static final Map<AccessionNumber, List<InterproAnnotation>> annotationMap = InterproDomainParser.getInterproAnnotationMap(INTERPRO_ADAR_PATH.toFile());
     private static final Path JANNOVAR_ADAR_PATH = Paths.get("src/test/resources/jannovar/hg38_ensembl_ADAR.ser");
     private static final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
