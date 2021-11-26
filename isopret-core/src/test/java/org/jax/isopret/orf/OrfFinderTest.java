@@ -1,0 +1,33 @@
+package test.java.org.jax.isopret.orf;
+
+import org.jax.core.orf.OrfFinder;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class OrfFinderTest {
+
+    private static final String h3_4_cDNA = "GCAGAGGACACCGCGGGGCCAACAGTTTCGGATTCATGGCCCGAACCAAGCAGACTGCGCGCAAGTCAAC" +
+            "GGGTGGCAAGGCGCCGCGCAAGCAGCTGGCCACCAAGGTGGCTCGCAAGAGCGCACCTGCCACTGGCGGC" +
+            "GTGAAGAAGCCGCACCGCTACCGGCCCGGCACGGTGGCGCTTCGCGAGATCCGCCGCTACCAGAAGTCCA" +
+            "CTGAGCTGCTAATCCGCAAGTTGCCCTTCCAGCGGCTGATGCGCGAGATCGCTCAGGACTTTAAGACCGA" +
+            "CCTGCGCTTCCAGAGCTCGGCCGTGATGGCGCTGCAGGAGGCGTGCGAGTCTTACCTGGTGGGGCTGTTT" +
+            "GAGGACACCAACCTGTGTGTCATCCATGCCAAACGGGTCACCATCATGCCTAAGGACATCCAGCTGGCAC" +
+            "GCCGTATCCGCGGGGAGCGGGCCTAGGAGGGCTATCTCGCCACCTGAGAGGTTGCGCAACGTTCACCCCA" +
+            "AAGGCTCTTTTAAGAGCCACCCACCT";
+    private static final String h3_4_aa = "MARTKQTARKSTGGKAPRKQLATKVARKSAPATGGVKKPHRYRPGTVALREIRRYQKSTELLIRKLPFQR" +
+            "LMREIAQDFKTDLRFQSSAVMALQEACESYLVGLFEDTNLCVIHAKRVTIMPKDIQLARRIRGERA";
+
+    /**
+     * NM_003493 Homo sapiens H3.4 histone (H3-4), mRNA.
+     * CDS: 36..446
+     */
+    @Test
+    public void testNM_003493(){
+        OrfFinder orff = new OrfFinder(h3_4_cDNA);
+        assertTrue(orff.hasORF());
+        assertEquals(h3_4_aa, orff.getLongestAaSequence());
+
+    }
+}
