@@ -27,3 +27,5 @@ hs_err_pid*
 /isopret.iml
 /*.html
 /.idea/
+/isopret-core/isopret-core.iml
+/isopret-cli/isopret-cli.iml
