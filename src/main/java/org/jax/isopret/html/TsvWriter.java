@@ -17,35 +17,22 @@ import java.util.*;
  * Output a series of TSV files with "significant" differential HBA-DEALS results and the corresponding Study sets and
  * Gene Ontology analysis results.
  */
-public class TsvWriter {
+public class TsvWriter extends AbstractWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(TsvWriter.class);
-    private final String outprefix;
-    private final HbaDealsThresholder thresholder;
-    private final List<GoTerm2PValAndCounts> dasGoTerms;
-    private final List<GoTerm2PValAndCounts> dgeGoTerms;
-    private final Map<String, HbaDealsResult> hbaDealsResults;
-    private final String ontologizerCalculation;
-    private final String mtc;
-    private final Ontology geneOntology;
 
 
-    private TsvWriter(String prefix,
-                      HbaDealsThresholder thresholder,
-                      List<GoTerm2PValAndCounts> das,
-                      List<GoTerm2PValAndCounts> dge,
-                      String calc,
-                      String mtc,
-                      Ontology ontology) {
-        this.outprefix = prefix;
-        this.thresholder = thresholder;
-        this.dasGoTerms = das;
-        this.dgeGoTerms = dge;
-        this.hbaDealsResults = thresholder.getRawResults();
-        this.ontologizerCalculation = calc;
-        this.mtc = mtc;
-        this.geneOntology = ontology;
+
+    TsvWriter(String prefix,
+              HbaDealsThresholder thresholder,
+              List<GoTerm2PValAndCounts> das,
+              List<GoTerm2PValAndCounts> dge,
+              String calc,
+              String mtc,
+              Ontology ontology) {
+        super(prefix, thresholder, das, dge, calc, mtc, ontology);
     }
 
+    @Override
     public void write() {
         outputDifferentialGenes();
         outputGoResultsTable(this.dgeGoTerms, "dge", this.geneOntology);
@@ -125,66 +112,5 @@ public class TsvWriter {
             e.printStackTrace();
         }
     }
-
-
-    public static class Builder {
-
-        private String outprefix = "ISOPRET";
-        private HbaDealsThresholder thresholder;
-        private List<GoTerm2PValAndCounts> dasGoTerms;
-        private List<GoTerm2PValAndCounts> dgeGoTerms;
-        private String ontologizerCalculation;
-        private String mtc;
-        private Ontology ontology;
-
-
-
-        public Builder prefix(String p) {
-            this.outprefix = p;
-            return this;
-        }
-
-        public Builder thresholder(HbaDealsThresholder t) {
-            this.thresholder = t;
-            return this;
-        }
-
-        public Builder dasGoTerms(List<GoTerm2PValAndCounts> das) {
-            this.dasGoTerms = das;
-            return this;
-        }
-
-        public Builder dgeGoTerms(List<GoTerm2PValAndCounts> dge) {
-            this.dgeGoTerms = dge;
-            return this;
-        }
-
-
-        public Builder ontologizerCalculation(String calc) {
-            this.ontologizerCalculation = calc;
-            return this;
-        }
-
-        public Builder mtc(String m) {
-            this.mtc = m;
-            return this;
-        }
-
-        public Builder ontology(Ontology ontology) {
-            this.ontology = ontology;
-            return this;
-        }
-
-        public TsvWriter build() {
-            Objects.requireNonNull(outprefix);
-            Objects.requireNonNull(thresholder);
-            Objects.requireNonNull(dasGoTerms);
-            Objects.requireNonNull(dgeGoTerms);
-            Objects.requireNonNull(ontologizerCalculation);
-            Objects.requireNonNull(mtc);
-            return new TsvWriter(outprefix, thresholder, dasGoTerms, dgeGoTerms, ontologizerCalculation, mtc, ontology);
-        }
-    }
-
 
 }
