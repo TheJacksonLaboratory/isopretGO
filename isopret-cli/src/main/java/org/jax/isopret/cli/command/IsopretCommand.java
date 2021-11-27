@@ -4,12 +4,14 @@ import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.InterproMapper;
+import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.JannovarReader;
 import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
 import picocli.CommandLine;
@@ -17,6 +19,7 @@ import picocli.CommandLine;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class IsopretCommand {
     /** isopret only supports hg38. */
@@ -29,6 +32,8 @@ public abstract class IsopretCommand {
     private JannovarReader jannovarReader = null;
 
     private  Map<AccessionNumber, HgncItem> hgncMap = null;
+
+    private Map<AccessionNumber, Set<TermId>> transcriptToGoMap = null;
 
 
     @CommandLine.Option(names={"-d","--download"},
@@ -81,6 +86,13 @@ public abstract class IsopretCommand {
         return jannovarReader.getSymbolToTranscriptListMap();
     }
 
+    protected Map<AccessionNumber, List<Transcript>> loadJannovarGeneIdToTranscriptMap() {
+        if (jannovarReader == null) {
+            jannovarReader = new JannovarReader(jannovarTranscriptFile(), assembly);
+        }
+        return jannovarReader.getGeneIdToTranscriptMap();
+    }
+
 
     protected Map<AccessionNumber, HgncItem> loadHgncMap() {
         if (hgncMap == null) {
@@ -102,6 +114,27 @@ public abstract class IsopretCommand {
                     interproDescriptionFile.getAbsolutePath());
         }
         return new InterproMapper(interproDescriptionFile, interproDomainsFile);
+    }
+
+
+    private void runTranscriptFunctionFileParser() {
+        File predictionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
+        if (!predictionFile.isFile()) {
+            throw new IsopretRuntimeException("Could not find isoform_function_list.txt at " +
+                    predictionFile.getAbsolutePath());
+        }
+        if (geneOntology == null) {
+            loadGeneOntology();
+        }
+        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(predictionFile, geneOntology);
+        transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
+
+    }
+
+    protected Map<AccessionNumber, Set<TermId>> loadTranscriptIdToGoTermsMap() {
+        if (transcriptToGoMap == null)
+            runTranscriptFunctionFileParser();
+        return transcriptToGoMap;
     }
 
 
