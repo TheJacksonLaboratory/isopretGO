@@ -3,6 +3,9 @@ package org.jax.isopret.cli.command;
 import org.jax.isopret.core.analysis.AssociationContainerStats;
 import org.jax.isopret.core.analysis.IsopretAssociationContainer;
 import org.jax.isopret.core.analysis.TranscriptToGeneStats;
+import org.jax.isopret.core.go.GoMethod;
+import org.jax.isopret.core.go.HbaDealsGoAnalysis;
+import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
@@ -11,6 +14,7 @@ import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -37,11 +41,23 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
     @CommandLine.Option(names={"--trfx"},
             required = true,
             description = "transcript function file")
-    protected String transcriptFx;
+    private String transcriptFx;
+    @CommandLine.Option(names={"-b","--hbadeals"},
+            scope = CommandLine.ScopeType.INHERIT,
+            description ="HBA-DEALS output file" , required = true)
+    private String hbadealsFile;
+    @CommandLine.Option(names={"-c","--calculation"},
+            scope = CommandLine.ScopeType.INHERIT,
+            description ="Ontologizer calculation (Term-for-Term, PC-Union, PC-Intersection)" )
+    private String ontologizerCalculation = "Term-for-Term";
+    @CommandLine.Option(names={"--mtc"},
+            scope = CommandLine.ScopeType.INHERIT,
+            description="Multiple-Testing-Correction for GO analysis")
+    private String mtc = "Bonferroni";
 
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         Ontology geneOntology = loadGeneOntology();
         GoAssociationContainer container = loadGoAssociationContainer();
         Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
@@ -63,6 +79,26 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
         containerStats.display();
         containerStats = new AssociationContainerStats(geneOntology, geneContainer, "Genes");
         containerStats.display();
+
+        // ----------  6. HBA-DEALS input file  ----------------
+        HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
+        /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
+        GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
+//        HbaDealsGoAnalysis hbago =  getHbaDealsGoAnalysis(goMethod,
+//                thresholder,
+//                geneOntology,
+//                transcriptContainer,
+//                mtc);
+//
+//
+//        List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
+//        List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
+//        dasGoTerms.sort(new HbaDealsCommand.SortByPvalue());
+//        dgeGoTerms.sort(new HbaDealsCommand.SortByPvalue());
+//
+//        for (var x : dasGoTerms.listIterator()) {
+//            System.out.println(x.toString());
+//        }
 
         return 0;
     }

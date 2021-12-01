@@ -1,6 +1,12 @@
 package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.core.go.GoMethod;
+import org.jax.isopret.core.go.HbaDealsGoAnalysis;
+import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.InterproMapper;
@@ -14,6 +20,8 @@ import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -22,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class IsopretCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsopretCommand.class);
     /** isopret only supports hg38. */
     private final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
 
@@ -135,6 +144,27 @@ public abstract class IsopretCommand {
         if (transcriptToGoMap == null)
             runTranscriptFunctionFileParser();
         return transcriptToGoMap;
+    }
+
+    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, HgncItem> hgncMap, String hbadealsPath) {
+        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsPath, hgncMap);
+        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
+        return new HbaDealsThresholder(hbaDealsResults);
+    }
+
+    protected HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
+                                                     HbaDealsThresholder thresholder,
+                                                     Ontology ontology,
+                                                     GoAssociationContainer goAssociationContainer,
+                                                     MtcMethod mtc) {
+        if (goMethod == GoMethod.PCunion) {
+            return HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
+        } else if (goMethod == GoMethod.PCintersect) {
+            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
+        } else {
+            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
+        }
     }
 
 

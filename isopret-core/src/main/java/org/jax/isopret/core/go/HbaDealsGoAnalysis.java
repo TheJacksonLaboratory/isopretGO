@@ -39,29 +39,18 @@ public class HbaDealsGoAnalysis {
         this.ontology = ontology;
         this.goAssociationContainer = associationContainer;
         this.goMethod = method;
-        switch(mtcMethod) {
-            case BONFERRONI:
-                this.mtc = new Bonferroni();
-                break;
-            case BONFERRONI_HOLM:
-                this.mtc = new BonferroniHolm();
-                break;
-            case BENJAMINI_HOCHBERG:
-                this.mtc = new BenjaminiHochberg();
-                break;
-            case BENJAMINI_YEKUTIELI:
-                this.mtc = new BenjaminiYekutieli();
-                break;
-            case SIDAK:
-                this.mtc = new Sidak();
-                break;
-            case NONE:
-                this.mtc = new NoMultipleTestingCorrection();
-                break;
-            default:
+        switch (mtcMethod) {
+            case BONFERRONI -> this.mtc = new Bonferroni();
+            case BONFERRONI_HOLM -> this.mtc = new BonferroniHolm();
+            case BENJAMINI_HOCHBERG -> this.mtc = new BenjaminiHochberg();
+            case BENJAMINI_YEKUTIELI -> this.mtc = new BenjaminiYekutieli();
+            case SIDAK -> this.mtc = new Sidak();
+            case NONE -> this.mtc = new NoMultipleTestingCorrection();
+            default -> {
                 // should never happen
                 System.err.println("[WARNING] Did not recognize MTC");
                 this.mtc = new Bonferroni();
+            }
         }
         Set<String> population = thresholder.population();
         Set<String> dgeGenes = thresholder.dgeGeneSymbols();
@@ -140,35 +129,27 @@ public class HbaDealsGoAnalysis {
 
 
     public List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
-        switch (this.goMethod) {
-            case TFT:
-                return termForTerm(this.dge);
-            case PCunion:
-                return parentChildUnion(this.dge);
-            case PCintersect:
-                return parentChildIntersect(this.dge);
-            case MGSA:
-                return mgsa(this.dge);
-            default:
-                // should never happen
-                throw new IsopretRuntimeException("Unrecognized method");
-        }
+        return switch (this.goMethod) {
+            case TFT -> termForTerm(this.dge);
+            case PCunion -> parentChildUnion(this.dge);
+            case PCintersect -> parentChildIntersect(this.dge);
+            case MGSA -> mgsa(this.dge);
+            default ->
+                    // should never happen
+                    throw new IsopretRuntimeException("Unrecognized method");
+        };
     }
 
     public List<GoTerm2PValAndCounts> dasOverrepresetationAnalysis() {
-        switch (this.goMethod) {
-            case TFT:
-                return termForTerm(this.das);
-            case PCunion:
-                return parentChildUnion(this.das);
-            case PCintersect:
-                return parentChildIntersect(this.das);
-            case MGSA:
-                return mgsa(this.das);
-            default:
-                // should never happen
-                throw new IsopretRuntimeException("Unrecognized method");
-        }
+        return switch (this.goMethod) {
+            case TFT -> termForTerm(this.das);
+            case PCunion -> parentChildUnion(this.das);
+            case PCintersect -> parentChildIntersect(this.das);
+            case MGSA -> mgsa(this.das);
+            default ->
+                    // should never happen
+                    throw new IsopretRuntimeException("Unrecognized method");
+        };
     }
 
 
@@ -193,10 +174,10 @@ public class HbaDealsGoAnalysis {
         return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCintersect, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis mgssa(HbaDealsThresholder thresholder,
-                                           Ontology ontology,
-                                           GoAssociationContainer associationContainer,
-                                           MtcMethod mtcMethod) {
+    public static HbaDealsGoAnalysis mgsa(HbaDealsThresholder thresholder,
+                                          Ontology ontology,
+                                          GoAssociationContainer associationContainer,
+                                          MtcMethod mtcMethod) {
         return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.MGSA, mtcMethod);
     }
 
