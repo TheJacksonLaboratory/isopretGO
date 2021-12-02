@@ -1,18 +1,18 @@
 package org.jax.isopret.core.go;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
+import org.jax.isopret.core.transcript.AccessionNumber;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
+import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
-import org.monarchinitiative.phenol.stats.ParentChildIntersectionPValueCalculation;
-import org.monarchinitiative.phenol.stats.ParentChildUnionPValueCalculation;
 import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
 import org.monarchinitiative.phenol.stats.mtc.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +24,7 @@ public class HbaDealsGoContainer {
     private final AssociationContainer associationContainer;
     private final GoMethod goMethod;
     private final MultipleTestingCorrection mtc;
+    private final HbaDealsThresholder thresholder;
 
 
     public HbaDealsGoContainer(Ontology ontology,
@@ -47,15 +48,44 @@ public class HbaDealsGoContainer {
                 this.mtc = new Bonferroni();
             }
         }
-
-        Set<String> dasGeneSymbols = thresholder.dasGeneSymbols();
+        this.thresholder = thresholder;
     }
 
 
-//    public List<GoTerm2PValAndCounts> termForTermDge() {
-//        StudySet study = new
-//    }
+    public List<GoTerm2PValAndCounts> termForTermDge() {
+        Set<TermId> studyIds = this.thresholder.dgeGeneTermIds();
+        Map<TermId, DirectAndIndirectTermAnnotations> annMap = associationContainer.getAssociationMap(studyIds);
+        StudySet study = new StudySet(studyIds, "dge-study", annMap);
+        Set<TermId> popIds = this.thresholder.getAllGeneTermIds();
+        Map<TermId, DirectAndIndirectTermAnnotations> popMap = associationContainer.getAssociationMap(popIds);
+        StudySet population = new StudySet(popIds, "population", popMap);
+
+        TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
+                population,
+                study,
+                new Bonferroni());
+        return tftpvalcal.calculatePVals()
+                .stream()
+                .filter(item -> item.passesThreshold(ALPHA))
+                .collect(Collectors.toList());
+    }
 
 
+    public List<GoTerm2PValAndCounts> termForTermDas() {
+        Set<TermId> studyIds = this.thresholder.dasIsoformTermIds();
+        Map<TermId, DirectAndIndirectTermAnnotations> annMap = associationContainer.getAssociationMap(studyIds);
+        StudySet study = new StudySet(studyIds, "das-study", annMap);
+        Set<TermId> popIds = this.thresholder.getAllTranscriptTermIds();
+        Map<TermId, DirectAndIndirectTermAnnotations> popMap = associationContainer.getAssociationMap(popIds);
+        StudySet population = new StudySet(popIds, "population", popMap);
 
+        TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
+                population,
+                study,
+                new Bonferroni());
+        return tftpvalcal.calculatePVals()
+                .stream()
+                .filter(item -> item.passesThreshold(ALPHA))
+                .collect(Collectors.toList());
+    }
 }
