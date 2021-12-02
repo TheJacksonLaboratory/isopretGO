@@ -34,6 +34,7 @@ public class TranscriptFunctionFileParser {
 
     public TranscriptFunctionFileParser(File transcriptFunctionFile, Ontology ontology) {
         Map<AccessionNumber, Set<TermId>> annotMap = new HashMap<>();
+        Set<String> notFound = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new FileReader(transcriptFunctionFile))) {
             String line = br.readLine();
             if (! line.startsWith("Ensembl.ID\tGo.Terms")) {
@@ -48,7 +49,7 @@ public class TranscriptFunctionFileParser {
                 AccessionNumber transcriptId = AccessionNumber.ensemblTranscript(fields[0]);
                 TermId GoId = TermId.of(fields[1]);
                 if (! ontology.containsTerm(GoId)) {
-                    LOGGER.warn("Could not find " + GoId.getValue() + " in Ontology");
+                    notFound.add(GoId.getValue());
                     continue;
                 }
                 annotMap.putIfAbsent(transcriptId, new HashSet<>());
@@ -56,6 +57,11 @@ public class TranscriptFunctionFileParser {
             }
         } catch (IOException e) {
             throw new PhenolRuntimeException("Could not import isoform_function_list.txt :" + e.getMessage());
+        }
+        if (notFound.size() > 0) {
+            LOGGER.warn("Could not find " + notFound.size() + " terms in Ontology");
+            LOGGER.warn(String.join("; ", notFound));
+
         }
         transcriptIdToGoTermsMap = Map.copyOf(annotMap); // return immutable map
     }
