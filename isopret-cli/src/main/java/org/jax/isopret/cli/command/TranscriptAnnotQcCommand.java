@@ -5,6 +5,8 @@ import org.jax.isopret.core.analysis.IsopretAssociationContainer;
 import org.jax.isopret.core.analysis.TranscriptToGeneStats;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
+import org.jax.isopret.core.go.HbaDealsGoContainer;
+import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
@@ -84,6 +86,29 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
         HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
+        HbaDealsGoContainer hbaDealsGoContainer = new HbaDealsGoContainer(geneOntology,
+                thresholder,
+                geneContainer,
+                goMethod,
+                MtcMethod.fromString(mtc)
+                );
+        List<GoTerm2PValAndCounts> dgeGoTerms = hbaDealsGoContainer.termForTermDge();
+        System.out.println("Go enrichments, DGE");
+        for (var cts : dgeGoTerms) {
+            System.out.println(cts.getRow(geneOntology));
+        }
+        HbaDealsGoContainer hbaDealsGoContainerT = new HbaDealsGoContainer(geneOntology,
+                thresholder,
+                transcriptContainer,
+                goMethod,
+                MtcMethod.fromString(mtc)
+        );
+        List<GoTerm2PValAndCounts> dasGoTerms = hbaDealsGoContainerT.termForTermDas();
+        System.out.println("Go enrichments, DAS");
+        for (var cts : dasGoTerms) {
+            System.out.println(cts.getRow(geneOntology));
+        }
+
 //        HbaDealsGoAnalysis hbago =  getHbaDealsGoAnalysis(goMethod,
 //                thresholder,
 //                geneOntology,
