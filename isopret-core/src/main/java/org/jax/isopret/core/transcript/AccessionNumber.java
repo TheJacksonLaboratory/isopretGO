@@ -162,8 +162,8 @@ public class AccessionNumber {
             case GENE -> "ENSG";
             case TRANSCRIPT -> "ENST";
         };
-        String value = String.valueOf(accession);
-        return TermId.of(prefix, value);
+        String value = String.format("%s:%011d",prefix, this.accession);
+        return TermId.of(value);
     }
 
 }
