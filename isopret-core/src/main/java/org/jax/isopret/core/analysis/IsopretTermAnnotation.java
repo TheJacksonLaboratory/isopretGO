@@ -10,13 +10,10 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import java.util.Objects;
 
 public class IsopretTermAnnotation implements TermAnnotation {
-
-    private static final long serialVersionUID = 1L;
-
     private final TermId goTermId;
-    private final AccessionNumber accessionNumber;
+    private final TermId accessionNumber;
 
-    public IsopretTermAnnotation(AccessionNumber accession, TermId goTermId) {
+    public IsopretTermAnnotation(TermId accession, TermId goTermId) {
         this.accessionNumber = accession;
         this.goTermId = goTermId;
     }
@@ -28,17 +25,17 @@ public class IsopretTermAnnotation implements TermAnnotation {
 
     @Override
     public TermId getLabel() {
-        return TermId.of(String.format("ENST:%011d", accessionNumber.getAccessionNumber()));
+        return accessionNumber;
     }
 
     @Override
-    public int compareTo(TermAnnotation o) {
-        if (!(o instanceof IsopretTermAnnotation that)) {
-            throw new PhenolRuntimeException("Cannot compare " + o + " to " + this);
+    public int compareTo(TermAnnotation other) {
+        if (!(other instanceof IsopretTermAnnotation that)) {
+            throw new PhenolRuntimeException("Cannot compare " + other + " to " + this);
         }
         return ComparisonChain.start()
                 .compare(this.goTermId, that.goTermId)
-                .compare(this.accessionNumber.getAccessionNumber(), that.accessionNumber.getAccessionNumber())
+                .compare(this.accessionNumber, that.accessionNumber)
                 .result();
     }
 
@@ -49,6 +46,6 @@ public class IsopretTermAnnotation implements TermAnnotation {
 
     @Override
     public String toString() {
-        return "IsopretTermAnnotation [termId=" + goTermId + ": " + accessionNumber.getAccessionString() + "]";
+        return "IsopretTermAnnotation [termId=" + goTermId + ": " + accessionNumber.getValue() + "]";
     }
 }

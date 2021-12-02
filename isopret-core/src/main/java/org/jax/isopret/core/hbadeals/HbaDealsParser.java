@@ -52,7 +52,7 @@ public class HbaDealsParser {
     }
 
     /**
-     *
+     * This parser expects ENSG and ENST nomenclature
      * @param fname Path to an HBA-DEALS output file
      * @param hgncMap Map from
      */

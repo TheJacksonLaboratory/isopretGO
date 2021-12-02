@@ -27,13 +27,13 @@ public class IsopretAssociationContainer implements AssociationContainer  {
     /**
      * Key -- TermId for a gene. Value: {@link ItemAssociations} object with GO annotations for the gene.
      */
-    private Map<TermId, ItemAssociations> gene2associationMap;
+    private final Map<TermId, ItemAssociations> gene2associationMap;
     /**
      * The total number of GO (or HP, MP, etc) terms that are annotating the items in this container.
      * This variable is initialzed only if needed. The getter first checks if it is null, and if so
      * calculates the required count.
      */
-    private int annotatingTermCount;
+    private final int annotatingTermCount;
     /** Gene Ontology object. */
     private final Ontology ontology;
 
@@ -46,11 +46,11 @@ public class IsopretAssociationContainer implements AssociationContainer  {
         this.termToItemMultiMap =  ArrayListMultimap.create();
         Map<TermId, ItemAssociations> assocMap = new HashMap<>();
         for (var entry : transcriptIdToGoTermsMap.entrySet()) {
-            var transcriptId = entry.getKey();
+            var transcriptId = entry.getKey().toTermId();
             for (var goId: entry.getValue())  {
                 TermAnnotation termAnnot = new IsopretTermAnnotation(transcriptId, goId);
-                assocMap.putIfAbsent(goId, new ItemAssociations(goId));
-                assocMap.get(goId).add(termAnnot);
+                assocMap.putIfAbsent(transcriptId, new ItemAssociations(goId));
+                assocMap.get(transcriptId).add(termAnnot);
             }
         }
         this.gene2associationMap = ImmutableMap.copyOf(assocMap);
@@ -142,6 +142,6 @@ public class IsopretAssociationContainer implements AssociationContainer  {
 
     @Override
     public Set<TermId> getAllAnnotatedGenes() {
-        return null;
+        return gene2associationMap.keySet();
     }
 }
