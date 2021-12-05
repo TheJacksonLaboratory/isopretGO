@@ -48,7 +48,7 @@ for (node.number in 1:number.of.nodes)  #For every set of isoforms
   
   load(paste0('interpro_state_',node.number,'.RData'))  #read the state after the last run for isoform set number 'node.number'
   
-  total.lik=total.lik+res.ga@fitnessValue/sum(lower.tri(seq.sim.mat) & compare.pairs)  #add to the total likelihood the value of the solution that the
+  total.lik=total.lik+res.ga@fitnessValue/sum(lower.tri(seq.sim.mat) & compare.pairs)/sd(seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs])  #add to the total likelihood the value of the solution that the
                                                                                       #genetic algorithm found, but also divide by the number of isoform pairs in that 
                                                                                       #group for comparability, since group sizes vary 
   
@@ -202,6 +202,8 @@ rm(share.vec)
 
 
 #split the isoforms into new subsets
+
+set.seed(as.integer(args[1]))
 
 split.ids.comb=sample(1:number.of.nodes,length(combined.transcript.ids),replace=TRUE)  #randomly assign set labels (1-200 to isoforms)
 
