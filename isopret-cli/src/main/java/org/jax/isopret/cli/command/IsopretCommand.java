@@ -17,6 +17,7 @@ import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
@@ -41,8 +42,8 @@ public abstract class IsopretCommand {
     private JannovarReader jannovarReader = null;
 
     private  Map<AccessionNumber, HgncItem> hgncMap = null;
-
-    private Map<AccessionNumber, Set<TermId>> transcriptToGoMap = null;
+    /** Key ensembl transcript id; values: annotating go terms .*/
+    private Map<TermId, Set<TermId>> transcriptToGoMap = null;
 
 
     @CommandLine.Option(names={"-d","--download"},
@@ -140,7 +141,7 @@ public abstract class IsopretCommand {
 
     }
 
-    protected Map<AccessionNumber, Set<TermId>> loadTranscriptIdToGoTermsMap() {
+    protected Map<TermId, Set<TermId>> loadTranscriptIdToGoTermsMap() {
         if (transcriptToGoMap == null)
             runTranscriptFunctionFileParser();
         return transcriptToGoMap;

@@ -17,6 +17,8 @@ import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -39,7 +41,7 @@ import java.util.concurrent.Callable;
         mixinStandardHelpOptions = true,
         description = "Q/C the transcript annotations")
 public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable<Integer> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(TranscriptAnnotQcCommand.class);
     @CommandLine.Option(names={"--trfx"},
             required = true,
             description = "transcript function file")
@@ -61,31 +63,62 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
     @Override
     public Integer call() {
         Ontology geneOntology = loadGeneOntology();
-        GoAssociationContainer container = loadGoAssociationContainer();
+        LOGGER.info("Loaded Gene Ontology with {} terms", geneOntology.countNonObsoleteTerms());
+        //GoAssociationContainer container = loadGoAssociationContainer();
         Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
+        LOGGER.info("Loaded HGNC map with {} genes", hgncMap.size());
         Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap = loadJannovarGeneIdToTranscriptMap();
-        Map<AccessionNumber, Set<TermId>> transcriptIdToGoTermsMap = loadTranscriptIdToGoTermsMap();
-        Map<AccessionNumber, AccessionNumber> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneIdToTranscriptMap);
+        LOGGER.info("Loaded geneId-to-transcript map with {} genes", geneIdToTranscriptMap.size());
+        Map<TermId, Set<TermId>> transcriptIdToGoTermsMap = loadTranscriptIdToGoTermsMap();
+        LOGGER.info("Loaded transcriptIdToGoTermsMap with {} entries", transcriptIdToGoTermsMap.size());
+        int c = 0;
+        for (var e : transcriptIdToGoTermsMap.entrySet()) {
+            if (c>5) break;
+            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
+        }
+        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneIdToTranscriptMap);
+        LOGGER.info("Loaded transcriptToGeneIdMap with {} entries", transcriptIdToGoTermsMap.size());
+        c=0;
+        for (var e : transcriptToGeneIdMap.entrySet()) {
+            if (c>5) break;
+            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
+        }
         System.out.println();
-        TranscriptToGeneStats stats = new TranscriptToGeneStats(geneOntology, transcriptIdToGoTermsMap, transcriptToGeneIdMap);
-        stats.display();
+        //TranscriptToGeneStats stats = new TranscriptToGeneStats(geneOntology, transcriptIdToGoTermsMap, transcriptToGeneIdMap);
+        LOGGER.info("Displaying stats");
+        //stats.display();
         // create and check the annotation containers for the inferred data
+        LOGGER.info("Loading TranscriptFunctionFileParser");
         TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(transcriptFx), geneOntology);
-        Map<AccessionNumber, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
-        Map<AccessionNumber, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
+        Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
+        LOGGER.info("Loaded transcript2GoMap with {} entries", transcript2GoMap.size());
+        c=0;
+        for (var e : transcript2GoMap.entrySet()) {
+            if (c>5) break;
+            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
+        }
+        Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
+        LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
+        c=0;
+        for (var e : gene2GoMap.entrySet()) {
+            if (c>5) break;
+            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
+        }
+        //if (true) return 0;
+        LOGGER.info("About to create transcrpt container");
         AssociationContainer transcriptContainer = new IsopretAssociationContainer(geneOntology, transcript2GoMap);
         AssociationContainer geneContainer = new IsopretAssociationContainer(geneOntology, gene2GoMap);
-        var containerStats = new AssociationContainerStats(geneOntology, transcriptContainer, "GoGAF");
-        containerStats.display();
-        containerStats = new AssociationContainerStats(geneOntology, transcriptContainer, "Transcripts");
-        containerStats.display();
-        containerStats = new AssociationContainerStats(geneOntology, geneContainer, "Genes");
-        containerStats.display();
+//        var containerStats = new AssociationContainerStats(geneOntology, transcriptContainer, "Transcripts");
+//        containerStats.display();
+//        containerStats = new AssociationContainerStats(geneOntology, geneContainer, "Genes");
+//        containerStats.display();
 
         // ----------  6. HBA-DEALS input file  ----------------
+        LOGGER.info("About to create thresholder");
         HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
+        LOGGER.info("About to create HbaDealsGoContainer");
         HbaDealsGoContainer hbaDealsGoContainer = new HbaDealsGoContainer(geneOntology,
                 thresholder,
                 geneContainer,
@@ -129,15 +162,17 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
     }
 
 
-    Map<AccessionNumber, AccessionNumber> createTranscriptToGeneIdMap(Map<AccessionNumber, List<Transcript>> gene2transcript) {
-        Map<AccessionNumber, AccessionNumber> accessionNumberMap = new HashMap<>();
+    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<AccessionNumber, List<Transcript>> gene2transcript) {
+        Map<TermId, TermId> accessionNumberMap = new HashMap<>();
         for (var entry : gene2transcript.entrySet()) {
             var geneAcc = entry.getKey();
+            var geneTermId = geneAcc.toTermId();
             var transcriptList = entry.getValue();
             for (var transcript: transcriptList) {
                 var transcriptAcc = transcript.accessionId();
+                var transcriptTermId = transcriptAcc.toTermId();
                 //System.out.println(transcriptAcc.getAccessionString() +": " + geneAcc.getAccessionString());
-                accessionNumberMap.put(transcriptAcc, geneAcc);
+                accessionNumberMap.put(transcriptTermId, geneTermId);
             }
         }
         return Map.copyOf(accessionNumberMap); // immutable copy

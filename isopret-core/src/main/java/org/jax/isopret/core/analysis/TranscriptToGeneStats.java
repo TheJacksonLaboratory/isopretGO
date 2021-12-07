@@ -1,7 +1,5 @@
 package org.jax.isopret.core.analysis;
 
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -15,10 +13,12 @@ public class TranscriptToGeneStats {
     Logger LOGGER = LoggerFactory.getLogger(TranscriptToGeneStats.class);
 
     private final Ontology geneOntology;
-    private final Map<AccessionNumber, Set<TermId>> transcriptIdToGoTermsMap;
-    private final Map<AccessionNumber, AccessionNumber> transcriptToGeneIdMap;
+    private final Map<TermId, Set<TermId>> transcriptIdToGoTermsMap;
+    private final  Map<TermId, TermId> transcriptToGeneIdMap;
 
-    public TranscriptToGeneStats(Ontology geneOntology, Map<AccessionNumber, Set<TermId>> transcriptIdToGoTermsMap, Map<AccessionNumber, AccessionNumber> transcriptToGeneIdMap) {
+    public TranscriptToGeneStats(Ontology geneOntology,
+                                 Map<TermId, Set<TermId>> transcriptIdToGoTermsMap,
+                                 Map<TermId, TermId> transcriptToGeneIdMap) {
         this.geneOntology = geneOntology;
         this.transcriptIdToGoTermsMap = transcriptIdToGoTermsMap;
         this.transcriptToGeneIdMap = transcriptToGeneIdMap;
@@ -43,7 +43,7 @@ public class TranscriptToGeneStats {
 
     public void write(Writer writer) throws IOException {
         writer.write("### Isopret: Transcript to Gene Annotations data  ###\n\n");
-        Set<AccessionNumber> geneIds = new HashSet<>(this.transcriptToGeneIdMap.values());
+        Set<TermId> geneIds = new HashSet<>(this.transcriptToGeneIdMap.values());
         int n_number_of_genes = geneIds.size();
         int n_number_of_transcripts = this.transcriptIdToGoTermsMap.size();
         writer.write("\tgenes: " + n_number_of_genes +"\n");
