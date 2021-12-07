@@ -22,7 +22,6 @@ num.cores=4  #The number of cores that will be used by this script
 #The following function calculates the fitness, i.e. minus the sum of absolute residuals, of the regression model
 #for a given assignment of GO terms to isoforms(the input parameter sol). The prefix 'ga' is used because the optimization of function
 #assignment is performed by a Genetic Algorithm (appears later in this script)
-
 ga.fitness=function(sol)
 {
   
@@ -48,10 +47,51 @@ ga.fitness=function(sol)
   
   #Return the negative sum of absolute residuals
   
-  -sum(abs(v1-a))
+  -sum((v1-a)^2)
   
 }
 
+
+calcParProtSeqSim=function (protlist, cores = 2, type = "local", submat = "BLOSUM62")
+{
+  doParallel::registerDoParallel(cores)
+  idx = combn(1:length(protlist), 2)
+  seqsimlist = vector("list", ncol(idx))
+  seqsimlist <- foreach(i = 1:length(seqsimlist), .errorhandling = "pass") %dopar%
+  {
+    tmp <- IPcalcSeqPairSim(rev(idx[, i]), protlist = protlist,
+                            type = type, submat = submat)
+  }
+  seqsimmat = matrix(0, length(protlist), length(protlist))
+  for (i in 1:length(seqsimlist)) seqsimmat[idx[2, i], idx[1,
+                                                           i]] = seqsimlist[[i]]
+  seqsimmat[upper.tri(seqsimmat)] = t(seqsimmat)[upper.tri(t(seqsimmat))]
+  diag(seqsimmat) = 1
+  return(seqsimmat)
+}
+
+IPcalcSeqPairSim=function (twoid,protlist = protlist, type = type, submat = submat)
+{
+  id1 = twoid[1]
+  id2 = twoid[2]
+  if (protlist[[id1]] == "" | protlist[[id2]] == "") {
+    sim = 0L
+  }
+  else {
+    s1 = try(Biostrings::AAString(protlist[[id1]]), silent = TRUE)
+    s2 = try(Biostrings::AAString(protlist[[id2]]), silent = TRUE)
+    s12 = try(Biostrings::pairwiseAlignment(s1, s2, type = type,
+                                            substitutionMatrix = submat, scoreOnly = TRUE),
+              silent = TRUE)
+    
+    if (is.numeric(s12) == FALSE ) {
+      sim = 0L
+    }else {
+      sim = s12
+    }
+  }
+  return(sim)
+}
 
 #The following function accepts a list of protein sequences (the products of isoforms), and returns their local alignment matrrix.
 #This function and the one it calls(appears after it in the script) are mostly copied from another package, I just removed their normalization
@@ -100,7 +140,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   rm(interpro.ids)
   
-  init.coefs=c(0.04,0.07,-0.00001)   #start from an initial guess for the quadratic model coeffcients
+  init.coefs=c(0,1,-0.001)   #start from an initial guess for the quadratic model coeffcients
   
   #init
   
@@ -307,6 +347,10 @@ compare.pairs=(compare.pairs%*%t(compare.pairs))>0
 
 #Run a genetic algorithm that will optimize the assignment of functions to isoforms such that the model fit, returned by the functions gs.fitness,
 #is optimal.
+
+t.data=orderNorm(seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs])$x.t
+
+seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs]=t.data
 
 res.ga=ga(type = 'binary',fitness = ga.fitness,nBits = total.length,maxiter = 200,popSize = pop.size,suggestions = sugg,parallel=num.cores)
     

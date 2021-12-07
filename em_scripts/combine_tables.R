@@ -48,7 +48,7 @@ for (node.number in 1:number.of.nodes)  #For every set of isoforms
   
   load(paste0('interpro_state_',node.number,'.RData'))  #read the state after the last run for isoform set number 'node.number'
   
-  total.lik=total.lik+res.ga@fitnessValue/sum(lower.tri(seq.sim.mat) & compare.pairs)/sd(seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs])  #add to the total likelihood the value of the solution that the
+  total.lik=total.lik+res.ga@fitnessValue/sum(lower.tri(seq.sim.mat) & compare.pairs)  #add to the total likelihood the value of the solution that the
                                                                                       #genetic algorithm found, but also divide by the number of isoform pairs in that 
                                                                                       #group for comparability, since group sizes vary 
   
@@ -154,7 +154,7 @@ if (file.exists('last_lik.txt'))  #If the value of the likelihood was recorded b
       
       share.vec2=share.vec^2  #the square of the number of shared go terms between isoforms
       
-      new.coefs=lad(fit.sample~share.vec+share.vec2)$coefficients  #fit new quadratic model parameters
+      new.coefs=lm(fit.sample~share.vec+share.vec2,method='EM')$coefficients  #fit new quadratic model parameters
       
       if (!file.exists('convergence_log.txt'))  #record the iteration number at which convergence was detected
       {
