@@ -1,6 +1,7 @@
 package org.jax.isopret.core.go;
 
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
+import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
@@ -10,13 +11,17 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
 import org.monarchinitiative.phenol.stats.mtc.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class HbaDealsGoContainer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsGoContainer.class);
 
     private final static double ALPHA = 0.05;
 
@@ -54,7 +59,14 @@ public class HbaDealsGoContainer {
 
     public List<GoTerm2PValAndCounts> termForTermDge() {
         Set<TermId> studyIds = this.thresholder.dgeGeneTermIds();
+        LOGGER.info("Study set size {}", studyIds.size());
+        int c = 0;
+        for (var tid : studyIds) {
+            if (c++>5) break;
+            LOGGER.info("{}) {}", c, tid.getValue());
+        }
         Map<TermId, DirectAndIndirectTermAnnotations> annMap = associationContainer.getAssociationMap(studyIds);
+        LOGGER.info("annMap size {}", annMap.size());
         StudySet study = new StudySet(studyIds, "dge-study", annMap);
         Set<TermId> popIds = this.thresholder.getAllGeneTermIds();
         Map<TermId, DirectAndIndirectTermAnnotations> popMap = associationContainer.getAssociationMap(popIds);
@@ -64,10 +76,12 @@ public class HbaDealsGoContainer {
                 population,
                 study,
                 new Bonferroni());
-        return tftpvalcal.calculatePVals()
+        var pvals = tftpvalcal.calculatePVals()
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
                 .collect(Collectors.toList());
+        Collections.sort(pvals);
+        return pvals;
     }
 
 
@@ -83,9 +97,11 @@ public class HbaDealsGoContainer {
                 population,
                 study,
                 new Bonferroni());
-        return tftpvalcal.calculatePVals()
+        var pvals = tftpvalcal.calculatePVals()
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
                 .collect(Collectors.toList());
+        Collections.sort(pvals);
+        return pvals;
     }
 }

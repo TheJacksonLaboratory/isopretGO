@@ -21,7 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +131,8 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
         List<GoTerm2PValAndCounts> dgeGoTerms = hbaDealsGoContainer.termForTermDge();
         System.out.println("Go enrichments, DGE");
         for (var cts : dgeGoTerms) {
-            System.out.println(cts.getRow(geneOntology));
+            if (cts.passesThreshold(0.05))
+                System.out.println(cts.getRow(geneOntology));
         }
         HbaDealsGoContainer hbaDealsGoContainerT = new HbaDealsGoContainer(geneOntology,
                 thresholder,
@@ -139,27 +143,33 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
         List<GoTerm2PValAndCounts> dasGoTerms = hbaDealsGoContainerT.termForTermDas();
         System.out.println("Go enrichments, DAS");
         for (var cts : dasGoTerms) {
-            System.out.println(cts.getRow(geneOntology));
+            if (cts.passesThreshold(0.05))
+                System.out.println(cts.getRow(geneOntology));
         }
-
-//        HbaDealsGoAnalysis hbago =  getHbaDealsGoAnalysis(goMethod,
-//                thresholder,
-//                geneOntology,
-//                transcriptContainer,
-//                mtc);
+        writeGoResultsToFile(dasGoTerms, dgeGoTerms, geneOntology);
 //
-//
-//        List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
-//        List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
-//        dasGoTerms.sort(new HbaDealsCommand.SortByPvalue());
-//        dgeGoTerms.sort(new HbaDealsCommand.SortByPvalue());
-//
-//        for (var x : dasGoTerms.listIterator()) {
-//            System.out.println(x.toString());
-//        }
-
         return 0;
     }
+
+    private void writeGoResultsToFile(List<GoTerm2PValAndCounts> dasGoTerms,
+                                      List<GoTerm2PValAndCounts> dgeGoTerms,
+                                      Ontology geneOntology) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("isopret-out.txt"))) {
+            for (var cts : dasGoTerms) {
+                if (cts.passesThreshold(0.05))
+                    bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
+            }
+            for (var cts : dgeGoTerms) {
+                if (cts.passesThreshold(0.05))
+                    bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 
 
     Map<TermId, TermId> createTranscriptToGeneIdMap(Map<AccessionNumber, List<Transcript>> gene2transcript) {
