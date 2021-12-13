@@ -61,6 +61,7 @@ public abstract class IsopretCommand {
             }
             geneOntology = OntologyLoader.loadOntology(goJsonFile);
         }
+        LOGGER.info("Loaded Gene Ontology json file with {} terms.", geneOntology.getNonObsoleteTermIds());
         return geneOntology;
     }
 
@@ -75,6 +76,8 @@ public abstract class IsopretCommand {
             Ontology go = loadGeneOntology();
             this.associationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, go);
         }
+        LOGGER.info("Loaded GO Association container with {} associations",
+                associationContainer.getRawAssociations().size());
         return this.associationContainer;
     }
 
@@ -91,6 +94,8 @@ public abstract class IsopretCommand {
     protected Map<String, List<Transcript>> loadJannovarTranscriptMap() {
         if (jannovarReader == null) {
             jannovarReader = new JannovarReader(jannovarTranscriptFile(), assembly);
+            LOGGER.info("Loaded JannovarReader with {} symbols",
+                    jannovarReader.getSymbolToTranscriptListMap().size());
         }
         return jannovarReader.getSymbolToTranscriptListMap();
     }
@@ -98,15 +103,20 @@ public abstract class IsopretCommand {
     protected Map<AccessionNumber, List<Transcript>> loadJannovarGeneIdToTranscriptMap() {
         if (jannovarReader == null) {
             jannovarReader = new JannovarReader(jannovarTranscriptFile(), assembly);
+            LOGGER.info("Loaded JannovarReader with {} genes",
+                    jannovarReader.getGeneIdToTranscriptMap().size());
         }
         return jannovarReader.getGeneIdToTranscriptMap();
     }
 
-
+    /**
+     * @return map with key: Ensembl Gene ID and value: the corresponding {@link HgncItem} object
+     */
     protected Map<AccessionNumber, HgncItem> loadHgncMap() {
         if (hgncMap == null) {
             HgncParser hgncParser = new HgncParser();
             hgncMap = hgncParser.ensemblMap();
+            LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
         }
         return hgncMap;
     }

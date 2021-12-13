@@ -22,7 +22,6 @@ public class HbaDealsGoAnalysis {
     private final static double ALPHA = 0.05;
 
     private final Ontology ontology;
-    private final GoAssociationContainer goAssociationContainer;
 
     private final StudySet dge;
     private final StudySet das;
@@ -37,7 +36,6 @@ public class HbaDealsGoAnalysis {
                                GoMethod method,
                                MtcMethod mtcMethod) {
         this.ontology = ontology;
-        this.goAssociationContainer = associationContainer;
         this.goMethod = method;
         switch (mtcMethod) {
             case BONFERRONI -> this.mtc = new Bonferroni();

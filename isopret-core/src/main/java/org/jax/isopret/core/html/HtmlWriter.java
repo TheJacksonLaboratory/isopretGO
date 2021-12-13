@@ -15,6 +15,8 @@ import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
@@ -27,6 +29,7 @@ import java.util.stream.Stream;
  * TODO this is messy and needs to be cleaned up.
  */
 public class HtmlWriter extends AbstractWriter {
+    Logger LOGGER = LoggerFactory.getLogger(HtmlWriter.class);
     int hbadeals = 0;
     int hbadealSig = 0;
     int foundTranscripts = 0;
@@ -59,7 +62,7 @@ public class HtmlWriter extends AbstractWriter {
         // Add differentially expressed genes/GO analysis
         String dgeTable = getGoHtmlTable(dgeGoTerms, ontology, "dgego-table");
         data.put("dgeTable", dgeTable);
-        // Same for DAS (note -- in this application, DAS may overlap with DAS/DGE)
+        // Same for DAS (note -- DAS may overlap with DGE)
         String dasTable = getGoHtmlTable(dasGoTerms, ontology, "dasgo-table");
         data.put("dasTable", dasTable);
         // genes symbols differential  for significant expression OR splicing
@@ -123,7 +126,7 @@ public class HtmlWriter extends AbstractWriter {
         } else {
             data.put("prefix", hbadealsFile.getName());
         }
-        LOGGER.trace("Total unidentified genes:"+ unidentifiedSymbols.size());
+        LOGGER.trace("Total unidentified genes: {}", unidentifiedSymbols.size());
         LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also interpro: {}",
                 hbadeals, foundTranscripts, hbadealSig, foundInterPro);
     }

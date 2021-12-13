@@ -32,8 +32,7 @@ public class GoTermIdPlusLabel implements Comparable<GoTermIdPlusLabel> {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (! (obj instanceof GoTermIdPlusLabel)) return false;
-        GoTermIdPlusLabel that = (GoTermIdPlusLabel) obj;
+        if (! (obj instanceof GoTermIdPlusLabel that)) return false;
         return this.id.equals(that.id) && this.label.equals(that.label);
     }
 
