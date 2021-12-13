@@ -3,6 +3,7 @@ package org.jax.isopret.core.io;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +30,13 @@ import java.util.Set;
  */
 public class TranscriptFunctionFileParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TranscriptFunctionFileParser.class);
-
-    private final  Map<AccessionNumber, Set<TermId>> transcriptIdToGoTermsMap;
+    /** Key: TermId representing the accession number of a gene or transcript (e.g., ENST:00123), value:
+     * set of annotated GO terms
+     */
+    private final  Map<TermId, Set<TermId>> transcriptIdToGoTermsMap;
 
     public TranscriptFunctionFileParser(File transcriptFunctionFile, Ontology ontology) {
-        Map<AccessionNumber, Set<TermId>> annotMap = new HashMap<>();
+        Map<TermId, Set<TermId>> annotMap = new HashMap<>();
         Set<String> notFound = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new FileReader(transcriptFunctionFile))) {
             String line = br.readLine();
@@ -52,8 +55,9 @@ public class TranscriptFunctionFileParser {
                     notFound.add(GoId.getValue());
                     continue;
                 }
-                annotMap.putIfAbsent(transcriptId, new HashSet<>());
-                annotMap.get(transcriptId).add(GoId);
+                TermId transcriptTermId = transcriptId.toTermId();
+                annotMap.putIfAbsent(transcriptTermId, new HashSet<>());
+                annotMap.get(transcriptTermId).add(GoId);
             }
         } catch (IOException e) {
             throw new PhenolRuntimeException("Could not import isoform_function_list.txt :" + e.getMessage());
@@ -66,7 +70,7 @@ public class TranscriptFunctionFileParser {
         transcriptIdToGoTermsMap = Map.copyOf(annotMap); // return immutable map
     }
 
-    public Map<AccessionNumber, Set<TermId>> getTranscriptIdToGoTermsMap() {
+    public Map<TermId, Set<TermId>> getTranscriptIdToGoTermsMap() {
         return transcriptIdToGoTermsMap;
     }
 
@@ -75,18 +79,18 @@ public class TranscriptFunctionFileParser {
      * @param transcript2gene Map with Ensembl transcript id to gene id map
      * @return Map with key: Ensembl gene id and value set of GO Annotations.
      */
-    public Map<AccessionNumber, Set<TermId>> getGeneIdToGoTermsMap(Map<AccessionNumber, AccessionNumber> transcript2gene) {
-        Map<AccessionNumber, Set<TermId>> annotMap = new HashMap<>();
+    public Map<TermId, Set<TermId>> getGeneIdToGoTermsMap(Map<TermId, TermId> transcript2gene) {
+        Map<TermId, Set<TermId>> annotMap = new HashMap<>();
         if (transcriptIdToGoTermsMap.isEmpty()) {
             // should never happen
             throw new PhenolRuntimeException("Attempt to get gene-level annotations without transcript annotations");
         }
         for (var entry : transcriptIdToGoTermsMap.entrySet()) {
-            AccessionNumber transcriptAcc = entry.getKey();
+            TermId transcriptAcc = entry.getKey();
             if (! transcript2gene.containsKey(transcriptAcc)) {
-                LOGGER.error("Could not find gene accession number for {}", transcriptAcc.getAccessionString());
+                LOGGER.error("Could not find gene accession number for {}", transcriptAcc.getValue());
             } else {
-                AccessionNumber geneAcc = transcript2gene.get(transcriptAcc);
+                TermId geneAcc = transcript2gene.get(transcriptAcc);
                 annotMap.putIfAbsent(geneAcc, new HashSet<>());
                 for (TermId goId : entry.getValue()) {
                     annotMap.get(geneAcc).add(goId);

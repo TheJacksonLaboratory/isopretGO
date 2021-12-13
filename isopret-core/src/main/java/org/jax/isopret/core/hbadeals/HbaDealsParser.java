@@ -61,6 +61,7 @@ public class HbaDealsParser {
         this.hbaDealsResultMap = new HashMap<>();
         int n_lines = 0;
         List<HbaLine> lines = new ArrayList<>();
+        Set<String> unfound = new HashSet<>();
         try (BufferedReader br = new BufferedReader(new FileReader(this.hbadealsFile))) {
             String line;
             checkHeader(br.readLine()); // skip header
@@ -74,15 +75,13 @@ public class HbaDealsParser {
             throw new IsopretRuntimeException("Could not read HBA-DEALS file: " + e.getMessage());
         }
         int found_symbol = 0;
-        int missed_symbol = 0;
         for (HbaLine hline : lines) {
             String symbol = hline.geneAccession.getAccessionString(); // if we cannot find symbol, just show the accession
             if (hgncMap.containsKey(hline.geneAccession)) {
                 symbol = hgncMap.get(hline.geneAccession).getGeneSymbol();
                 found_symbol++;
             } else {
-                LOGGER.warn("Could not find symbol for " + hline.geneAccession.getAccessionString());
-                missed_symbol++;
+                unfound.add(hline.geneAccession.getAccessionString());
             }
             this.hbaDealsResultMap.putIfAbsent(symbol, new HbaDealsResult(hline.geneAccession, symbol));
             HbaDealsResult hbaresult = this.hbaDealsResultMap.get(symbol);
@@ -92,13 +91,16 @@ public class HbaDealsParser {
                 hbaresult.addExpressionResult(hline.expFC, hline.raw_p);
             }
         }
-        if (missed_symbol > found_symbol) {
-            LOGGER.error("We could not map {} accession numbers and could map {} accession numbers", missed_symbol, found_symbol);
+        if (unfound.size() > found_symbol) {
+            LOGGER.error("We could not map {} accession numbers and could map {} accession numbers", unfound.size(), found_symbol);
             throw new IsopretRuntimeException("Could not map most accession numbers/identifiers. Terminating program because this will invalidate downstream analysis.");
         }
-        LOGGER.trace("We found gene symbols {} times and missed it {} times.\n", found_symbol, missed_symbol);
+        LOGGER.trace("We found gene symbols {} times and missed it {} times.\n", found_symbol, unfound.size());
         LOGGER.trace("We parsed {} lines from {}.\n", n_lines, this.hbadealsFile);
         LOGGER.trace("We got {} genes with HBA DEALS results\n", hbaDealsResultMap.size());
+        if (! unfound.isEmpty()) {
+            LOGGER.info("Could not find symbols for {} accessions: ", unfound.size(), String.join(", ", unfound));
+        }
     }
 
     public Map<String, HbaDealsResult> getHbaDealsResultMap() {

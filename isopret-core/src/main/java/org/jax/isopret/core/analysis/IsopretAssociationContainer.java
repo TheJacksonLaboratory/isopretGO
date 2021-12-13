@@ -20,7 +20,7 @@ import java.util.*;
 import static org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm.getAncestorTerms;
 
 public class IsopretAssociationContainer implements AssociationContainer  {
-    Logger LOGGER = LoggerFactory.getLogger(IsopretAssociationContainer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(IsopretAssociationContainer.class);
 
 
 
@@ -41,17 +41,24 @@ public class IsopretAssociationContainer implements AssociationContainer  {
     private final Multimap<TermId, TermId> termToItemMultiMap;
 
     public IsopretAssociationContainer(Ontology ontology,
-                                       Map<AccessionNumber, Set<TermId>> transcriptIdToGoTermsMap){
+                                       Map<TermId, Set<TermId>> transcriptIdToGoTermsMap){
         this.ontology = ontology;
         this.termToItemMultiMap =  ArrayListMultimap.create();
         Map<TermId, ItemAssociations> assocMap = new HashMap<>();
         for (var entry : transcriptIdToGoTermsMap.entrySet()) {
-            var transcriptId = entry.getKey().toTermId();
+            var transcriptId = entry.getKey();
             for (var goId: entry.getValue())  {
                 TermAnnotation termAnnot = new IsopretTermAnnotation(transcriptId, goId);
                 assocMap.putIfAbsent(transcriptId, new ItemAssociations(goId));
                 assocMap.get(transcriptId).add(termAnnot);
             }
+        }
+        LOGGER.info("Isopret association container");
+        LOGGER.info("Assoc map with {} entries", assocMap.size());
+        int c = 0;
+        for (var e : assocMap.entrySet()) {
+            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
+            if (c>5) break;
         }
         this.gene2associationMap = ImmutableMap.copyOf(assocMap);
         this.annotatingTermCount = gene2associationMap.values()
@@ -59,6 +66,7 @@ public class IsopretAssociationContainer implements AssociationContainer  {
                 .map(ItemAssociations::getAssociations)
                 .mapToInt(List::size)
                 .sum();
+        LOGGER.info("annotatingTermCount {}", annotatingTermCount);
     }
 
 
