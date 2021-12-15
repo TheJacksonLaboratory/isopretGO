@@ -20,26 +20,17 @@ public enum InterproEntryType {
 
 
     public static InterproEntryType fromString(String s) {
-        switch (s.toUpperCase()) {
-            case "ACTIVE_SITE":
-                return ACTIVE_SITE;
-            case "BINDING_SITE":
-                return BINDING_SITE;
-            case "CONSERVED_SITE":
-                return CONSERVED_SITE;
-            case "DOMAIN":
-                return DOMAIN;
-            case "FAMILY":
-                return FAMILY;
-            case "HOMOLOGOUS_SUPERFAMILY":
-                return HOMOLOGOUS_SUPERFAMILY;
-            case "PTM":
-                return PTM;
-            case "REPEAT":
-                return REPEAT;
-            default:
-                throw new IsopretRuntimeException("Did not recognize InterproEntryType:" + s);
-        }
+        return switch (s.toUpperCase()) {
+            case "ACTIVE_SITE" -> ACTIVE_SITE;
+            case "BINDING_SITE" -> BINDING_SITE;
+            case "CONSERVED_SITE" -> CONSERVED_SITE;
+            case "DOMAIN" -> DOMAIN;
+            case "FAMILY" -> FAMILY;
+            case "HOMOLOGOUS_SUPERFAMILY" -> HOMOLOGOUS_SUPERFAMILY;
+            case "PTM" -> PTM;
+            case "REPEAT" -> REPEAT;
+            default -> throw new IsopretRuntimeException("Did not recognize InterproEntryType:" + s);
+        };
     }
 
 

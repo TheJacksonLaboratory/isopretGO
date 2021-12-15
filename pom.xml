@@ -15,8 +15,8 @@
     <version>0.7.0</version>
     <modules>
         <module>isopret-core</module>
-       <module>isopret-cli</module>
-        <!--    <module>isopret-gui</module> -->
+        <module>isopret-cli</module>
+        <module>isopret-gui</module>
     </modules>
     <packaging>pom</packaging>
 

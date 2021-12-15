@@ -1,9 +1,6 @@
 package org.jax.isopret.cli;
 
-import org.jax.isopret.cli.command.DownloadCommand;
-import org.jax.isopret.cli.command.HbaDealsCommand;
-import org.jax.isopret.cli.command.StatsCommand;
-import org.jax.isopret.cli.command.SvgCommand;
+import org.jax.isopret.cli.command.*;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -22,6 +19,7 @@ public class Main implements Callable<Integer> {
                 .addSubcommand("download", new DownloadCommand())
                 .addSubcommand("test/resources/hbadeals", new HbaDealsCommand())
                 .addSubcommand("stats", new StatsCommand())
+                .addSubcommand("transcriptqc", new TranscriptAnnotQcCommand())
                 .addSubcommand("svg", new SvgCommand());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);
