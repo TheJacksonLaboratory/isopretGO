@@ -86,7 +86,6 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
             if (c>5) break;
             LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
         }
-        System.out.println();
         //TranscriptToGeneStats stats = new TranscriptToGeneStats(geneOntology, transcriptIdToGoTermsMap, transcriptToGeneIdMap);
         LOGGER.info("Displaying stats");
         //stats.display();

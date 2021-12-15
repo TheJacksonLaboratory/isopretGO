@@ -28,6 +28,7 @@ public class HbaDealsGoAnalysis {
     private final StudySet population;
     private final GoMethod goMethod;
     private final MultipleTestingCorrection mtc;
+    private final GoAssociationContainer goAssociationContainer;
 
 
     private HbaDealsGoAnalysis(HbaDealsThresholder thresholder,
@@ -37,6 +38,7 @@ public class HbaDealsGoAnalysis {
                                MtcMethod mtcMethod) {
         this.ontology = ontology;
         this.goMethod = method;
+        this.goAssociationContainer = associationContainer;
         switch (mtcMethod) {
             case BONFERRONI -> this.mtc = new Bonferroni();
             case BONFERRONI_HOLM -> this.mtc = new BonferroniHolm();
@@ -132,9 +134,6 @@ public class HbaDealsGoAnalysis {
             case PCunion -> parentChildUnion(this.dge);
             case PCintersect -> parentChildIntersect(this.dge);
             case MGSA -> mgsa(this.dge);
-            default ->
-                    // should never happen
-                    throw new IsopretRuntimeException("Unrecognized method");
         };
     }
 
@@ -144,9 +143,6 @@ public class HbaDealsGoAnalysis {
             case PCunion -> parentChildUnion(this.das);
             case PCintersect -> parentChildIntersect(this.das);
             case MGSA -> mgsa(this.das);
-            default ->
-                    // should never happen
-                    throw new IsopretRuntimeException("Unrecognized method");
         };
     }
 
