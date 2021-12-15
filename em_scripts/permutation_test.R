@@ -136,7 +136,9 @@ set.seed(123)
 
 sensitivity.by.random=c()
 
-for (i in 1:1000)
+iso.has.func=iso.has.func[match(names(isoform.functions),rownames(iso.has.func)),]
+
+for (i in 1:5)
 {
   random.sol=c(rep(1,num.chosen),rep(0,total.length-num.chosen))
   
@@ -148,7 +150,7 @@ for (i in 1:1000)
   
   random.isoform.functions=as.data.frame(random.isoform.functions)
   
-  random.isoform.functions$Ensembl.ID=transcript.ids[as.integer(random.isoform.functions$Ensembl.ID)]
+  random.isoform.functions$Ensembl.ID=rownames(iso.has.func)[as.integer(random.isoform.functions$Ensembl.ID)]
   
   random.isoform.functions=split(random.isoform.functions$Go.Terms,random.isoform.functions$Ensembl.ID)
   
@@ -196,9 +198,9 @@ sensitivity.by.isoform=unlist(mclapply(rownames(iso.has.func),function(tr){  #fo
 
 mean(sensitivity.by.isoform,na.rm=T)/mean(sensitivity.by.random,na.rm=T)
 
-sum(sensitivity.by.isoform<=sensitivity.by.random)
+sum(mean(sensitivity.by.isoform,na.rm=T)<=sensitivity.by.random)
 
-ggboxplot(sensitivity.by.random,ylim=c(0,mean(sensitivity.by.isoform,na.rm=T)+0.01),ylab='Mean Interpro2GO Proportion',xlab='', add = 'jitter')+
+ggboxplot(sensitivity.by.random,ylab='Mean Interpro2GO Proportion',xlab='', add = 'jitter')+
   geom_point(aes(x=1, y=mean(sensitivity.by.isoform,na.rm=T)), colour="blue")+
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank())
