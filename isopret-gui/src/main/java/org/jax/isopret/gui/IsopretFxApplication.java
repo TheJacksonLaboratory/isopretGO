@@ -34,6 +34,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Properties;
 
 
@@ -65,8 +66,9 @@ public class IsopretFxApplication extends Application {
     public void init() {
         applicationContext = new SpringApplicationBuilder(StockUiApplication.class).run();
         ClassPathResource applicationProps =  new ClassPathResource("application.properties");
+        Objects.requireNonNull(applicationProps);
         // export app's version into System properties
-       try (InputStream is = new FileInputStream(applicationProps.getFilename())) {
+       try (Reader is = new InputStreamReader(applicationProps.getInputStream())) {
             Properties properties = new Properties();
             properties.load(is);
             String version = "1.2";//properties.getProperty(FENOMINAL_VERSION_PROP_KEY, "unknown version");

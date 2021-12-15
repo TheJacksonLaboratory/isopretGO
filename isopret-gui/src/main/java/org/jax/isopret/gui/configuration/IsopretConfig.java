@@ -16,10 +16,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Configuration
-public class GopherConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GopherConfig.class);
+public class IsopretConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IsopretConfig.class);
 
-    public static final String CONFIG_FILE_BASENAME = "hpowb.properties";
+    public static final String CONFIG_FILE_BASENAME = "isopretfx.properties";
 
 
     @Bean
