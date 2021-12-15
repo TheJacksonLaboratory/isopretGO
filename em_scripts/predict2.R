@@ -22,6 +22,7 @@ num.cores=4  #The number of cores that will be used by this script
 #The following function calculates the fitness, i.e. minus the sum of absolute residuals, of the regression model
 #for a given assignment of GO terms to isoforms(the input parameter sol). The prefix 'ga' is used because the optimization of function
 #assignment is performed by a Genetic Algorithm (appears later in this script)
+
 ga.fitness=function(sol)
 {
   
@@ -36,21 +37,25 @@ ga.fitness=function(sol)
   
   b=number.shared.functions[lower.tri(number.shared.functions) & compare.pairs]
   
-  
   #The normalized local alignment scores between the isoforms, used as the dependent variabe in the model.
   
   a=seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs]
   
   #The values predicted by the model for all the data points in b
   
-  v1=(b^2)*coefs[3]+b*coefs[2]+coefs[1]
+  combs=comp.vals
+  
+  b.dif=b[combs[1,]]>b[combs[2,]]
+  
+  combs=combs[,b.dif]
+  
+  vals=(a[combs[1,]]-a[combs[2,]])/(b[combs[1,]]-b[combs[2,]])
   
   #Return the negative sum of absolute residuals
   
-  -sum((v1-a)^2)
+  -mean(abs(vals-med.val))-mean(abs(a[combs[2,vals==median(vals) & b[combs[2,]]==0]]-a0))
   
 }
-
 
 calcParProtSeqSim=function (protlist, cores = 2, type = "local", submat = "BLOSUM62")
 {
@@ -122,11 +127,11 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   interpro.tab=read.table('interpro_domains.txt',sep='\t',header=TRUE)
   
-  interpro.tab=interpro.tab[interpro.tab[,3]!="",]
+  interpro.tab=interpro.tab[interpro.tab[,2]!="",]
   
-  interpro.tab=interpro.tab[!duplicated(paste(interpro.tab[,1],interpro.tab[,3])),]
+  interpro.tab=interpro.tab[!duplicated(paste(interpro.tab[,1],interpro.tab[,2])),]
   
-  colnames(interpro.tab)[3]='domain'
+  colnames(interpro.tab)[2]='domain'
   
   interpro2go=fread('interpro2go',sep=';',header=FALSE,data.table = FALSE,skip = 3)
   
@@ -140,12 +145,14 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   rm(interpro.ids)
   
-  init.coefs=c(0,1,-0.001)   #start from an initial guess for the quadratic model coeffcients
-  
+  init.med.val=20  #start from an initial guess for the slope
+ 
+  init.a0=25 
   #init
   
-  coefs=init.coefs
+  med.val=init.med.val
   
+  a0=init.a0
   #The following lines read the GTF files with all genes and isoforms, and extract their Ensembl IDs
   
   gtf.file=fread('/projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/Homo_sapiens.GRCh38.91.gtf',sep='\t',quote = '',data.table = FALSE)
@@ -180,7 +187,14 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
       
       return(NULL)
       
-    unique(gaf.file$V5[gaf.file$V2 %in% next.uniprot])
+    all.trs=unique(transcript.ids[gene.ids==x])
+    
+    domains=interpro.tab$domain[interpro.tab$ensembl_transcript_id %in% all.trs]
+    
+    interpro2go.terms=unique(interpro2go[names(interpro2go) %in% domains])
+    
+    unique(c(gaf.file$V5[gaf.file$V2 %in% next.uniprot],interpro2go.terms))
+    
     
   },mc.cores = num.cores)
   
@@ -348,9 +362,7 @@ compare.pairs=(compare.pairs%*%t(compare.pairs))>0
 #Run a genetic algorithm that will optimize the assignment of functions to isoforms such that the model fit, returned by the functions gs.fitness,
 #is optimal.
 
-t.data=orderNorm(seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs])$x.t
-
-seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs]=t.data
+comp.vals=combn(sum(lower.tri(seq.sim.mat) & compare.pairs),2)
 
 res.ga=ga(type = 'binary',fitness = ga.fitness,nBits = total.length,maxiter = 200,popSize = pop.size,suggestions = sugg,parallel=num.cores)
     
@@ -372,6 +384,8 @@ if (sum(res.ga@solution[1,])>0)
 colnames(iso.has.func)=col.names.ihf
 
 rownames(iso.has.func)=row.names.ihf
+
+rm(comp.vals)
 
 #Transform the GO terms from integers back to strings, for the master script's use
 

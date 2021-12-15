@@ -22,6 +22,21 @@ if (file.exists('convergence_log.txt'))  #If a previous iteration created the fi
   
 }
 
+
+get.med=function(a,b)
+{
+  combs=combn(length(b),2)
+  
+  b.dif=b[combs[1,]]>b[combs[2,]]
+  
+  combs=combs[,b.dif]
+  
+  vals=(a[combs[1,]]-a[combs[2,]])/(b[combs[1,]]-b[combs[2,]])
+  
+  list(median(vals),median(a[combs[2,vals==median(vals) & b[combs[2,]]==0]]))
+}
+
+
 #define data structures that will be used for combining the results that were computed for the 200 different sets of isoforms
 #their role is explained in the body of the loop, at the part of the code where data is added to them
 
@@ -37,7 +52,7 @@ share.vec=c()
 
 fit.sample=c()
 
-new.coefs=NULL  #If the E step converged, this will be used to store the new coefficients of the quadratic model
+new.med=NULL  #If the E step converged, this will be used to store the new slope
 
 total.lik=0  #sums the log-likelihood from the different sets of isoforms
 
@@ -48,7 +63,7 @@ for (node.number in 1:number.of.nodes)  #For every set of isoforms
   
   load(paste0('interpro_state_',node.number,'.RData'))  #read the state after the last run for isoform set number 'node.number'
   
-  total.lik=total.lik+res.ga@fitnessValue/sum(lower.tri(seq.sim.mat) & compare.pairs)  #add to the total likelihood the value of the solution that the
+  total.lik=total.lik+res.ga@fitnessValue #add to the total likelihood the value of the solution that the
                                                                                       #genetic algorithm found, but also divide by the number of isoform pairs in that 
                                                                                       #group for comparability, since group sizes vary 
   
@@ -105,7 +120,7 @@ for (node.number in 1:number.of.nodes)  #For every set of isoforms
   
   combined.transcript.ids=c(combined.transcript.ids,transcript.ids)
   
-  #Collect the number of shared functions and local alignment scores, in case we need to re-fit coefficients
+  #Collect the number of shared functions and local alignment scores, in case we need to re-fit the slope
   
   next.share.vec=(iso.has.func%*%t(iso.has.func))[lower.tri(seq.sim.mat) & compare.pairs]  #number of shared GO terms between isoform pairs
   
@@ -154,7 +169,11 @@ if (file.exists('last_lik.txt'))  #If the value of the likelihood was recorded b
       
       share.vec2=share.vec^2  #the square of the number of shared go terms between isoforms
       
-      new.coefs=lm(fit.sample~share.vec+share.vec2,method='EM')$coefficients  #fit new quadratic model parameters
+      new.params=get.med(fit.sample,share.vec)  #fit new slope
+      
+      new.med=new.params[[1]]
+      
+      new.a0=new.params[[2]]
       
       if (!file.exists('convergence_log.txt'))  #record the iteration number at which convergence was detected
       {
@@ -218,13 +237,15 @@ for (node.number in 1:number.of.nodes)  #for each new set
   
   iso.has.func=combined.table[rownames(combined.table) %in% transcript.ids,]  # assignment of functions to this set of isoforms in the last iteration
   
-  if (!is.null(new.coefs))  #if new coefficients were computed, update the variable 'coefs'
+  if (!is.null(new.med))  #if a new slope was computed, update the variable
+  {
+    med.val=new.med
     
-    coefs=new.coefs
-  
+    a0=new.a0
+  } 
   #create an .RData file for the script predict2.R, which will be used when that script is run with argument equal to 'node.number'
   
-  save(transcript.ids,x.seq,isoform.functions,iso.has.func,coefs,file=paste0('interpro_state_',node.number,'.RData'))
+  save(transcript.ids,x.seq,isoform.functions,iso.has.func,med.val,a0,file=paste0('interpro_state_',node.number,'.RData'))
   
 }
 
