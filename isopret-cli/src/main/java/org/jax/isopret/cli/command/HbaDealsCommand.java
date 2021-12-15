@@ -132,26 +132,9 @@ public class HbaDealsCommand extends IsopretCommand implements Callable<Integer>
     }
 
 
-    private HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
-                                             HbaDealsThresholder thresholder,
-                                             Ontology ontology,
-                                             GoAssociationContainer goAssociationContainer,
-                                             MtcMethod mtc) {
-        if (goMethod == GoMethod.PCunion) {
-            return HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
-        } else if (goMethod == GoMethod.PCintersect) {
-            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
-        } else {
-            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
-        }
-    }
 
 
-    private HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, HgncItem> hgncMap, String hbadealsPath) {
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsPath, hgncMap);
-        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
-        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
-        return new HbaDealsThresholder(hbaDealsResults);
-    }
+
+
 
 }

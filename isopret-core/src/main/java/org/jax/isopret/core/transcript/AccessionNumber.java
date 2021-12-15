@@ -1,6 +1,8 @@
 package org.jax.isopret.core.transcript;
 
+import org.checkerframework.checker.units.qual.A;
 import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.Objects;
 
@@ -64,8 +66,7 @@ public class AccessionNumber {
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
-        if (!(obj instanceof AccessionNumber)) return false;
-        AccessionNumber that = (AccessionNumber) obj;
+        if (!(obj instanceof AccessionNumber that)) return false;
         return this.database == that.database &&
                 this.category == that.category &&
                 this.accession == that.accession;
@@ -136,6 +137,33 @@ public class AccessionNumber {
             throw new IsopretRuntimeException("Negative integer used for Ensembl id:" + enst);
         }
         return String.format("ENST%011d", enst);
+    }
+
+    public static AccessionNumber ensgFromInt(int ensg) {
+        if (ensg<1) {
+            throw new IsopretRuntimeException("Negative integer used for Ensembl id:" + ensg);
+        }
+        return new AccessionNumber(Database.ENSEMBL, Category.GENE, ensg);
+    }
+
+    public static AccessionNumber enstFromInt(int enst) {
+        if (enst<1) {
+            throw new IsopretRuntimeException("Negative integer used for Ensembl id:" + enst);
+        }
+        return new AccessionNumber(Database.ENSEMBL, Category.TRANSCRIPT, enst);
+    }
+
+    /**
+     * We need to format the Accession numbers as TermIds to satisfy the interface of StudySet.
+     * @return TermId corresponding to this accession number, with prefix being ENSG or ENST
+     */
+    public TermId toTermId() {
+        String prefix = switch (category) {
+            case GENE -> "ENSG";
+            case TRANSCRIPT -> "ENST";
+        };
+        String value = String.format("%s:%011d",prefix, this.accession);
+        return TermId.of(value);
     }
 
 }

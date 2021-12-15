@@ -1,12 +1,11 @@
 package org.jax.isopret.core.hbadeals;
 
+import org.jax.isopret.core.transcript.AccessionNumber;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -184,5 +183,50 @@ public class HbaDealsThresholder {
 
     public Map<String, HbaDealsResult> getRawResults() {
         return rawResults;
+    }
+
+    /**
+     * @return all the ensembl gene Ids observed in our experiment, regardless of significant differential expr.
+     */
+    public Set<TermId> getAllGeneTermIds() {
+        return rawResults.values().stream()
+                .map(HbaDealsResult::getEnsgId)
+                .map(AccessionNumber::ensgFromInt)
+                .map(AccessionNumber::toTermId)
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * @return all the ensembl transcript Ids observed in our experiment, regardless of significant differential expr.
+     */
+    public Set<TermId> getAllTranscriptTermIds() {
+        return rawResults.values().stream()
+                .map(HbaDealsResult::getTranscriptMap)
+                .map(Map::values)
+                .flatMap(Collection::stream)
+                .map(HbaDealsTranscriptResult::getTranscriptId)
+                .map(AccessionNumber::toTermId)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<TermId> dgeGeneTermIds() {
+        return this.rawResults
+                .values()
+                .stream()
+                .filter(r -> r.getExpressionP() <= this.expressionThreshold)
+                .map(HbaDealsResult::getGeneAccession)
+                .map(AccessionNumber::toTermId)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<TermId> dasIsoformTermIds() {
+        return rawResults.values().stream()
+                .map(HbaDealsResult::getTranscriptMap)
+                .map(Map::values)
+                .flatMap(Collection::stream)
+                .filter(r -> r.isSignificant(this.splicingThreshold ))
+               .map(HbaDealsTranscriptResult::getTranscriptId)
+                .map(AccessionNumber::toTermId)
+                .collect(Collectors.toSet());
     }
 }
