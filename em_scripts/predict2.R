@@ -26,34 +26,16 @@ num.cores=4  #The number of cores that will be used by this script
 ga.fitness=function(sol)
 {
   
-  #This is a product of a the isoformsXGO terms Boolean matrix and its transpose.  The resulting isoformsXisoforms matrix at entry [i,j]
-  #contains the number of GO terms shared by isoforms i and j.  These values correspond to the independent variable in the model.
-  
   number.shared.functions=Matrix::tcrossprod(Matrix::sparseMatrix(i=rep(1:length(transcript.ids),start.funcs)[sol==1],
                                                                   j = unlist(isoform.functions)[sol==1],dims=c(nrow(iso.has.func),ncol(iso.has.func))),boolArith=F)
   
-  #Restrict the data only to isoforms whose genes share at least one GO function.  Since the isoformsXisoforms matrix is symmetrix, we only need
-  #it lower triangle for calculating the residuals
-  
   b=number.shared.functions[lower.tri(number.shared.functions) & compare.pairs]
-  
-  #The normalized local alignment scores between the isoforms, used as the dependent variabe in the model.
   
   a=seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs]
   
-  #The values predicted by the model for all the data points in b
+  v1=(b^2)*coefs[3]+b*coefs[2]+coefs[1]
   
-  combs=comp.vals
-  
-  b.dif=b[combs[1,]]>b[combs[2,]]
-  
-  combs=combs[,b.dif]
-  
-  vals=(a[combs[1,]]-a[combs[2,]])/(b[combs[1,]]-b[combs[2,]])
-  
-  #Return the negative sum of absolute residuals
-  
-  -mean(abs(vals-med.val))-mean(abs(a[combs[2,vals==median(vals) & b[combs[2,]]==0]]-a0))
+  -sum((v1-a)^2)
   
 }
 
@@ -108,7 +90,7 @@ pop.size=50  #Population side for the Genetic Algorithm that modifies the isofor
 number.of.nodes=200  #This is the number of groups that the isoforms will be split into in order to speed up computation
 
 args=commandArgs(trailingOnly = TRUE)  #The argument to this script is an integer between 1 and 200, and it gives the group of isoforms that
-                                        #the machine that called the script will process
+#the machine that called the script will process
 
 node.number=as.integer(args[1])  #convert the argument from string to integer
 
@@ -145,14 +127,12 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   rm(interpro.ids)
   
-  init.med.val=20  #start from an initial guess for the slope
- 
-  init.a0=25 
+  init.coefs=c(-0.04359383,0.23389276,0.39723520)
+  
   #init
   
-  med.val=init.med.val
+  coefs=init.coefs
   
-  a0=init.a0
   #The following lines read the GTF files with all genes and isoforms, and extract their Ensembl IDs
   
   gtf.file=fread('/projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/Homo_sapiens.GRCh38.91.gtf',sep='\t',quote = '',data.table = FALSE)
@@ -186,7 +166,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
     if (nchar(next.uniprot)<=1)
       
       return(NULL)
-      
+    
     all.trs=unique(transcript.ids[gene.ids==x])
     
     domains=interpro.tab$domain[interpro.tab$ensembl_transcript_id %in% all.trs]
@@ -331,8 +311,8 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   for (iso.itr in 1:length(transcript.ids))
     
     sugg=c(sugg,iso.has.func[iso.itr,isoform.functions[[iso.itr]]])  #this concatenates for each isoform the values of the 
-                                                                      #Boolean matrix 'iso.has.func' that indicate whether it has each of the GO terms
-                                                                      #of the gene that contains it
+  #Boolean matrix 'iso.has.func' that indicate whether it has each of the GO terms
+  #of the gene that contains it
   
   #Calculate the local alignment scores between all pairs of isoforms.  This is needed because in each iterations a new set of isoform is being processed
   
@@ -343,9 +323,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
 print('Starting optimization')
 
 total.length=length(unlist(isoform.functions))  #The sum of the number of GO terms that each isoform can have.  This is the length of a solution,
-                                                #because for each isoform we have to specify which of the candidate GO terms are assigned to it
-
-
+#because for each isoform we have to specify which of the candidate GO terms are assigned to it
 
 start.funcs=unlist(lapply(isoform.functions,function(l)length(l)))  #The maximal number of functions each isoform can have
 
@@ -362,10 +340,12 @@ compare.pairs=(compare.pairs%*%t(compare.pairs))>0
 #Run a genetic algorithm that will optimize the assignment of functions to isoforms such that the model fit, returned by the functions gs.fitness,
 #is optimal.
 
-comp.vals=combn(sum(lower.tri(seq.sim.mat) & compare.pairs),2)
+t.data=log_x(seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs])$x.t
+
+seq.sim.mat[lower.tri(seq.sim.mat) & compare.pairs]=t.data
 
 res.ga=ga(type = 'binary',fitness = ga.fitness,nBits = total.length,maxiter = 200,popSize = pop.size,suggestions = sugg,parallel=num.cores)
-    
+
 #Next we extract the solution into a new matrix 'iso.has'func', so that the GO term assignment that it chose will be passed to the next iteration
 
 col.names.ihf=colnames(iso.has.func)
@@ -375,10 +355,10 @@ row.names.ihf=rownames(iso.has.func)
 iso.has.func=Matrix(0,nrow=nrow(iso.has.func),ncol=ncol(iso.has.func))  #Start with a matrix of zeroes
 
 if (sum(res.ga@solution[1,])>0)
-
+  
   #Wherever the value of the solution is 1 (a function is assigned to an isoform) , set the value of the matrix 'iso.has.func'
   #to 1 in the row that corresponds to the isoform and the column that corresponds to the GO function
-   
+  
   iso.has.func[cbind(rep(1:length(transcript.ids),start.funcs)[res.ga@solution[1,]==1],unlist(isoform.functions)[res.ga@solution[1,]==1])]=1
 
 colnames(iso.has.func)=col.names.ihf
