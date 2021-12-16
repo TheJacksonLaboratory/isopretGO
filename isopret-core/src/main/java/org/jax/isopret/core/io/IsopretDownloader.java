@@ -62,8 +62,6 @@ public class IsopretDownloader {
      * Download the files unless they are already present.
      */
     public void download() {
-        //downloadFileIfNeeded(PROSITE_DAT, PROSITE_DAT_URL);
-       // downloadFileIfNeeded(ENSEMBL_CDNA,ENSEMBL_CDNA_URL);
         downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
         downloadFileIfNeeded(GO_JSON, GO_JSON_URL);
         downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
@@ -74,10 +72,16 @@ public class IsopretDownloader {
     private void downloadGzipFileIfNeeded(String filename, String gzFilename, String webAddress) {
         File file = new File(String.format("%s%s%s",downloadDirectory,File.separator,filename));
         File gzfile = new File(String.format("%s%s%s",downloadDirectory,File.separator,gzFilename));
-        if (! ( file.exists() || gzfile.exists()) && ! overwrite ) {
+        if (! gzfile.exists() || overwrite ) { // download gzip file if needed or if users wants to overwrite
             downloadFileIfNeeded(gzFilename, webAddress);
         }
-        if (! file.exists()) {
+        if (! gzfile.isFile()) {
+            // when we get here, the gzFile should exist and be a File
+            LOGGER.error("Could not download {}", gzfile.getAbsolutePath());
+            return;
+        }
+        if (! file.exists()) { // if we have not yet g-unzipped the file, do so
+            LOGGER.info("Did not find file \"{}\", so we are g-unzipping \"{}\"", file.getAbsolutePath(), gzfile.getAbsolutePath());
             Path source = Paths.get(gzfile.getAbsolutePath());
             Path target = Paths.get(file.getAbsolutePath());
             try (GZIPInputStream gis = new GZIPInputStream(

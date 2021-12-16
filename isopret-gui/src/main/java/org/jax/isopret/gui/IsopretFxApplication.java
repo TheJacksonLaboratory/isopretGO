@@ -78,7 +78,6 @@ public class IsopretFxApplication extends Application {
         } catch (IOException e) {
            LOGGER.error("Could not load application properties: {}", e.getMessage());
         }
-        File f = applicationContext.getBean("appHomeDir", File.class);
     }
 
     /**
@@ -88,9 +87,10 @@ public class IsopretFxApplication extends Application {
     public void stop() throws Exception {
         super.stop();
         final Properties pgProperties = applicationContext.getBean("pgProperties", Properties.class);
-        final Path configFilePath = applicationContext.getBean("configFilePath", Path.class);
+        final File configFile = applicationContext.getBean("isopretSettingsFile", File.class);
+        final Path configFilePath = configFile.toPath();
         try (OutputStream os = Files.newOutputStream(configFilePath)) {
-            pgProperties.store(os, "Fenominal properties");
+            pgProperties.store(os, "IsopretFX properties");
         }
         Platform.exit();
         applicationContext.close();
