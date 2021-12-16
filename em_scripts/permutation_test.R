@@ -138,7 +138,7 @@ sensitivity.by.random=c()
 
 iso.has.func=iso.has.func[match(names(isoform.functions),rownames(iso.has.func)),]
 
-for (i in 1:5)
+for (i in 1:1000)
 {
   random.sol=c(rep(1,num.chosen),rep(0,total.length-num.chosen))
   
@@ -164,7 +164,7 @@ for (i in 1:5)
     interpro2go.terms=unique(interpro2go[names(interpro2go) %in% domains])
     
     
-    if(length(go.terms)==0 || length(domains)==0 || length(interpro2go.terms)==0)
+    if(length(domains)==0 || length(interpro2go.terms)==0)
       
       return(NA)
     
@@ -186,7 +186,7 @@ sensitivity.by.isoform=unlist(mclapply(rownames(iso.has.func),function(tr){  #fo
   interpro2go.terms=unique(interpro2go[names(interpro2go) %in% domains])
   
   
-  if(length(go.terms)==0 || length(domains)==0 || length(interpro2go.terms)==0)
+  if(length(domains)==0 || length(interpro2go.terms)==0)
     
     return(NA)
   
