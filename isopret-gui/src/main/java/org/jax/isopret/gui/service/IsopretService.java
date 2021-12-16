@@ -1,5 +1,7 @@
 package org.jax.isopret.gui.service;
 
+import javafx.beans.property.StringProperty;
+
 import java.io.File;
 import java.util.Set;
 
@@ -13,4 +15,6 @@ public interface IsopretService {
     /** Source files. */
     boolean sourcesDownloaded();
     void downloadSources(File file);
+
+    StringProperty downloadDirProperty();
 }

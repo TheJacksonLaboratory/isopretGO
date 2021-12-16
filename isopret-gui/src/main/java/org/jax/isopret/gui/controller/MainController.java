@@ -1,9 +1,11 @@
 package org.jax.isopret.gui.controller;
 
 
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import org.jax.isopret.gui.service.IsopretService;
@@ -28,13 +30,15 @@ public class MainController implements Initializable {
 
     @FXML
     BorderPane rootNode;
+    @FXML
+    Label downloadDataSourceLabel;
 
     @Autowired
     private IsopretService service;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        Bindings.bindBidirectional(this.downloadDataSourceLabel.textProperty(), service.downloadDirProperty());
     }
 
 

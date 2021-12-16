@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.jax.isopret.gui.configuration.ApplicationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ClassPathResource;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.Properties;
 
 @Component
 public class StageInitializer implements ApplicationListener<IsopretFxApplication.StageReadyEvent> {
@@ -26,6 +28,9 @@ public class StageInitializer implements ApplicationListener<IsopretFxApplicatio
     private final ApplicationContext applicationContext;
     private final ApplicationProperties applicationProperties;
 
+    @Autowired
+    private Properties pgProperties;
+
     public StageInitializer(ApplicationProperties props, ApplicationContext context) {
         this.applicationContext = context;
         this.applicationProperties = props;
@@ -34,6 +39,17 @@ public class StageInitializer implements ApplicationListener<IsopretFxApplicatio
 
     @Override
     public void onApplicationEvent(IsopretFxApplication.StageReadyEvent event) {
+        LOGGER.info("onApplicationEvent started");
+        if (this.pgProperties == null) {
+            LOGGER.error("pgProperties is null, cannot initialize settings");
+            return;
+        }
+        if (! this.pgProperties.containsKey("downloaddir")) {
+            LOGGER.error("pgProperties did not contain downloaddir key, cannot initialize downloaded files");
+            return;
+        } else {
+            LOGGER.info("pgProperties downloaddir = {}", pgProperties.getProperty("downloaddir"));
+        }
         try {
             ClassPathResource gopherResource = new ClassPathResource("fxml/isopretmain.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());

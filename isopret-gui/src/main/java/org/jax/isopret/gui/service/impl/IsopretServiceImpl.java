@@ -1,5 +1,7 @@
 package org.jax.isopret.gui.service.impl;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.io.IsopretDownloader;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
@@ -25,6 +27,8 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Autowired
     Properties pgProperties;
+
+    private final StringProperty downloadDirProp = new SimpleStringProperty(null);
 
     @Override
     public boolean sourcesDownloaded() {
@@ -78,5 +82,10 @@ public class IsopretServiceImpl implements IsopretService  {
         IsopretDownloader downloader = new IsopretDownloader(file.getAbsolutePath(), true);
         downloader.download();
         pgProperties.setProperty("downloaddir", file.getAbsolutePath());
+    }
+
+    @Override
+    public StringProperty downloadDirProperty() {
+        return this.downloadDirProp;
     }
 }

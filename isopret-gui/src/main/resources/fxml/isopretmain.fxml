@@ -36,7 +36,7 @@
                      <MenuItem mnemonicParsing="false" text="Import project ..." />
                      <MenuItem mnemonicParsing="false" text="Export project ..." />
                      <MenuItem mnemonicParsing="false" text="Save project and close" />
-                     <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" text="Quit" onAction="#exitGui"/>
+                     <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#exitGui" text="Quit" />
                  </Menu>
                  <Menu mnemonicParsing="false" text="Edit">
                      <MenuItem mnemonicParsing="false" text="Show settings of current project" />
@@ -101,7 +101,7 @@
                            <GridPane.margin>
                               <Insets left="20.0" top="5.0" />
                            </GridPane.margin></ProgressIndicator>
-                        <Label text="Label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label fx:id="downloadDataSourceLabel" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                              </GridPane>
                              <GridPane styleClass="grid" VBox.vgrow="NEVER">
                                  <columnConstraints>
