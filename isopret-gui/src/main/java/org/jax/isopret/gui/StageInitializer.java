@@ -39,17 +39,7 @@ public class StageInitializer implements ApplicationListener<IsopretFxApplicatio
 
     @Override
     public void onApplicationEvent(IsopretFxApplication.StageReadyEvent event) {
-        LOGGER.info("onApplicationEvent started");
-        if (this.pgProperties == null) {
-            LOGGER.error("pgProperties is null, cannot initialize settings");
-            return;
-        }
-        if (! this.pgProperties.containsKey("downloaddir")) {
-            LOGGER.error("pgProperties did not contain downloaddir key, cannot initialize downloaded files");
-            return;
-        } else {
-            LOGGER.info("pgProperties downloaddir = {}", pgProperties.getProperty("downloaddir"));
-        }
+
         try {
             ClassPathResource gopherResource = new ClassPathResource("fxml/isopretmain.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(gopherResource.getURL());

@@ -1,13 +1,19 @@
 package org.jax.isopret.gui.controller;
 
 
+import com.google.j2objc.annotations.AutoreleasePool;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
@@ -17,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 /**
@@ -29,21 +36,50 @@ public class MainController implements Initializable {
     private final static Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
 
     @FXML
-    BorderPane rootNode;
+    private BorderPane rootNode;
     @FXML
-    Label downloadDataSourceLabel;
+    private Label downloadDataSourceLabel;
+    @FXML
+    private ProgressIndicator transcriptDownloadPI;
+
+    @FXML
+    private final ObservableList<String> goMethodList = FXCollections.observableArrayList("Term for Term",
+            "Parent-Child Union", "Parent-Child Intersect");
+    @FXML
+    private ChoiceBox<String> goChoiceBox;
 
     @Autowired
     private IsopretService service;
 
+    @Autowired
+    private Properties pgProperties;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Bindings.bindBidirectional(this.downloadDataSourceLabel.textProperty(), service.downloadDirProperty());
+        this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
+        goChoiceBox.setItems(goMethodList);
+        goChoiceBox.getSelectionModel().selectFirst();
+        goChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> service.setGoMethod(newValue) );
     }
 
 
 
 
+    @FXML
+    private void chooseHbaDealsOutputFile(ActionEvent e) {
+        e.consume();
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.setTitle("Choose HBA-DEALS File");
+        File file = chooser.showOpenDialog(rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().equals("")) {
+            LOGGER.error("Could not get HBA-DEALS file");
+            PopupFactory.displayError("Error","Could not get HBA-DEALS file.");
+            return;
+        }
+        service.setHbaDealsFile(file);
+    }
 
     @FXML
     private void downloadSources(ActionEvent e) {

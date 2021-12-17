@@ -103,11 +103,9 @@
                            </GridPane.margin></ProgressIndicator>
                         <Label fx:id="downloadDataSourceLabel" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                              </GridPane>
-                             <GridPane styleClass="grid" VBox.vgrow="NEVER">
+                             <GridPane prefHeight="109.0" prefWidth="575.0" styleClass="grid" VBox.vgrow="NEVER">
                                  <columnConstraints>
-                                     <ColumnConstraints halignment="CENTER" minWidth="300.0" prefWidth="300.0" />
-                                     <ColumnConstraints halignment="CENTER" minWidth="300.0" prefWidth="300.0" />
-                                     <ColumnConstraints halignment="CENTER" minWidth="300.0" prefWidth="300.0" />
+                                     <ColumnConstraints halignment="CENTER" minWidth="500.0" prefWidth="500.0" />
                                  </columnConstraints>
                                  <rowConstraints>
                                      <RowConstraints minHeight="50.0" vgrow="NEVER" />
@@ -116,7 +114,7 @@
                                  </rowConstraints>
                                  <HBox alignment="CENTER_LEFT" GridPane.columnSpan="2147483647" GridPane.valignment="CENTER">
                                      <Separator maxWidth="200.0" prefWidth="200.0" styleClass="sep" stylesheets="@../css/isopretstyle.css" />
-                                     <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Enrichment targets">
+                                     <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Input file">
                                          <padding>
                                              <Insets left="10.0" />
                                          </padding>
@@ -125,24 +123,12 @@
                                          </HBox.margin>
                                      </Label>
                                  </HBox>
-                                 <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="Target gene list" GridPane.rowIndex="1">
+                                 <Button fx:id="chooseHbaDealsFile" onAction="#chooseHbaDealsOutputFile" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="HBA-DEALS output file" GridPane.rowIndex="1">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                      </GridPane.margin>
                                  </Button>
                                  <Label fx:id="targetGeneLabel" styleClass="bluelabel" stylesheets="@../css/isopretstyle.css" GridPane.rowIndex="2" />
-                                 <Button mnemonicParsing="false" prefHeight="30.0" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="All protein-coding genes" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                     <GridPane.margin>
-                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                     </GridPane.margin>
-                                 </Button>
-                                 <Label fx:id="allGenesLabel" styleClass="bluelabel" stylesheets="@../css/isopretstyle.css" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                 <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="Enter BED file" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                     <GridPane.margin>
-                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                     </GridPane.margin>
-                                 </Button>
-                                 <Label fx:id="bedTargetsLabel" styleClass="bluelabel" stylesheets="@../css/isopretstyle.css" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                              </GridPane>
                              <GridPane styleClass="grid" VBox.vgrow="NEVER">
                                  <columnConstraints>
@@ -307,7 +293,7 @@
                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                      </GridPane.margin>
                                  </Label>
-                                 <ChoiceBox fx:id="approachChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <ChoiceBox fx:id="goChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                      <GridPane.margin>
                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                      </GridPane.margin>
@@ -328,7 +314,7 @@
                                      </GridPane.margin>
                                  </Label>
                                  <Separator maxWidth="200.0" prefWidth="190.0" styleClass="sep" stylesheets="@../css/isopretstyle.css" />
-                                 <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Design parameters" GridPane.columnIndex="1">
+                                 <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Settings" GridPane.columnIndex="1">
                                      <padding>
                                          <Insets left="10.0" />
                                      </padding>

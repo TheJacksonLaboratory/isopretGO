@@ -1,7 +1,10 @@
 package org.jax.isopret.gui.service.impl;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.io.IsopretDownloader;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
@@ -25,10 +28,27 @@ public class IsopretServiceImpl implements IsopretService  {
     @Autowired
     File isopretSettingsFile;
 
-    @Autowired
-    Properties pgProperties;
+    private final Properties pgProperties;
+    private final StringProperty downloadDirProp;
+    private final DoubleProperty downloadCompletenessProp;
+    private File hbaDealsFile = null;
+    private GoMethod goMethod = GoMethod.TFT;
 
-    private final StringProperty downloadDirProp = new SimpleStringProperty(null);
+    public IsopretServiceImpl(Properties pgProperties) {
+        this.pgProperties = pgProperties;
+        if (this.pgProperties.containsKey("downloaddir")) {
+            this.downloadDirProp = new SimpleStringProperty(this.pgProperties.getProperty("downloaddir"));
+        } else {
+            this.downloadDirProp = new SimpleStringProperty("");
+        }
+        this.downloadCompletenessProp = new SimpleDoubleProperty(calculateDownloadCompleteness());
+    }
+
+    private double calculateDownloadCompleteness() {
+        if (sourcesDownloaded()) return 1.0d;
+        else return 0.0;
+    }
+
 
     @Override
     public boolean sourcesDownloaded() {
@@ -85,7 +105,23 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
+    public void setHbaDealsFile(File file) {
+        this.hbaDealsFile = file;
+        LOGGER.info("Set HBA-DEALS file to {}", this.hbaDealsFile);
+    }
+
+    @Override
     public StringProperty downloadDirProperty() {
         return this.downloadDirProp;
+    }
+
+    @Override
+    public DoubleProperty downloadCompletenessProperty() {
+        return this.downloadCompletenessProp;
+    }
+
+    @Override
+    public void setGoMethod(String method) {
+        this.goMethod = GoMethod.fromString(method);
     }
 }
