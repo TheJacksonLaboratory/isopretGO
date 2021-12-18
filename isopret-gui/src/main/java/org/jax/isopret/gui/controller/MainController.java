@@ -66,6 +66,9 @@ public class MainController implements Initializable {
     private IsopretService service;
 
     @Autowired
+    private AnalysisController analysisController;
+
+    @Autowired
     private Properties pgProperties;
 
     @Override
@@ -145,13 +148,16 @@ public class MainController implements Initializable {
             PopupFactory.displayError("ERROR", "HBA-DEALS file not found");
             return;
         }
-        Task<Integer> task = new IsopretDataLoadTask(downloadOpt.get(), hbadealsOpt.get());
+        IsopretDataLoadTask task = new IsopretDataLoadTask(downloadOpt.get(), hbadealsOpt.get());
         ProgressForm pform = new ProgressForm();
         pform.messageProperty().bind(task.messageProperty());
         pform.titleProperty().bind(task.titleProperty());
         pform.progressProperty().bind(task.progressProperty());
         task.setOnSucceeded(event -> {
-            LOGGER.trace("Finished creating digest file");
+            LOGGER.trace("Finished Gene Ontology analysis of HBA-DEALS results");
+            this.service.setData(task); // add the results of analysis to Service
+            this.analysisController.refreshListView(); // show stats.
+            this.analysisController.refreshVPTable(); // uses HbaDealsGeneRow objects to populate table etc.
             SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
             selectionModel.select(this.analysisTab);
             pform.close();
@@ -164,5 +170,9 @@ public class MainController implements Initializable {
         });
         pform.activateProgressBar(task);
         task.run();
+    }
+
+    public TabPane getMainTabPaneRef() {
+        return this.tabPane;
     }
 }

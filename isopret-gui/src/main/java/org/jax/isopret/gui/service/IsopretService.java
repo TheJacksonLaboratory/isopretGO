@@ -2,8 +2,12 @@ package org.jax.isopret.gui.service;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
+import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,4 +37,10 @@ public interface IsopretService {
     Optional<File> getDownloadDir();
 
     Optional<File> getHbaDealsFileOpt();
+
+    void setData(IsopretDataLoadTask task);
+
+    List<HbaDealsGeneRow> getHbaDealsRows();
+
+    Map<String, String> getResultsSummaryMap();
 }

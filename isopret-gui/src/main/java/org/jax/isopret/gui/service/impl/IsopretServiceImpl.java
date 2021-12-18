@@ -6,8 +6,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
+import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.IsopretDownloader;
+import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +38,11 @@ public class IsopretServiceImpl implements IsopretService  {
     private File hbaDealsFile = null;
     private GoMethod goMethod = GoMethod.TFT;
     private MtcMethod mtcMethod = MtcMethod.NONE;
+
+    private List<String> analysisErrors = null;
+    private Ontology geneOntology = null;
+    private InterproMapper interproMapper = null;
+    private HbaDealsThresholder thresholder = null;
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -166,5 +173,41 @@ public class IsopretServiceImpl implements IsopretService  {
         } else  {
             return Optional.of(this.hbaDealsFile);
         }
+    }
+
+    @Override
+    public void setData(IsopretDataLoadTask task) {
+        this.analysisErrors = task.getErrors();
+        this.geneOntology = task.getGeneOntology();
+        this.interproMapper = task.getInterproMapper();
+        this.thresholder = task.getThresholder();
+    }
+
+    /**
+     * Return a sorted list of {@link HbaDealsGeneRow} objects
+     * @return
+     */
+    @Override
+    public List<HbaDealsGeneRow> getHbaDealsRows() {
+        return thresholder.getRawResults().
+                values().
+                stream()
+                .sorted()
+                .map(HbaDealsGeneRow::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public  Map<String, String> getResultsSummaryMap(){
+        Map<String, String> resultsMap = new HashMap<>();
+        if (thresholder == null) {
+            resultsMap.put("n/a", "not initialized");
+        } else {
+            resultsMap.put("Observed genes", String.valueOf(thresholder.getTotalGeneCount()));
+            resultsMap.put("Differentially expressed genes", String.valueOf(thresholder.getDgeGeneCount()));
+            resultsMap.put("Differentially spliced genes", String.valueOf(thresholder.getDasGeneCount()));
+            resultsMap.put("FDR threshold", String.valueOf(thresholder.getFdrThreshold()));
+        }
+        return resultsMap;
     }
 }
