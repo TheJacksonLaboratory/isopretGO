@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * This class encapsulates the results of HBADEALS for one gene and all of the isoforms of that gene that were
  */
-public class HbaDealsResult {
+public class HbaDealsResult implements Comparable<HbaDealsResult> {
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final AccessionNumber geneAccession;
     private final String symbol;
@@ -100,4 +100,15 @@ public class HbaDealsResult {
                 .orElse(1.0);
     }
 
+    private double minp() {
+        return Math.min(getExpressionP(), getSmallestSplicingP());
+    }
+
+    /**
+     * Sort according to the smallest ('most significant') p value for expression or splicing.
+     */
+    @Override
+    public int compareTo(HbaDealsResult that) {
+        return Double.compare(that.minp(), this.minp());
+    }
 }

@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
+import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.io.IsopretDownloader;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +35,7 @@ public class IsopretServiceImpl implements IsopretService  {
     private final DoubleProperty downloadCompletenessProp;
     private File hbaDealsFile = null;
     private GoMethod goMethod = GoMethod.TFT;
+    private MtcMethod mtcMethod = MtcMethod.NONE;
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -123,5 +126,45 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public void setGoMethod(String method) {
         this.goMethod = GoMethod.fromString(method);
+    }
+
+    @Override
+    public void setMtcMethod(String method) {
+        this.mtcMethod = MtcMethod.fromString(method);
+    }
+
+    @Override
+    public void doIsopretAnalysis() {
+        LOGGER.info("Starting isopret analysis");
+        if (this.hbaDealsFile == null) {
+            LOGGER.error("Cannot do isopret analysis because HBA-DEALS file not initialized");
+            return;
+        }
+        LOGGER.info("GO Method: {}", this.goMethod.toString());
+        LOGGER.info("MTC Method: {}", this.mtcMethod.toString());
+        LOGGER.info("HBA-DEALS file: {}", this.hbaDealsFile);
+        // get files from download dir
+        LOGGER.info("Getting data files from download dir: {}", this.downloadDirProperty().get());
+    }
+
+    @Override
+    public Optional<File> getDownloadDir() {
+        String ddir = downloadDirProp.get();
+        if (ddir == null) return Optional.empty();
+        File f = new File(ddir);
+        if (f.isDirectory()) {
+            return Optional.of(f);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<File> getHbaDealsFileOpt() {
+        if (this.hbaDealsFile == null || ! this.hbaDealsFile.isFile()) {
+            return Optional.empty();
+        } else  {
+            return Optional.of(this.hbaDealsFile);
+        }
     }
 }
