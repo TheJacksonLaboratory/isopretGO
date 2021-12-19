@@ -109,6 +109,6 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
      */
     @Override
     public int compareTo(HbaDealsResult that) {
-        return Double.compare(that.minp(), this.minp());
+        return Double.compare(this.minp(), that.minp());
     }
 }

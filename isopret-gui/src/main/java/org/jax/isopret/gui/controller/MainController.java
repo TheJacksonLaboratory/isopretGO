@@ -4,7 +4,6 @@ package org.jax.isopret.gui.controller;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,7 +14,6 @@ import javafx.stage.FileChooser;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
-import org.jax.isopret.gui.widgets.ProgressForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +33,10 @@ import java.util.ResourceBundle;
 @Component
 public class MainController implements Initializable {
     private final static Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
+    @FXML
+    private ProgressBar analysisPB;
+    @FXML
+    private Label analysisLabel;
 
     @FXML
     private BorderPane rootNode;
@@ -149,10 +151,8 @@ public class MainController implements Initializable {
             return;
         }
         IsopretDataLoadTask task = new IsopretDataLoadTask(downloadOpt.get(), hbadealsOpt.get());
-        ProgressForm pform = new ProgressForm();
-        pform.messageProperty().bind(task.messageProperty());
-        pform.titleProperty().bind(task.titleProperty());
-        pform.progressProperty().bind(task.progressProperty());
+        this.analysisLabel.textProperty().bind(task.messageProperty());
+        this.analysisPB.progressProperty().bind(task.progressProperty());
         task.setOnSucceeded(event -> {
             LOGGER.trace("Finished Gene Ontology analysis of HBA-DEALS results");
             this.service.setData(task); // add the results of analysis to Service
@@ -160,15 +160,15 @@ public class MainController implements Initializable {
             this.analysisController.refreshVPTable(); // uses HbaDealsGeneRow objects to populate table etc.
             SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
             selectionModel.select(this.analysisTab);
-            pform.close();
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
+            this.analysisLabel.setText("Failed!");
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to create digest file",
                     exc);
         });
-        pform.activateProgressBar(task);
+
         task.run();
     }
 

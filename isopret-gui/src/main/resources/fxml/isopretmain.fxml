@@ -23,164 +23,198 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../css/isopretstyle.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.MainController">
-     <top>
-         <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
-             <MenuBar minHeight="30.0" minWidth="183.0" HBox.hgrow="NEVER">
-                 <Menu mnemonicParsing="false" text="File">
-                     <MenuItem accelerator="Shortcut+N" mnemonicParsing="false" text="New" />
-                     <MenuItem accelerator="Shortcut+S" mnemonicParsing="false" text="Save project" />
-                     <MenuItem mnemonicParsing="false" text="Import project ..." />
-                     <MenuItem mnemonicParsing="false" text="Export project ..." />
-                     <MenuItem mnemonicParsing="false" text="Save project and close" />
-                     <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#exitGui" text="Quit" />
-                 </Menu>
-                 <Menu mnemonicParsing="false" text="Edit">
-                     <MenuItem mnemonicParsing="false" text="Show settings of current project" />
-                     <MenuItem mnemonicParsing="false" text="Set proxy" />
-                 </Menu>
-                 <Menu mnemonicParsing="false" text="Export">
-                     <MenuItem mnemonicParsing="false" text="Display report" />
-                     <SeparatorMenuItem mnemonicParsing="false" />
-                     <MenuItem mnemonicParsing="false" text="Export report" />
-                 </Menu>
-             </MenuBar>
-             <Region styleClass="menu-bar" HBox.hgrow="SOMETIMES" />
-             <MenuBar minHeight="30.0" minWidth="72.0" nodeOrientation="RIGHT_TO_LEFT" HBox.hgrow="NEVER">
-                 <Menu mnemonicParsing="false" text="Help">
-                     <MenuItem accelerator="Shortcut+H" mnemonicParsing="false" text="Help" />
-                     <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
-                 </Menu>
-             </MenuBar>
-         </HBox>
-     </top>
-     <center>
-         <TabPane fx:id="tabPane" tabMaxHeight="30.0" tabMaxWidth="200.0">
-             <Tab fx:id="setupTab" closable="false" text="Setup">
-                 <ScrollPane fitToHeight="true" fitToWidth="true">
-                     <StackPane alignment="TOP_CENTER">
-                         <VBox alignment="TOP_CENTER" maxHeight="714.0" maxWidth="900.0" minHeight="714.0" minWidth="900.0" prefHeight="714.0" prefWidth="900.0">
-                             <effect>
-                                 <DropShadow color="#00000097" height="4.00" radius="2.0" spread="0.25" width="5.0" />
-                             </effect>
-                             <GridPane prefHeight="100.0" prefWidth="838.0" styleClass="grid" VBox.vgrow="NEVER">
-                                 <columnConstraints>
-                                     <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0" prefWidth="200.0" />
-                                     <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="330.0" minWidth="154.0" prefWidth="154.0" />
-                                     <ColumnConstraints maxWidth="421.0" minWidth="72.0" prefWidth="421.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                     <RowConstraints minHeight="50.0" />
-                                     <RowConstraints minHeight="50.0" />
-                                 </rowConstraints>
-                                 <VBox.margin>
-                                     <Insets />
-                                 </VBox.margin>
-                                 <Separator prefWidth="200.0" styleClass="sep" stylesheets="@../css/isopretstyle.css">
-                                     <GridPane.margin>
-                                         <Insets />
-                                     </GridPane.margin>
-                                 </Separator>
-                                 <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Data sources" GridPane.columnIndex="1">
-                                     <padding>
-                                         <Insets left="10.0" />
-                                     </padding>
-                                     <GridPane.margin>
-                                         <Insets left="10.0" />
-                                     </GridPane.margin>
-                                 </Label>
-                                 <Button mnemonicParsing="false" onAction="#downloadSources" prefHeight="30.0" prefWidth="145.0" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="Download" GridPane.rowIndex="1">
-                                     <GridPane.margin>
-                                         <Insets bottom="5.0" left="40.0" right="5.0" top="5.0" />
-                                     </GridPane.margin>
-                                 </Button>
-                                 <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                           <GridPane.margin>
-                              <Insets left="20.0" top="5.0" />
-                           </GridPane.margin></ProgressIndicator>
-                        <Label fx:id="downloadDataSourceLabel" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                             </GridPane>
-                             <GridPane prefHeight="109.0" prefWidth="575.0" styleClass="grid" VBox.vgrow="NEVER">
-                                 <columnConstraints>
-                                     <ColumnConstraints halignment="CENTER" minWidth="500.0" prefWidth="500.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                     <RowConstraints minHeight="50.0" vgrow="NEVER" />
-                                     <RowConstraints vgrow="NEVER" />
-                                     <RowConstraints vgrow="NEVER" />
-                                 </rowConstraints>
-                                 <HBox alignment="CENTER_LEFT" GridPane.columnSpan="2147483647" GridPane.valignment="CENTER">
-                                     <Separator maxWidth="200.0" prefWidth="200.0" styleClass="sep" stylesheets="@../css/isopretstyle.css" />
-                                     <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Input file">
-                                         <padding>
-                                             <Insets left="10.0" />
-                                         </padding>
-                                         <HBox.margin>
-                                             <Insets left="10.0" />
-                                         </HBox.margin>
-                                     </Label>
-                                 </HBox>
-                                 <Button mnemonicParsing="false" onAction="#chooseHbaDealsOutputFile" prefHeight="30.0" prefWidth="200.0" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="HBA-DEALS output file" GridPane.rowIndex="1">
-                                     <GridPane.margin>
-                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                     </GridPane.margin>
-                                 </Button>
-                             </GridPane>
-                             <GridPane styleClass="grid" VBox.vgrow="NEVER">
-                                 <columnConstraints>
-                                     <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0" prefWidth="200.0" />
-                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="210.0" />
-                                     <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0" />
-                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="210.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                     <RowConstraints minHeight="40.0" prefHeight="30.0" />
-                                     <RowConstraints minHeight="40.0" prefHeight="30.0" />
-                                     <RowConstraints minHeight="40.0" prefHeight="30.0" />
-                                     <RowConstraints minHeight="45.0" />
-                                 </rowConstraints>
-                                 <Button alignment="CENTER" onAction="#isopretAnalysis" defaultButton="true" minHeight="30.0" minWidth="145.0" mnemonicParsing="false" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="Analyse!" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="3">
-                                     <GridPane.margin>
-                                         <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
-                                     </GridPane.margin>
-                                 </Button>
-                                 <Label text="Approach" GridPane.rowIndex="1">
-                                     <GridPane.margin>
-                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                     </GridPane.margin>
-                                 </Label>
-                                 <ChoiceBox fx:id="goChoiceBox" prefHeight="30.0" prefWidth="145.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                     <GridPane.margin>
-                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                     </GridPane.margin>
-                                 </ChoiceBox>
-                                 <Label text="Multiple Testing Correction" GridPane.rowIndex="2">
-                                     <GridPane.margin>
-                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                     </GridPane.margin>
-                                 </Label>
-                                 <ChoiceBox fx:id="mtcChoiceBox" prefHeight="30.0" prefWidth="145.0" stylesheets="@../css/isopretstyle.css" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                     <GridPane.margin>
-                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                     </GridPane.margin>
-                                 </ChoiceBox>
-                                 <Separator maxWidth="200.0" prefWidth="190.0" styleClass="sep" stylesheets="@../css/isopretstyle.css" />
-                                 <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Settings" GridPane.columnIndex="1">
-                                     <padding>
-                                         <Insets left="10.0" />
-                                     </padding>
-                                     <GridPane.margin>
-                                         <Insets left="10.0" />
-                                     </GridPane.margin>
-                                 </Label>
-                             </GridPane>
-                         </VBox>
-                     </StackPane>
-                 </ScrollPane>
-             </Tab>
-             <Tab fx:id="analysisTab" closable="false" text="Analysis">
+<?import javafx.scene.control.ProgressBar?>
+<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+            stylesheets="@../css/isopretstyle.css" xmlns="http://javafx.com/javafx/16"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.MainController">
+    <top>
+        <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+            <MenuBar minHeight="30.0" minWidth="183.0" HBox.hgrow="NEVER">
+                <Menu mnemonicParsing="false" text="File">
+                    <MenuItem accelerator="Shortcut+N" mnemonicParsing="false" text="New"/>
+                    <MenuItem accelerator="Shortcut+S" mnemonicParsing="false" text="Save project"/>
+                    <MenuItem mnemonicParsing="false" text="Save project and close"/>
+                    <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#exitGui" text="Quit"/>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                    <MenuItem mnemonicParsing="false" text="Show settings of current project"/>
+                    <MenuItem mnemonicParsing="false" text="Set proxy"/>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Export">
+                    <MenuItem mnemonicParsing="false" text="Display report"/>
+                    <SeparatorMenuItem mnemonicParsing="false"/>
+                    <MenuItem mnemonicParsing="false" text="Export report"/>
+                </Menu>
+            </MenuBar>
+            <Region styleClass="menu-bar" HBox.hgrow="SOMETIMES"/>
+            <MenuBar minHeight="30.0" minWidth="72.0" nodeOrientation="RIGHT_TO_LEFT" HBox.hgrow="NEVER">
+                <Menu mnemonicParsing="false" text="Help">
+                    <MenuItem accelerator="Shortcut+H" mnemonicParsing="false" text="Help"/>
+                    <MenuItem mnemonicParsing="false" onAction="#about" text="About"/>
+                </Menu>
+            </MenuBar>
+        </HBox>
+    </top>
+    <center>
+        <TabPane fx:id="tabPane" tabMaxHeight="30.0" tabMaxWidth="200.0">
+            <Tab fx:id="setupTab" closable="false" text="Setup">
+                <ScrollPane fitToHeight="true" fitToWidth="true">
+                    <StackPane alignment="TOP_CENTER">
+                        <VBox alignment="TOP_CENTER" maxHeight="714.0" maxWidth="900.0" minHeight="714.0"
+                              minWidth="900.0" prefHeight="714.0" prefWidth="900.0">
+                            <effect>
+                                <DropShadow color="#00000097" height="4.00" radius="2.0" spread="0.25" width="5.0"/>
+                            </effect>
+                            <GridPane prefHeight="100.0" prefWidth="838.0" styleClass="grid" VBox.vgrow="NEVER">
+                                <columnConstraints>
+                                    <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0"
+                                                       prefWidth="200.0"/>
+                                    <ColumnConstraints halignment="LEFT" hgrow="NEVER" maxWidth="330.0" minWidth="154.0"
+                                                       prefWidth="154.0"/>
+                                    <ColumnConstraints maxWidth="421.0" minWidth="72.0" prefWidth="421.0"/>
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="50.0"/>
+                                    <RowConstraints minHeight="50.0"/>
+                                </rowConstraints>
+                                <VBox.margin>
+                                    <Insets/>
+                                </VBox.margin>
+                                <Separator prefWidth="200.0" styleClass="sep" stylesheets="@../css/isopretstyle.css">
+                                    <GridPane.margin>
+                                        <Insets/>
+                                    </GridPane.margin>
+                                </Separator>
+                                <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Data sources"
+                                       GridPane.columnIndex="1">
+                                    <padding>
+                                        <Insets left="10.0"/>
+                                    </padding>
+                                    <GridPane.margin>
+                                        <Insets left="10.0"/>
+                                    </GridPane.margin>
+                                </Label>
+                                <Button mnemonicParsing="false" onAction="#downloadSources" prefHeight="30.0"
+                                        prefWidth="145.0" styleClass="Button" stylesheets="@../css/isopretstyle.css"
+                                        text="Download" GridPane.rowIndex="1">
+                                    <GridPane.margin>
+                                        <Insets bottom="5.0" left="40.0" right="5.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </Button>
+                                <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0" GridPane.columnIndex="1"
+                                                   GridPane.rowIndex="1">
+                                    <GridPane.margin>
+                                        <Insets left="20.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </ProgressIndicator>
+                                <Label fx:id="downloadDataSourceLabel" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                            </GridPane>
+                            <GridPane prefHeight="109.0" prefWidth="575.0" styleClass="grid" VBox.vgrow="NEVER">
+                                <columnConstraints>
+                                    <ColumnConstraints halignment="CENTER" minWidth="500.0" prefWidth="500.0"/>
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="50.0" vgrow="NEVER"/>
+                                    <RowConstraints vgrow="NEVER"/>
+                                    <RowConstraints vgrow="NEVER"/>
+                                </rowConstraints>
+                                <HBox alignment="CENTER_LEFT" GridPane.columnSpan="2147483647"
+                                      GridPane.valignment="CENTER">
+                                    <Separator maxWidth="200.0" prefWidth="200.0" styleClass="sep"
+                                               stylesheets="@../css/isopretstyle.css"/>
+                                    <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css"
+                                           text="Input file">
+                                        <padding>
+                                            <Insets left="10.0"/>
+                                        </padding>
+                                        <HBox.margin>
+                                            <Insets left="10.0"/>
+                                        </HBox.margin>
+                                    </Label>
+                                </HBox>
+                                <Button mnemonicParsing="false" onAction="#chooseHbaDealsOutputFile" prefHeight="30.0"
+                                        prefWidth="200.0" styleClass="Button" stylesheets="@../css/isopretstyle.css"
+                                        text="HBA-DEALS output file" GridPane.rowIndex="1">
+                                    <GridPane.margin>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </Button>
+                            </GridPane>
+                            <GridPane styleClass="grid" VBox.vgrow="NEVER">
+                                <columnConstraints>
+                                    <ColumnConstraints halignment="LEFT" hgrow="NEVER" minWidth="200.0"
+                                                       prefWidth="200.0"/>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="210.0"/>
+                                    <ColumnConstraints hgrow="NEVER" minWidth="210.0" prefWidth="210.0"/>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="210.0"/>
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="40.0" prefHeight="30.0"/>
+                                    <RowConstraints minHeight="40.0" prefHeight="30.0"/>
+                                    <RowConstraints minHeight="40.0" prefHeight="30.0"/>
+                                    <RowConstraints minHeight="45.0"/>
+                                </rowConstraints>
+                                <Label text="Approach" GridPane.rowIndex="1">
+                                    <GridPane.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </GridPane.margin>
+                                </Label>
+                                <ChoiceBox fx:id="goChoiceBox" prefHeight="30.0" prefWidth="145.0"
+                                           GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <GridPane.margin>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </ChoiceBox>
+                                <Label text="Multiple Testing Correction" GridPane.rowIndex="2">
+                                    <GridPane.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </GridPane.margin>
+                                </Label>
+                                <ChoiceBox fx:id="mtcChoiceBox" prefHeight="30.0" prefWidth="145.0"
+                                           stylesheets="@../css/isopretstyle.css" GridPane.columnIndex="1"
+                                           GridPane.rowIndex="2">
+                                    <GridPane.margin>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </ChoiceBox>
+                                <Separator maxWidth="200.0" prefWidth="190.0" styleClass="sep"
+                                           stylesheets="@../css/isopretstyle.css"/>
+                                <Label styleClass="biglabel" stylesheets="@../css/isopretstyle.css" text="Settings"
+                                       GridPane.columnIndex="1">
+                                    <padding>
+                                        <Insets left="10.0"/>
+                                    </padding>
+                                    <GridPane.margin>
+                                        <Insets left="10.0"/>
+                                    </GridPane.margin>
+                                </Label>
+                                <Button alignment="CENTER" onAction="#isopretAnalysis" defaultButton="true"
+                                        minHeight="30.0" minWidth="145.0"
+                                        mnemonicParsing="false" styleClass="Button"
+                                        stylesheets="@../css/isopretstyle.css" text="Analyse!"
+                                        GridPane.halignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                    <GridPane.margin>
+                                        <Insets bottom="10.0" left="5.0" right="5.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </Button>
+                                <ProgressBar fx:id="analysisPB" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                    <GridPane.margin>
+                                        <Insets bottom="10.0" left="5.0" right="5.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </ProgressBar>
+                                <Label fx:id="analysisLabel" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                                    <GridPane.margin>
+                                        <Insets bottom="10.0" left="5.0" right="5.0" top="5.0"/>
+                                    </GridPane.margin>
+                                </Label>
+                            </GridPane>
+                        </VBox>
+                    </StackPane>
+                </ScrollPane>
+            </Tab>
+            <Tab fx:id="analysisTab" closable="false" text="Analysis">
                 <fx:include source="analysisPane.fxml"/>
-             </Tab>
-         </TabPane>
-     </center>
- </BorderPane>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>
