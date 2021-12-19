@@ -5,26 +5,21 @@ import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 
 public class HbaDealsGeneRow {
 
-    private final String geneSymbol;
-    private final String geneAccession;
 
    private final int significantIsoforms;
 
-    private final int totalIsoforms;
+    private final HbaDealsResult result;
 
-    private final double expressionFoldChange;
-
-    private final double expressionPval;
-
-    private final double bestSplicingPval;
-
-
+    public HbaDealsGeneRow(HbaDealsResult result) {
+        this.result = result;
+        this.significantIsoforms = (int)result.getTranscriptMap().values().stream().filter(HbaDealsTranscriptResult::isSignificant).count();
+    }
     public String getGeneSymbol() {
-        return geneSymbol;
+        return result.getSymbol();
     }
 
     public String getGeneAccession() {
-        return geneAccession;
+        return result.getGeneAccession().getAccessionString();
     }
 
     public int getSignificantIsoforms() {
@@ -32,28 +27,24 @@ public class HbaDealsGeneRow {
     }
 
     public int getTotalIsoforms() {
-        return totalIsoforms;
+        return result.getTranscriptMap().size();
     }
 
     public double getExpressionFoldChange() {
-        return expressionFoldChange;
+        return result.getExpressionFoldChange();
     }
 
     public double getExpressionPval() {
-        return expressionPval;
+        return result.getExpressionP();
     }
 
     public double getBestSplicingPval() {
-        return bestSplicingPval;
+        return result.getSmallestSplicingP();
     }
 
-    public HbaDealsGeneRow(HbaDealsResult result) {
-        this.geneSymbol = result.getSymbol();
-        this.geneAccession = result.getGeneAccession().getAccessionString();
-        this.totalIsoforms = result.getTranscriptMap().size();
-        this.significantIsoforms = (int)result.getTranscriptMap().values().stream().filter(HbaDealsTranscriptResult::isSignificant).count();
-        this.expressionFoldChange = result.getExpressionFoldChange();
-        this.expressionPval = result.getExpressionP();
-        this.bestSplicingPval = result.getSmallestSplicingP();
+    public String getNofMsplicing() {
+        return String.format("%d/%d", this.getSignificantIsoforms(), this.getTotalIsoforms());
     }
+
+
 }

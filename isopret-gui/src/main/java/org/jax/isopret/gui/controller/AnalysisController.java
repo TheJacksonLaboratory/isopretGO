@@ -20,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -81,7 +78,7 @@ public class AnalysisController implements Initializable {
 
         foldChangeColumn.setSortable(true);
         foldChangeColumn.setEditable(false);
-        //foldChangeColumn.setCellValueFactory();
+        foldChangeColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getExpressionFoldChange()));
         foldChangeColumn.setCellFactory(c -> new TableCell<>() {
             @Override
             protected void updateItem(Double balance, boolean empty) {
@@ -93,6 +90,42 @@ public class AnalysisController implements Initializable {
                 }
             }
         });
+
+        geneProbabilityColumn.setSortable(true);
+        geneProbabilityColumn.setEditable(false);
+        geneProbabilityColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getExpressionPval()));
+        geneProbabilityColumn.setCellFactory(c -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double balance, boolean empty) {
+                super.updateItem(balance, empty);
+                if (balance == null || empty) {
+                    setText(null);
+                } else {
+                    setText(scientificNotation(balance));
+                }
+            }
+        });
+
+        isoformCountColumn.setSortable(false);
+        isoformCountColumn.setEditable(false);
+        isoformCountColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getNofMsplicing()));
+
+
+        isoformProbabilityColumn.setSortable(true);
+        isoformProbabilityColumn.setEditable(false);
+        isoformProbabilityColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getBestSplicingPval()));
+        isoformProbabilityColumn.setCellFactory(c -> new TableCell<>() {
+            @Override
+            protected void updateItem(Double balance, boolean empty) {
+                super.updateItem(balance, empty);
+                if (balance == null || empty) {
+                    setText(null);
+                } else {
+                    setText(scientificNotation(balance));
+                }
+            }
+        });
+
 
         visualizeColumn.setSortable(false);
         visualizeColumn.setCellValueFactory(cdf -> {
@@ -107,6 +140,15 @@ public class AnalysisController implements Initializable {
         });
         // allow titles of all table columns to be broken into multiple lines
         viewPointTableView.getColumns().forEach(AnalysisController::makeHeaderWrappable);
+    }
+
+
+    public String scientificNotation(Double d) {
+        Formatter fmt = new Formatter();
+        if (d == null) return "1.0";
+        else if (d > 0.01) return String.format("%.3f", d);
+        else if (d > 0.001) return String.format("%.4f", d);
+        else return fmt.format("%16.2e",d).toString();
     }
 
 
