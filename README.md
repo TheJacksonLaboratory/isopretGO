@@ -5,7 +5,7 @@ functions that are affected by differential alternative splicing.  Isopret is in
 right now...
 
 ## Building isopret
-isopret was developed under Java 11. To build the app, clone this repository and
+isopret was developed under Java 17, which is required to build the app from source. To do so, clone this repository and
 build the executable with maven.
 ```
 git clone https://github.com/TheJacksonLaboratory/isopret
@@ -27,10 +27,26 @@ Commands:
   stats, S     Show descriptive statistics about data
 ```
 
+## GUI
+
+A prototype GUI is available
+```
+java -jar isopret-gui/target/isopret-gui-0.7.0.jar
+```
+
+Note that for now the Download button does not import all of the files we require for analysis. To
+run the isopret GUI, Use the download button, choose a directory to odownload files, and copy in (or ln -s)
+the three additional files, interpro_domain_desc.txt, interpro_domains.txt, and isoform_function_list.txt.
+After this, you can use the HBA-DEALS button to choose the output file of HBA-DEALS for this analysis.
+Note that the genes must be in ENSEMBL (ENSG) notation.
+
+# NOTE
+Note that probably we will rework the command-line version of isopret to just output tab-separated files and not HTML.
+The following documentation is not guaranteed to be up-to-date.
 
 ## Download
 
-isopret requires several files to run (NOTE--everything is being refactored, but this command works now). It will download these files and copy them
+The command-line version of isopret requires several files to run (NOTE--everything is being refactored, but this command works now). It will download these files and copy them
 to a subdirectory called data with the ``download`` command. If desired, the paths
 of the files can be adjusted, but by default prositometry will assume that all
 required files are in the ``data`` directory.
@@ -96,5 +112,5 @@ This produces four files
  * SMAD3-isoforms.svg and SMAD3-isoforms.pdf    
  * SMAD3-protein.svg and SMAD3-protein.pdf  
 
-THe PDF files are generated from the SVG files by running a system command with the ``rsvg-convert`` tool (which must be availble on the
+The PDF files are generated from the SVG files by running a system command with the ``rsvg-convert`` tool (which must be availble on the
 system path for this to work. Otherwise, just SVG files will be generated).
