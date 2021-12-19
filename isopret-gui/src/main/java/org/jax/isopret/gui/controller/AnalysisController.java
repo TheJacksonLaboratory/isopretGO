@@ -254,3 +254,42 @@ public class AnalysisController implements Initializable {
     }
 
 }
+
+/*
+private void createTabDynamically() {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("secondView.fxml"));
+        loader.setController(new SecondViewController());
+        try {
+            Parent parent = loader.load();
+            myDynamicTab = new Tab("A Dynamic Tab");
+            myDynamicTab.setClosable(true);
+            myDynamicTab.setContent(parent);
+            tabPane.getTabs().add(myDynamicTab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+SecondViewController.java
+
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+
+public class SecondViewController implements Initializable {
+
+    @FXML private Label secondInfoLbl;
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        secondInfoLbl.setText("Hello from the second view");
+    }
+}
+
+ */

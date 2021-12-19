@@ -43,4 +43,6 @@ public interface IsopretService {
     List<HbaDealsGeneRow> getHbaDealsRows();
 
     Map<String, String> getResultsSummaryMap();
+
+    String getHtmlForGene(String symbol);
 }
