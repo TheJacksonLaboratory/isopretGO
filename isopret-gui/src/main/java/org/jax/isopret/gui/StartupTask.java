@@ -27,9 +27,12 @@ public final class StartupTask extends Task<Void> {
 
     private final Properties pgProperties;
 
+    /**
+     * pgProperties is derived from the settings file that is stored in the
+     * @param pgProperties
+     */
     public StartupTask(Properties pgProperties) {
         this.pgProperties = pgProperties;
-
     }
 
     /**
@@ -43,6 +46,10 @@ public final class StartupTask extends Task<Void> {
      */
     @Override
     protected Void call() {
+
+
+
+
         /*
         This is the place where we deserialize HPO ontology if we know path to the OBO file.
         We need to make sure to set ontology property of `optionalResources` to null if loading fails.

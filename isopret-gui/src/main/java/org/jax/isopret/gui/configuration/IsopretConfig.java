@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 public class IsopretConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsopretConfig.class);
 
-    public static final String CONFIG_FILE_BASENAME = "isopretfx.properties";
+    public static final String ISOPRET_SETTINGS_FILE_BASENAME = "isopretfx.properties";
 
 
     @Bean
@@ -35,7 +35,7 @@ public class IsopretConfig {
      */
     @Bean(value="pgProperties")
     @Primary
-    public Properties pgProperties(@Qualifier("configFilePath") File configFilePath) {
+    public Properties pgProperties(@Qualifier("isopretSettingsFile") File configFilePath) {
         Properties properties = new Properties();
         if (configFilePath.isFile()) {
             try (InputStream is = Files.newInputStream(configFilePath.toPath())) {
@@ -47,24 +47,24 @@ public class IsopretConfig {
         return properties;
     }
 
-    @Bean("configFilePath")
-    public File configFilePath(@Qualifier("appHomeDir") File appHomeDir) {
-        return new File(appHomeDir, CONFIG_FILE_BASENAME);
+
+    @Bean("isopretSettingsFile")
+    public File isopretSettingsFile(File isopretDirectory){
+        return new File(isopretDirectory + File.separator + ISOPRET_SETTINGS_FILE_BASENAME);
     }
 
-
-    @Bean("appHomeDir")
-    public File appHomeDir() throws IOException {
+    @Bean("isopretDirectory")
+    public File isopretDirectory() throws IOException {
         String osName = System.getProperty("os.name").toLowerCase();
         File appHomeDir;
         if (osName.contains("nix") || osName.contains("nux") || osName.contains("aix")) { // Unix
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".hpowb");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".isopretfx");
         } else if (osName.contains("win")) { // Windows
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + "hpowb");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + "isopretfx");
         } else if (osName.contains("mac")) { // OsX
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".hpowb");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + ".isopretfx");
         } else { // unknown platform
-            appHomeDir = new File(System.getProperty("user.home") + File.separator + "hpowb");
+            appHomeDir = new File(System.getProperty("user.home") + File.separator + "isopretfx");
         }
 
         if (!appHomeDir.exists()) {

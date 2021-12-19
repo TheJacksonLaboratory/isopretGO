@@ -18,6 +18,7 @@ public enum GoMethod {
     public static GoMethod fromString(String calculation) {
         switch (calculation.toLowerCase()) {
             case "term-for-term":
+            case "term for term":
             case "tft":
                 return TFT;
             case "parent-child-union":

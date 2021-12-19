@@ -99,7 +99,7 @@ public class HbaDealsParser {
         LOGGER.trace("We parsed {} lines from {}.\n", n_lines, this.hbadealsFile);
         LOGGER.trace("We got {} genes with HBA DEALS results\n", hbaDealsResultMap.size());
         if (! unfound.isEmpty()) {
-            LOGGER.info("Could not find symbols for {} accessions: ", unfound.size(), String.join(", ", unfound));
+            LOGGER.info("Could not find symbols for {} accessions: {}", unfound.size(), String.join(", ", unfound));
         }
     }
 

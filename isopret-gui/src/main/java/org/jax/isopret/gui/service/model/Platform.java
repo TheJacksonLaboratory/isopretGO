@@ -1,6 +1,4 @@
-package org.jax.isopret.gui;
-
-
+package org.jax.isopret.gui.service.model;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -9,19 +7,17 @@ import java.io.File;
 
 public class Platform {
 
-    private static String projectDirname = "projects";
-
     /**
      * Get path to directory where HRMD-gui stores global settings.
      * The path depends on underlying operating system. Linux, Windows & OSX
      * currently supported.
      * @return File to directory
      */
-    public static File getGopherDir() {
+    public static File getIsopretFxDir() {
         CurrentPlatform platform = figureOutPlatform();
-        File linuxPath = new File(System.getProperty("user.home") + File.separator + ".gopher");
-        File windowsPath = new File(System.getProperty("user.home") + File.separator + "gopher");
-        File osxPath = new File(System.getProperty("user.home") + File.separator + ".gopher");
+        File linuxPath = new File(System.getProperty("user.home") + File.separator + ".isopretfx");
+        File windowsPath = new File(System.getProperty("user.home") + File.separator + "isopretfx");
+        File osxPath = new File(System.getProperty("user.home") + File.separator + ".isopretfx");
 
         switch (platform) {
             case LINUX: return linuxPath;
@@ -30,9 +26,9 @@ public class Platform {
             case UNKNOWN: return null;
             default:
                 Alert a = new Alert(AlertType.ERROR);
-                a.setTitle("Find gui config dir");
+                a.setTitle("Find GUI config dir");
                 a.setHeaderText(null);
-                a.setContentText(String.format("Unrecognized platform. %s", platform.toString()));
+                a.setContentText(String.format("Unrecognized platform: \"%s\"", platform));
                 a.showAndWait();
                 return null;
         }
@@ -43,15 +39,8 @@ public class Platform {
      * @return the absolute path,e.g., /home/user/.vpvgui/vpvgui.log
      */
     public static String getAbsoluteLogPath() {
-        File dir = getGopherDir();
-        return dir + File.separator +  "gopher.log";
-    }
-
-
-
-    public static File getParametersFile() {
-        String parametersFileName = "parameters.yml";
-        return new File(getGopherDir() + File.separator + parametersFileName);
+        File dir = getIsopretFxDir();
+        return dir + File.separator +  "isopretfx.log";
     }
 
 
