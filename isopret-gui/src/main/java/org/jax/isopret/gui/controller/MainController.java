@@ -64,6 +64,8 @@ public class MainController implements Initializable {
     @FXML
     private ChoiceBox<String> mtcChoiceBox;
 
+
+
     @Autowired
     private IsopretService service;
 
@@ -83,6 +85,8 @@ public class MainController implements Initializable {
         mtcChoiceBox.setItems(mtcMethodList);
         mtcChoiceBox.getSelectionModel().selectFirst();
         mtcChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> service.setMtcMethod(newValue));
+        analysisPB.setProgress(0.0);
+
     }
 
 

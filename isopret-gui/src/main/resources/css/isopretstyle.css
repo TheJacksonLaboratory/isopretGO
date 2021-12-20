@@ -1,22 +1,4 @@
-/*
- * #%L
- * VPV
- * %%
- * Copyright (C) 2017 Peter Robinson
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
+
 .boxSpacing{
     -fx-margin: 2 10 2 10;
 }
@@ -46,7 +28,7 @@
 }
 
 .bluelabel {
-    -fx-font-size: 11pt;
+    -fx-font-size: 14pt;
     -fx-font-family: "Helvetica";
     -fx-font-style: italic;
      -fx-text-fill: blue;
@@ -60,6 +42,15 @@
      -fx-text-fill: black;
     -fx-opacity: 0.95;
 
+}
+
+
+.vboxWithBorder {
+    -fx-background-color: white;
+    -fx-border-color: blue;
+    -fx-border-insets: 1;
+    -fx-border-width: 1;
+    -fx-border-style: dotted;
 }
 
 
@@ -117,4 +108,12 @@
 .Button:pressed {
     -fx-background-color: #000000,linear-gradient(#7ebcea, #2f4b8f),linear-gradient(#426ab7, #263e75),linear-gradient(#395cab, #223768);
     -fx-text-fill: white;
+}
+
+
+.infolabel {
+ -fx-font-family: "Helvetica";
+    -fx-font-style: italic;
+      -fx-text-fill: black;
+     -fx-opacity: 0.5;
 }

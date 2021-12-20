@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.GoTermIdPlusLabel;
+import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
@@ -20,7 +21,9 @@ import org.jax.isopret.core.visualization.HtmlVisualizer;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
+import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +55,8 @@ public class IsopretServiceImpl implements IsopretService  {
     private InterproMapper interproMapper = null;
     private HbaDealsThresholder thresholder = null;
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
+    private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
+    private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -191,6 +196,58 @@ public class IsopretServiceImpl implements IsopretService  {
         this.interproMapper = task.getInterproMapper();
         this.thresholder = task.getThresholder();
         this.geneSymbolToTranscriptMap = task.getGeneSymbolToTranscriptMap();
+
+        /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
+        HbaDealsGoAnalysis hbago =  getHbaDealsGoAnalysis(goMethod,
+                thresholder,
+                geneOntology,
+                task.getGoAssociationContainer(),
+                this.mtcMethod);
+
+
+        dasGoTerms = hbago.dasOverrepresetationAnalysis();
+        dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
+        dasGoTerms.sort(new SortByPvalue());
+        dgeGoTerms.sort(new SortByPvalue());
+    }
+
+    @Override
+    public List<GoTerm2PValAndCounts> getDasGoTerms() {
+        return dasGoTerms;
+    }
+    @Override
+    public List<GoTerm2PValAndCounts> getDgeGoTerms() {
+        return dgeGoTerms;
+    }
+
+    static class SortByPvalue implements Comparator<GoTerm2PValAndCounts>
+    {
+        // Used for sorting in ascending order of
+        // roll number
+        public int compare(GoTerm2PValAndCounts a, GoTerm2PValAndCounts b)
+        {
+            double diff = a.getRawPValue() - b.getRawPValue();
+            if (diff > 0) {
+                return 1;
+            } else if (diff < 0) {
+                return -1;
+            } else  {
+                return 0;
+            }
+        }
+    }
+    protected HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
+                                                       HbaDealsThresholder thresholder,
+                                                       Ontology ontology,
+                                                       GoAssociationContainer goAssociationContainer,
+                                                       MtcMethod mtc) {
+        if (goMethod == GoMethod.PCunion) {
+            return HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
+        } else if (goMethod == GoMethod.PCintersect) {
+            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
+        } else {
+            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
+        }
     }
 
     /**
@@ -217,6 +274,9 @@ public class IsopretServiceImpl implements IsopretService  {
             resultsMap.put("Differentially expressed genes", String.valueOf(thresholder.getDgeGeneCount()));
             resultsMap.put("Differentially spliced genes", String.valueOf(thresholder.getDasGeneCount()));
             resultsMap.put("FDR threshold", String.valueOf(thresholder.getFdrThreshold()));
+            resultsMap.put("Significant DGE GO Terms", String.valueOf(this.dgeGoTerms.size()));
+            resultsMap.put("Significant DAS GO Terms", String.valueOf(this.dasGoTerms.size()));
+
         }
         return resultsMap;
     }
