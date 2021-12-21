@@ -56,7 +56,7 @@ public class GoTermAndPvalVisualized {
     }
 
     public String getPopulationGenePercentage() {
-        return String.format(".1%f%%", 100.0 * this.annotatedPopulationGenes / this.totalPopulationGenes);
+        return String.format("%.1f%%", 100.0 * this.annotatedPopulationGenes / this.totalPopulationGenes);
     }
 
     public int getTotalPopulationGenes() {

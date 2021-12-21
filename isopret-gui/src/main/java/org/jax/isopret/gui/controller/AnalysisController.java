@@ -5,6 +5,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -17,8 +18,11 @@ import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,6 +69,11 @@ public class AnalysisController implements Initializable {
     private IsopretService isopretService;
     @Autowired
     private MainController mainController;
+    @Autowired
+    ResourceLoader resourceLoader;
+
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // 1. the gene symbol
@@ -133,7 +142,7 @@ public class AnalysisController implements Initializable {
             Button btn = new Button("Visualize");
             btn.setOnAction(e -> {
                 LOGGER.trace(String.format("Adding tab for row with generow: %s", geneRow.getGeneSymbol()));
-                openViewPointInTab(geneRow);
+                openHbaDealsResultInTab(geneRow);
             });
             // wrap it so it can be displayed in the TableView
             return new ReadOnlyObjectWrapper<>(btn);
@@ -188,28 +197,28 @@ public class AnalysisController implements Initializable {
     /**
      * This method creates a new {@link Tab} populated with a viewpoint!
      *
-     * @param vp This {@link HbaDealsGeneRow} object will be opened into a new Tab.
+     * @param hbadealsResult This {@link HbaDealsGeneRow} object will be opened into a new Tab.
      */
-    private void openViewPointInTab(HbaDealsGeneRow vp) {
+    private void openHbaDealsResultInTab(HbaDealsGeneRow hbadealsResult) {
         TabPane tabPane = this.mainController.getMainTabPaneRef();
         /* First check if we have already opened a tab for this gene. */
-        if (openTabs.containsKey(vp)) {
-            Tab tab = openTabs.get(vp);
-            LOGGER.trace("openTabs already containsKey " + vp.getGeneSymbol());
+        if (openTabs.containsKey(hbadealsResult)) {
+            Tab tab = openTabs.get(hbadealsResult);
+            LOGGER.trace("openTabs already containsKey " + hbadealsResult.getGeneSymbol());
             if (tab == null || tab.isDisabled()) {
-                LOGGER.trace("Tab is null (error), REMOVING " + vp.getGeneSymbol());
-                openTabs.remove(vp);
+                LOGGER.trace("Tab is null (error), REMOVING " + hbadealsResult.getGeneSymbol());
+                openTabs.remove(hbadealsResult);
             } else {
-                LOGGER.trace("openTabs SELECTING " + vp.getGeneSymbol());
+                LOGGER.trace("openTabs SELECTING " + hbadealsResult.getGeneSymbol());
                 tabPane.getSelectionModel().select(tab);
                 return;
             }
         }
         // If we get here, there is no tab yet for this gene
-        LOGGER.trace("openTabs with new tab for" + vp.getGeneSymbol());
+        LOGGER.trace("openTabs with new tab for" + hbadealsResult.getGeneSymbol());
 
-        final Tab tab = new Tab("Viewpoint: " + vp.getGeneSymbol());
-        tab.setId(vp.getGeneSymbol());
+        final Tab tab = new Tab(hbadealsResult.getGeneSymbol());
+        tab.setId(hbadealsResult.getGeneSymbol());
         tab.setClosable(true);
         tab.setOnClosed(event -> {
             if (tabPane.getTabs()
@@ -226,24 +235,29 @@ public class AnalysisController implements Initializable {
                 }
             }
         });
+        try {
+            Resource r = resourceLoader.getResource(
+                    "classpath:fxml/hbaGenePane.fxml");
+            if (! r.exists()) {
+                LOGGER.error("Could not initialize hbaGenePane pane (fxml file not found)");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
+            String html = isopretService.getHtmlForGene(hbadealsResult.getGeneSymbol());
+            loader.setControllerFactory(c -> new HbaGeneController(hbadealsResult, html));
+            ScrollPane p = loader.load();
+            HbaGeneController gc2 = loader.getController();
+            //gc2.refreshGeneOntologyTable();
+            // TODO initialize as needed
+            tab.setContent(p);
+            tabPane.getTabs().add(tab);
+            tabPane.getSelectionModel().select(tab);
+            this.openTabs.put(hbadealsResult, tab);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        /*
-         ViewPointView view = new ViewPointView();
-        ViewPointPresenter presenter = (ViewPointPresenter) view.getPresenter();
-        presenter.setModel(this.model);
-        presenter.setCallback(this);
-        presenter.setTab(tab);
-        presenter.setViewPoint(vp);
-        tab.setContent(presenter.getPane());
 
-        this.tabpane.getTabs().add(tab);
-        this.tabpane.getSelectionModel().select(tab);
-        openTabs.put(vp, tab);
-         */
-
-        tabPane.getTabs().add(tab);
-        tabPane.getSelectionModel().select(tab);
-        this.openTabs.put(vp, tab);
     }
 
 
@@ -266,44 +280,4 @@ public class AnalysisController implements Initializable {
         label.prefWidthProperty().bind(stack.prefWidthProperty());
         col.setGraphic(stack);
     }
-
 }
-
-/*
-private void createTabDynamically() {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("secondView.fxml"));
-        loader.setController(new SecondViewController());
-        try {
-            Parent parent = loader.load();
-            myDynamicTab = new Tab("A Dynamic Tab");
-            myDynamicTab.setClosable(true);
-            myDynamicTab.setContent(parent);
-            tabPane.getTabs().add(myDynamicTab);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-}
-
-SecondViewController.java
-
-import java.net.URL;
-import java.util.ResourceBundle;
-
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-
-public class SecondViewController implements Initializable {
-
-    @FXML private Label secondInfoLbl;
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        secondInfoLbl.setText("Hello from the second view");
-    }
-}
-
- */

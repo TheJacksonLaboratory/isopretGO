@@ -96,12 +96,12 @@ public class MainController implements Initializable {
         mtcChoiceBox.getSelectionModel().selectFirst();
         mtcChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> service.setMtcMethod(newValue));
         analysisPB.setProgress(0.0);
-
     }
 
 
-
-
+    /**
+     * Show the user a file chooser to select an output (results) file from HBA-DEALS.
+     */
     @FXML
     private void chooseHbaDealsOutputFile(ActionEvent e) {
         e.consume();

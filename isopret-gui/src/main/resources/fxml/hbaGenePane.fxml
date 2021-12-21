@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
+
+
+<ScrollPane fitToHeight="true" fitToWidth="true"
+            xmlns="http://javafx.com/javafx/16"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
+    <VBox prefHeight="887.0" prefWidth="1203.0">
+        <VBox fx:id="hbaGeneVbox" prefHeight="61.0" prefWidth="1203.0"/>
+        <WebView fx:id="hbaGeneWebView" prefHeight="275.0" prefWidth="1203.0"/>
+    </VBox>
+</ScrollPane>
