@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
@@ -193,6 +192,27 @@ public class MainController implements Initializable {
                 //
                 GeneOntologyController gc1 = loader.getController();
                 gc1.refreshGeneOntologyTable();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // Now the same for DAS
+            try {
+                Resource r = resourceLoader.getResource(
+                        "classpath:fxml/geneOntologyPane.fxml");
+                if (! r.exists()) {
+                    LOGGER.error("Could not initialize Gene Ontology pane (fxml file not found)");
+                    return;
+                }
+                FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
+                loader.setControllerFactory(c -> new GeneOntologyController("DAS", service.getDasGoTerms(), service.getGeneOntology()));
+                ScrollPane p = loader.load();
+                Tab dasTab = new Tab("DAS");
+                dasTab.setId("DAS");
+                dasTab.setClosable(false);
+                dasTab.setContent(p);
+                this.tabPane.getTabs().add(dasTab);
+                GeneOntologyController gc2 = loader.getController();
+                gc2.refreshGeneOntologyTable();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -75,6 +75,24 @@ public class GoTermAndPvalVisualized {
         return p_raw;
     }
 
+    public String getPvalFormated() {
+        return formatP(p_raw);
+    }
+
+    public String getPvalAdjFormated() {
+        return formatP(p_adjusted);
+    }
+
+    private String formatP(double p) {
+        if (p > 0.05) {
+            return String.format("%.2f", p);
+        } else if (p > 0.001) {
+            return String.format("%.3f", p);
+        } else {
+            return String.format("%e", p);
+        }
+    }
+
     public double getP_adjusted() {
         return p_adjusted;
     }

@@ -65,6 +65,30 @@ public class GeneOntologyController implements Initializable {
         termIdColumn.setSortable(false);
         termIdColumn.setEditable(false);
         termIdColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getGoTermId()));
+
+        studyCountsColumn.setSortable(false);
+        studyCountsColumn.setEditable(false);
+        studyCountsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getStudyGeneRatio()));
+
+        studyPercentageColumn.setSortable(false);
+        studyPercentageColumn.setEditable(false);
+        studyPercentageColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getStudyGenePercentage()));
+
+        populationCountsColumn.setSortable(false);
+        populationCountsColumn.setEditable(false);
+        populationCountsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPopulationGeneRatio()));
+
+        populationPercentageColumn.setSortable(false);
+        populationPercentageColumn.setEditable(false);
+        populationPercentageColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPopulationGenePercentage()));
+
+        pvalColumn.setSortable(false);
+        pvalColumn.setEditable(false);
+        pvalColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPvalFormated()));
+
+        adjpvalColumn.setSortable(false);
+        adjpvalColumn.setEditable(false);
+        adjpvalColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPvalAdjFormated()));
     }
 
 
