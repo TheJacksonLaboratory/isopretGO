@@ -40,9 +40,7 @@ public class GeneOntologyController implements Initializable {
     public TableColumn<GoTermAndPvalVisualized, String> termColumn;
     public TableColumn<GoTermAndPvalVisualized, String> termIdColumn;
     public TableColumn<GoTermAndPvalVisualized, String> studyCountsColumn;
-    public TableColumn<GoTermAndPvalVisualized, String> studyPercentageColumn;
     public TableColumn<GoTermAndPvalVisualized, String> populationCountsColumn;
-    public TableColumn<GoTermAndPvalVisualized, String> populationPercentageColumn;
     public TableColumn<GoTermAndPvalVisualized, String> pvalColumn;
     public TableColumn<GoTermAndPvalVisualized, String> adjpvalColumn;
 
@@ -70,17 +68,9 @@ public class GeneOntologyController implements Initializable {
         studyCountsColumn.setEditable(false);
         studyCountsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getStudyGeneRatio()));
 
-        studyPercentageColumn.setSortable(false);
-        studyPercentageColumn.setEditable(false);
-        studyPercentageColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getStudyGenePercentage()));
-
         populationCountsColumn.setSortable(false);
         populationCountsColumn.setEditable(false);
         populationCountsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPopulationGeneRatio()));
-
-        populationPercentageColumn.setSortable(false);
-        populationPercentageColumn.setEditable(false);
-        populationPercentageColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPopulationGenePercentage()));
 
         pvalColumn.setSortable(false);
         pvalColumn.setEditable(false);

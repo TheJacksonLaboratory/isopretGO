@@ -21,12 +21,10 @@
 
             <TableView fx:id="goPvalTableView" stylesheets="@../css/isopretstyle.css" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="termColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" resizable="false" text="GO Term" />
+                    <TableColumn fx:id="termColumn" editable="false" maxWidth="-1.0" minWidth="300.0" prefWidth="-1.0" resizable="false" text="GO Term" />
                     <TableColumn fx:id="termIdColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumntarget" text="GO id" />
                     <TableColumn fx:id="studyCountsColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Study counts" />
-                    <TableColumn fx:id="studyPercentageColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Study (%)" />
                     <TableColumn fx:id="populationCountsColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population counts" />
-                    <TableColumn fx:id="populationPercentageColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population (%)" />
                     <TableColumn fx:id="pvalColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="P-value" />
                     <TableColumn fx:id="adjpvalColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="Adj. P-value" />
                 </columns>
