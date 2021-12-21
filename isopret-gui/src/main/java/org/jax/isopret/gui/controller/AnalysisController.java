@@ -48,7 +48,7 @@ public class AnalysisController implements Initializable {
     private ListView<String> lviewValue;
 
     @FXML
-    private TableView<HbaDealsGeneRow> viewPointTableView;
+    private TableView<HbaDealsGeneRow> hbaGeneResultTableView;
     @FXML
     private TableColumn<HbaDealsGeneRow, String> symbolColumn;
     @FXML
@@ -148,7 +148,9 @@ public class AnalysisController implements Initializable {
             return new ReadOnlyObjectWrapper<>(btn);
         });
         // allow titles of all table columns to be broken into multiple lines
-        viewPointTableView.getColumns().forEach(AnalysisController::makeHeaderWrappable);
+        hbaGeneResultTableView.getColumns().forEach(AnalysisController::makeHeaderWrappable);
+        hbaGeneResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+
     }
 
 
@@ -185,11 +187,11 @@ public class AnalysisController implements Initializable {
         javafx.application.Platform.runLater(() -> {
             List<HbaDealsGeneRow> vpl = this.isopretService.getHbaDealsRows();
             LOGGER.trace("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
-            viewPointTableView.getItems().clear(); /* clear previous rows, if any */
-            viewPointTableView.getItems().addAll(vpl);
-            viewPointTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-            AnchorPane.setTopAnchor(viewPointTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
-            viewPointTableView.sort();
+            hbaGeneResultTableView.getItems().clear(); /* clear previous rows, if any */
+            hbaGeneResultTableView.getItems().addAll(vpl);
+            hbaGeneResultTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            AnchorPane.setTopAnchor(hbaGeneResultTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
+            hbaGeneResultTableView.sort();
         });
     }
 

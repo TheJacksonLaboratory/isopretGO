@@ -1,34 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-
-<ScrollPane fx:id="geneOntologyPane" fitToHeight="true"
-            fitToWidth="true"
-            xmlns="http://javafx.com/javafx/16"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.jax.isopret.gui.controller.GeneOntologyController">
+<ScrollPane fx:id="geneOntologyPane" fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.GeneOntologyController">
     <StackPane alignment="TOP_CENTER">
         <VBox alignment="TOP_CENTER" maxWidth="1200.0" minHeight="600.0" minWidth="1105.0" prefWidth="1200.0">
             <VBox alignment="TOP_CENTER">
-                <Label styleClass="toplabel" stylesheets="@../css/isopretstyle.css" text="Results summary" />
-                <HBox fx:id="listviewHbox" alignment="TOP_CENTER" prefHeight="120.0" prefWidth="1105.0">
-                    <ListView fx:id="lviewKey" minHeight="175.0" prefHeight="175.0" prefWidth="1159.0" />
-                    <ListView fx:id="lviewValue" minHeight="175.0" prefHeight="170.0" prefWidth="905.0" />
-                </HBox>
+                <VBox>
+                <Label fx:id="goTopLevelLabel" styleClass="plainlabel" stylesheets="@../css/isopretstyle.css" text=".">
+                  <VBox.margin>
+                     <Insets left="20.0" top="5.0" />
+                  </VBox.margin></Label>
+               <Label fx:id="goMethodsLabel" styleClass="plainlabel" stylesheets="@../css/isopretstyle.css" text=".">
+                  <VBox.margin>
+                     <Insets left="20.0" top="5.0" />
+                  </VBox.margin></Label>
+               <Label fx:id="goSummaryLabel" styleClass="plainlabel" stylesheets="@../css/isopretstyle.css" text=".">
+                  <VBox.margin>
+                     <Insets left="20.0" top="5.0" />
+                  </VBox.margin></Label>
+                </VBox>
             </VBox>
 
             <TableView fx:id="goPvalTableView" stylesheets="@../css/isopretstyle.css" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="termColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" resizable="false" text="GO Term" />
+                    <TableColumn fx:id="termColumn" editable="false" maxWidth="-1.0" minWidth="300.0" prefWidth="-1.0" resizable="false" text="GO Term" />
                     <TableColumn fx:id="termIdColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumntarget" text="GO id" />
                     <TableColumn fx:id="studyCountsColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Study counts" />
-                    <TableColumn fx:id="studyPercentageColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Study (%)" />
                     <TableColumn fx:id="populationCountsColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population counts" />
-                    <TableColumn fx:id="populationPercentageColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population (%)" />
                     <TableColumn fx:id="pvalColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="P-value" />
                     <TableColumn fx:id="adjpvalColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="Adj. P-value" />
+                    <TableColumn fx:id="amigoColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="AmiGO" />
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -37,4 +45,3 @@
         </VBox>
     </StackPane>
 </ScrollPane>
-

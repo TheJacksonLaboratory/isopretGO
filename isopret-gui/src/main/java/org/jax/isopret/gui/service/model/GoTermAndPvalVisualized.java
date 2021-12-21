@@ -44,19 +44,12 @@ public class GoTermAndPvalVisualized {
     }
 
     public String getStudyGeneRatio() {
-        return String.format("%d/%d", this.annotatedStudyGenes, this.totalStudyGenes);
+        return String.format("%d/%d (%.1f%%)", this.annotatedStudyGenes, this.totalStudyGenes, 100.0 * this.annotatedStudyGenes / this.totalStudyGenes);
     }
 
-    public String getStudyGenePercentage() {
-        return String.format("%.1f%%", 100.0 * this.annotatedStudyGenes / this.totalStudyGenes);
-    }
 
     public String getPopulationGeneRatio() {
-        return String.format("%d/%d", this.annotatedPopulationGenes, this.totalPopulationGenes);
-    }
-
-    public String getPopulationGenePercentage() {
-        return String.format("%.1f%%", 100.0 * this.annotatedPopulationGenes / this.totalPopulationGenes);
+        return String.format("%d/%d (%.1f%%)", this.annotatedPopulationGenes, this.totalPopulationGenes, 100.0 * this.annotatedPopulationGenes / this.totalPopulationGenes);
     }
 
     public int getTotalPopulationGenes() {
