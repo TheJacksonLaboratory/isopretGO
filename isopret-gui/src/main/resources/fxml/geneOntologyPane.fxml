@@ -36,6 +36,7 @@
                     <TableColumn fx:id="populationCountsColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population counts" />
                     <TableColumn fx:id="pvalColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="P-value" />
                     <TableColumn fx:id="adjpvalColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="Adj. P-value" />
+                    <TableColumn fx:id="amigoColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="AmiGO" />
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -1,5 +1,6 @@
 package org.jax.isopret.gui.service;
 
+import javafx.application.HostServices;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
@@ -65,4 +66,6 @@ public interface IsopretService {
     String getGoMethods();
 
     String getGoSummary();
+
+    HostServices getHostServices();
 }

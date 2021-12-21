@@ -1,5 +1,6 @@
 package org.jax.isopret.gui.service.impl;
 
+import javafx.application.HostServices;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -42,6 +43,9 @@ public class IsopretServiceImpl implements IsopretService  {
     /** File for reading/writing settings. */
     @Autowired
     File isopretSettingsFile;
+
+    @Autowired
+    private HostServices hostServices;
 
     private final Properties pgProperties;
     private final StringProperty downloadDirProp;
@@ -345,6 +349,11 @@ public class IsopretServiceImpl implements IsopretService  {
         String version = geneOntology.getMetaInfo().getOrDefault("data-version", "no version found");
         String nterms = String.valueOf(geneOntology.countNonObsoleteTerms());
         return "Gene Ontology (version: " + version +"), " + nterms + " terms.";
+    }
+
+    @Override
+    public HostServices getHostServices() {
+        return hostServices;
     }
 
 

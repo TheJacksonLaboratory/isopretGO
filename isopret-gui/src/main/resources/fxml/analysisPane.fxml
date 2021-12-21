@@ -20,7 +20,7 @@
                 </HBox>
             </VBox>
 
-            <TableView fx:id="viewPointTableView" stylesheets="@../css/isopretstyle.css" VBox.vgrow="ALWAYS">
+            <TableView fx:id="hbaGeneResultTableView" stylesheets="@../css/isopretstyle.css" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="symbolColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" resizable="false" text="Symbol" />
                     <TableColumn fx:id="accessionColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumntarget" text="Accession" />
