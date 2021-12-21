@@ -2,6 +2,7 @@ package org.jax.isopret.gui.controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -18,6 +19,7 @@ import java.util.ResourceBundle;
 @Scope("prototype")
 public class HbaGeneController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaGeneController.class.getName());
+    public Label hbaGeneLabel;
     @FXML
     private VBox hbaGeneVbox;
     @FXML
@@ -36,6 +38,7 @@ public class HbaGeneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.hbaGeneLabel.setText(result.getGeneSymbol() + " (" + result.getGeneAccession() + ")");
         WebEngine webEngine = hbaGeneWebView.getEngine();
         webEngine.loadContent(this.html);
     }
