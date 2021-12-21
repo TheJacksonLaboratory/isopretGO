@@ -224,7 +224,7 @@ public class MainController implements Initializable {
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
-            this.analysisLabel.setText("Failed!");
+           // this.analysisLabel.setText("Failed!");
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to create digest file",
                     exc);
