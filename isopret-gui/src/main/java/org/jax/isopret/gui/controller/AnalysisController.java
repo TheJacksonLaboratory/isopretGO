@@ -227,6 +227,20 @@ public class AnalysisController implements Initializable {
             }
         });
 
+        /*
+         ViewPointView view = new ViewPointView();
+        ViewPointPresenter presenter = (ViewPointPresenter) view.getPresenter();
+        presenter.setModel(this.model);
+        presenter.setCallback(this);
+        presenter.setTab(tab);
+        presenter.setViewPoint(vp);
+        tab.setContent(presenter.getPane());
+
+        this.tabpane.getTabs().add(tab);
+        this.tabpane.getSelectionModel().select(tab);
+        openTabs.put(vp, tab);
+         */
+
         tabPane.getTabs().add(tab);
         tabPane.getSelectionModel().select(tab);
         this.openTabs.put(vp, tab);

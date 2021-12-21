@@ -4,6 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
+import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 
 import java.io.File;
@@ -48,6 +49,8 @@ public interface IsopretService {
     String getHtmlForGene(String symbol);
 
 
-    public List<GoTerm2PValAndCounts> getDasGoTerms();
-    public List<GoTerm2PValAndCounts> getDgeGoTerms();
+    List<GoTerm2PValAndCounts> getDasGoTerms();
+    List<GoTerm2PValAndCounts> getDgeGoTerms();
+
+    Ontology getGeneOntology();
 }

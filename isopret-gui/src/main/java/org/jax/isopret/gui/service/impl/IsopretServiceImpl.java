@@ -303,4 +303,8 @@ public class IsopretServiceImpl implements IsopretService  {
         HtmlVisualizer visualizer = new HtmlVisualizer();
         return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms, 0));
     }
+
+    public Ontology getGeneOntology() {
+        return this.geneOntology;
+    }
 }

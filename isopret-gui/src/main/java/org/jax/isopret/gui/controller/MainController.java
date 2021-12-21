@@ -6,9 +6,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
@@ -17,10 +19,14 @@ import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -33,6 +39,8 @@ import java.util.ResourceBundle;
 @Component
 public class MainController implements Initializable {
     private final static Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
+    public Tab dgeTab;
+    public Tab dasTab;
     @FXML
     private ProgressBar analysisPB;
     @FXML
@@ -74,6 +82,9 @@ public class MainController implements Initializable {
 
     @Autowired
     private Properties pgProperties;
+
+    @Autowired
+    ResourceLoader resourceLoader;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -164,6 +175,28 @@ public class MainController implements Initializable {
             this.analysisController.refreshVPTable(); // uses HbaDealsGeneRow objects to populate table etc.
             SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
             selectionModel.select(this.analysisTab);
+            try {
+                Resource r = resourceLoader.getResource(
+                        "classpath:fxml/geneOntologyPane.fxml");
+                if (! r.exists()) {
+                    LOGGER.error("Could not initialize Gene Ontology pane (fxml file not found)");
+                    return;
+                }
+                FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
+                loader.setControllerFactory(c -> new GeneOntologyController("DGE", service.getDgeGoTerms(), service.getGeneOntology()));
+                ScrollPane p = loader.load();
+                Tab dgeTab = new Tab("DGE");
+                dgeTab.setId("DGE");
+                dgeTab.setClosable(false);
+                dgeTab.setContent(p);
+                this.tabPane.getTabs().add(dgeTab);
+                //
+                GeneOntologyController gc1 = loader.getController();
+                gc1.refreshGeneOntologyTable();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
