@@ -5,14 +5,25 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
+import org.jax.isopret.core.go.GoTermIdPlusLabel;
+import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
+import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.IsopretDownloader;
+import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.transcript.AnnotatedGene;
+import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.visualization.EnsemblVisualizable;
+import org.jax.isopret.core.visualization.HtmlVisualizer;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
+import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +54,9 @@ public class IsopretServiceImpl implements IsopretService  {
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
     private HbaDealsThresholder thresholder = null;
+    private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
+    private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
+    private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -181,11 +195,64 @@ public class IsopretServiceImpl implements IsopretService  {
         this.geneOntology = task.getGeneOntology();
         this.interproMapper = task.getInterproMapper();
         this.thresholder = task.getThresholder();
+        this.geneSymbolToTranscriptMap = task.getGeneSymbolToTranscriptMap();
+
+        /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
+        HbaDealsGoAnalysis hbago =  getHbaDealsGoAnalysis(goMethod,
+                thresholder,
+                geneOntology,
+                task.getGoAssociationContainer(),
+                this.mtcMethod);
+
+
+        dasGoTerms = hbago.dasOverrepresetationAnalysis();
+        dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
+        dasGoTerms.sort(new SortByPvalue());
+        dgeGoTerms.sort(new SortByPvalue());
+    }
+
+    @Override
+    public List<GoTerm2PValAndCounts> getDasGoTerms() {
+        return dasGoTerms;
+    }
+    @Override
+    public List<GoTerm2PValAndCounts> getDgeGoTerms() {
+        return dgeGoTerms;
+    }
+
+    static class SortByPvalue implements Comparator<GoTerm2PValAndCounts>
+    {
+        // Used for sorting in ascending order of
+        // roll number
+        public int compare(GoTerm2PValAndCounts a, GoTerm2PValAndCounts b)
+        {
+            double diff = a.getRawPValue() - b.getRawPValue();
+            if (diff > 0) {
+                return 1;
+            } else if (diff < 0) {
+                return -1;
+            } else  {
+                return 0;
+            }
+        }
+    }
+    protected HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
+                                                       HbaDealsThresholder thresholder,
+                                                       Ontology ontology,
+                                                       GoAssociationContainer goAssociationContainer,
+                                                       MtcMethod mtc) {
+        if (goMethod == GoMethod.PCunion) {
+            return HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
+        } else if (goMethod == GoMethod.PCintersect) {
+            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
+        } else {
+            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
+        }
     }
 
     /**
      * Return a sorted list of {@link HbaDealsGeneRow} objects
-     * @return
+     * @return Rows intended for display in the second tab
      */
     @Override
     public List<HbaDealsGeneRow> getHbaDealsRows() {
@@ -207,7 +274,37 @@ public class IsopretServiceImpl implements IsopretService  {
             resultsMap.put("Differentially expressed genes", String.valueOf(thresholder.getDgeGeneCount()));
             resultsMap.put("Differentially spliced genes", String.valueOf(thresholder.getDasGeneCount()));
             resultsMap.put("FDR threshold", String.valueOf(thresholder.getFdrThreshold()));
+            resultsMap.put("Significant DGE GO Terms", String.valueOf(this.dgeGoTerms.size()));
+            resultsMap.put("Significant DAS GO Terms", String.valueOf(this.dasGoTerms.size()));
+
         }
         return resultsMap;
+    }
+
+    @Override
+    public String getHtmlForGene(String symbol) {
+        if (! this.thresholder.getRawResults().containsKey(symbol)) {
+            LOGGER.error("Could not find HBADEALS results for {}.", symbol);
+            return "ERROR TODO";
+        }
+        List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(symbol);
+        HbaDealsResult result = thresholder.getRawResults().get(symbol);
+        double splicingThreshold = thresholder.getSplicingThreshold();
+        double expressionThreshold = thresholder.getExpressionThreshold();
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+        AnnotatedGene agene = new AnnotatedGene(transcripts,
+                    transcriptToInterproHitMap,
+                    result,
+                    expressionThreshold,
+                    splicingThreshold);
+
+        Set<GoTermIdPlusLabel> goTerms = Set.of(); // TODO INTIIALZIED
+        HtmlVisualizer visualizer = new HtmlVisualizer();
+        return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms, 0));
+    }
+
+    public Ontology getGeneOntology() {
+        return this.geneOntology;
     }
 }

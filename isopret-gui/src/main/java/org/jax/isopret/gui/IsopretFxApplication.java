@@ -25,6 +25,7 @@ import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
+import org.jax.isopret.gui.configuration.ApplicationProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -76,19 +77,19 @@ public class IsopretFxApplication extends Application {
                 .sources(IsopretFxApplication.class)
                 .initializers(initializer).run();
 
-        ClassPathResource applicationProps =  new ClassPathResource("application.properties");
-        Objects.requireNonNull(applicationProps);
-        // export app's version into System properties
-       try (Reader is = new InputStreamReader(applicationProps.getInputStream())) {
-            Properties properties = new Properties();
-            properties.load(is);
-            String version = "1.2";//properties.getProperty(FENOMINAL_VERSION_PROP_KEY, "unknown version");
-            System.setProperty(ISOPRETFX_VERSION_PROP_KEY, version);
-            String name = properties.getProperty(ISOPRETFX_NAME_KEY, "PhenoteFX");
-            System.setProperty(ISOPRETFX_NAME_KEY, name);
-        } catch (IOException e) {
-           LOGGER.error("Could not load application properties: {}", e.getMessage());
-        }
+//        ClassPathResource applicationProps =  new ClassPathResource("application.properties");
+//        Objects.requireNonNull(applicationProps);
+//        // export app's version into System properties
+//       try (Reader is = new InputStreamReader(applicationProps.getInputStream())) {
+//            Properties properties = new Properties();
+//            properties.load(is);
+//            String version = "1.2";//properties.getProperty(FENOMINAL_VERSION_PROP_KEY, "unknown version");
+//            System.setProperty(ISOPRETFX_VERSION_PROP_KEY, version);
+//            String name = properties.getProperty(ISOPRETFX_NAME_KEY, "Isopret");
+//            System.setProperty(ISOPRETFX_NAME_KEY, name);
+//        } catch (IOException e) {
+//           LOGGER.error("Could not load application properties: {}", e.getMessage());
+//        }
     }
 
     /**
@@ -103,8 +104,8 @@ public class IsopretFxApplication extends Application {
         try (OutputStream os = Files.newOutputStream(configFilePath)) {
             pgProperties.store(os, "IsopretFX properties");
         }
-        Platform.exit();
         applicationContext.close();
+        Platform.exit();
     }
 
 
@@ -117,48 +118,4 @@ public class IsopretFxApplication extends Application {
         }
     }
 
-
-
 }
-
-/*private ConfigurableApplicationContext context;
-
-    @Override
-    public void init() throws Exception {
-        ApplicationContextInitializer<GenericApplicationContext> initializer = new ApplicationContextInitializer<GenericApplicationContext>() {
-            @Override
-            public void initialize(GenericApplicationContext genericApplicationContext) {
-                genericApplicationContext.registerBean(Application.class, () -> JavafxApplication.this);
-                genericApplicationContext.registerBean(Parameters.class, () -> getParameters());
-                genericApplicationContext.registerBean(HostServices.class, () -> getHostServices());
-            }
-        };
-
-        this.context = new SpringApplicationBuilder().sources(BootifulFxApplication.class)
-                .initializers(initializer)
-                .build().run(getParameters().getRaw().toArray(new String[0]));
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        this.context.publishEvent(new StageReadyEvent(primaryStage));
-    }
-
-    @Override
-    public void stop() throws Exception {
-        this.context.close();
-        Platform.exit();
-    }
-
-    class StageReadyEvent extends ApplicationEvent {
-
-        public Stage getStage() {
-            return Stage.class.cast(getSource());
-        }
-
-        public StageReadyEvent(Object source) {
-            super(source);
-        }
-    }
-
- */

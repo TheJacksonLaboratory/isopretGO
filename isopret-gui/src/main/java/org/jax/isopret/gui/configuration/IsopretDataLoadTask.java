@@ -46,6 +46,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     /** Key ensembl transcript id; values: annotating go terms .*/
     private Map<TermId, Set<TermId>> transcriptToGoMap = Map.of();
 
+    private GoAssociationContainer goAssociationContainer = null;
+
+    private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
+
     private InterproMapper interproMapper = null;
 
     private  HbaDealsThresholder thresholder = null;
@@ -92,14 +96,14 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                     goGafFile.getAbsolutePath());
             return 1;
         }
-        GoAssociationContainer associationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, geneOntology);
+        this.goAssociationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, geneOntology);
         Platform.runLater(() -> {
                     updateProgress(0.45, 1); /* this will update the progress bar */
                     updateMessage(String.format("Loaded GO Association container with %d associations",
-                            associationContainer.getRawAssociations().size()));
+                            this.goAssociationContainer.getRawAssociations().size()));
                 });
         LOGGER.info(String.format("Loaded GO Association container with %d associations",
-                associationContainer.getRawAssociations().size()));
+                this.goAssociationContainer.getRawAssociations().size()));
         File jannovarFile = new File(downloadDirectory + File.separator + "hg38_ensembl.ser");
         if (! jannovarFile.isFile()) {
             errors.add("Could not find hg38_ensembl.ser (Jannovar file) at " +
@@ -113,6 +117,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                 });
         LOGGER.info(String.format("Loaded JannovarReader with %d gene symbols.", jannovarReader.getSymbolToTranscriptListMap().size()));
         this.geneIdToTranscriptMap = jannovarReader.getGeneIdToTranscriptMap();
+        this.geneSymbolToTranscriptMap = jannovarReader.getSymbolToTranscriptListMap();
         Platform.runLater(() -> {
                     updateProgress(0.65, 1); /* this will update the progress bar */
                     updateMessage(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
@@ -192,7 +197,15 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         return thresholder;
     }
 
+    public GoAssociationContainer getGoAssociationContainer() {
+        return goAssociationContainer;
+    }
+
     public List<String> getErrors() {
         return errors;
+    }
+
+    public Map<String, List<Transcript>> getGeneSymbolToTranscriptMap() {
+        return geneSymbolToTranscriptMap;
     }
 }
