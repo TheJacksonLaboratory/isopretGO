@@ -184,7 +184,8 @@ public class MainController implements Initializable {
                     return;
                 }
                 FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
-                loader.setControllerFactory(c -> new GeneOntologyController("DGE", service.getDgeGoTerms(), service.getGeneOntology()));
+                String topLevelDAS = service.getDgeLabel();
+                loader.setControllerFactory(c -> new GeneOntologyController(topLevelDAS,  service.getDgeGoTerms(), service));
                 ScrollPane p = loader.load();
                 Tab dgeTab = new Tab("DGE");
                 dgeTab.setId("DGE");
@@ -206,7 +207,8 @@ public class MainController implements Initializable {
                     return;
                 }
                 FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
-                loader.setControllerFactory(c -> new GeneOntologyController("DAS", service.getDasGoTerms(), service.getGeneOntology()));
+                String dasLabel = service.getDasLabel();
+                loader.setControllerFactory(c -> new GeneOntologyController(dasLabel,  service.getDasGoTerms(), service));
                 ScrollPane p = loader.load();
                 Tab dasTab = new Tab("DAS");
                 dasTab.setId("DAS");

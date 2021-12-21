@@ -17,11 +17,15 @@ public interface IsopretService {
 
     /* Settings */
     void saveSettings();
+
     Set<String> getExpectedDownloadedFiles();
 
 
-    /** Source files. */
+    /**
+     * Source files.
+     */
     boolean sourcesDownloaded();
+
     void downloadSources(File file);
 
     StringProperty downloadDirProperty();
@@ -48,9 +52,17 @@ public interface IsopretService {
 
     String getHtmlForGene(String symbol);
 
-
     List<GoTerm2PValAndCounts> getDasGoTerms();
+
     List<GoTerm2PValAndCounts> getDgeGoTerms();
 
     Ontology getGeneOntology();
+
+    String getDasLabel();
+
+    String getDgeLabel();
+
+    String getGoMethods();
+
+    String getGoSummary();
 }

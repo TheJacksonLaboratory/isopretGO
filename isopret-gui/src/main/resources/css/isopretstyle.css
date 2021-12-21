@@ -117,3 +117,12 @@
       -fx-text-fill: black;
      -fx-opacity: 0.5;
 }
+
+
+
+.plainlabel {
+  -fx-font-family: "Helvetica";
+  -fx-font-size: 11pt;
+  -fx-text-fill: black;
+  -fx-opacity: 0.95;
+}

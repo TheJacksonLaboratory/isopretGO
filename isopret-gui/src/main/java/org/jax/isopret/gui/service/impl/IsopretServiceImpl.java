@@ -307,4 +307,45 @@ public class IsopretServiceImpl implements IsopretService  {
     public Ontology getGeneOntology() {
         return this.geneOntology;
     }
+
+    @Override
+    public String getDasLabel() {
+        int n = this.dasGoTerms.size();
+        return "GO Overrepresentation analysis of differentially spliced isoforms: " + n + " significantly overrepresented terms.";
+    }
+
+    @Override
+    public String getDgeLabel() {
+        int n = this.dgeGoTerms.size();
+        return "GO Overrepresentation analysis of differentially expressed genes: " + n + " significantly overrepresented terms.";
+    }
+    @Override
+    public String getGoMethods() {
+        StringBuilder sb = new StringBuilder();
+        switch (this.goMethod) {
+            case TFT -> sb.append("Term-for-term analysis");
+            case PCintersect -> sb.append("Parent-child intersection");
+            case PCunion -> sb.append("Parent-child union");
+        }
+        sb.append(" (");
+        switch (this.mtcMethod) {
+            case BONFERRONI -> sb.append("Bonferroni");
+            case SIDAK -> sb.append("Sidak");
+            case NONE -> sb.append("No MTC");
+            case BONFERRONI_HOLM -> sb.append("Bonferroni-Holm");
+            case BENJAMINI_HOCHBERG -> sb.append("Benjamini-Hochberg");
+            case BENJAMINI_YEKUTIELI -> sb.append("Benjamini-Yekutieli");
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    @Override
+    public String getGoSummary() {
+        String version = geneOntology.getMetaInfo().getOrDefault("data-version", "no version found");
+        String nterms = String.valueOf(geneOntology.countNonObsoleteTerms());
+        return "Gene Ontology (version: " + version +"), " + nterms + " terms.";
+    }
+
+
 }

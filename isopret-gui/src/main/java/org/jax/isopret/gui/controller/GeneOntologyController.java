@@ -12,7 +12,6 @@ import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class GeneOntologyController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneOntologyController.class.getName());
 
-    private final String label;
+
     private final List<GoTermAndPvalVisualized> goPvals;
     /* Main pane of the GO Overpresentation tabs */
     public ScrollPane geneOntologyPane;
@@ -43,14 +42,21 @@ public class GeneOntologyController implements Initializable {
     public TableColumn<GoTermAndPvalVisualized, String> populationCountsColumn;
     public TableColumn<GoTermAndPvalVisualized, String> pvalColumn;
     public TableColumn<GoTermAndPvalVisualized, String> adjpvalColumn;
+    private final String label;
+    private final String methodsLabel;
+    private final String summaryLabel;
+    public Label goTopLevelLabel;
+    public Label goMethodsLabel;
+    public Label goSummaryLabel;
 
-    @Autowired
-    private IsopretService isopretService;
 
-    public GeneOntologyController(String label, List<GoTerm2PValAndCounts> pvals, Ontology ontology) {
-        this.label = label;
+
+    public GeneOntologyController(String topLevelLabel,  List<GoTerm2PValAndCounts> pvals, IsopretService service) {
+        this.label = topLevelLabel;
+        this.methodsLabel = service.getGoMethods();
+        this.summaryLabel = service.getGoSummary();
         this.goPvals = pvals.stream()
-                .map(pval -> new GoTermAndPvalVisualized(pval, ontology))
+                .map(pval -> new GoTermAndPvalVisualized(pval, service.getGeneOntology()))
                 .collect(Collectors.toList());
     }
 
@@ -79,6 +85,10 @@ public class GeneOntologyController implements Initializable {
         adjpvalColumn.setSortable(false);
         adjpvalColumn.setEditable(false);
         adjpvalColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPvalAdjFormated()));
+
+        this.goTopLevelLabel.setText(this.label);
+        this.goMethodsLabel.setText(this.methodsLabel);
+        this.goSummaryLabel.setText(this.summaryLabel);
     }
 
 
