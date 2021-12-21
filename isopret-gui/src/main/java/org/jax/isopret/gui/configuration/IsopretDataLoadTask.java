@@ -75,21 +75,20 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     @Override
     protected Integer call() {
-        Platform.runLater(() -> {
-                    updateProgress(0, 1); /* this will update the progress bar */
-                    updateMessage("Reading Gene Ontology file");
-                });
+
+        updateProgress(0, 1); /* this will update the progress bar */
+        updateMessage("Reading Gene Ontology file");
+
         File goJsonFile = new File(downloadDirectory + File.separator + "go.json");
         if (!goJsonFile.isFile()) {
             errors.add("Could not find Gene Ontology JSON file at " + goJsonFile.getAbsolutePath());
             return 1;
         }
         this.geneOntology = OntologyLoader.loadOntology(goJsonFile);
-        Platform.runLater(() -> {
-                    updateProgress(0.2, 1); /* this will update the progress bar */
-                    updateMessage(String.format("Loaded Gene Ontology json file with %d terms.", geneOntology.countNonObsoleteTerms()));
-                    LOGGER.info(String.format("Loaded Gene Ontology json file with %d terms.", geneOntology.countNonObsoleteTerms()));
-                });
+
+        updateProgress(0.2, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded Gene Ontology json file with %d terms.", geneOntology.countNonObsoleteTerms()));
+        LOGGER.info(String.format("Loaded Gene Ontology json file with %d terms.", geneOntology.countNonObsoleteTerms()));
         File goGafFile = new File(downloadDirectory + File.separator + "goa_human.gaf");
         if (!goGafFile.isFile()) {
             errors.add("Could not find Gene Ontology goa_human.gaf file at " +
@@ -97,11 +96,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             return 1;
         }
         this.goAssociationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, geneOntology);
-        Platform.runLater(() -> {
-                    updateProgress(0.45, 1); /* this will update the progress bar */
-                    updateMessage(String.format("Loaded GO Association container with %d associations",
+
+        updateProgress(0.45, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded GO Association container with %d associations",
                             this.goAssociationContainer.getRawAssociations().size()));
-                });
         LOGGER.info(String.format("Loaded GO Association container with %d associations",
                 this.goAssociationContainer.getRawAssociations().size()));
         File jannovarFile = new File(downloadDirectory + File.separator + "hg38_ensembl.ser");
@@ -111,25 +109,22 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             return 1;
         }
         JannovarReader jannovarReader = new JannovarReader(jannovarFile, assembly);
-        Platform.runLater(() -> {
-                    updateProgress(0.60, 1); /* this will update the progress bar */
-                    updateMessage(String.format("Loaded JannovarReader with %d gene symbols.", jannovarReader.getSymbolToTranscriptListMap().size()));
-                });
+
+        updateProgress(0.60, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded JannovarReader with %d gene symbols.", jannovarReader.getSymbolToTranscriptListMap().size()));
         LOGGER.info(String.format("Loaded JannovarReader with %d gene symbols.", jannovarReader.getSymbolToTranscriptListMap().size()));
         this.geneIdToTranscriptMap = jannovarReader.getGeneIdToTranscriptMap();
         this.geneSymbolToTranscriptMap = jannovarReader.getSymbolToTranscriptListMap();
-        Platform.runLater(() -> {
-                    updateProgress(0.65, 1); /* this will update the progress bar */
-                    updateMessage(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
-                });
+
+        updateProgress(0.65, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
         LOGGER.info(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
         HgncParser hgncParser = new HgncParser();
         this.hgncMap = hgncParser.ensemblMap();
-        Platform.runLater(() -> {
-                    updateProgress(0.70, 1); /* this will update the progress bar */
-                    updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
-                    LOGGER.info(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
-                });
+        updateProgress(0.70, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
+        LOGGER.info(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
+
         File interproDescriptionFile = new File(downloadDirectory + File.separator + "interpro_domain_desc.txt");
         File interproDomainsFile = new File(downloadDirectory + File.separator + "interpro_domains.txt");
         if (! interproDomainsFile.isFile()) {
@@ -153,23 +148,18 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         }
         TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(predictionFile, geneOntology);
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
-        Platform.runLater(() -> {
-                    updateProgress(0.85, 1); /* this will update the progress bar */
-                    updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
-                    LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
-                });
+        updateProgress(0.85, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
+        LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), hgncMap);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
-        Platform.runLater(() -> {
-            updateProgress(0.95, 1); /* this will update the progress bar */
-            updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
-        });
+        updateProgress(0.95, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
         this.thresholder = new HbaDealsThresholder(hbaDealsResults);
-        Platform.runLater(() -> {
-            updateProgress(1, 1); /* this will update the progress bar */
-            updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
-            LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
-        });
+        updateProgress(1, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
+        LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
+        updateMessage("Finished loading data for isopret analysis.");
         return 0;
     }
 

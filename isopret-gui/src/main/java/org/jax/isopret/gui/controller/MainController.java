@@ -165,7 +165,9 @@ public class MainController implements Initializable {
             return;
         }
         IsopretDataLoadTask task = new IsopretDataLoadTask(downloadOpt.get(), hbadealsOpt.get());
+
         this.analysisLabel.textProperty().bind(task.messageProperty());
+        this.analysisPB.progressProperty().unbind();
         this.analysisPB.progressProperty().bind(task.progressProperty());
         task.setOnSucceeded(event -> {
             LOGGER.trace("Finished Gene Ontology analysis of HBA-DEALS results");
@@ -225,8 +227,7 @@ public class MainController implements Initializable {
                     "Exception encountered while attempting to create digest file",
                     exc);
         });
-
-        task.run();
+        new Thread(task).start();
     }
 
     public TabPane getMainTabPaneRef() {
