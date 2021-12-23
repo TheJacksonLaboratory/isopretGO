@@ -1,11 +1,10 @@
 package org.jax.isopret.core.go;
 
-import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
+
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
-import org.monarchinitiative.phenol.annotations.formats.go.GoGaf21Annotation;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.stats.ParentChildIntersectionPValueCalculation;
@@ -22,22 +21,22 @@ public class HbaDealsGoAnalysis {
 
     private final Ontology ontology;
 
-    private final StudySet dge;
-    private final StudySet das;
+    private final StudySet study;
     private final StudySet population;
     private final GoMethod goMethod;
     private final MultipleTestingCorrection mtc;
-    private final AssociationContainer<TermId> goAssociationContainer;
+    private final AssociationContainer<TermId> associationContainer;
 
 
-    private HbaDealsGoAnalysis(HbaDealsIsoformSpecificThresholder thresholder,
-                               Ontology ontology,
+    private HbaDealsGoAnalysis(Ontology ontology,
                                AssociationContainer<TermId> associationContainer,
+                               StudySet study,
+                               StudySet population,
                                GoMethod method,
                                MtcMethod mtcMethod) {
         this.ontology = ontology;
+        this.associationContainer = associationContainer;
         this.goMethod = method;
-        this.goAssociationContainer = associationContainer;
         switch (mtcMethod) {
             case BONFERRONI -> this.mtc = new Bonferroni();
             case BONFERRONI_HOLM -> this.mtc = new BonferroniHolm();
@@ -51,12 +50,8 @@ public class HbaDealsGoAnalysis {
                 this.mtc = new Bonferroni();
             }
         }
-        Set<String> population = thresholder.population();
-        Set<String> dgeGenes = thresholder.dgeGeneSymbols();
-//        Set<String> dasGenes = thresholder.dasGeneSymbols();
-//        this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge");
-//        this.das = associationContainer.fromGeneSymbols(dasGenes, "das");
-//        this.population = associationContainer.fromGeneSymbols(population, "population");
+        this.study = study;
+        this.population = population;
     }
 
 
@@ -64,36 +59,17 @@ public class HbaDealsGoAnalysis {
         return this.population.getAnnotatedItemCount();
     }
 
-    public int dasCount() {
-        return this.das.getAnnotatedItemCount();
+    public int studyCount() {
+        return this.study.getAnnotatedItemCount();
     }
 
-//    public int unmappedDasCount() {
-//        return this.das.getUnmappedGeneSymbolCount();
-//    }
-
-//    public List<String> unmappedDasSymbols() {
-//        return this.das.getSortedUnmappedGeneSymbols();
-//    }
-
-    public int dgeCount() {
-        return this.dge.getAnnotatedItemCount();
-    }
-//
-//    public int unmappedDgeCount() {
-//        return this.dge.getUnmappedGeneSymbolCount();
-//    }
 
 
-//    public List<String> unmappedDgeSymbols() {
-//        return this.dge.getSortedUnmappedGeneSymbols();
-//    }
 
-
-    private List<GoTerm2PValAndCounts> termForTerm(StudySet study) {
+    private List<GoTerm2PValAndCounts> termForTerm() {
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
                 this.population,
-                study,
+                this.study,
                 new Bonferroni());
         return tftpvalcal.calculatePVals()
                 .stream()
@@ -101,10 +77,10 @@ public class HbaDealsGoAnalysis {
                 .collect(Collectors.toList());
     }
 
-    private List<GoTerm2PValAndCounts> parentChildUnion(StudySet study) {
+    private List<GoTerm2PValAndCounts> parentChildUnion() {
         ParentChildUnionPValueCalculation tftpvalcal = new ParentChildUnionPValueCalculation(this.ontology,
                 this.population,
-                study,
+                this.study,
                 new Bonferroni());
         return tftpvalcal.calculatePVals()
                 .stream()
@@ -112,10 +88,10 @@ public class HbaDealsGoAnalysis {
                 .collect(Collectors.toList());
     }
 
-    private List<GoTerm2PValAndCounts> parentChildIntersect(StudySet study) {
+    private List<GoTerm2PValAndCounts> parentChildIntersect() {
         ParentChildIntersectionPValueCalculation tftpvalcal = new ParentChildIntersectionPValueCalculation(this.ontology,
                 this.population,
-                study,
+                this.study,
                 new Bonferroni());
         return tftpvalcal.calculatePVals()
                 .stream()
@@ -123,56 +99,61 @@ public class HbaDealsGoAnalysis {
                 .collect(Collectors.toList());
     }
 
-    private List<GoTerm2PValAndCounts> mgsa(StudySet study) {
+    private List<GoTerm2PValAndCounts> mgsa() {
         throw new UnsupportedOperationException(); // TODO
     }
 
 
     public List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
         return switch (this.goMethod) {
-            case TFT -> termForTerm(this.dge);
-            case PCunion -> parentChildUnion(this.dge);
-            case PCintersect -> parentChildIntersect(this.dge);
-            case MGSA -> mgsa(this.dge);
+            case TFT -> termForTerm();
+            case PCunion -> parentChildUnion();
+            case PCintersect -> parentChildIntersect();
+            case MGSA -> mgsa();
         };
     }
 
     public List<GoTerm2PValAndCounts> dasOverrepresetationAnalysis() {
         return switch (this.goMethod) {
-            case TFT -> termForTerm(this.das);
-            case PCunion -> parentChildUnion(this.das);
-            case PCintersect -> parentChildIntersect(this.das);
-            case MGSA -> mgsa(this.das);
+            case TFT -> termForTerm();
+            case PCunion -> parentChildUnion();
+            case PCintersect -> parentChildIntersect();
+            case MGSA -> mgsa();
         };
     }
 
 
 
-    public static HbaDealsGoAnalysis termForTerm(HbaDealsThresholder thresholder,
-                                                 Ontology ontology,
+    public static HbaDealsGoAnalysis termForTerm(Ontology ontology,
                                                  AssociationContainer<TermId> associationContainer,
+                                                 StudySet study,
+                                                 StudySet population,
                                                  MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.TFT, mtcMethod);
+        return new HbaDealsGoAnalysis(ontology, associationContainer, study, population, GoMethod.TFT, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis parentChildUnion(HbaDealsThresholder thresholder,
-                                                      Ontology ontology,
-                                                      AssociationContainer<TermId> associationContainer, MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCunion, mtcMethod);
+    public static HbaDealsGoAnalysis parentChildUnion(Ontology ontology,
+                                                      AssociationContainer<TermId> associationContainer,
+                                                      StudySet study,
+                                                      StudySet population,
+                                                      MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysis(ontology, associationContainer, study, population, GoMethod.PCunion, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis parentChildIntersect(HbaDealsThresholder thresholder,
-                                                          Ontology ontology,
+    public static HbaDealsGoAnalysis parentChildIntersect(Ontology ontology,
                                                           AssociationContainer<TermId> associationContainer,
+                                                          StudySet study,
+                                                          StudySet population,
                                                           MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCintersect, mtcMethod);
+        return new HbaDealsGoAnalysis(ontology,  associationContainer, study, population, GoMethod.PCintersect, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis mgsa(HbaDealsThresholder thresholder,
-                                          Ontology ontology,
+    public static HbaDealsGoAnalysis mgsa(Ontology ontology,
                                           AssociationContainer<TermId> associationContainer,
+                                          StudySet study,
+                                          StudySet population,
                                           MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.MGSA, mtcMethod);
+        return new HbaDealsGoAnalysis(ontology, associationContainer, study, population, GoMethod.MGSA, mtcMethod);
     }
 
 
@@ -184,8 +165,8 @@ public class HbaDealsGoAnalysis {
      */
     public Map<String, Set<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap(Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
         Map<String, Set<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
-        List<GoGaf21Annotation> rawAnnots = this.goAssociationContainer.getRawAssociations();
-        for (GoGaf21Annotation a : rawAnnots) {
+        List<TermAnnotation> rawAnnots = this.associationContainer.getRawAssociations();
+        for (TermAnnotation a : rawAnnots) {
             String symbol = a.getDbObjectSymbol();
             if (symbols.contains(symbol)) {
                 symbolToGoTermResults.putIfAbsent(symbol, new HashSet<>());
@@ -199,11 +180,11 @@ public class HbaDealsGoAnalysis {
         return symbolToGoTermResults;
     }
 
-    public StudySet getDgeStudySet() {
-        return dge;
+    public StudySet getStudy() {
+        return study;
     }
 
-    public StudySet getDasStudySet() {
-        return das;
+    public StudySet getPopulation() {
+        return population;
     }
 }
