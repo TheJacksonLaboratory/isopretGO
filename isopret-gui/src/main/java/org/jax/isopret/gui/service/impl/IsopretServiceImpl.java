@@ -9,6 +9,7 @@ import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
@@ -25,6 +26,7 @@ import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
+import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
@@ -212,12 +214,22 @@ public class IsopretServiceImpl implements IsopretService  {
         this.geneContainer = task.getGeneContainer();
         this.transcriptContainer = task.getTranscriptContainer();
 
+        HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder();
+
+        /*
+        GoMethod goMethod,
+                                                     AssociationContainer<TermId> associationContainer,
+                                                     Ontology ontology,
+                                                     StudySet study,
+                                                     StudySet population,
+                                                     MtcMethod mtc
+         */
 
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
         HbaDealsGoAnalysis hbagoGenes =  getHbaDealsGoAnalysis(goMethod,
-                thresholder,
+                geneContainer,
                 geneOntology,
-                this.geneContainer,
+
                 this.mtcMethod);
 
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
@@ -259,16 +271,17 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     private HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
-                                                     HbaDealsThresholder thresholder,
+                                                     AssociationContainer<TermId> associationContainer,
                                                      Ontology ontology,
-                                                     AssociationContainer goAssociationContainer,
+                                                     StudySet study,
+                                                     StudySet population,
                                                      MtcMethod mtc) {
         if (goMethod == GoMethod.PCunion) {
-            return HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
+            return HbaDealsGoAnalysis.parentChildUnion(ontology, associationContainer, study, population, mtc);
         } else if (goMethod == GoMethod.PCintersect) {
-            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
+            return HbaDealsGoAnalysis.parentChildIntersect(ontology, associationContainer, study, population, mtc);
         } else {
-            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
+            return HbaDealsGoAnalysis.termForTerm(ontology, associationContainer, study, population, mtc);
         }
     }
 
@@ -394,5 +407,11 @@ public class IsopretServiceImpl implements IsopretService  {
         return hostServices;
     }
 
+    public AssociationContainer getTranscriptContainer() {
+        return transcriptContainer;
+    }
 
+    public AssociationContainer getGeneContainer() {
+        return geneContainer;
+    }
 }

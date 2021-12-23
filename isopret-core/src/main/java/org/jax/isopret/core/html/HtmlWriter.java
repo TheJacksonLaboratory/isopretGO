@@ -126,7 +126,6 @@ public class HtmlWriter extends AbstractWriter {
         } else {
             data.put("prefix", hbadealsFile.getName());
         }
-        LOGGER.trace("Total unidentified genes: {}", unidentifiedSymbols.size());
         LOGGER.info("Total HBADEALS results: {}, found transcripts {}, also significant {}, also interpro: {}",
                 hbadeals, foundTranscripts, hbadealSig, foundInterPro);
     }
@@ -196,11 +195,7 @@ public class HtmlWriter extends AbstractWriter {
         LOGGER.trace("We got {} term to annotation list mappings.",goAssociationContainer.getRawAssociations().size());
         data.put("n_population", hbago.populationCount());
         data.put("n_das",thresholder.getDasGeneCount());
-        data.put("n_das_unmapped", hbago.unmappedDasCount());
-        data.put("unmappable_das_list", VisualizationUtil.fromList(hbago.unmappedDasSymbols(), "Unmappable DAS Gene Symbols"));
         data.put("n_dge", thresholder.getDgeGeneCount());
-        data.put("n_dge_unmapped", hbago.unmappedDgeCount());
-        data.put("unmappable_dge_list", VisualizationUtil.fromList(hbago.unmappedDgeSymbols(), "Unmappable DGE Gene Symbols"));
         data.put("probability_threshold", thresholder.getFdrThreshold());
         data.put("expression_threshold", thresholder.getExpressionThreshold());
         data.put("splicing_threshold", thresholder.getSplicingThreshold());

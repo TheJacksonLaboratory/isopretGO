@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.jax.isopret.core.go.IsopretGeneAssociationContainer;
 import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
@@ -54,12 +55,16 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private  HbaDealsThresholder thresholder = null;
 
+    private HbaDealsIsoformSpecificThresholder isoformSpecificThresholder = null;
+
     private final File downloadDirectory;
 
     private final File hbaDealsFile;
 
-    private StudySet study = null;
-    private StudySet population = null;
+    private StudySet dgeStudy = null;
+    private StudySet dgePopulation = null;
+    private StudySet dasStudy = null;
+    private StudySet dasPopulation = null;
 
     AssociationContainer transcriptContainer = null;
     AssociationContainer geneContainer = null;
@@ -179,7 +184,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         updateProgress(0.95, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
-        this.thresholder = new HbaDealsThresholder(hbaDealsResults);
+        this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults);
         updateProgress(1, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));

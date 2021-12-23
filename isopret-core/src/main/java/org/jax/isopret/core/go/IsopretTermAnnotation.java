@@ -8,6 +8,10 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Simple class to represent that a given GO Term {@link #goTermId} annotates a given gene or isoform {@link #accessionNumber}.
+ * @author Peter N Robinson
+ */
 public class IsopretTermAnnotation implements TermAnnotation {
     private final TermId goTermId;
     private final TermId accessionNumber;
