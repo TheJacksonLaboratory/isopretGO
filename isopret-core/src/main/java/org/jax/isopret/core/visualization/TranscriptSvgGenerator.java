@@ -538,7 +538,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         List<Transcript> affectedTranscripts = transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))
-                .collect(Collectors.toList());
+                .toList();
         int height = HEIGHT_FOR_SV_DISPLAY + affectedTranscripts.size() * HEIGHT_PER_DISPLAY_ITEM;
         return new TranscriptSvgGenerator(height,
                 annotatedTranscript);

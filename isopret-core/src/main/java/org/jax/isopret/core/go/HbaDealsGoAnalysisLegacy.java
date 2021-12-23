@@ -1,8 +1,7 @@
 package org.jax.isopret.core.go;
 
-import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
-import org.monarchinitiative.phenol.analysis.AssociationContainer;
+import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.annotations.formats.go.GoGaf21Annotation;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -16,7 +15,7 @@ import org.monarchinitiative.phenol.stats.mtc.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HbaDealsGoAnalysis {
+public class HbaDealsGoAnalysisLegacy {
 
     private final static double ALPHA = 0.05;
 
@@ -27,14 +26,14 @@ public class HbaDealsGoAnalysis {
     private final StudySet population;
     private final GoMethod goMethod;
     private final MultipleTestingCorrection mtc;
-    private final AssociationContainer<TermId> goAssociationContainer;
+    private final GoAssociationContainer goAssociationContainer;
 
 
-    private HbaDealsGoAnalysis(HbaDealsIsoformSpecificThresholder thresholder,
-                               Ontology ontology,
-                               AssociationContainer<TermId> associationContainer,
-                               GoMethod method,
-                               MtcMethod mtcMethod) {
+    private HbaDealsGoAnalysisLegacy(HbaDealsThresholder thresholder,
+                                     Ontology ontology,
+                                     GoAssociationContainer associationContainer,
+                                     GoMethod method,
+                                     MtcMethod mtcMethod) {
         this.ontology = ontology;
         this.goMethod = method;
         this.goAssociationContainer = associationContainer;
@@ -53,10 +52,10 @@ public class HbaDealsGoAnalysis {
         }
         Set<String> population = thresholder.population();
         Set<String> dgeGenes = thresholder.dgeGeneSymbols();
-//        Set<String> dasGenes = thresholder.dasGeneSymbols();
-//        this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge");
-//        this.das = associationContainer.fromGeneSymbols(dasGenes, "das");
-//        this.population = associationContainer.fromGeneSymbols(population, "population");
+        Set<String> dasGenes = thresholder.dasGeneSymbols();
+        this.dge = associationContainer.fromGeneSymbols(dgeGenes, "dge");
+        this.das = associationContainer.fromGeneSymbols(dasGenes, "das");
+        this.population = associationContainer.fromGeneSymbols(population, "population");
     }
 
 
@@ -68,26 +67,25 @@ public class HbaDealsGoAnalysis {
         return this.das.getAnnotatedItemCount();
     }
 
-//    public int unmappedDasCount() {
-//        return this.das.getUnmappedGeneSymbolCount();
-//    }
+    public int unmappedDasCount() {
+        return this.das.getUnmappedGeneSymbolCount();
+    }
 
-//    public List<String> unmappedDasSymbols() {
-//        return this.das.getSortedUnmappedGeneSymbols();
-//    }
+    public List<String> unmappedDasSymbols() {
+        return this.das.getSortedUnmappedGeneSymbols();
+    }
 
     public int dgeCount() {
         return this.dge.getAnnotatedItemCount();
     }
-//
-//    public int unmappedDgeCount() {
-//        return this.dge.getUnmappedGeneSymbolCount();
-//    }
 
+    public int unmappedDgeCount() {
+        return this.dge.getUnmappedGeneSymbolCount();
+    }
 
-//    public List<String> unmappedDgeSymbols() {
-//        return this.dge.getSortedUnmappedGeneSymbols();
-//    }
+    public List<String> unmappedDgeSymbols() {
+        return this.dge.getSortedUnmappedGeneSymbols();
+    }
 
 
     private List<GoTerm2PValAndCounts> termForTerm(StudySet study) {
@@ -148,31 +146,31 @@ public class HbaDealsGoAnalysis {
 
 
 
-    public static HbaDealsGoAnalysis termForTerm(HbaDealsThresholder thresholder,
-                                                 Ontology ontology,
-                                                 AssociationContainer<TermId> associationContainer,
-                                                 MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.TFT, mtcMethod);
+    public static HbaDealsGoAnalysisLegacy termForTerm(HbaDealsThresholder thresholder,
+                                                       Ontology ontology,
+                                                       GoAssociationContainer associationContainer,
+                                                       MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysisLegacy(thresholder, ontology, associationContainer, GoMethod.TFT, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis parentChildUnion(HbaDealsThresholder thresholder,
-                                                      Ontology ontology,
-                                                      AssociationContainer<TermId> associationContainer, MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCunion, mtcMethod);
+    public static HbaDealsGoAnalysisLegacy parentChildUnion(HbaDealsThresholder thresholder,
+                                                            Ontology ontology,
+                                                            GoAssociationContainer associationContainer, MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysisLegacy(thresholder, ontology, associationContainer, GoMethod.PCunion, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis parentChildIntersect(HbaDealsThresholder thresholder,
-                                                          Ontology ontology,
-                                                          AssociationContainer<TermId> associationContainer,
-                                                          MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.PCintersect, mtcMethod);
+    public static HbaDealsGoAnalysisLegacy parentChildIntersect(HbaDealsThresholder thresholder,
+                                                                Ontology ontology,
+                                                                GoAssociationContainer associationContainer,
+                                                                MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysisLegacy(thresholder, ontology, associationContainer, GoMethod.PCintersect, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis mgsa(HbaDealsThresholder thresholder,
-                                          Ontology ontology,
-                                          AssociationContainer<TermId> associationContainer,
-                                          MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(thresholder, ontology, associationContainer, GoMethod.MGSA, mtcMethod);
+    public static HbaDealsGoAnalysisLegacy mgsa(HbaDealsThresholder thresholder,
+                                                Ontology ontology,
+                                                GoAssociationContainer associationContainer,
+                                                MtcMethod mtcMethod) {
+        return new HbaDealsGoAnalysisLegacy(thresholder, ontology, associationContainer, GoMethod.MGSA, mtcMethod);
     }
 
 

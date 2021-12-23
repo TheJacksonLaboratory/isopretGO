@@ -1,8 +1,6 @@
 package org.jax.isopret.core.go;
 
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
-import org.jax.isopret.core.io.TranscriptFunctionFileParser;
-import org.jax.isopret.core.transcript.AccessionNumber;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.StudySet;
@@ -67,10 +65,10 @@ public class HbaDealsGoContainer {
         }
         Map<TermId, DirectAndIndirectTermAnnotations> annMap = associationContainer.getAssociationMap(studyIds);
         LOGGER.info("annMap size {}", annMap.size());
-        StudySet study = new StudySet(studyIds, "dge-study", annMap);
+        StudySet study = new StudySet("dge-study", annMap);
         Set<TermId> popIds = this.thresholder.getAllGeneTermIds();
         Map<TermId, DirectAndIndirectTermAnnotations> popMap = associationContainer.getAssociationMap(popIds);
-        StudySet population = new StudySet(popIds, "population", popMap);
+        StudySet population = new StudySet("population", popMap);
 
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
                 population,
@@ -88,10 +86,10 @@ public class HbaDealsGoContainer {
     public List<GoTerm2PValAndCounts> termForTermDas() {
         Set<TermId> studyIds = this.thresholder.dasIsoformTermIds();
         Map<TermId, DirectAndIndirectTermAnnotations> annMap = associationContainer.getAssociationMap(studyIds);
-        StudySet study = new StudySet(studyIds, "das-study", annMap);
+        StudySet study = new StudySet("das-study", annMap);
         Set<TermId> popIds = this.thresholder.getAllTranscriptTermIds();
         Map<TermId, DirectAndIndirectTermAnnotations> popMap = associationContainer.getAssociationMap(popIds);
-        StudySet population = new StudySet(popIds, "population", popMap);
+        StudySet population = new StudySet("population", popMap);
 
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
                 population,

@@ -1,10 +1,7 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.analysis.AssociationContainerStats;
-import org.jax.isopret.core.analysis.IsopretAssociationContainer;
-import org.jax.isopret.core.analysis.TranscriptToGeneStats;
+import org.jax.isopret.core.go.IsopretGeneAssociationContainer;
 import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.HbaDealsGoContainer;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
@@ -13,7 +10,6 @@ import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
@@ -108,8 +104,8 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
         }
         //if (true) return 0;
         LOGGER.info("About to create transcrpt container");
-        AssociationContainer transcriptContainer = new IsopretAssociationContainer(geneOntology, transcript2GoMap);
-        AssociationContainer geneContainer = new IsopretAssociationContainer(geneOntology, gene2GoMap);
+        AssociationContainer transcriptContainer = new IsopretGeneAssociationContainer(geneOntology, transcript2GoMap);
+        AssociationContainer geneContainer = new IsopretGeneAssociationContainer(geneOntology, gene2GoMap);
 //        var containerStats = new AssociationContainerStats(geneOntology, transcriptContainer, "Transcripts");
 //        containerStats.display();
 //        containerStats = new AssociationContainerStats(geneOntology, geneContainer, "Genes");

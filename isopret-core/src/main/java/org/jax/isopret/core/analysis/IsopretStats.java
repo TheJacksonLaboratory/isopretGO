@@ -65,7 +65,7 @@ public class IsopretStats {
         writer.write("\tTerms n=" + n_terms + "\n");
         writer.write("### GO associations:\n");
         int n_association_counts = container.getRawAssociations().size();
-        int n_annotating_go_terms = container.getOntologyTermCount();
+        int n_annotating_go_terms = container.getAnnotatingTermCount();
         int n_annotated_gene_count = container.getTotalNumberOfAnnotatedItems();
         writer.write("\tAnnotations n=" + n_association_counts + "\n");
         writer.write("\tNumber of GO terms used for annotations n=" + n_annotating_go_terms + "\n");

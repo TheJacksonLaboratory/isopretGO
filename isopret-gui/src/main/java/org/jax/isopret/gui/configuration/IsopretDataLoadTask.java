@@ -2,6 +2,7 @@ package org.jax.isopret.gui.configuration;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import org.jax.isopret.core.go.IsopretGeneAssociationContainer;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
@@ -13,7 +14,9 @@ import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.JannovarReader;
 import org.jax.isopret.core.transcript.Transcript;
+import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
+import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -24,10 +27,7 @@ import org.slf4j.LoggerFactory;
 
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class organizes data input and preparation
@@ -58,6 +58,12 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private final File hbaDealsFile;
 
+    private StudySet study = null;
+    private StudySet population = null;
+
+    AssociationContainer transcriptContainer = null;
+    AssociationContainer geneContainer = null;
+
     private final List<String> errors;
 
     public IsopretDataLoadTask(File downloadDirectory, File hbaDealsFile) {
@@ -75,7 +81,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     @Override
     protected Integer call() {
-
+        boolean valid = true;
         updateProgress(0, 1); /* this will update the progress bar */
         updateMessage("Reading Gene Ontology file");
 
@@ -93,9 +99,28 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         if (!goGafFile.isFile()) {
             errors.add("Could not find Gene Ontology goa_human.gaf file at " +
                     goGafFile.getAbsolutePath());
-            return 1;
+            valid = false;
+        } else {
+            this.goAssociationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, geneOntology);
         }
-        this.goAssociationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, geneOntology);
+
+
+        File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
+        if (! isoformFunctionFile.isFile()) {
+            errors.add("Could not find \"isoform_function_list.txt\" in download directory");
+            valid = false;
+        } else {
+            TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(isoformFunctionFile, geneOntology);
+            Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
+            Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
+            updateProgress(0.25, 1); /* this will update the progress bar */
+            updateMessage(String.format("Loaded isoformFunctionFile %d transcript.", transcript2GoMap.size()));
+            Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
+            transcriptContainer = new IsopretGeneAssociationContainer(geneOntology, transcript2GoMap);
+            geneContainer = new IsopretGeneAssociationContainer(geneOntology, gene2GoMap);
+            LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
+        }
+
 
         updateProgress(0.45, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded GO Association container with %d associations",
@@ -136,10 +161,9 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                     interproDescriptionFile.getAbsolutePath());
         }
         this.interproMapper = new InterproMapper(interproDescriptionFile, interproDomainsFile);
-        Platform.runLater(() -> {
-                    updateProgress(0.80, 1); /* this will update the progress bar */
-                    updateMessage(String.format("Loaded InterproMapper with %d domains", interproMapper.getInterproDescription().size()));
-                });
+        updateProgress(0.80, 1); /* this will update the progress bar */
+        updateMessage(String.format("Loaded InterproMapper with %d domains", interproMapper.getInterproDescription().size()));
+
         LOGGER.info(String.format("Loaded InterproMapper with %d domains", interproMapper.getInterproDescription().size()));
         File predictionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
         if (!predictionFile.isFile()) {
@@ -160,7 +184,24 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         updateMessage("Finished loading data for isopret analysis.");
+
         return 0;
+    }
+
+    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<AccessionNumber, List<Transcript>> gene2transcript) {
+        Map<TermId, TermId> accessionNumberMap = new HashMap<>();
+        for (var entry : gene2transcript.entrySet()) {
+            var geneAcc = entry.getKey();
+            var geneTermId = geneAcc.toTermId();
+            var transcriptList = entry.getValue();
+            for (var transcript: transcriptList) {
+                var transcriptAcc = transcript.accessionId();
+                var transcriptTermId = transcriptAcc.toTermId();
+                //System.out.println(transcriptAcc.getAccessionString() +": " + geneAcc.getAccessionString());
+                accessionNumberMap.put(transcriptTermId, geneTermId);
+            }
+        }
+        return Map.copyOf(accessionNumberMap); // immutable copy
     }
 
     public Ontology getGeneOntology() {
@@ -187,15 +228,19 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         return thresholder;
     }
 
-    public GoAssociationContainer getGoAssociationContainer() {
-        return goAssociationContainer;
-    }
-
     public List<String> getErrors() {
         return errors;
     }
 
     public Map<String, List<Transcript>> getGeneSymbolToTranscriptMap() {
         return geneSymbolToTranscriptMap;
+    }
+
+    public AssociationContainer getTranscriptContainer() {
+        return transcriptContainer;
+    }
+
+    public AssociationContainer getGeneContainer() {
+        return geneContainer;
     }
 }

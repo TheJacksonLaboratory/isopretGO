@@ -104,6 +104,10 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
         return Math.min(getExpressionP(), getSmallestSplicingP());
     }
 
+    public Set<HbaDealsTranscriptResult> getTranscriptResults() {
+        return new HashSet<>(this.transcriptMap.values());
+    }
+
     /**
      * Sort according to the smallest ('most significant') p value for expression or splicing.
      */

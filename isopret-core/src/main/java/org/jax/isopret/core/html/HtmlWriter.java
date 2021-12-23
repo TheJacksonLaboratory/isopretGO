@@ -189,7 +189,7 @@ public class HtmlWriter extends AbstractWriter {
                                            HbaDealsGoAnalysis hbago) {
         data.put("go_version", ontology.getMetaInfo().getOrDefault("data-version", "unknown"));
         data.put("n_go_terms", ontology.getNonObsoleteTermIds().size());
-        data.put("annotation_term_count", goAssociationContainer.getOntologyTermCount());
+        data.put("annotation_term_count", goAssociationContainer.getAnnotatingTermCount());
         data.put("annotation_count", goAssociationContainer.getRawAssociations().size());
         data.put("annotated_genes", goAssociationContainer.getTotalNumberOfAnnotatedItems());
         LOGGER.trace("We got {} GO terms.", ontology.countNonObsoleteTerms());

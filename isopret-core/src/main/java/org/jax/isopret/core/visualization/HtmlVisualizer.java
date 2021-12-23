@@ -71,7 +71,7 @@ public class HtmlVisualizer implements Visualizer {
                 .map(DisplayInterproAnnotation::getInterproEntry)
                 .distinct()
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         if (introProAnnotations.isEmpty()) {
             return "<p><i>No interpro domains found.</i></p>\n";
         }
