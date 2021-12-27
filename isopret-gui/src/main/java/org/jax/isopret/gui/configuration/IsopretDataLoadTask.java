@@ -2,8 +2,8 @@ package org.jax.isopret.gui.configuration;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import org.jax.isopret.core.go.IsopretGeneAssociationContainer;
 import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.core.go.IsopretContainerFactory;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
@@ -66,8 +66,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     private StudySet dasStudy = null;
     private StudySet dasPopulation = null;
 
-    AssociationContainer transcriptContainer = null;
-    AssociationContainer geneContainer = null;
+    AssociationContainer<TermId> transcriptContainer = null;
+    AssociationContainer<TermId> geneContainer = null;
 
     private final List<String> errors;
 
@@ -121,8 +121,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             updateProgress(0.25, 1); /* this will update the progress bar */
             updateMessage(String.format("Loaded isoformFunctionFile %d transcript.", transcript2GoMap.size()));
             Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
-            transcriptContainer = new IsopretGeneAssociationContainer(geneOntology, transcript2GoMap);
-            geneContainer = new IsopretGeneAssociationContainer(geneOntology, gene2GoMap);
+            IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);
+
+            transcriptContainer = isoContainerFac.transcriptContainer();
+            geneContainer = isoContainerFac.geneContainer();
             LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
         }
 
@@ -184,7 +186,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
         updateProgress(0.95, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
-        this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults);
+        this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+                0.05,
+                geneContainer,
+                transcriptContainer);
         updateProgress(1, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
@@ -241,11 +246,11 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         return geneSymbolToTranscriptMap;
     }
 
-    public AssociationContainer getTranscriptContainer() {
+    public AssociationContainer<TermId> getTranscriptContainer() {
         return transcriptContainer;
     }
 
-    public AssociationContainer getGeneContainer() {
+    public AssociationContainer<TermId> getGeneContainer() {
         return geneContainer;
     }
 }

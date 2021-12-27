@@ -4,10 +4,10 @@ import org.jax.isopret.core.transcript.AccessionNumber;
 
 import java.util.Set;
 
-public class HbaDealsIsoformThresholder implements DifferentialThresholder<AccessionNumber>  {
+public class HbaDealsNewThresholder implements DifferentialThresholder<AccessionNumber>  {
 
 
-    public HbaDealsIsoformThresholder() {
+    public HbaDealsNewThresholder() {
 
     }
 

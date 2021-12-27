@@ -1,18 +1,20 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.go.IsopretGeneAssociationContainer;
-import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.HbaDealsGoContainer;
-import org.jax.isopret.core.go.MtcMethod;
-import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
+import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.core.go.*;
+import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
+import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.stats.*;
+import org.monarchinitiative.phenol.stats.mtc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -21,11 +23,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * Our inference procedure generates a file called {@code isoform_function_list.txt} that
@@ -39,8 +39,8 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(name = "transcriptqc", aliases = {"T"},
         mixinStandardHelpOptions = true,
         description = "Q/C the transcript annotations")
-public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable<Integer> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TranscriptAnnotQcCommand.class);
+public class GoOverrepCommand extends IsopretCommand implements Callable<Integer> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoOverrepCommand.class);
     @CommandLine.Option(names={"--trfx"},
             required = true,
             description = "transcript function file")
@@ -70,80 +70,113 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
         LOGGER.info("Loaded geneId-to-transcript map with {} genes", geneIdToTranscriptMap.size());
         Map<TermId, Set<TermId>> transcriptIdToGoTermsMap = loadTranscriptIdToGoTermsMap();
         LOGGER.info("Loaded transcriptIdToGoTermsMap with {} entries", transcriptIdToGoTermsMap.size());
-        int c = 0;
-        for (var e : transcriptIdToGoTermsMap.entrySet()) {
-            if (c>5) break;
-            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
-        }
         Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneIdToTranscriptMap);
         LOGGER.info("Loaded transcriptToGeneIdMap with {} entries", transcriptIdToGoTermsMap.size());
-        c=0;
-        for (var e : transcriptToGeneIdMap.entrySet()) {
-            if (c>5) break;
-            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
-        }
-        //TranscriptToGeneStats stats = new TranscriptToGeneStats(geneOntology, transcriptIdToGoTermsMap, transcriptToGeneIdMap);
-        LOGGER.info("Displaying stats");
-        //stats.display();
         // create and check the annotation containers for the inferred data
         LOGGER.info("Loading TranscriptFunctionFileParser");
         TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(transcriptFx), geneOntology);
         Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
         LOGGER.info("Loaded transcript2GoMap with {} entries", transcript2GoMap.size());
-        c=0;
-        for (var e : transcript2GoMap.entrySet()) {
-            if (c>5) break;
-            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
-        }
         Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
         LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
-        c=0;
-        for (var e : gene2GoMap.entrySet()) {
-            if (c>5) break;
-            LOGGER.info("{}) {} -> {}", ++c, e.getKey(), e.getValue());
-        }
-        //if (true) return 0;
-        LOGGER.info("About to create transcrpt container");
-        AssociationContainer transcriptContainer = new IsopretGeneAssociationContainer(geneOntology, transcript2GoMap);
-        AssociationContainer geneContainer = new IsopretGeneAssociationContainer(geneOntology, gene2GoMap);
-//        var containerStats = new AssociationContainerStats(geneOntology, transcriptContainer, "Transcripts");
-//        containerStats.display();
-//        containerStats = new AssociationContainerStats(geneOntology, geneContainer, "Genes");
-//        containerStats.display();
-
+        LOGGER.info("About to create transcript container");
+        IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology,transcriptIdToGoTermsMap, gene2GoMap);
+        AssociationContainer<TermId> transcriptContainer = isoContainerFac.transcriptContainer();
+        AssociationContainer<TermId> geneContainer = isoContainerFac.geneContainer();
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
-        HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
+        HbaDealsParser hbaParser = new HbaDealsParser(this.hbadealsFile, hgncMap);
+        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
+       // HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
+        MtcMethod mtcMethod = MtcMethod.fromString(mtc);
+        HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+                0.05,
+                geneContainer,
+                transcriptContainer);
+        LOGGER.info("Initialized HBADealsThresholder");
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
+        LOGGER.info("Using Gene Ontology approach {}", goMethod.name());
         LOGGER.info("About to create HbaDealsGoContainer");
-        HbaDealsGoContainer hbaDealsGoContainer = new HbaDealsGoContainer(geneOntology,
-                thresholder,
-                geneContainer,
-                goMethod,
-                MtcMethod.fromString(mtc)
-                );
-        List<GoTerm2PValAndCounts> dgeGoTerms = hbaDealsGoContainer.termForTermDge();
+        List<GoTerm2PValAndCounts> dgeGoTerms = doGoAnalysis(goMethod,
+                mtcMethod,
+                geneOntology,
+                isoThresholder.getDgeStudy(),
+                isoThresholder.getDgePopulation());
         System.out.println("Go enrichments, DGE");
         for (var cts : dgeGoTerms) {
             if (cts.passesThreshold(0.05))
-                System.out.println(cts.getRow(geneOntology));
+                try {
+                    System.out.println(cts.getRow(geneOntology));
+                } catch (Exception e) {
+                    // some issue with getting terms, probably ontology is not in sync
+                    LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
+                }
         }
-        HbaDealsGoContainer hbaDealsGoContainerT = new HbaDealsGoContainer(geneOntology,
-                thresholder,
-                transcriptContainer,
-                goMethod,
-                MtcMethod.fromString(mtc)
-        );
-        List<GoTerm2PValAndCounts> dasGoTerms = hbaDealsGoContainerT.termForTermDas();
+
+        List<GoTerm2PValAndCounts> dasGoTerms = doGoAnalysis(goMethod,
+                mtcMethod,
+                geneOntology,
+                isoThresholder.getDasStudy(),
+                isoThresholder.getDasPopulation());
         System.out.println("Go enrichments, DAS");
         for (var cts : dasGoTerms) {
             if (cts.passesThreshold(0.05))
-                System.out.println(cts.getRow(geneOntology));
+                try {
+                    System.out.println(cts.getRow(geneOntology));
+                } catch (Exception e) {
+                    // some issue with getting terms, probably ontology is not in sync
+                    LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
+                }
         }
         writeGoResultsToFile(dasGoTerms, dgeGoTerms, geneOntology);
 //
         return 0;
+    }
+
+    private List<GoTerm2PValAndCounts> doGoAnalysis(GoMethod goMethod, MtcMethod mtcMethod, Ontology geneOntology, StudySet dgeStudy, StudySet dgePopulation) {
+        final double ALPHA = 0.05;
+        PValueCalculation pvalcal;
+        MultipleTestingCorrection mtc;
+        switch (mtcMethod) {
+            case BONFERRONI -> mtc = new Bonferroni();
+            case BONFERRONI_HOLM -> mtc = new BonferroniHolm();
+            case BENJAMINI_HOCHBERG -> mtc = new BenjaminiHochberg();
+            case BENJAMINI_YEKUTIELI -> mtc = new BenjaminiYekutieli();
+            case SIDAK -> mtc = new Sidak();
+            case NONE -> mtc = new NoMultipleTestingCorrection();
+            default -> {
+                // should never happen
+                System.err.println("[WARNING] Did not recognize MTC");
+                mtc = new Bonferroni();
+            }
+        }
+        if (goMethod.equals(GoMethod.TFT)) {
+            pvalcal = new TermForTermPValueCalculation(geneOntology,
+                    dgePopulation,
+                    dgeStudy,
+                    mtc);
+        } else if (goMethod.equals(GoMethod.PCunion)) {
+            pvalcal = new ParentChildUnionPValueCalculation(geneOntology,
+                    dgePopulation,
+                    dgeStudy,
+                    mtc);
+        } else if (goMethod.equals(GoMethod.PCintersect)) {
+            pvalcal = new ParentChildIntersectionPValueCalculation(geneOntology,
+                    dgePopulation,
+                    dgeStudy,
+                    mtc);
+        } else {
+            throw new IsopretRuntimeException("Did not recognise GO Method");
+        }
+        var pvals = pvalcal.calculatePVals()
+                .stream()
+                .filter(item -> item.passesThreshold(ALPHA))
+                .collect(Collectors.toList());
+        Collections.sort(pvals);
+        return pvals;
+
     }
 
     private void writeGoResultsToFile(List<GoTerm2PValAndCounts> dasGoTerms,
@@ -152,11 +185,21 @@ public class TranscriptAnnotQcCommand extends IsopretCommand implements Callable
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("isopret-out.txt"))) {
             for (var cts : dasGoTerms) {
                 if (cts.passesThreshold(0.05))
-                    bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
+                    try {
+                        bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
+                    } catch (Exception e) {
+                        // some issue with getting terms, probably ontology is not in sync
+                        LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
+                    }
             }
             for (var cts : dgeGoTerms) {
                 if (cts.passesThreshold(0.05))
-                    bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
+                    try {
+                        bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
+                    } catch (Exception e) {
+                        // some issue with getting terms, probably ontology is not in sync
+                        LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
+                    }
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -9,7 +9,6 @@ import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
-import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
@@ -24,8 +23,6 @@ import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
-import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -63,12 +60,12 @@ public class IsopretServiceImpl implements IsopretService  {
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
     private HbaDealsThresholder thresholder = null;
-    private GoAssociationContainer associationContainer = null;
+    //private GoAssociationContainer associationContainer = null;
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
     private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();
-    AssociationContainer transcriptContainer = null;
-    AssociationContainer geneContainer = null;
+    AssociationContainer<TermId> transcriptContainer = null;
+    AssociationContainer<TermId> geneContainer = null;
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -407,11 +404,11 @@ public class IsopretServiceImpl implements IsopretService  {
         return hostServices;
     }
 
-    public AssociationContainer getTranscriptContainer() {
+    public AssociationContainer<TermId> getTranscriptContainer() {
         return transcriptContainer;
     }
 
-    public AssociationContainer getGeneContainer() {
+    public AssociationContainer<TermId> getGeneContainer() {
         return geneContainer;
     }
 }

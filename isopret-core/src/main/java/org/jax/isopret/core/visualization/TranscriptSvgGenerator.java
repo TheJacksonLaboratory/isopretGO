@@ -363,22 +363,17 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         String textAnchor = "start";
         double textBeginX = minX;
         switch (region) {
-            case FIRST_THIRD_OF_SVG:
-                textBeginX = minX;
-                break;
-            case SECOND_THIRD_OF_SVG:
-                textBeginX = 0.5*(minX+maxX);
+            case FIRST_THIRD_OF_SVG -> textBeginX = minX;
+            case SECOND_THIRD_OF_SVG -> {
+                textBeginX = 0.5 * (minX + maxX);
                 textAnchor = "middle";
-                break;
-            case THIRD_THIRD_OF_SVG:
+            }
+            case THIRD_THIRD_OF_SVG -> {
                 textBeginX = maxX;
                 textAnchor = "end";
-                break;
-
-            default:
-
-
-
+            }
+            default -> {
+            }
         }
         String txt = String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-size:24px;text-anchor:%s\">%s</text>\n",
                 textBeginX, y, PURPLE, textAnchor, String.format("%s", geneName));

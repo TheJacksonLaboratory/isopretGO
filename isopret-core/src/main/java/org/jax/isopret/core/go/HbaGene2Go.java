@@ -1,5 +1,6 @@
 package org.jax.isopret.core.go;
 
+import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -16,19 +17,19 @@ import java.util.*;
  * GO terms, and returns a Map with key (gene) and value (set of associated overrepresented GO terms).
  */
 public class HbaGene2Go {
-    Logger LOGGER = LoggerFactory.getLogger(HbaGene2Go.class);
+    final Logger LOGGER = LoggerFactory.getLogger(HbaGene2Go.class);
 
     private final Ontology ontology;
-    private final IsopretGeneAssociationContainer geneContainer;
-    private final IsopretTranscriptAssociationContainer transcriptContainer;
+    private final AssociationContainer<TermId> geneContainer;
+    private final AssociationContainer<TermId> transcriptContainer;
 
     /**
      * @param ontology Gene Ontology object
      * @param geneContainer link between the genes and GO annotations
      * @param transcriptContainer  link between the transcripts and GO annotations
      */
-    public HbaGene2Go(Ontology ontology,IsopretGeneAssociationContainer geneContainer,
-                      IsopretTranscriptAssociationContainer transcriptContainer){
+    public HbaGene2Go(Ontology ontology,AssociationContainer<TermId> geneContainer,
+                      AssociationContainer<TermId> transcriptContainer){
         this.ontology = ontology;
         this.geneContainer = geneContainer;
         this.transcriptContainer = transcriptContainer;

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class HtmlVisualizer implements Visualizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlVisualizer.class);
@@ -16,15 +15,17 @@ public class HtmlVisualizer implements Visualizer {
     }
 
 
-    private final static String GENE_TABLE_HEADER = "<table>\n" +
-            "  <thead>\n" +
-            "    <tr>\n" +
-            "      <th>Gene</th>\n" +
-            "      <th>Chrom.</th>\n" +
-            "      <th>Log<sub>2</sub> fold change</th>\n" +
-            "      <th>Probability (PEP)</th>\n" +
-            "    </tr>\n" +
-            "  </thead>\n";
+    private final static String GENE_TABLE_HEADER = """
+            <table>
+              <thead>
+                <tr>
+                  <th>Gene</th>
+                  <th>Chrom.</th>
+                  <th>Log<sub>2</sub> fold change</th>
+                  <th>Probability (PEP)</th>
+                </tr>
+              </thead>
+            """;
 
 
     private String getGoAnchor(GoTermIdPlusLabel go) {
@@ -55,14 +56,16 @@ public class HtmlVisualizer implements Visualizer {
         return sb.toString();
     }
 
-    private final static String INTERPRO_TABLE_HEADER = "<table>\n" +
-            "  <thead>\n" +
-            "    <tr>\n" +
-            "      <th>Interpro id</th>\n" +
-            "      <th>Name</th>\n" +
-            "      <th>Type</th>\n" +
-            "    </tr>\n" +
-            "  </thead>\n";
+    private final static String INTERPRO_TABLE_HEADER = """
+            <table>
+              <thead>
+                <tr>
+                  <th>Interpro id</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+            """;
 
     public String getInterproBox(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
@@ -88,14 +91,16 @@ public class HtmlVisualizer implements Visualizer {
     }
 
 
-    private final static String ISOFORM_TABLE_HEADER = "<table>\n" +
-            "  <thead>\n" +
-            "    <tr>\n" +
-            "      <th>Isoform</th>\n" +
-            "      <th>Log<sub>2</sub> fold change</th>\n" +
-            "      <th>Probability (PEP)</th>\n" +
-            "    </tr>\n" +
-            "  </thead>\n";
+    private final static String ISOFORM_TABLE_HEADER = """
+            <table>
+              <thead>
+                <tr>
+                  <th>Isoform</th>
+                  <th>Log<sub>2</sub> fold change</th>
+                  <th>Probability (PEP)</th>
+                </tr>
+              </thead>
+            """;
 
     private String getTranscriptBox(Visualizable vis) {
         final int EXPECTED_N_COLUMNS = 3;
@@ -147,28 +152,26 @@ public class HtmlVisualizer implements Visualizer {
 
     @Override
     public String getHtml(Visualizable vis) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getGeneNameAndBadges(vis));
-        sb.append("<article>\n");
-        sb.append("<div class=\"generow\">\n");
-        sb.append("<div class=\"column\" style=\"background-color:#F8F8F8;\">\n");
-        sb.append(getGeneBox(vis)).append("\n");
-        sb.append("</div>\n");
-        sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
-        sb.append(getInterproBox(vis)).append("\n");
-        sb.append("</div>\n");
-        sb.append("<div class=\"column\" style=\"background-color:#F0F0F0;\">\n");
-        sb.append(getTranscriptBox(vis)).append("\n");
-        sb.append("</div>\n");
-        sb.append("</div>\n");
-        sb.append("<div class=\"svgrow\">\n");
-        sb.append(vis.getIsoformSvg());
-        sb.append("</div>\n");
-        sb.append("<div class=\"svgrow\">\n");
-        sb.append(vis.getProteinSvg());
-        sb.append("</div>\n");
-        sb.append("</article>\n");
-        return sb.toString();
+        return getGeneNameAndBadges(vis) +
+                "<article>\n" +
+                "<div class=\"generow\">\n" +
+                "<div class=\"column\" style=\"background-color:#F8F8F8;\">\n" +
+                getGeneBox(vis) + "\n" +
+                "</div>\n" +
+                "<div class=\"column\" style=\"background-color:#F0F0F0;\">\n" +
+                getInterproBox(vis) + "\n" +
+                "</div>\n" +
+                "<div class=\"column\" style=\"background-color:#F0F0F0;\">\n" +
+                getTranscriptBox(vis) + "\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "<div class=\"svgrow\">\n" +
+                vis.getIsoformSvg() +
+                "</div>\n" +
+                "<div class=\"svgrow\">\n" +
+                vis.getProteinSvg() +
+                "</div>\n" +
+                "</article>\n";
     }
 
 }
