@@ -106,7 +106,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                     goGafFile.getAbsolutePath());
             valid = false;
         } else {
-            this.goAssociationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, geneOntology);
+            this.goAssociationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile.toPath(), geneOntology);
         }
 
 

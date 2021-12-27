@@ -25,8 +25,6 @@ public class IsopretTranscriptAnnotations implements ItemAnnotations<TermId> {
 
 
 
-
-    @Override
     public void addAnnotation(TermAnnotation a) {
         annotations.add(a);
     }

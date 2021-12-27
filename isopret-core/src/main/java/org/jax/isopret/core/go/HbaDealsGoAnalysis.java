@@ -165,7 +165,7 @@ public class HbaDealsGoAnalysis {
      */
     public Map<String, Set<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap(Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
         Map<String, Set<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
-        List<TermAnnotation> rawAnnots = this.associationContainer.getRawAssociations();
+       /* List<TermAnnotation> rawAnnots = this.associationContainer.getRawAssociations();
         for (TermAnnotation a : rawAnnots) {
             String symbol = a.getDbObjectSymbol();
             if (symbols.contains(symbol)) {
@@ -176,7 +176,7 @@ public class HbaDealsGoAnalysis {
                     labelOpt.ifPresent(s -> symbolToGoTermResults.get(symbol).add(new GoTermIdPlusLabel(goId, s)));
                 }
             }
-        }
+        }*/
         return symbolToGoTermResults;
     }
 

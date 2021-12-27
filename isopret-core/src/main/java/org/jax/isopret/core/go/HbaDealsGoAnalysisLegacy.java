@@ -3,7 +3,7 @@ package org.jax.isopret.core.go;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
-import org.monarchinitiative.phenol.annotations.formats.go.GoGaf21Annotation;
+import org.monarchinitiative.phenol.annotations.formats.go.GoGaf22Annotation;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
@@ -67,25 +67,25 @@ public class HbaDealsGoAnalysisLegacy {
         return this.das.getAnnotatedItemCount();
     }
 
-    public int unmappedDasCount() {
-        return this.das.getUnmappedGeneSymbolCount();
-    }
+//    public int unmappedDasCount() {
+//        return this.das.getUnmappedGeneSymbolCount();
+//    }
 
-    public List<String> unmappedDasSymbols() {
-        return this.das.getSortedUnmappedGeneSymbols();
-    }
+//    public List<String> unmappedDasSymbols() {
+//        return this.das.getSortedUnmappedGeneSymbols();
+//    }
 
     public int dgeCount() {
         return this.dge.getAnnotatedItemCount();
     }
 
-    public int unmappedDgeCount() {
-        return this.dge.getUnmappedGeneSymbolCount();
-    }
-
-    public List<String> unmappedDgeSymbols() {
-        return this.dge.getSortedUnmappedGeneSymbols();
-    }
+//    public int unmappedDgeCount() {
+//        return this.dge.getUnmappedGeneSymbolCount();
+//    }
+//
+//    public List<String> unmappedDgeSymbols() {
+//        return this.dge.getSortedUnmappedGeneSymbols();
+//    }
 
 
     private List<GoTerm2PValAndCounts> termForTerm(StudySet study) {
@@ -182,8 +182,8 @@ public class HbaDealsGoAnalysisLegacy {
      */
     public Map<String, Set<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap(Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
         Map<String, Set<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
-        List<GoGaf21Annotation> rawAnnots = this.goAssociationContainer.getRawAssociations();
-        for (GoGaf21Annotation a : rawAnnots) {
+        List<GoGaf22Annotation> rawAnnots = this.goAssociationContainer.getRawAssociations();
+        for (GoGaf22Annotation a : rawAnnots) {
             String symbol = a.getDbObjectSymbol();
             if (symbols.contains(symbol)) {
                 symbolToGoTermResults.putIfAbsent(symbol, new HashSet<>());

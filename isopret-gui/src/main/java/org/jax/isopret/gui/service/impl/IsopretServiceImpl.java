@@ -214,7 +214,7 @@ public class IsopretServiceImpl implements IsopretService  {
         this.geneContainer = task.getGeneContainer();
         this.transcriptContainer = task.getTranscriptContainer();
 
-        HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder();
+       // HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder();
 
         /*
         GoMethod goMethod,
@@ -226,21 +226,21 @@ public class IsopretServiceImpl implements IsopretService  {
          */
 
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
-        HbaDealsGoAnalysis hbagoGenes =  getHbaDealsGoAnalysis(goMethod,
-                geneContainer,
-                geneOntology,
-
-                this.mtcMethod);
+//        HbaDealsGoAnalysis hbagoGenes =  getHbaDealsGoAnalysis(goMethod,
+//                geneContainer,
+//                geneOntology,
+//
+//                this.mtcMethod);
 
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
-        HbaDealsGoAnalysis hbagoTranscript =  getHbaDealsGoAnalysis(goMethod,
-                thresholder,
-                geneOntology,
-                this.transcriptContainer,
-                this.mtcMethod);
-
-        this.dgeGoTerms = hbagoGenes.dasOverrepresetationAnalysis();
-        this.dasGoTerms = hbagoTranscript.dgeOverrepresetationAnalysis();
+//        HbaDealsGoAnalysis hbagoTranscript =  getHbaDealsGoAnalysis(goMethod,
+//                thresholder,
+//                geneOntology,
+//                this.transcriptContainer,
+//                this.mtcMethod);
+//
+//        this.dgeGoTerms = hbagoGenes.dasOverrepresetationAnalysis();
+//        this.dasGoTerms = hbagoTranscript.dgeOverrepresetationAnalysis();
 
     }
 
@@ -304,10 +304,10 @@ public class IsopretServiceImpl implements IsopretService  {
                     result,
                     expressionThreshold,
                     splicingThreshold);
-            if (dasStudySet.contains(r.getGeneAccession().toTermId())) {
-                DirectAndIndirectTermAnnotations annots = dasStudySet.getAnnotationMap().get(r.getGeneAccession().toTermId());
-                Set<TermId> directDas = annots.getDirectAnnotated();
-            }
+//            if (dasStudySet.contains(r.getGeneAccession().toTermId())) {
+//                DirectAndIndirectTermAnnotations annots = dasStudySet.getAnnotationMap().get(r.getGeneAccession().toTermId());
+//                Set<TermId> directDas = annots.getDirectAnnotated();
+//            }
             Set<GoTermIdPlusLabel> goTerms = Set.of(); // TODO INTIIALZIED
         }
 

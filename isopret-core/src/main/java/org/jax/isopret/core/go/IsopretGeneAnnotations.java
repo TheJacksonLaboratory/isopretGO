@@ -22,7 +22,7 @@ public class IsopretGeneAnnotations implements ItemAnnotations<TermId> {
         annotations = new ArrayList<>();
     }
 
-    @Override
+
     public void addAnnotation(TermAnnotation a) {
         this.annotations.add(a);
     }
