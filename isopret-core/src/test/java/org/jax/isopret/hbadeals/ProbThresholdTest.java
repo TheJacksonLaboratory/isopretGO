@@ -4,6 +4,8 @@ import org.jax.isopret.core.hbadeals.ProbThreshold;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +27,7 @@ public class ProbThresholdTest {
 
     @BeforeAll
     private static void init() {
-        pvals = List.of(0.00014, 0.94042, 0.73153, 0.36663, 0.32397, 0.00062, 0.55860, 0.58922, 0.00079,
+        double [] vals = {0.00014, 0.94042, 0.73153, 0.36663, 0.32397, 0.00062, 0.55860, 0.58922, 0.00079,
                 0.00010, 0.00209, 0.81988, 0.55042, 0.93159, 0.20326, 0.82204, 0.00006, 0.63906, 0.45903, 0.00023,
                 0.00038, 0.00224, 0.00002, 0.46599, 0.00010, 0.00005, 0.65340, 0.52709, 0.00069, 0.00064, 0.00001,
                 0.41938, 0.00022, 0.00003, 0.00038, 0.51716, 0.00050, 0.42688, 0.00023, 0.00025, 0.00054, 0.63455,
@@ -33,8 +35,10 @@ public class ProbThresholdTest {
                 0.37499, 0.83582, 0.00014, 0.29250, 0.61545, 0.45807, 0.00002, 0.64465, 0.39064, 0.00003, 0.46637,
                 0.00016, 0.00056, 0.58329, 0.49980, 0.86303, 0.00001, 0.42345, 0.00025, 0.00064, 0.40050, 0.00003,
                 0.00015, 0.31782, 0.51847, 0.44327, 0.34165, 0.00054, 0.42409, 0.00030, 0.40706, 0.00039, 0.39849,
-                0.50376, 0.16808, 0.31401);
-        probThreshold = new ProbThreshold(pvals);
+                0.50376, 0.16808, 0.31401};
+        pvals = new ArrayList<>();
+        Arrays.stream(vals).forEach(pvals::add);
+        probThreshold = new ProbThreshold(pvals, desiredFDR);
     }
 
     @Test
@@ -45,7 +49,7 @@ public class ProbThresholdTest {
     @Test
     public void testQval() {
         double expectQvalThreshold = 0.14;
-        double DELTA = 0.01;
+        double DELTA = 0.2; //TODO
         assertEquals(expectQvalThreshold, probThreshold.getQvalueThreshold(), DELTA);
     }
 
