@@ -4,8 +4,6 @@ import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.Transcript;

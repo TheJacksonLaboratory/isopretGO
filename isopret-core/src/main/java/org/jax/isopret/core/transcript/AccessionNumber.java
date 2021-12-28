@@ -1,13 +1,14 @@
 package org.jax.isopret.core.transcript;
 
-import org.checkerframework.checker.units.qual.A;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.Objects;
 
 
-public class AccessionNumber {
+public class AccessionNumber implements Comparable<AccessionNumber> {
+
+
     enum Database {ENSEMBL, REFSEQ, NCBIGENE}
 
     enum Category { GENE, TRANSCRIPT }
@@ -164,6 +165,12 @@ public class AccessionNumber {
         };
         String value = String.format("%s:%011d",prefix, this.accession);
         return TermId.of(value);
+    }
+
+
+    @Override
+    public int compareTo(AccessionNumber that) {
+        return Integer.compare(this.accession, that.accession);
     }
 
 }

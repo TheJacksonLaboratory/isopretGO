@@ -88,10 +88,9 @@ public class PrositePattern {
 
     @Override
     public boolean equals(Object obj) {
-        if (! (obj instanceof PrositePattern)) {
+        if (! (obj instanceof PrositePattern that)) {
             return false;
         }
-        PrositePattern that = (PrositePattern) obj;
         return (this.prositeId.equals((that.prositeId)) &&
                 this.prositeAccession.equals(that.prositeAccession) &&
                 this.prositePattern.equals(that.prositePattern));

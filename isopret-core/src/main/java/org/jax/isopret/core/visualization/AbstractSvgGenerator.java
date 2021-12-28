@@ -54,21 +54,25 @@ public abstract class AbstractSvgGenerator {
                 "xmlns=\"http://www.w3.org/2000/svg\" " +
                         "xmlns:svg=\"http://www.w3.org/2000/svg\">\n");
         writer.write("<!-- Created by Isopret -->\n");
-        writer.write("<style>\n" +
-                "  text { font: 24px; }\n" +
-                "  text.t20 { font: 20px; }\n" +
-                "  text.t14 { font: 14px; }\n");
-        writer.write("  .mytriangle{\n" +
-                "    margin: 0 auto;\n" +
-                "    width: 100px;\n" +
-                "    height: 100px;\n" +
-                "  }\n" +
-                "\n" +
-                "  .mytriangle polygon {\n" +
-                "    fill:#b31900;\n" +
-                "    stroke:#65b81d;\n" +
-                "    stroke-width:2;\n" +
-                "  }\n");
+        writer.write("""
+                <style>
+                  text { font: 24px; }
+                  text.t20 { font: 20px; }
+                  text.t14 { font: 14px; }
+                """);
+        writer.write("""
+                  .mytriangle{
+                    margin: 0 auto;
+                    width: 100px;
+                    height: 100px;
+                  }
+
+                  .mytriangle polygon {
+                    fill:#b31900;
+                    stroke:#65b81d;
+                    stroke-width:2;
+                  }
+                """);
         writer.write("  </style>\n");
         writer.write("<g>\n");
     }
@@ -91,12 +95,13 @@ public abstract class AbstractSvgGenerator {
      * @return An SVG element that contains the error
      */
     String getSvgErrorMessage(String msg) {
-        return String.format("<svg width=\"200\" height=\"100\" " +
-                "xmlns=\"http://www.w3.org/2000/svg\" " +
-                "xmlns:svg=\"http://www.w3.org/2000/svg\">\n" +
-                "<!-- Created by Isopret -->\n" +
-                "<g><text x=\"10\" y=\"10\">%s</text>\n</g>\n" +
-                "</svg>\n", msg);
+        return String.format("""
+                <svg width="200" height="100" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                <!-- Created by Isopret -->
+                <g><text x="10" y="10">%s</text>
+                </g>
+                </svg>
+                """, msg);
     }
 
 }

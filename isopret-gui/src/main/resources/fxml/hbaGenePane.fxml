@@ -9,17 +9,14 @@
 <ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
     <VBox prefHeight="887.0" prefWidth="1203.0">
         <VBox fx:id="hbaGeneVbox" prefHeight="887.0" prefWidth="1203.0">
-         <children>
             <Label fx:id="hbaGeneLabel" styleClass="mylabel" stylesheets="@../css/isopretstyle.css">
-               <VBox.margin>
-                  <Insets bottom="20.0" left="40.0" top="20.0" />
-               </VBox.margin>
+                <VBox.margin>
+                    <Insets bottom="20.0" left="40.0" top="20.0"/>
+                </VBox.margin>
             </Label>
             <ScrollPane prefHeight="772.0" prefWidth="1203.0">
-               <content>
-                    <WebView fx:id="hbaGeneWebView" prefHeight="861.0" prefWidth="1203.0" />
-               </content>
+                <WebView fx:id="hbaGeneWebView" prefHeight="861.0" prefWidth="1203.0"/>
             </ScrollPane>
-         </children></VBox>
+        </VBox>
     </VBox>
 </ScrollPane>

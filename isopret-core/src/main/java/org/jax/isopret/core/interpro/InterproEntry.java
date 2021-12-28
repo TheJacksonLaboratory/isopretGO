@@ -45,9 +45,8 @@ public class InterproEntry implements Comparable<InterproEntry> {
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
-        if (! (obj instanceof InterproEntry))
+        if (! (obj instanceof InterproEntry that))
             return false;
-        InterproEntry that = (InterproEntry) obj;
         return this.id == that.id &&
                 this.entryType == that.entryType &&
                 this.description.equals(that.description);

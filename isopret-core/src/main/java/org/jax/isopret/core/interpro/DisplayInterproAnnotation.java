@@ -60,8 +60,7 @@ public class DisplayInterproAnnotation extends InterproAnnotation implements Com
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
-        if (! (obj instanceof DisplayInterproAnnotation)) return false;
-        DisplayInterproAnnotation that = (DisplayInterproAnnotation) obj;
+        if (! (obj instanceof DisplayInterproAnnotation that)) return false;
         return this.interproEntry.equals(that.interproEntry) &&
                 this.ensg.equals(that.ensg) &&
                 this.enst.equals(that.enst) &&

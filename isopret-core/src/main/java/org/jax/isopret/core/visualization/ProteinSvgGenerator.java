@@ -6,6 +6,8 @@ import org.jax.isopret.core.interpro.InterproEntry;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
@@ -13,13 +15,13 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * Write an SVG representing the protein domains and corresponding exon structure.
  * @author Peter N Robinson
  */
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
+    Logger LOGGER = LoggerFactory.getLogger(ProteinSvgGenerator.class);
     private static final int SVG_WIDTH = 1050;
     private static final int HEIGHT_FOR_SV_DISPLAY = 160;
     private static final int HEIGHT_PER_DISPLAY_ITEM = 90;
@@ -140,7 +142,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                 double Ytop = Y2-0.25*ISOFORM_HEIGHT;
                 double Xmiddle = xstart + 0.5*width;
                 double Xend = xstart + width;
-                System.out.println("SITE-" + hit.getInterproEntry().getDescription() + ":" + hit.getStart() + "-" + hit.getEnd());
+                LOGGER.trace("SITE-" + hit.getInterproEntry().getDescription() + ":" + hit.getStart() + "-" + hit.getEnd());
 //                String line = String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"%s\" />",
 //                Xmiddle, Y, Xmiddle, Y2, color);
                 //writer.write(line);
@@ -273,7 +275,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                 .filter(Predicate.not(InterproEntry::isFamilyOrSuperfamily))
                 .distinct()
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         Random random = new Random();
         int i = random.nextInt(colors.length);
         for (var entry : entryList) {
