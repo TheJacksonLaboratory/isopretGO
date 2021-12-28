@@ -11,9 +11,11 @@ public class ProbThreshold {
     /** Threshold for total probability to calculate Bayesian FDR (Usually, we will use 0.05). */
     private final double fdrThreshold;
 
+    private final double qvalueThreshold;
+
     public ProbThreshold(List<Double> probabilities, double fdr) {
         this.fdrThreshold = fdr;
-
+        this.qvalueThreshold = getThreshold(probabilities);
     }
 
     /**
@@ -28,12 +30,17 @@ public class ProbThreshold {
 
     /**
      * Implements the following R
+     * # s containst the possible thresholds for the adjusted p-value
      * s <- seq(0.01,0.25,0.01) # 0.01, 0.02, ..., 0.25
+     * # pvals contains the observed (raw) p-values
+     * pvals <- c(... raw p-value list .. )
+     * fdr <- 0.05 # desired false-discovery rate
      * # The following gets the sum of all P values not more than s[i] divided by the count of such instances
-     * h0.de <- unlist(lapply(s,function(p)sum(res$P[res$Isoform=='Expression'& res$P<=p])/sum(res$Isoform=='Expression'& res$P<=p)))
+     * # Note that unlist producse a vector which contains all the atomic components of the original list
+     * h0.de <- unlist(lapply(s,function(p) {sum(pvals[pvals<=p])/sum(pvals<=p)} ))
      * exp.thresh <- s[max(which(h0.de<=fdr))] highest prob threshold below threshold.
-     * Calculates the q-value threshold needed to attain a desired FDR
-     * @param probs List of probabilities from HBA-DEALS
+     * Together, this calculates the q-value threshold needed to attain a desired FDR
+     * @param probs List of raw probabilities from HBA-DEALS
      * @return the probability threshold associated with the q-value threshold to reach the desired FDR
      */
     private double getThreshold(List<Double> probs) {
@@ -79,4 +86,12 @@ public class ProbThreshold {
         return fdr/(double) i;
     }
 
+
+    public double getQvalueThreshold() {
+        return qvalueThreshold;
+    }
+
+    public double getFdrThreshold() {
+        return fdrThreshold;
+    }
 }

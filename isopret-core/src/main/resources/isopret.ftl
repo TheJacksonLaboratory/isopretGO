@@ -447,12 +447,12 @@ a.svg:hover, a.svg:active {
       <p>Gene Ontology <tt>go.obo</tt> file: ${go_version} with ${n_go_terms} terms.</p>
       <p>${annotation_term_count} terms used for a total of ${annotation_count} annotations for ${annotated_genes} genes.</p>
       <h4>Differentially expressed genes (n=${n_dge})</h4>
-       <p>${n_dge_unmapped} of the ${n_dge} genes could not be mapped to gene ids for GO analysis
+       <p></p>
       <a id="show-dgego-table" class="table-btn" onclick="showDgeGoTable()">Show Table</a>
       <a id="hide-dgego-table" class="table-btn" onclick="hideDgeGoTable()">Hide Table</a>
       ${dgeTable}
       <h4>Differentially spliced genes (n=${n_das?string})</h4>
-      <p>${n_das_unmapped} of the ${n_das} genes could not be mapped to gene ids for GO analysis.</p>
+      <p></p>
       <a id="show-dasgo-table" class="table-btn" onclick="showDasGoTable()">Show Table</a>
       <a id="hide-dasgo-table" class="table-btn" onclick="hideDasGoTable()">Hide Table</a>
       ${dasTable}

@@ -187,7 +187,7 @@ public class MainController implements Initializable {
                 String topLevelDAS = service.getDgeLabel();
                 loader.setControllerFactory(c -> new GeneOntologyController(topLevelDAS,  service.getDgeGoTerms(), service));
                 ScrollPane p = loader.load();
-                Tab dgeTab = new Tab("DGE");
+                dgeTab = new Tab("DGE");
                 dgeTab.setId("DGE");
                 dgeTab.setClosable(false);
                 dgeTab.setContent(p);
@@ -210,7 +210,7 @@ public class MainController implements Initializable {
                 String dasLabel = service.getDasLabel();
                 loader.setControllerFactory(c -> new GeneOntologyController(dasLabel,  service.getDasGoTerms(), service));
                 ScrollPane p = loader.load();
-                Tab dasTab = new Tab("DAS");
+                dasTab = new Tab("DAS");
                 dasTab.setId("DAS");
                 dasTab.setClosable(false);
                 dasTab.setContent(p);

@@ -6,13 +6,11 @@ import de.charite.compbio.jannovar.data.JannovarDataSerializer;
 import de.charite.compbio.jannovar.data.SerializationException;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.monarchinitiative.svart.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import javax.swing.tree.TreeNode;
 import java.io.File;
 import java.util.*;
 

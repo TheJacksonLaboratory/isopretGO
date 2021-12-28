@@ -17,7 +17,6 @@ import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
@@ -75,7 +74,7 @@ public abstract class IsopretCommand {
                         goGafFile.getAbsolutePath());
             }
             Ontology go = loadGeneOntology();
-            this.associationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile, go);
+            this.associationContainer = GoAssociationContainer.loadGoGafAssociationContainer(goGafFile.toPath(), go);
         }
         LOGGER.info("Loaded GO Association container with {} associations",
                 associationContainer.getRawAssociations().size());
@@ -164,18 +163,27 @@ public abstract class IsopretCommand {
         return new HbaDealsThresholder(hbaDealsResults);
     }
 
+
+    /*
+    Ontology ontology,
+     AssociationContainer<TermId> associationContainer,
+                                                          StudySet study,
+                                                          StudySet population,
+                                                          MtcMethod mtcMethod
+     */
     protected HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
                                                      HbaDealsThresholder thresholder,
                                                      Ontology ontology,
                                                      GoAssociationContainer goAssociationContainer,
                                                      MtcMethod mtc) {
-        if (goMethod == GoMethod.PCunion) {
-            return HbaDealsGoAnalysis.parentChildUnion(thresholder, ontology, goAssociationContainer, mtc);
-        } else if (goMethod == GoMethod.PCintersect) {
-            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
-        } else {
-            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
-        }
+//        if (goMethod == GoMethod.PCunion) {
+//            return HbaDealsGoAnalysis.parentChildUnion(ontology, goAssociationContainer, mtc);
+//        } else if (goMethod == GoMethod.PCintersect) {
+//            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
+//        } else {
+//            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
+//        }
+        return null;
     }
 
 

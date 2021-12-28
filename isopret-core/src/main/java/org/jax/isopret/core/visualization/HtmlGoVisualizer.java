@@ -22,17 +22,19 @@ public class HtmlGoVisualizer {
      * Note that there is a placeholder for the id, which is used by the JavScript to identify
      * the dasTable, dgeTable
      */
-    private final static String GO_TABLE_HEADER = "<table class=\"goTable\" id=\"%s\">\n" +
-            "  <thead>\n" +
-            "    <tr>\n" +
-            "      <th>GO id</th>\n" +
-            "      <th>Name</th>\n" +
-            "      <th>Study</th>\n" +
-            "      <th>Population</th>\n" +
-            "      <th>p-value</th>\n" +
-            "      <th>p-value (adj.)</th>\n" +
-            "    </tr>\n" +
-            "  </thead>\n";
+    private final static String GO_TABLE_HEADER = """
+            <table class="goTable" id="%s">
+              <thead>
+                <tr>
+                  <th>GO id</th>
+                  <th>Name</th>
+                  <th>Study</th>
+                  <th>Population</th>
+                  <th>p-value</th>
+                  <th>p-value (adj.)</th>
+                </tr>
+              </thead>
+            """;
 
 
     private String countsCell(int annot, int total) {
