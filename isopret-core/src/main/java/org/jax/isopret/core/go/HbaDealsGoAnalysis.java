@@ -50,12 +50,14 @@ public class HbaDealsGoAnalysis {
     }
 
     public List<GoTerm2PValAndCounts> overrepresetationAnalysis() {
-        return switch (this.goMethod) {
+        List<GoTerm2PValAndCounts> pvals = switch (this.goMethod) {
             case TFT -> termForTerm();
             case PCunion -> parentChildUnion();
             case PCintersect -> parentChildIntersect();
             case MGSA -> mgsa();
         };
+        pvals.sort(new SortByPvalue());
+        return List.copyOf(pvals); // make immutable
     }
 
 

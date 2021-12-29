@@ -9,6 +9,7 @@ import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
@@ -59,7 +60,7 @@ public class IsopretServiceImpl implements IsopretService  {
     private List<String> analysisErrors = null;
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
-    private HbaDealsThresholder thresholder = null;
+    private HbaDealsIsoformSpecificThresholder thresholder = null;
     //private GoAssociationContainer associationContainer = null;
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
@@ -203,15 +204,12 @@ public class IsopretServiceImpl implements IsopretService  {
         this.analysisErrors = task.getErrors();
         this.geneOntology = task.getGeneOntology();
         this.interproMapper = task.getInterproMapper();
-        this.thresholder = task.getThresholder();
         this.geneSymbolToTranscriptMap = task.getGeneSymbolToTranscriptMap();
-
-        this.dasGoTerms.sort(new SortByPvalue());
-        this.dgeGoTerms.sort(new SortByPvalue());
         this.geneContainer = task.getGeneContainer();
         this.transcriptContainer = task.getTranscriptContainer();
         this.dgeGoTerms = task.getDgeResults();
         this.dasGoTerms = task.getDasResults();
+        this.thresholder = task.getIsoformSpecificThresholder();
     }
 
     @Override
@@ -223,22 +221,6 @@ public class IsopretServiceImpl implements IsopretService  {
         return dgeGoTerms;
     }
 
-    static class SortByPvalue implements Comparator<GoTerm2PValAndCounts>
-    {
-        // Used for sorting in ascending order of
-        // roll number
-        public int compare(GoTerm2PValAndCounts a, GoTerm2PValAndCounts b)
-        {
-            double diff = a.getRawPValue() - b.getRawPValue();
-            if (diff > 0) {
-                return 1;
-            } else if (diff < 0) {
-                return -1;
-            } else  {
-                return 0;
-            }
-        }
-    }
 
     private HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
                                                      AssociationContainer<TermId> associationContainer,
@@ -263,6 +245,10 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<HbaDealsGeneRow> getHbaDealsRows() {
 
         for (var r : thresholder.getRawResults().values()) {
+            if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
+                LOGGER.warn("Could not find transcript map for symbol {}", r.getSymbol());
+                continue;
+            }
             List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
             HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
             double splicingThreshold = thresholder.getSplicingThreshold();

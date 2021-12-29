@@ -35,6 +35,22 @@ public class HbaDealsIsoformSpecificThresholder {
     private final StudySet dasStudy;
     private final StudySet dasPopulation;
 
+    private final Map<String, HbaDealsResult> rawResults;
+
+    private final double fdrThreshold;
+
+
+    public Map<String, HbaDealsResult> getRawResults() {
+        return rawResults;
+    }
+
+    public int getTotalGeneCount() {
+        return this.rawResults.size();
+    }
+
+    public double getFdrThreshold() {
+        return fdrThreshold;
+    }
 
     /**
      * Find the FDR thresholds for splicing and expression
@@ -45,6 +61,8 @@ public class HbaDealsIsoformSpecificThresholder {
                                               AssociationContainer<TermId> geneContainer,
                                               AssociationContainer<TermId> transcriptContainer) {
 
+        this.rawResults = results;
+        this.fdrThreshold = fdrThreshold;
         List<Double> expressionProbs = results
                 .values()
                 .stream()
@@ -105,6 +123,10 @@ public class HbaDealsIsoformSpecificThresholder {
         return this.dgeStudy;
     }
 
+    public int getDgeGeneCount() {
+        return this.dgeStudy.getAnnotatedItemCount();
+    }
+
     public StudySet getDgePopulation() {
         return this.dgePopulation;
     }
@@ -113,6 +135,10 @@ public class HbaDealsIsoformSpecificThresholder {
 
     public StudySet getDasStudy() {
         return this.dasStudy;
+    }
+
+    public int getDasGeneCount() {
+        return this.dasStudy.getAnnotatedItemCount();
     }
 
     public StudySet getDasPopulation() {

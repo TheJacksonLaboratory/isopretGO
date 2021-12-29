@@ -9,7 +9,6 @@ import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.InterproMapper;
@@ -18,7 +17,6 @@ import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.JannovarReader;
 import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -50,13 +48,9 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     /** Key ensembl transcript id; values: annotating go terms .*/
     private Map<TermId, Set<TermId>> transcriptToGoMap = Map.of();
 
-//    private GoAssociationContainer goAssociationContainer = null;
-
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
 
     private InterproMapper interproMapper = null;
-
-    private  HbaDealsThresholder thresholder = null;
 
     private HbaDealsIsoformSpecificThresholder isoformSpecificThresholder = null;
 
@@ -87,6 +81,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         this.hbaDealsFile = hbaDealsFile;
         this.overrepMethod = goMethod;
         this.multipleTestingMethod = mtcMethod;
+    }
+
+    public HbaDealsIsoformSpecificThresholder getIsoformSpecificThresholder() {
+        return isoformSpecificThresholder;
     }
 
     @Override
@@ -143,7 +141,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             LOGGER.info("Loaded transcript container with {} annotating terms", transcriptContainer.getAnnotatingTermCount());
         }
 
-         HgncParser hgncParser = new HgncParser();
+        HgncParser hgncParser = new HgncParser();
         this.hgncMap = hgncParser.ensemblMap();
         updateProgress(0.65, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
@@ -186,7 +184,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         updateMessage("Finished loading data for isopret analysis.");
-
         HbaDealsGoAnalysis dgeGoAnalysis = new HbaDealsGoAnalysis(geneOntology,
                 isoformSpecificThresholder.getDgeStudy(),
                 isoformSpecificThresholder.getDgePopulation(),
@@ -268,10 +265,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     public InterproMapper getInterproMapper() {
         return interproMapper;
-    }
-
-    public HbaDealsThresholder getThresholder() {
-        return thresholder;
     }
 
     public List<String> getErrors() {
