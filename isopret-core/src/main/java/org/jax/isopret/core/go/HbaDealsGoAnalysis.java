@@ -24,17 +24,13 @@ public class HbaDealsGoAnalysis {
     private final StudySet population;
     private final GoMethod goMethod;
     private final MultipleTestingCorrection mtc;
-    private final AssociationContainer<TermId> associationContainer;
 
-
-    private HbaDealsGoAnalysis(Ontology ontology,
-                               AssociationContainer<TermId> associationContainer,
-                               StudySet study,
-                               StudySet population,
-                               GoMethod method,
-                               MtcMethod mtcMethod) {
+    public HbaDealsGoAnalysis(Ontology ontology,
+                              StudySet study,
+                              StudySet population,
+                              GoMethod method,
+                              MtcMethod mtcMethod) {
         this.ontology = ontology;
-        this.associationContainer = associationContainer;
         this.goMethod = method;
         switch (mtcMethod) {
             case BONFERRONI -> this.mtc = new Bonferroni();
@@ -52,6 +48,16 @@ public class HbaDealsGoAnalysis {
         this.study = study;
         this.population = population;
     }
+
+    public List<GoTerm2PValAndCounts> overrepresetationAnalysis() {
+        return switch (this.goMethod) {
+            case TFT -> termForTerm();
+            case PCunion -> parentChildUnion();
+            case PCintersect -> parentChildIntersect();
+            case MGSA -> mgsa();
+        };
+    }
+
 
 
     public int populationCount() {
@@ -103,23 +109,8 @@ public class HbaDealsGoAnalysis {
     }
 
 
-    public List<GoTerm2PValAndCounts> dgeOverrepresetationAnalysis() {
-        return switch (this.goMethod) {
-            case TFT -> termForTerm();
-            case PCunion -> parentChildUnion();
-            case PCintersect -> parentChildIntersect();
-            case MGSA -> mgsa();
-        };
-    }
 
-    public List<GoTerm2PValAndCounts> dasOverrepresetationAnalysis() {
-        return switch (this.goMethod) {
-            case TFT -> termForTerm();
-            case PCunion -> parentChildUnion();
-            case PCintersect -> parentChildIntersect();
-            case MGSA -> mgsa();
-        };
-    }
+
 
 
 
@@ -128,7 +119,7 @@ public class HbaDealsGoAnalysis {
                                                  StudySet study,
                                                  StudySet population,
                                                  MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(ontology, associationContainer, study, population, GoMethod.TFT, mtcMethod);
+        return new HbaDealsGoAnalysis(ontology, study, population, GoMethod.TFT, mtcMethod);
     }
 
     public static HbaDealsGoAnalysis parentChildUnion(Ontology ontology,
@@ -136,7 +127,7 @@ public class HbaDealsGoAnalysis {
                                                       StudySet study,
                                                       StudySet population,
                                                       MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(ontology, associationContainer, study, population, GoMethod.PCunion, mtcMethod);
+        return new HbaDealsGoAnalysis(ontology, study, population, GoMethod.PCunion, mtcMethod);
     }
 
     public static HbaDealsGoAnalysis parentChildIntersect(Ontology ontology,
@@ -144,7 +135,7 @@ public class HbaDealsGoAnalysis {
                                                           StudySet study,
                                                           StudySet population,
                                                           MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(ontology,  associationContainer, study, population, GoMethod.PCintersect, mtcMethod);
+        return new HbaDealsGoAnalysis(ontology, study, population, GoMethod.PCintersect, mtcMethod);
     }
 
     public static HbaDealsGoAnalysis mgsa(Ontology ontology,
@@ -152,7 +143,7 @@ public class HbaDealsGoAnalysis {
                                           StudySet study,
                                           StudySet population,
                                           MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(ontology, associationContainer, study, population, GoMethod.MGSA, mtcMethod);
+        return new HbaDealsGoAnalysis(ontology, study, population, GoMethod.MGSA, mtcMethod);
     }
 
 

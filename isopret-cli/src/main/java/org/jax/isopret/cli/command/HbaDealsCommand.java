@@ -1,7 +1,6 @@
 package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
@@ -64,17 +63,19 @@ public class HbaDealsCommand extends IsopretCommand implements Callable<Integer>
         HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
 
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
-        HbaDealsGoAnalysis hbago =  getHbaDealsGoAnalysis(goMethod,
-                thresholder,
-                 ontology,
-                 goAssociationContainer,
-                 mtc);
+//        HbaDealsGoAnalysis hbago =  new HbaDealsGoAnalysis(ontology,
+//                thresholder.
+//                ,
+//                thresholder,
+//                 ,
+//                 goAssociationContainer,
+//                 mtc);
+//TODO --bring up to date
 
-
-        List<GoTerm2PValAndCounts> dasGoTerms = hbago.dasOverrepresetationAnalysis();
-        List<GoTerm2PValAndCounts> dgeGoTerms = hbago.dgeOverrepresetationAnalysis();
-        dasGoTerms.sort(new SortByPvalue());
-        dgeGoTerms.sort(new SortByPvalue());
+        List<GoTerm2PValAndCounts> dasGoTerms = List.of();// hbago.overrepresetationAnalysis();
+        List<GoTerm2PValAndCounts> dgeGoTerms =List.of();// hbago.overrepresetationAnalysis();
+//        dasGoTerms.sort(new SortByPvalue());
+//        dgeGoTerms.sort(new SortByPvalue());
 
         if (outputTsv) {
             LOGGER.trace("TSV output");
@@ -99,7 +100,7 @@ public class HbaDealsCommand extends IsopretCommand implements Callable<Integer>
                     .mtc(this.mtc)
                     .ontology(ontology)
                     .goAssociationContainer(goAssociationContainer)
-                    .hbago(hbago)
+                    .hbago(null)
                     .genesymbolToTranscriptMap(geneSymbolToTranscriptMap)
                     .chunkSize(chunkSize)
                     .interproMapper(interproMapper)

@@ -210,35 +210,8 @@ public class IsopretServiceImpl implements IsopretService  {
         this.dgeGoTerms.sort(new SortByPvalue());
         this.geneContainer = task.getGeneContainer();
         this.transcriptContainer = task.getTranscriptContainer();
-
-       // HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder();
-
-        /*
-        GoMethod goMethod,
-                                                     AssociationContainer<TermId> associationContainer,
-                                                     Ontology ontology,
-                                                     StudySet study,
-                                                     StudySet population,
-                                                     MtcMethod mtc
-         */
-
-        /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
-//        HbaDealsGoAnalysis hbagoGenes =  getHbaDealsGoAnalysis(goMethod,
-//                geneContainer,
-//                geneOntology,
-//
-//                this.mtcMethod);
-
-        /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
-//        HbaDealsGoAnalysis hbagoTranscript =  getHbaDealsGoAnalysis(goMethod,
-//                thresholder,
-//                geneOntology,
-//                this.transcriptContainer,
-//                this.mtcMethod);
-//
-//        this.dgeGoTerms = hbagoGenes.dasOverrepresetationAnalysis();
-//        this.dasGoTerms = hbagoTranscript.dgeOverrepresetationAnalysis();
-
+        this.dgeGoTerms = task.getDgeResults();
+        this.dasGoTerms = task.getDasResults();
     }
 
     @Override

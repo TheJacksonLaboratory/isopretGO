@@ -11,6 +11,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,7 +86,10 @@ public class PopupFactory {
 
 
     public static void displayException(String title, String message, Exception e) {
-        TextArea textArea = new TextArea(e.toString());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);//print the stack trace to the print writer
+        TextArea textArea = new TextArea(sw.toString());
         textArea.setEditable(false);
         textArea.setWrapText(true);
         Label label = new Label("The exception stacktrace was:");
