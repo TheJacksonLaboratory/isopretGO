@@ -62,8 +62,7 @@ public class InterproAnnotation {
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
-        if (! (obj instanceof InterproAnnotation)) return false;
-        InterproAnnotation that = (InterproAnnotation) obj;
+        if (! (obj instanceof InterproAnnotation that)) return false;
         return this.ensg.equals(that.ensg) &&
                 this.enst.equals(that.enst) &&
                 this.interpro == that.interpro &&
