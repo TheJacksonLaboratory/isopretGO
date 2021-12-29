@@ -62,7 +62,8 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
     @Override
     public Integer call() {
         Ontology geneOntology = loadGeneOntology();
-        LOGGER.info("Loaded Gene Ontology with {} terms", geneOntology.countNonObsoleteTerms());
+        int n_go_terms = geneOntology.countNonObsoleteTerms();
+        LOGGER.info("Loaded Gene Ontology with {} terms", n_go_terms);
         //GoAssociationContainer container = loadGoAssociationContainer();
         Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
         LOGGER.info("Loaded HGNC map with {} genes", hgncMap.size());
@@ -173,8 +174,8 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         var pvals = pvalcal.calculatePVals()
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
+                .sorted()
                 .collect(Collectors.toList());
-        Collections.sort(pvals);
         return pvals;
 
     }

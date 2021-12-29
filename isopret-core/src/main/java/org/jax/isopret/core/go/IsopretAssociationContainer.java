@@ -2,7 +2,11 @@ package org.jax.isopret.core.go;
 
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
+import org.monarchinitiative.phenol.analysis.GeneAnnotations;
+import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
+import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,25 +47,49 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
 
     @Override
     public Map<TermId, DirectAndIndirectTermAnnotations> getAssociationMap(Set<TermId> annotatedItemTermIds) {
-        Map<TermId, DirectAndIndirectTermAnnotations> annotationMap = new HashMap<>();
+        // 1. Get all of the direct GO annotations to the genes. Key: domain item; value: annotating Ontlogy terms
+        Map<TermId, Set<TermId>> directAnnotationMap = new HashMap<>();
+        int not_found = 0;
         for (TermId domainTermId : annotatedItemTermIds) {
-            IsopretAnnotations assocs = this.associationMap.get(domainTermId);
-            if (assocs == null) {
-                LOGGER.warn("Could not retrieve assocs for {}.", domainTermId);
+            if (!this.associationMap.containsKey(domainTermId)) {
+                LOGGER.error("Could not find annotations for  {}", domainTermId.getValue());
                 continue;
             }
-            List<TermId> annotatingIds = assocs.getAnnotatingTermIds();
-            try {
-                DirectAndIndirectTermAnnotations dai = new DirectAndIndirectTermAnnotations(new HashSet<>(annotatingIds), ontology);
-                annotationMap.put(domainTermId, dai);
-            } catch (Exception e) {
-                // A no such vertex in graph Exception is possible if the
-                // ontology file and the associations are not in synch.
-                // We need to catch this to avoid crashs
-                LOGGER.warn("Could not construct annotations for {}: {}", domainTermId.getValue(), e.getMessage());
+            IsopretAnnotations assocs = this.associationMap.get(domainTermId);
+            for (TermAnnotation termAnnotation : assocs.getAnnotations()) {
+                /* In this step add the direct annotations only */
+                TermId ontologyTermId = termAnnotation.getTermId();
+                // check if the term is in the ontology (sometimes, obsoletes are used in the bla32 files)
+                Term term = this.ontology.getTermMap().get(ontologyTermId);
+                if (term == null) {
+                    not_found++;
+                    LOGGER.warn("Unable to retrieve ontology term {} (omitted).", ontologyTermId.getValue());
+                    continue;
+                }
+                // if necessary, replace with the latest primary term id
+                ontologyTermId = this.ontology.getPrimaryTermId(ontologyTermId);
+                directAnnotationMap.computeIfAbsent(domainTermId, k -> new HashSet<>()).add(ontologyTermId);
             }
         }
-        return annotationMap;
+        if (not_found > 0) {
+            LOGGER.warn("Cound not find annotations for {} ontology term ids (are versions in synch?)", not_found);
+        }
+        Map<TermId, DirectAndIndirectTermAnnotations> annotationMap = new HashMap<>();
+        for (Map.Entry<TermId, Set<TermId>> entry : directAnnotationMap.entrySet()) {
+            TermId domainItemTermId = entry.getKey();
+            for (TermId ontologyId : entry.getValue()) {
+                annotationMap.putIfAbsent(ontologyId, new DirectAndIndirectTermAnnotations(ontologyId));
+                annotationMap.get(ontologyId).addDirectAnnotatedItem(domainItemTermId);
+                // In addition to the direct annotation, the gene is also indirectly annotated
+                // to all of the GO Term's ancestors
+                Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, ontologyId, false);
+                for (TermId ancestor : ancs) {
+                    annotationMap.putIfAbsent(ancestor, new DirectAndIndirectTermAnnotations(ancestor));
+                    annotationMap.get(ancestor).addIndirectAnnotatedItem(domainItemTermId);
+                }
+            }
+        }
+        return Map.copyOf(annotationMap); //make immutable
     }
 
     @Override
