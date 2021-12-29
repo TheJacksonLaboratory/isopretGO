@@ -15,16 +15,8 @@ import java.util.Optional;
 /**
  * Class for remapping Jannovar {@link TranscriptModel} to our domain model.
  */
-class JannovarTxMapper {
-
+record JannovarTxMapper(GenomicAssembly assembly) {
     private static final Logger LOGGER = LoggerFactory.getLogger(JannovarTxMapper.class);
-
-    private final GenomicAssembly assembly;
-   
-
-    JannovarTxMapper(GenomicAssembly assembly) {
-        this.assembly = assembly;
-    }
 
     Optional<Transcript> remap(TranscriptModel tm) {
         String contigName = tm.getTXRegion().getRefDict().getContigIDToName().get(tm.getChr());

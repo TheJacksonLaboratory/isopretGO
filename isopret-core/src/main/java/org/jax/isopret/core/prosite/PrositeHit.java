@@ -34,8 +34,7 @@ public class PrositeHit implements Comparable<PrositeHit> {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (! (obj instanceof PrositeHit)) return false;
-        PrositeHit that = (PrositeHit) obj;
+        if (! (obj instanceof PrositeHit that)) return false;
         return this.accession.equals(that.accession)
                 && this.startAminoAcidPos == that.startAminoAcidPos &&
                 this.endAminoAcidPos == that.endAminoAcidPos;
