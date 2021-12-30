@@ -1,13 +1,14 @@
 package org.jax.isopret.gui.controller;
 
 import javafx.application.HostServices;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.jax.isopret.core.visualization.IsoformVisualizable;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
@@ -23,6 +24,17 @@ import java.util.ResourceBundle;
 @Scope("prototype")
 public class HbaGeneController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaGeneController.class.getName());
+    @FXML
+    private TableView<IsoformVisualizable> isoformTableView;
+    @FXML
+    private TableColumn<IsoformVisualizable, String> accessionColumn;
+    @FXML
+    private TableColumn<IsoformVisualizable, String> urlColumn;
+    @FXML
+    private TableColumn<IsoformVisualizable, String> isoformLogFcColumn;
+    @FXML
+    private TableColumn<IsoformVisualizable, String> isoformPColumn;
+
 
 
     @FXML
@@ -71,6 +83,24 @@ public class HbaGeneController implements Initializable {
         geneFoldChangeLabel.setText(fc);
         String prob = String.format("Probability (PEP): %.2f", result.getExpressionPval());
         this.geneProbabilityLabel.setText(prob);
+        // isoform table
+        accessionColumn.setSortable(false);
+        accessionColumn.setEditable(false);
+        accessionColumn.setCellValueFactory(v ->  new ReadOnlyStringWrapper(v.getValue().transcriptAccession()));
+        urlColumn.setEditable(false);
+        urlColumn.setSortable(false);
+        urlColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper("todo"));
+        isoformLogFcColumn.setSortable(false);
+        isoformLogFcColumn.setEditable(false);
+        isoformLogFcColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().log2Foldchange()));
+        isoformPColumn.setSortable(false);
+        isoformPColumn.setEditable(false);
+        isoformPColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().isoformP()));
+        isoformTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+
+        isoformTableView.getItems().clear();
+        isoformTableView.getItems().addAll(result.getIsoformVisualizable());
+        isoformTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         WebEngine webEngine = hbaGeneWebView.getEngine();
         webEngine.loadContent(this.html);
     }
