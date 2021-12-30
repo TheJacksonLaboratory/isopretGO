@@ -47,6 +47,10 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final int significantIsoforms;
 
+    private final String isoformSvg;
+
+    private final int isoformSvgHeight;
+
 
     private final double splicingThreshold;
 
@@ -69,6 +73,9 @@ public class EnsemblVisualizable implements Visualizable {
                 stream().
                 map(EnsemblIsoformVisualizable::new)
                 .collect(Collectors.toList());
+        AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
+        this.isoformSvg = svggen.getSvg();
+        this.isoformSvgHeight = svggen.getSvgHeight();
     }
 
     public int getI() { return i; }
@@ -278,5 +285,10 @@ body {
                 getProteinSvg() +
                 HTML_FOR_SVG_FOOTER;
         return html;
+    }
+
+    @Override
+    public int getIsoformSvgHeight() {
+        return this.isoformSvgHeight;
     }
 }

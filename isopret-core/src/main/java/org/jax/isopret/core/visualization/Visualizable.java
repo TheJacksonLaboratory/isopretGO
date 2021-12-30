@@ -34,6 +34,8 @@ public interface Visualizable {
 
     String getIsoformSvg();
 
+    int getIsoformSvgHeight();
+
     String getIsoformHtml();
 
    String getProteinSvg();

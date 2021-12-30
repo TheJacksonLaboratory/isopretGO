@@ -38,6 +38,10 @@ public abstract class AbstractSvgGenerator {
     abstract void write(Writer writer);
     abstract public String getSvg();
 
+    public int getSvgHeight() {
+        return this.SVG_HEIGHT;
+    }
+
 
     /**
      * Write the header of the SVG.

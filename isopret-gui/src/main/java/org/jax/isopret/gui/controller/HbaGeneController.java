@@ -138,13 +138,14 @@ public class HbaGeneController implements Initializable {
             isoformTableView.getItems().addAll(visualizable.getIsoformVisualizable());
             isoformTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             isoformTableView.setFixedCellSize(25);
-            isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(10));
+            isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
+            hbaGeneWebView.setMaxHeight(visualizable.getIsoformSvgHeight());
             LOGGER.info("Loading isoform table");
             interprTableView.getItems().clear();
             interprTableView.getItems().addAll(visualizable.getInterproVisualizable());
             interprTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             interprTableView.setFixedCellSize(25);
-            interprTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(10));
+            interprTableView.prefHeightProperty().bind(Bindings.size(interprTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             LOGGER.info("Loading isoform table");
         });
     }

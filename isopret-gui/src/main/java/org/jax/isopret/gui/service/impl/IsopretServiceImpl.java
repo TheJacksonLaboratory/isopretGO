@@ -287,10 +287,11 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public List<Visualizable> getGeneVisualizables() {
+        int notfound = 0;
         List<Visualizable> visualizables = new ArrayList<>();
         for (var r : thresholder.getRawResults().values()) {
             if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
-                LOGGER.warn("Could not find transcript map for symbol {}", r.getSymbol());
+                notfound++;
                 continue;
             }
             List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
@@ -307,6 +308,9 @@ public class IsopretServiceImpl implements IsopretService  {
             Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
             EnsemblVisualizable viz = new EnsemblVisualizable(agene, goTerms);
             visualizables.add(viz);
+        }
+        if (notfound > 0) {
+            LOGGER.warn("Could not find transcript map for {} genes", notfound);
         }
        return visualizables;
     }
