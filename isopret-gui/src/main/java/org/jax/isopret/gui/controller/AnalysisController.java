@@ -13,8 +13,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
+import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.service.IsopretService;
-import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class AnalysisController implements Initializable {
      * A map used to keep track of the open tabs. The Key is a reference to a viewpoint object, and the value is a
      * reference to a Tab that has been opened for it.
      */
-    private final Map<HbaDealsGeneRow, Tab> openTabs = new ConcurrentHashMap<>();
+    private final Map<Visualizable, Tab> openTabs = new ConcurrentHashMap<>();
 
     @FXML
     private ScrollPane VpAnalysisPane;
@@ -48,21 +48,21 @@ public class AnalysisController implements Initializable {
     private ListView<String> lviewValue;
 
     @FXML
-    private TableView<HbaDealsGeneRow> hbaGeneResultTableView;
+    private TableView<Visualizable> hbaGeneResultTableView;
     @FXML
-    private TableColumn<HbaDealsGeneRow, String> symbolColumn;
+    private TableColumn<Visualizable, String> symbolColumn;
     @FXML
-    private TableColumn<HbaDealsGeneRow, String> accessionColumn;
+    private TableColumn<Visualizable, String> accessionColumn;
     @FXML
-    private TableColumn<HbaDealsGeneRow, Double> foldChangeColumn;
+    private TableColumn<Visualizable, Double> foldChangeColumn;
     @FXML
-    private TableColumn<HbaDealsGeneRow, Double> geneProbabilityColumn;
+    private TableColumn<Visualizable, Double> geneProbabilityColumn;
     @FXML
-    private TableColumn<HbaDealsGeneRow, String> isoformCountColumn;
+    private TableColumn<Visualizable, String> isoformCountColumn;
     @FXML
-    private TableColumn<HbaDealsGeneRow, Double> isoformProbabilityColumn;
+    private TableColumn<Visualizable, Double> isoformProbabilityColumn;
     @FXML
-    private TableColumn<HbaDealsGeneRow, Button> visualizeColumn;
+    private TableColumn<Visualizable, Button> visualizeColumn;
 
 
     @Autowired
@@ -70,7 +70,7 @@ public class AnalysisController implements Initializable {
     @Autowired
     private MainController mainController;
     @Autowired
-    ResourceLoader resourceLoader;
+    private ResourceLoader resourceLoader;
 
 
 
@@ -138,7 +138,7 @@ public class AnalysisController implements Initializable {
 
         visualizeColumn.setSortable(false);
         visualizeColumn.setCellValueFactory(cdf -> {
-            HbaDealsGeneRow geneRow = cdf.getValue();
+            Visualizable geneRow = cdf.getValue();
             Button btn = new Button("Visualize");
             btn.setOnAction(e -> {
                 LOGGER.trace(String.format("Adding tab for row with generow: %s", geneRow.getGeneSymbol()));
@@ -185,7 +185,7 @@ public class AnalysisController implements Initializable {
             return;
         }
         javafx.application.Platform.runLater(() -> {
-            List<HbaDealsGeneRow> vpl = this.isopretService.getHbaDealsRows();
+            List<Visualizable> vpl = this.isopretService.getGeneVisualizables();
             LOGGER.trace("refreshVPTable: got a total of " + vpl.size() + " ViewPoint objects");
             hbaGeneResultTableView.getItems().clear(); /* clear previous rows, if any */
             hbaGeneResultTableView.getItems().addAll(vpl);
@@ -199,9 +199,9 @@ public class AnalysisController implements Initializable {
     /**
      * This method creates a new {@link Tab} populated with a viewpoint!
      *
-     * @param hbadealsResult This {@link HbaDealsGeneRow} object will be opened into a new Tab.
+     * @param hbadealsResult This {@link Visualizable} object will be opened into a new Tab.
      */
-    private void openHbaDealsResultInTab(HbaDealsGeneRow hbadealsResult) {
+    private void openHbaDealsResultInTab(Visualizable hbadealsResult) {
         TabPane tabPane = this.mainController.getMainTabPaneRef();
         /* First check if we have already opened a tab for this gene. */
         if (openTabs.containsKey(hbadealsResult)) {
@@ -230,7 +230,7 @@ public class AnalysisController implements Initializable {
         });
 
         tab.setOnCloseRequest((e)-> {
-            for (HbaDealsGeneRow vpnt : this.openTabs.keySet()) {
+            for (Visualizable vpnt : this.openTabs.keySet()) {
                 Tab t = this.openTabs.get(vpnt);
                 if (t.equals(tab)) {
                     this.openTabs.remove(vpnt);
@@ -270,7 +270,7 @@ public class AnalysisController implements Initializable {
      *
      * @param col {@link TableColumn} with a name that will be wrapped
      */
-    public static  <T> void makeHeaderWrappable(TableColumn<HbaDealsGeneRow, T> col) {
+    public static  <T> void makeHeaderWrappable(TableColumn<Visualizable, T> col) {
         Label label = new Label(col.getText());
         label.setStyle("-fx-padding: 8px;");
         label.setWrapText(true);

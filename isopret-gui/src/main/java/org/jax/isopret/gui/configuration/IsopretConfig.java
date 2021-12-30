@@ -27,6 +27,8 @@ public class IsopretConfig {
         return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
+
+
     /**
      * Properties meant to store user configuration within the app's directory
      *

@@ -1,7 +1,6 @@
 package org.jax.isopret.core.visualization;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
 import org.slf4j.Logger;
@@ -28,10 +27,10 @@ public class HtmlVisualizer implements Visualizer {
             """;
 
 
-    private String getGoAnchor(GoTermIdPlusLabel go) {
+    private String getGoAnchor(OntologyTermVisualizable go) {
         //QuickGO - https://www.ebi.ac.uk/QuickGO/term/GO:0006915
-        String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getId();
-        return String.format("<a href=\"%s\" target=\"_blank\">%s</a>\n", url, go.getLabel());
+        String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getTermId();
+        return String.format("<a href=\"%s\" target=\"_blank\">%s</a>\n", url, go.getTermLabel());
     }
 
     public String getGeneBox(Visualizable vis) {
@@ -44,7 +43,7 @@ public class HtmlVisualizer implements Visualizer {
         String prob = String.format("%.2f", vis.getExpressionPval()) + (vis.isDifferentiallyExpressed() ? " (*)" : "");
         sb.append("<td>").append(prob).append("</td></tr>\n");
         sb.append("</table>\n");
-        List<GoTermIdPlusLabel> goterms = vis.getGoTerms();
+        List<OntologyTermVisualizable> goterms = vis.getGoTerms();
         if (goterms.size() > 0) {
             sb.append("<p>Enriched GO terms associated with ").append(vis.getGeneSymbol()).append(".</p>\n");
             sb.append("<ul>\n");

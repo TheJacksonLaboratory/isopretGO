@@ -3,8 +3,8 @@ package org.jax.isopret.gui.service;
 import javafx.application.HostServices;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
+import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
-import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 
@@ -47,7 +47,7 @@ public interface IsopretService {
 
     void setData(IsopretDataLoadTask task);
 
-    List<HbaDealsGeneRow> getHbaDealsRows();
+//    List<HbaDealsGeneRow> getHbaDealsRows();
 
     Map<String, String> getResultsSummaryMap();
 
@@ -68,4 +68,9 @@ public interface IsopretService {
     String getGoSummary();
 
     HostServices getHostServices();
+
+    Visualizable getVisualizableForGene(String symbol);
+
+    List<Visualizable> getGeneVisualizables();
+
 }

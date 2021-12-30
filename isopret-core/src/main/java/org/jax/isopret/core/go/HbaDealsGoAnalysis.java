@@ -2,19 +2,24 @@ package org.jax.isopret.core.go;
 
 
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
+import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.stats.ParentChildIntersectionPValueCalculation;
 import org.monarchinitiative.phenol.stats.ParentChildUnionPValueCalculation;
 import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
 import org.monarchinitiative.phenol.stats.mtc.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class HbaDealsGoAnalysis {
+    private final Logger LOGGER = LoggerFactory.getLogger(HbaDealsGoAnalysis.class);
 
     private final static double ALPHA = 0.05;
 
@@ -23,6 +28,7 @@ public class HbaDealsGoAnalysis {
     private final StudySet study;
     private final StudySet population;
     private final GoMethod goMethod;
+
     private final MultipleTestingCorrection mtc;
 
     public HbaDealsGoAnalysis(Ontology ontology,
@@ -33,16 +39,16 @@ public class HbaDealsGoAnalysis {
         this.ontology = ontology;
         this.goMethod = method;
         switch (mtcMethod) {
-            case BONFERRONI -> this.mtc = new Bonferroni();
-            case BONFERRONI_HOLM -> this.mtc = new BonferroniHolm();
-            case BENJAMINI_HOCHBERG -> this.mtc = new BenjaminiHochberg();
-            case BENJAMINI_YEKUTIELI -> this.mtc = new BenjaminiYekutieli();
-            case SIDAK -> this.mtc = new Sidak();
-            case NONE -> this.mtc = new NoMultipleTestingCorrection();
+            case BONFERRONI -> mtc = new Bonferroni();
+            case BONFERRONI_HOLM -> mtc = new BonferroniHolm();
+            case BENJAMINI_HOCHBERG -> mtc = new BenjaminiHochberg();
+            case BENJAMINI_YEKUTIELI -> mtc = new BenjaminiYekutieli();
+            case SIDAK -> mtc = new Sidak();
+            case NONE -> mtc = new NoMultipleTestingCorrection();
             default -> {
                 // should never happen
                 System.err.println("[WARNING] Did not recognize MTC");
-                this.mtc = new Bonferroni();
+                mtc = new Bonferroni();
             }
         }
         this.study = study;
@@ -77,7 +83,7 @@ public class HbaDealsGoAnalysis {
         TermForTermPValueCalculation tftpvalcal = new TermForTermPValueCalculation(this.ontology,
                 this.population,
                 this.study,
-                new Bonferroni());
+                mtc);
         return tftpvalcal.calculatePVals()
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
@@ -88,7 +94,7 @@ public class HbaDealsGoAnalysis {
         ParentChildUnionPValueCalculation tftpvalcal = new ParentChildUnionPValueCalculation(this.ontology,
                 this.population,
                 this.study,
-                new Bonferroni());
+                mtc);
         return tftpvalcal.calculatePVals()
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
@@ -99,7 +105,7 @@ public class HbaDealsGoAnalysis {
         ParentChildIntersectionPValueCalculation tftpvalcal = new ParentChildIntersectionPValueCalculation(this.ontology,
                 this.population,
                 this.study,
-                new Bonferroni());
+                mtc);
         return tftpvalcal.calculatePVals()
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
@@ -155,20 +161,19 @@ public class HbaDealsGoAnalysis {
      * Key -- gene symbols for any genes that are annotated to enriched GO terms.
      * Value -- list of corresponding annotations, but only to the enriched GO terms
      */
-    public Map<String, Set<GoTermIdPlusLabel>> getEnrichedSymbolToEnrichedGoMap(Set<TermId> einrichedGoTermIdSet, Set<String> symbols) {
-        Map<String, Set<GoTermIdPlusLabel>> symbolToGoTermResults = new HashMap<>();
-       /* List<TermAnnotation> rawAnnots = this.associationContainer.getRawAssociations();
-        for (TermAnnotation a : rawAnnots) {
-            String symbol = a.getDbObjectSymbol();
-            if (symbols.contains(symbol)) {
-                symbolToGoTermResults.putIfAbsent(symbol, new HashSet<>());
-                TermId goId = a.getGoId();
-                if (einrichedGoTermIdSet.contains(goId)) {
-                    Optional<String> labelOpt = ontology.getTermLabel(goId);
-                    labelOpt.ifPresent(s -> symbolToGoTermResults.get(symbol).add(new GoTermIdPlusLabel(goId, s)));
-                }
+    public Map<TermId, Set<Term>> getEnrichedSymbolToEnrichedGoMap(Set<TermId> einrichedGoTermIdSet) {
+        Map<TermId, Set<Term>> symbolToGoTermResults = new HashMap<>();
+        for (DirectAndIndirectTermAnnotations dai : study.getAnnotationMap().values()) {
+            TermId ontologyId = dai.getOntologyId();
+            if (! ontology.containsTerm(ontologyId)) {
+                LOGGER.error("Could not find Ontology id {}", ontologyId.getValue());
+                continue;
             }
-        }*/
+            Term term = ontology.getTermMap().get(ontologyId);
+            for (TermId domainItemId : dai.getTotalAnnotatedDomainItemSet()) {
+                symbolToGoTermResults.computeIfAbsent(domainItemId, r -> new HashSet<>()).add(term);
+            }
+        }
         return symbolToGoTermResults;
     }
 

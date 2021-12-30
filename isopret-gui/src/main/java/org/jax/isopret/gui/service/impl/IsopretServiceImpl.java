@@ -6,12 +6,10 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.IsopretDownloader;
@@ -20,12 +18,13 @@ import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
 import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.HtmlVisualizer;
+import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
-import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
@@ -237,43 +236,6 @@ public class IsopretServiceImpl implements IsopretService  {
         }
     }
 
-    /**
-     * Return a sorted list of {@link HbaDealsGeneRow} objects
-     * @return Rows intended for display in the second tab
-     */
-    @Override
-    public List<HbaDealsGeneRow> getHbaDealsRows() {
-
-        for (var r : thresholder.getRawResults().values()) {
-            if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
-                LOGGER.warn("Could not find transcript map for symbol {}", r.getSymbol());
-                continue;
-            }
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
-            HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
-            double splicingThreshold = thresholder.getSplicingThreshold();
-            double expressionThreshold = thresholder.getExpressionThreshold();
-            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
-                    interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
-            AnnotatedGene agene = new AnnotatedGene(transcripts,
-                    transcriptToInterproHitMap,
-                    result,
-                    expressionThreshold,
-                    splicingThreshold);
-//            if (dasStudySet.contains(r.getGeneAccession().toTermId())) {
-//                DirectAndIndirectTermAnnotations annots = dasStudySet.getAnnotationMap().get(r.getGeneAccession().toTermId());
-//                Set<TermId> directDas = annots.getDirectAnnotated();
-//            }
-            Set<GoTermIdPlusLabel> goTerms = Set.of(); // TODO INTIIALZIED
-        }
-
-        return thresholder.getRawResults().
-                values().
-                stream()
-                .sorted()
-                .map(HbaDealsGeneRow::new)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public  Map<String, String> getResultsSummaryMap(){
@@ -293,6 +255,57 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
+    public Visualizable getVisualizableForGene(String symbol) {
+        if (! this.thresholder.getRawResults().containsKey(symbol)) {
+            LOGGER.error("Could not find HBADEALS results for {}.", symbol);
+            return null;
+        }
+        List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(symbol);
+        HbaDealsResult result = thresholder.getRawResults().get(symbol);
+        double splicingThreshold = thresholder.getSplicingThreshold();
+        double expressionThreshold = thresholder.getExpressionThreshold();
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+        AnnotatedGene agene = new AnnotatedGene(transcripts,
+                transcriptToInterproHitMap,
+                result,
+                expressionThreshold,
+                splicingThreshold);
+
+        Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
+        HtmlVisualizer visualizer = new HtmlVisualizer();
+        return new EnsemblVisualizable(agene, goTerms);
+    }
+
+    @Override
+    public List<Visualizable> getGeneVisualizables() {
+        List<Visualizable> visualizables = new ArrayList<>();
+        for (var r : thresholder.getRawResults().values()) {
+            if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
+                LOGGER.warn("Could not find transcript map for symbol {}", r.getSymbol());
+                continue;
+            }
+            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
+            HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
+            double splicingThreshold = thresholder.getSplicingThreshold();
+            double expressionThreshold = thresholder.getExpressionThreshold();
+            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                    interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+            AnnotatedGene agene = new AnnotatedGene(transcripts,
+                    transcriptToInterproHitMap,
+                    result,
+                    expressionThreshold,
+                    splicingThreshold);
+            Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
+            EnsemblVisualizable viz = new EnsemblVisualizable(agene, goTerms);
+            visualizables.add(viz);
+        }
+       return visualizables;
+    }
+
+
+
+    @Override
     public String getHtmlForGene(String symbol) {
         if (! this.thresholder.getRawResults().containsKey(symbol)) {
             LOGGER.error("Could not find HBADEALS results for {}.", symbol);
@@ -310,9 +323,9 @@ public class IsopretServiceImpl implements IsopretService  {
                     expressionThreshold,
                     splicingThreshold);
 
-        Set<GoTermIdPlusLabel> goTerms = Set.of(); // TODO INTIIALZIED
+        Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
         HtmlVisualizer visualizer = new HtmlVisualizer();
-        return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms, 0));
+        return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms));
     }
 
     public Ontology getGeneOntology() {

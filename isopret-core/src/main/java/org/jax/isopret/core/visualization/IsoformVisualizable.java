@@ -1,5 +1,11 @@
 package org.jax.isopret.core.visualization;
 
+/**
+ * Interface for classes that help display results for isoforms.
+ * See {@link EnsemblIsoformVisualizable} for the implementation
+ * we are currently using.
+ * @author Peter Robinson
+ */
 public interface IsoformVisualizable {
     String transcriptAccession();
     String isoformUrlAnchor();

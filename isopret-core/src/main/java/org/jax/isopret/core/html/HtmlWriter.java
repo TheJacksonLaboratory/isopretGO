@@ -1,7 +1,6 @@
 package org.jax.isopret.core.html;
 
 import org.jax.isopret.core.analysis.Partition;
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
@@ -13,6 +12,7 @@ import org.jax.isopret.core.transcript.Transcript;
 import org.jax.isopret.core.visualization.*;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
@@ -27,7 +27,9 @@ import java.util.stream.Stream;
 /**
  * Class to organize writing to HTML files.
  * TODO this is messy and needs to be cleaned up.
+ * -- refactor to ourput one gene at a time
  */
+@Deprecated
 public class HtmlWriter extends AbstractWriter {
     Logger LOGGER = LoggerFactory.getLogger(HtmlWriter.class);
     int hbadeals = 0;
@@ -72,7 +74,7 @@ public class HtmlWriter extends AbstractWriter {
         Set<TermId> einrichedGoTermIdSet = Stream.concat(dasGoTerms.stream(), dgeGoTerms.stream())
                 .map(GoTerm2PValAndCounts::getItem)
                 .collect(Collectors.toSet());
-        Map<String, Set<GoTermIdPlusLabel>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet,significantGeneSymbols);
+        Map<TermId, Set<Term>> enrichedGeneAnnots = hbago.getEnrichedSymbolToEnrichedGoMap(einrichedGoTermIdSet);
 
         List<String> unidentifiedSymbols = new ArrayList<>();
         this.geneVisualizations = new ArrayList<>();
@@ -116,8 +118,8 @@ public class HtmlWriter extends AbstractWriter {
         int i = 0;
         for (AnnotatedGene annotatedGene : annotatedGeneList) {
             i++;
-            Set<GoTermIdPlusLabel> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
-            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene, goTerms, i)));
+            Set<Term> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
+            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene, goTerms)));
         }
         // record source of analysis
         data.put("hbadealsFile", hbadealsFile.getAbsolutePath());

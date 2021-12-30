@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
     <VBox prefHeight="887.0" prefWidth="1203.0">
         <VBox fx:id="hbaGeneVbox" prefHeight="887.0" prefWidth="1203.0">
-            <Label fx:id="hbaGeneLabel" styleClass="mylabel" stylesheets="@../css/isopretstyle.css">
-                <VBox.margin>
-                    <Insets bottom="20.0" left="40.0" top="20.0"/>
-                </VBox.margin>
-            </Label>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+                <Label fx:id="hbaGeneLabel" minWidth="150.0" styleClass="mylabel" stylesheets="@../css/isopretstyle.css" />
+                <Hyperlink fx:id="geneHyperlink" minWidth="150.0" />
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+                <Label fx:id="geneFoldChangeLabel" minWidth="200.0"/>
+                <Label fx:id="geneProbabilityLabel" minWidth="200.0"/>
+            </HBox>
             <ScrollPane prefHeight="772.0" prefWidth="1203.0">
-                <WebView fx:id="hbaGeneWebView" prefHeight="861.0" prefWidth="1203.0"/>
+                <WebView fx:id="hbaGeneWebView" prefHeight="861.0" prefWidth="1203.0" />
             </ScrollPane>
         </VBox>
     </VBox>

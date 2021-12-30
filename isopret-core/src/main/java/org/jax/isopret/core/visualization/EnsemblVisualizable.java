@@ -1,18 +1,19 @@
 package org.jax.isopret.core.visualization;
 
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.svart.Contig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class acts as an interface between the HtmlVisualizer and the analysis results and
@@ -28,27 +29,31 @@ public class EnsemblVisualizable implements Visualizable {
     /** All annotated transcripts of some gene that were expressed according to HBA deals */
     private final List<Transcript> expressedTranscripts;
 
+    /** All annotated transcripts of a gene; just those transcripts that were expressed according to HBA deals */
+    private final List<IsoformVisualizable> isoformVisualizables;
+
     private final HbaDealsResult hbaDealsResult;
 
     private final String chromosome;
 
     private final AnnotatedGene agene;
 
-    private final List<GoTermIdPlusLabel> goterms;
+    private final List<OntologyTermVisualizable> goterms;
 
     private final boolean differentiallyExpressed;
 
     private final boolean differentiallySpliced;
 
+    private final int significantIsoforms;
+
+
     private final double splicingThreshold;
 
     private final int i;
 
-    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms, int i) {
+    public EnsemblVisualizable(AnnotatedGene agene, Set<Term> goterms) {
         this.agene = agene;
-        List<GoTermIdPlusLabel> golist = new ArrayList<>(goterms);
-        Collections.sort(golist);
-        this.goterms = golist;
+        this.goterms = goterms.stream().map(OntologyTermVisualizable::new).collect(Collectors.toList());
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
         this.hbaDealsResult = agene.getHbaDealsResult();
@@ -57,7 +62,12 @@ public class EnsemblVisualizable implements Visualizable {
         this.differentiallyExpressed = agene.passesExpressionThreshold();
         this.differentiallySpliced = agene.passesSplicingThreshold();
         this.splicingThreshold = agene.getSplicingThreshold();
-        this.i = i;
+        this.i = 0;
+        this.significantIsoforms = (int)hbaDealsResult.getTranscriptMap().values().stream().filter(HbaDealsTranscriptResult::isSignificant).count();
+        this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().
+                stream().
+                map(EnsemblIsoformVisualizable::new)
+                .collect(Collectors.toList());
     }
 
     public int getI() { return i; }
@@ -179,6 +189,11 @@ public class EnsemblVisualizable implements Visualizable {
         return rows;
     }
 
+    @Override
+    public List<IsoformVisualizable> getIsoformVisualizable() {
+        return this.isoformVisualizables;
+    }
+
     /**
      * @return a list of interpro annotations that cover the isoforms of the gene that are expressed in our data
      */
@@ -197,7 +212,7 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
-    public List<GoTermIdPlusLabel> getGoTerms() {
+    public List<OntologyTermVisualizable> getGoTerms() {
         return this.goterms;
     }
 
@@ -209,5 +224,17 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public boolean isDifferentiallySpliced(){
         return this.differentiallySpliced;
+    }
+    @Override
+    public String getNofMsplicing() {
+        if (isoformVisualizables.size() == 0) {
+            return "n/a";
+        }
+        return String.format("%d/%d", this.significantIsoforms, isoformVisualizables.size());
+    }
+
+    @Override
+    public double getBestSplicingPval() {
+        return hbaDealsResult.getSmallestSplicingP();
     }
 }
