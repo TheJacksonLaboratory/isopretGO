@@ -1,6 +1,5 @@
 package org.jax.isopret.core.visualization;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
 import org.slf4j.Logger;

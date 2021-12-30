@@ -2,7 +2,6 @@ package org.jax.isopret.core.hbadeals;
 
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;

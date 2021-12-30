@@ -210,7 +210,7 @@ public class EnsemblVisualizable implements Visualizable {
      * The DisplayInterproAnnotation provides more detail about the locations of individual
      * annotations and is used to generate the protein SVG
      *
-     * @return
+     * @return Object to visualize Interpro entries
      */
     @Override
     public List<InterproVisualizable> getInterproVisualizable() {

@@ -15,7 +15,6 @@ import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 

@@ -2,7 +2,6 @@ package org.jax.isopret.core.go;
 
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
-import org.monarchinitiative.phenol.analysis.GeneAnnotations;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
