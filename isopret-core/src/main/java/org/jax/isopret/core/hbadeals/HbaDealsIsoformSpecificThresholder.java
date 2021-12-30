@@ -70,6 +70,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .collect(Collectors.toList());
         ProbThreshold probThresholdExpression = new ProbThreshold(expressionProbs, fdrThreshold);
         this.expressionThreshold = probThresholdExpression.getQvalueThreshold();
+        LOGGER.info("Expression threshold {}", this.expressionThreshold);
         List<Double> splicingProbs = results
                 .values()
                 .stream()
@@ -78,6 +79,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .collect(Collectors.toList());
         ProbThreshold probThresholdSplicing = new ProbThreshold(splicingProbs, fdrThreshold);
         this.splicingThreshold = probThresholdSplicing.getQvalueThreshold();
+        LOGGER.info("Splicing threshold {}", this.expressionThreshold);
         Set<TermId> dgeSignificant = results
                 .values()
                 .stream()
@@ -91,6 +93,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .map(HbaDealsResult::getGeneAccession)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
+        LOGGER.info("DGE: {} study set and {} population genes", dgeSignificant.size(), dgePopulation.size());
         Map<TermId, DirectAndIndirectTermAnnotations> assocMap
                 = geneContainer.getAssociationMap(dgeSignificant);
         this.dgeStudy = new StudySet("DGE Study", assocMap);
@@ -112,6 +115,8 @@ public class HbaDealsIsoformSpecificThresholder {
                 .map(HbaDealsTranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
+        LOGGER.info("DAS: {} study set and {} population genes", dasIsoformStudy.size(), dasIsoformPopulation.size());
+
         assocMap = transcriptContainer.getAssociationMap(dasIsoformStudy);
         this.dasStudy = new StudySet("DAS Study", assocMap);
         assocMap = geneContainer.getAssociationMap(dasIsoformPopulation);

@@ -172,20 +172,6 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public void doIsopretAnalysis() {
-        LOGGER.info("Starting isopret analysis");
-        if (this.hbaDealsFile == null) {
-            LOGGER.error("Cannot do isopret analysis because HBA-DEALS file not initialized");
-            return;
-        }
-        LOGGER.info("GO Method: {}", this.goMethod.toString());
-        LOGGER.info("MTC Method: {}", this.mtcMethod.toString());
-        LOGGER.info("HBA-DEALS file: {}", this.hbaDealsFile);
-        // get files from download dir
-        LOGGER.info("Getting data files from download dir: {}", this.downloadDirProperty().get());
-    }
-
-    @Override
     public Optional<File> getDownloadDir() {
         String ddir = downloadDirProp.get();
         if (ddir == null) return Optional.empty();
@@ -315,7 +301,7 @@ public class IsopretServiceImpl implements IsopretService  {
        return visualizables;
     }
 
-
+/*
 
     @Override
     public String getHtmlForGene(String symbol) {
@@ -339,6 +325,8 @@ public class IsopretServiceImpl implements IsopretService  {
         HtmlVisualizer visualizer = new HtmlVisualizer();
         return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms));
     }
+
+ */
 
     public Ontology getGeneOntology() {
         return this.geneOntology;

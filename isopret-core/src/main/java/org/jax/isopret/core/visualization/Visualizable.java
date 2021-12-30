@@ -8,6 +8,7 @@ import java.util.List;
  * Interface for classes that help to display the results
  * for an indivudal gene. See {@link EnsemblVisualizable}
  * for an implementation.
+ *
  * @author Peter Robinson
  */
 public interface Visualizable {
@@ -38,28 +39,31 @@ public interface Visualizable {
 
     String getIsoformHtml();
 
-   String getProteinSvg();
-
-   List<IsoformVisualizable> getIsoformVisualizable();
-
-
-   List<OntologyTermVisualizable> getGoTerms();
-
-   boolean isDifferentiallyExpressed();
-
-   boolean isDifferentiallySpliced();
-
-  String getNofMsplicing();
-
-    double getBestSplicingPval();
-
-   List<DisplayInterproAnnotation>  getInterproForExpressedTranscripts();
-
-   List<InterproVisualizable> getInterproVisualizable();
+    String getProteinSvg();
 
     String getProteinHtml();
 
-   int getI();
+    int getProteinSvgHeight();
+
+    List<IsoformVisualizable> getIsoformVisualizable();
+
+
+    List<OntologyTermVisualizable> getGoTerms();
+
+    boolean isDifferentiallyExpressed();
+
+    boolean isDifferentiallySpliced();
+
+    String getNofMsplicing();
+
+    double getBestSplicingPval();
+
+    List<DisplayInterproAnnotation> getInterproForExpressedTranscripts();
+
+    List<InterproVisualizable> getInterproVisualizable();
+
+
+    int getI();
 
 
 }

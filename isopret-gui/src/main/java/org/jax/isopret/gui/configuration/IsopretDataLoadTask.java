@@ -184,6 +184,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         updateMessage("Finished loading data for isopret analysis.");
+        LOGGER.info("Beginning DGE GO analysis");
         HbaDealsGoAnalysis dgeGoAnalysis = new HbaDealsGoAnalysis(geneOntology,
                 isoformSpecificThresholder.getDgeStudy(),
                 isoformSpecificThresholder.getDgePopulation(),
@@ -193,12 +194,15 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateProgress(0.9, 1);
         updateMessage(String.format("Finished DGE overrepresentation analysis. %d overrepresented GO Terms",
                dgeResults.size()));
+        LOGGER.info("Finished DGE GO analysis, n = {}", this.dgeResults.size());
+        LOGGER.info("Beginning DAS GO analysis");
         HbaDealsGoAnalysis dasGoAnalysis = new HbaDealsGoAnalysis(geneOntology,
                 isoformSpecificThresholder.getDasStudy(),
                 isoformSpecificThresholder.getDasPopulation(),
                 this.overrepMethod,
                 this.multipleTestingMethod);
         this.dasResults = dasGoAnalysis.overrepresetationAnalysis();
+        LOGGER.info("Finished DAS GO analysis, n = {}", this.dasResults.size());
         updateProgress(0.95, 1);
         updateMessage(String.format("Finished DAS overrepresentation analysis. %d overrepresented GO Terms",
                 dasResults.size()));
