@@ -3,8 +3,8 @@ package org.jax.isopret.gui.service;
 import javafx.application.HostServices;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
+import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
-import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 
@@ -31,6 +31,8 @@ public interface IsopretService {
 
     StringProperty downloadDirProperty();
 
+    StringProperty hbaDealsFileProperty();
+
     DoubleProperty downloadCompletenessProperty();
 
     void setHbaDealsFile(File file);
@@ -39,19 +41,13 @@ public interface IsopretService {
 
     void setMtcMethod(String method);
 
-    void doIsopretAnalysis();
-
     Optional<File> getDownloadDir();
 
     Optional<File> getHbaDealsFileOpt();
 
     void setData(IsopretDataLoadTask task);
 
-    List<HbaDealsGeneRow> getHbaDealsRows();
-
     Map<String, String> getResultsSummaryMap();
-
-    String getHtmlForGene(String symbol);
 
     List<GoTerm2PValAndCounts> getDasGoTerms();
 
@@ -68,4 +64,10 @@ public interface IsopretService {
     String getGoSummary();
 
     HostServices getHostServices();
+
+    Visualizable getVisualizableForGene(String symbol);
+
+    List<Visualizable> getGeneVisualizables();
+
+
 }

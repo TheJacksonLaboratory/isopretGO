@@ -1,7 +1,6 @@
 package org.jax.isopret.core.io;
 
 public class FileDownloadException extends Exception {
-    private static final long serialVersionUID = 1L;
 
     public FileDownloadException() {
         super();

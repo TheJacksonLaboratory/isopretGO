@@ -63,7 +63,7 @@ public class TranscriptFunctionFileParser {
         }
         if (notFound.size() > 0) {
             LOGGER.warn("Could not find " + notFound.size() + " terms in Ontology");
-            LOGGER.warn(String.join("; ", notFound));
+            //LOGGER.warn(String.join("; ", notFound));
 
         }
         transcriptIdToGoTermsMap = Map.copyOf(annotMap); // return immutable map

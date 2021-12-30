@@ -1,9 +1,6 @@
 package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.HbaDealsGoAnalysis;
-import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
@@ -162,29 +159,5 @@ public abstract class IsopretCommand {
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         return new HbaDealsThresholder(hbaDealsResults);
     }
-
-
-    /*
-    Ontology ontology,
-     AssociationContainer<TermId> associationContainer,
-                                                          StudySet study,
-                                                          StudySet population,
-                                                          MtcMethod mtcMethod
-     */
-    protected HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
-                                                     HbaDealsThresholder thresholder,
-                                                     Ontology ontology,
-                                                     GoAssociationContainer goAssociationContainer,
-                                                     MtcMethod mtc) {
-//        if (goMethod == GoMethod.PCunion) {
-//            return HbaDealsGoAnalysis.parentChildUnion(ontology, goAssociationContainer, mtc);
-//        } else if (goMethod == GoMethod.PCintersect) {
-//            return HbaDealsGoAnalysis.parentChildIntersect(thresholder, ontology, goAssociationContainer, mtc);
-//        } else {
-//            return HbaDealsGoAnalysis.termForTerm(thresholder, ontology, goAssociationContainer, mtc);
-//        }
-        return null;
-    }
-
 
 }

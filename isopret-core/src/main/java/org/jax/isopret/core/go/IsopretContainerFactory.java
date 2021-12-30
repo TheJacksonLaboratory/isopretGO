@@ -34,11 +34,9 @@ public class IsopretContainerFactory {
     }
 
 
-
-
-    public AssociationContainer<TermId> transcriptContainer() {
+    private AssociationContainer<TermId> getContainer(Map<TermId, Set<TermId>> assocmap) {
         Map<TermId, IsopretAnnotations> assocMap = new HashMap<>();
-        for (var entry : transcript2associationMap.entrySet()) {
+        for (var entry : assocmap.entrySet()) {
             var transcriptId = entry.getKey();
             // Remove any GO terms that are not in the Ontology -- this could
             // represent a version error
@@ -53,33 +51,20 @@ public class IsopretContainerFactory {
             IsopretAnnotations isopretAnnotations = new IsopretAnnotations(transcriptId, termAnnots);
             assocMap.put(transcriptId, isopretAnnotations);
         }
-        LOGGER.info("Isopret association container");
-        LOGGER.info("Isopret transcript association containiner - map with {} entries", assocMap.size());
+        LOGGER.info("Isopret association containiner - map with {} entries", assocmap.size());
         return new IsopretAssociationContainer(ontology, assocMap);
     }
 
 
-    public AssociationContainer<TermId> geneContainer() {
-        Map<TermId, IsopretAnnotations> assocMap = new HashMap<>();
-        for (var entry : gene2associationMap.entrySet()) {
-            var geneId = entry.getKey();
-            // Remove any GO terms that are not in the Ontology -- this could
-            // represent a version error
-            Set<TermId> annotatingGoTerms = entry.getValue()
-                    .stream()
-                    .filter(ontology::containsTerm)
-                    .collect(Collectors.toSet());
-            List<TermAnnotation> termAnnots = new ArrayList<>();
-            for (TermId goId : annotatingGoTerms) {
-                termAnnots.add(new IsopretTermAnnotation(geneId, goId));
-            }
-            IsopretAnnotations isopretAnnotations = new IsopretAnnotations(geneId, termAnnots);
-            assocMap.put(geneId, isopretAnnotations);
-        }
-        LOGGER.info("Isopret association container");
-        LOGGER.info("Isopret transcript association containiner - map with {} entries", assocMap.size());
-        return new IsopretAssociationContainer(ontology, assocMap);
+    public AssociationContainer<TermId> transcriptContainer() {
+        LOGGER.info("Constructing transcript association container");
+        return getContainer(this.transcript2associationMap);
+    }
 
+
+    public AssociationContainer<TermId> geneContainer() {
+        LOGGER.info("Constructing gene association container");
+        return getContainer(this.gene2associationMap);
     }
 
 

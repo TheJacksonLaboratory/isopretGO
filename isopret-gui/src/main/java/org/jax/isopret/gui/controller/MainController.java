@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.jax.isopret.core.go.GoMethod;
+import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
@@ -41,6 +43,8 @@ public class MainController implements Initializable {
     public Tab dgeTab;
     public Tab dasTab;
     @FXML
+    private Label hbaDealsFileLabel;
+    @FXML
     private ProgressBar analysisPB;
     @FXML
     private Label analysisLabel;
@@ -55,8 +59,8 @@ public class MainController implements Initializable {
             "Parent-Child Union", "Parent-Child Intersect");
     @FXML
     private ChoiceBox<String> goChoiceBox;
-    private final ObservableList<String> mtcMethodList = FXCollections.observableArrayList("None",
-            "Bonferroni", "Bonferroni-Holm","Sidak","Benjamini-Hochberg","Benjamini-Yekutieli");
+    private final ObservableList<String> mtcMethodList = FXCollections.observableArrayList(
+            "Bonferroni", "Bonferroni-Holm","Sidak","Benjamini-Hochberg","Benjamini-Yekutieli", "None");
 
     /** The tab pane with setup, analysis, gene views. etc */
     @FXML
@@ -88,6 +92,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Bindings.bindBidirectional(this.downloadDataSourceLabel.textProperty(), service.downloadDirProperty());
+        Bindings.bindBidirectional(this.hbaDealsFileLabel.textProperty(), service.hbaDealsFileProperty());
         this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
         goChoiceBox.setItems(goMethodList);
         goChoiceBox.getSelectionModel().selectFirst();
@@ -152,7 +157,8 @@ public class MainController implements Initializable {
         javafx.application.Platform.exit();
     }
 
-    public void isopretAnalysis(ActionEvent actionEvent) {
+    @FXML
+    private void isopretAnalysis(ActionEvent actionEvent) {
         LOGGER.info("Do isopret analysis");
         Optional<File> downloadOpt = service.getDownloadDir();
         if (downloadOpt.isEmpty()) {
@@ -164,7 +170,14 @@ public class MainController implements Initializable {
             PopupFactory.displayError("ERROR", "HBA-DEALS file not found");
             return;
         }
-        IsopretDataLoadTask task = new IsopretDataLoadTask(downloadOpt.get(), hbadealsOpt.get());
+        String goString = this.goChoiceBox.getValue();
+        GoMethod goMethod = GoMethod.fromString(goString);
+        String mtcString = this.mtcChoiceBox.getValue();
+        MtcMethod mtcMethod = MtcMethod.fromString(mtcString);
+        IsopretDataLoadTask task = new IsopretDataLoadTask(downloadOpt.get(),
+                hbadealsOpt.get(),
+                goMethod,
+                mtcMethod);
 
         this.analysisLabel.textProperty().bind(task.messageProperty());
         this.analysisPB.progressProperty().unbind();
@@ -192,7 +205,6 @@ public class MainController implements Initializable {
                 dgeTab.setClosable(false);
                 dgeTab.setContent(p);
                 this.tabPane.getTabs().add(dgeTab);
-                //
                 GeneOntologyController gc1 = loader.getController();
                 gc1.refreshGeneOntologyTable();
             } catch (IOException e) {
@@ -224,9 +236,10 @@ public class MainController implements Initializable {
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
-           // this.analysisLabel.setText("Failed!");
+            eh.getSource().getException().printStackTrace();
+            //eh.getSource().getException().toString()
             PopupFactory.displayException("Error",
-                    "Exception encountered while attempting to create digest file",
+                    "Exception encountered while attempting to perform isopret analysis",
                     exc);
         });
         new Thread(task).start();
