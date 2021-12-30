@@ -74,19 +74,6 @@ public class IsopretFxApplication extends Application {
                 .sources(IsopretFxApplication.class)
                 .initializers(initializer).run();
 
-//        ClassPathResource applicationProps =  new ClassPathResource("application.properties");
-//        Objects.requireNonNull(applicationProps);
-//        // export app's version into System properties
-//       try (Reader is = new InputStreamReader(applicationProps.getInputStream())) {
-//            Properties properties = new Properties();
-//            properties.load(is);
-//            String version = "1.2";//properties.getProperty(FENOMINAL_VERSION_PROP_KEY, "unknown version");
-//            System.setProperty(ISOPRETFX_VERSION_PROP_KEY, version);
-//            String name = properties.getProperty(ISOPRETFX_NAME_KEY, "Isopret");
-//            System.setProperty(ISOPRETFX_NAME_KEY, name);
-//        } catch (IOException e) {
-//           LOGGER.error("Could not load application properties: {}", e.getMessage());
-//        }
     }
 
     /**

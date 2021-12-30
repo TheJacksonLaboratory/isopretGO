@@ -38,15 +38,22 @@ public abstract class AbstractSvgGenerator {
     abstract void write(Writer writer);
     abstract public String getSvg();
 
+    public int getSvgHeight() {
+        return this.SVG_HEIGHT;
+    }
+
 
     /**
      * Write the header of the SVG.
+     * //preserveAspectRatio="xMidYMid meet" viewBox="0 0 700 550"
      * @param writer file handle
      * @param blackBorder if true, write a black border around the SVG
      * @throws IOException if we cannot writ the SVG
      */
     private void writeHeader(Writer writer, boolean blackBorder) throws IOException {
-        writer.write("<svg width=\"" + SVG_WIDTH + "\" height=\"" + this.SVG_HEIGHT + "\" ");
+        String viewbox = String.format("preserveAspectRatio=\"xMidYMid meet\" viewBox=\"0 0 %d %d\" ",
+                this.SVG_WIDTH, this.SVG_HEIGHT);
+        writer.write("<svg width=\"1100" + viewbox + "\" ");
         if (blackBorder) {
             writer.write("style=\"border:1px solid black\" ");
         }

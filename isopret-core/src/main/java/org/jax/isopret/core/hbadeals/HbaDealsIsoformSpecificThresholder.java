@@ -2,7 +2,6 @@ package org.jax.isopret.core.hbadeals;
 
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -35,6 +34,22 @@ public class HbaDealsIsoformSpecificThresholder {
     private final StudySet dasStudy;
     private final StudySet dasPopulation;
 
+    private final Map<String, HbaDealsResult> rawResults;
+
+    private final double fdrThreshold;
+
+
+    public Map<String, HbaDealsResult> getRawResults() {
+        return rawResults;
+    }
+
+    public int getTotalGeneCount() {
+        return this.rawResults.size();
+    }
+
+    public double getFdrThreshold() {
+        return fdrThreshold;
+    }
 
     /**
      * Find the FDR thresholds for splicing and expression
@@ -45,6 +60,8 @@ public class HbaDealsIsoformSpecificThresholder {
                                               AssociationContainer<TermId> geneContainer,
                                               AssociationContainer<TermId> transcriptContainer) {
 
+        this.rawResults = results;
+        this.fdrThreshold = fdrThreshold;
         List<Double> expressionProbs = results
                 .values()
                 .stream()
@@ -52,6 +69,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .collect(Collectors.toList());
         ProbThreshold probThresholdExpression = new ProbThreshold(expressionProbs, fdrThreshold);
         this.expressionThreshold = probThresholdExpression.getQvalueThreshold();
+        LOGGER.info("Expression threshold {}", this.expressionThreshold);
         List<Double> splicingProbs = results
                 .values()
                 .stream()
@@ -60,6 +78,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .collect(Collectors.toList());
         ProbThreshold probThresholdSplicing = new ProbThreshold(splicingProbs, fdrThreshold);
         this.splicingThreshold = probThresholdSplicing.getQvalueThreshold();
+        LOGGER.info("Splicing threshold {}", this.expressionThreshold);
         Set<TermId> dgeSignificant = results
                 .values()
                 .stream()
@@ -73,8 +92,8 @@ public class HbaDealsIsoformSpecificThresholder {
                 .map(HbaDealsResult::getGeneAccession)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
-        Map<TermId, DirectAndIndirectTermAnnotations> assocMap
-                = geneContainer.getAssociationMap(dgeSignificant);
+        LOGGER.info("DGE: {} study set and {} population genes", dgeSignificant.size(), dgePopulation.size());
+        var assocMap = geneContainer.getAssociationMap(dgeSignificant);
         this.dgeStudy = new StudySet("DGE Study", assocMap);
         assocMap = geneContainer.getAssociationMap(dgePopulation);
         this.dgePopulation = new StudySet("DGE Population", assocMap);
@@ -94,15 +113,20 @@ public class HbaDealsIsoformSpecificThresholder {
                 .map(HbaDealsTranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
+        LOGGER.info("DAS: {} study set and {} population genes", dasIsoformStudy.size(), dasIsoformPopulation.size());
         assocMap = transcriptContainer.getAssociationMap(dasIsoformStudy);
         this.dasStudy = new StudySet("DAS Study", assocMap);
-        assocMap = geneContainer.getAssociationMap(dasIsoformPopulation);
+        assocMap = transcriptContainer.getAssociationMap(dasIsoformPopulation);
         this.dasPopulation = new StudySet("DAS Population", assocMap);
     }
 
 
     public StudySet getDgeStudy() {
         return this.dgeStudy;
+    }
+
+    public int getDgeGeneCount() {
+        return this.dgeStudy.getAnnotatedItemCount();
     }
 
     public StudySet getDgePopulation() {
@@ -113,6 +137,10 @@ public class HbaDealsIsoformSpecificThresholder {
 
     public StudySet getDasStudy() {
         return this.dasStudy;
+    }
+
+    public int getDasGeneCount() {
+        return this.dasStudy.getAnnotatedItemCount();
     }
 
     public StudySet getDasPopulation() {

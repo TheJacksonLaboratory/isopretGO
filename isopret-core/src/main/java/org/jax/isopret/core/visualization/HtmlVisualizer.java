@@ -1,7 +1,5 @@
 package org.jax.isopret.core.visualization;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
 import org.slf4j.Logger;
@@ -28,10 +26,10 @@ public class HtmlVisualizer implements Visualizer {
             """;
 
 
-    private String getGoAnchor(GoTermIdPlusLabel go) {
+    private String getGoAnchor(OntologyTermVisualizable go) {
         //QuickGO - https://www.ebi.ac.uk/QuickGO/term/GO:0006915
-        String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getId();
-        return String.format("<a href=\"%s\" target=\"_blank\">%s</a>\n", url, go.getLabel());
+        String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getTermId();
+        return String.format("<a href=\"%s\" target=\"_blank\">%s</a>\n", url, go.getTermLabel());
     }
 
     public String getGeneBox(Visualizable vis) {
@@ -44,7 +42,7 @@ public class HtmlVisualizer implements Visualizer {
         String prob = String.format("%.2f", vis.getExpressionPval()) + (vis.isDifferentiallyExpressed() ? " (*)" : "");
         sb.append("<td>").append(prob).append("</td></tr>\n");
         sb.append("</table>\n");
-        List<GoTermIdPlusLabel> goterms = vis.getGoTerms();
+        List<OntologyTermVisualizable> goterms = vis.getGoTerms();
         if (goterms.size() > 0) {
             sb.append("<p>Enriched GO terms associated with ").append(vis.getGeneSymbol()).append(".</p>\n");
             sb.append("<ul>\n");
@@ -105,7 +103,7 @@ public class HtmlVisualizer implements Visualizer {
     private String getTranscriptBox(Visualizable vis) {
         final int EXPECTED_N_COLUMNS = 3;
         StringBuilder sb = new StringBuilder();
-        List<List<String>> tableData = vis.getIsoformTableData();
+        List<IsoformVisualizable> tableData = vis.getIsoformVisualizable();
         if (tableData.isEmpty()) {
             return "<p>No isoform data found.</p>\n";
         }
@@ -113,13 +111,10 @@ public class HtmlVisualizer implements Visualizer {
         int expressionIsoforms = vis.getExpressedTranscriptCount();
         sb.append(ISOFORM_TABLE_HEADER);
         for (var row : tableData) {
-            if (row.size() != EXPECTED_N_COLUMNS) {
-                // should never happen!
-                throw new IsopretRuntimeException("Malformed isoform row: " + row);
-            }
-            sb.append("<tr><td>").append(row.get(0)).append("</td>");
-            sb.append("<td>").append(row.get(1)).append("</td>");
-            sb.append("<td>").append(row.get(2)).append("</td></tr>\n");
+
+            sb.append("<tr><td>").append(row.transcriptAccession()).append("</td>");
+            sb.append("<td>").append(row.log2Foldchange()).append("</td>");
+            sb.append("<td>").append(row.isoformP()).append("</td></tr>\n");
         }
         sb.append("</table>\n");
         sb.append("<p>").append(expressionIsoforms).append(" transcripts were expressed in the data from ")

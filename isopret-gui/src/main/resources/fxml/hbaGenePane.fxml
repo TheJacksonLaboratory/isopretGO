@@ -1,21 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
     <VBox prefHeight="887.0" prefWidth="1203.0">
         <VBox fx:id="hbaGeneVbox" prefHeight="887.0" prefWidth="1203.0">
-            <Label fx:id="hbaGeneLabel" styleClass="mylabel" stylesheets="@../css/isopretstyle.css">
-                <VBox.margin>
-                    <Insets bottom="20.0" left="40.0" top="20.0"/>
-                </VBox.margin>
-            </Label>
+            <HBox prefHeight="100.0" prefWidth="1200.0">
+                <Label fx:id="hbaGeneLabel" minWidth="150.0" styleClass="mylabel" stylesheets="@../css/isopretstyle.css">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin></Label>
+                <Hyperlink fx:id="geneHyperlink" minWidth="150.0" />
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="1200.0">
+                <Label fx:id="geneFoldChangeLabel" minWidth="300.0">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin></Label>
+                <Label fx:id="geneProbabilityLabel" minWidth="200.0" />
+            </HBox>
             <ScrollPane prefHeight="772.0" prefWidth="1203.0">
-                <WebView fx:id="hbaGeneWebView" prefHeight="861.0" prefWidth="1203.0"/>
+
+                <VBox VBox.vgrow="ALWAYS">
+                    <TableView fx:id="isoformTableView" stylesheets="@../css/isopretstyle.css">
+                        <columns>
+                            <TableColumn fx:id="accessionColumn" editable="false" maxWidth="-1.0" minWidth="300.0" prefWidth="300" resizable="false" text="Isoform" />
+                            <TableColumn fx:id="urlColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Ensembl" />
+                            <TableColumn fx:id="isoformLogFcColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Log2 Foldchange" />
+                            <TableColumn fx:id="isoformPColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Probability (PEP)" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                    </TableView>
+                    <WebView fx:id="hbaGeneWebView" prefHeight="861.0" prefWidth="1203.0" />
+                    <TableView fx:id="interprTableView" stylesheets="@../css/isopretstyle.css">
+                        <columns>
+                            <TableColumn fx:id="interproAccessionColumn" editable="false" maxWidth="-1.0" minWidth="300.0" prefWidth="300" resizable="false" text="Interpro Accession" />
+                            <TableColumn fx:id="interproEntryType" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Entry type" />
+                            <TableColumn fx:id="interproDescription" editable="false" maxWidth="-1.0" minWidth="500.0" prefWidth="150" styleClass="mycolumn" text="Description" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                    </TableView>
+                    <WebView fx:id="hbaProteinWebView" prefHeight="861.0" prefWidth="1203.0" />
+                </VBox>
             </ScrollPane>
         </VBox>
     </VBox>

@@ -6,11 +6,10 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.IsopretDownloader;
@@ -19,12 +18,13 @@ import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
 import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.HtmlVisualizer;
+import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
-import org.jax.isopret.gui.service.model.HbaDealsGeneRow;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
@@ -51,6 +51,7 @@ public class IsopretServiceImpl implements IsopretService  {
 
     private final Properties pgProperties;
     private final StringProperty downloadDirProp;
+    private final StringProperty hbaDealsFileProperty;
     private final DoubleProperty downloadCompletenessProp;
     private File hbaDealsFile = null;
     private GoMethod goMethod = GoMethod.TFT;
@@ -59,7 +60,7 @@ public class IsopretServiceImpl implements IsopretService  {
     private List<String> analysisErrors = null;
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
-    private HbaDealsThresholder thresholder = null;
+    private HbaDealsIsoformSpecificThresholder thresholder = null;
     //private GoAssociationContainer associationContainer = null;
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
@@ -74,6 +75,7 @@ public class IsopretServiceImpl implements IsopretService  {
         } else {
             this.downloadDirProp = new SimpleStringProperty("");
         }
+        this.hbaDealsFileProperty = new SimpleStringProperty("");
         this.downloadCompletenessProp = new SimpleDoubleProperty(calculateDownloadCompleteness());
     }
 
@@ -140,12 +142,18 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public void setHbaDealsFile(File file) {
         this.hbaDealsFile = file;
+        this.hbaDealsFileProperty.setValue(file.getAbsolutePath());
         LOGGER.info("Set HBA-DEALS file to {}", this.hbaDealsFile);
     }
 
     @Override
     public StringProperty downloadDirProperty() {
         return this.downloadDirProp;
+    }
+
+    @Override
+    public StringProperty hbaDealsFileProperty() {
+        return hbaDealsFileProperty;
     }
 
     @Override
@@ -161,20 +169,6 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public void setMtcMethod(String method) {
         this.mtcMethod = MtcMethod.fromString(method);
-    }
-
-    @Override
-    public void doIsopretAnalysis() {
-        LOGGER.info("Starting isopret analysis");
-        if (this.hbaDealsFile == null) {
-            LOGGER.error("Cannot do isopret analysis because HBA-DEALS file not initialized");
-            return;
-        }
-        LOGGER.info("GO Method: {}", this.goMethod.toString());
-        LOGGER.info("MTC Method: {}", this.mtcMethod.toString());
-        LOGGER.info("HBA-DEALS file: {}", this.hbaDealsFile);
-        // get files from download dir
-        LOGGER.info("Getting data files from download dir: {}", this.downloadDirProperty().get());
     }
 
     @Override
@@ -203,42 +197,12 @@ public class IsopretServiceImpl implements IsopretService  {
         this.analysisErrors = task.getErrors();
         this.geneOntology = task.getGeneOntology();
         this.interproMapper = task.getInterproMapper();
-        this.thresholder = task.getThresholder();
         this.geneSymbolToTranscriptMap = task.getGeneSymbolToTranscriptMap();
-
-        this.dasGoTerms.sort(new SortByPvalue());
-        this.dgeGoTerms.sort(new SortByPvalue());
         this.geneContainer = task.getGeneContainer();
         this.transcriptContainer = task.getTranscriptContainer();
-
-       // HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder();
-
-        /*
-        GoMethod goMethod,
-                                                     AssociationContainer<TermId> associationContainer,
-                                                     Ontology ontology,
-                                                     StudySet study,
-                                                     StudySet population,
-                                                     MtcMethod mtc
-         */
-
-        /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
-//        HbaDealsGoAnalysis hbagoGenes =  getHbaDealsGoAnalysis(goMethod,
-//                geneContainer,
-//                geneOntology,
-//
-//                this.mtcMethod);
-
-        /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
-//        HbaDealsGoAnalysis hbagoTranscript =  getHbaDealsGoAnalysis(goMethod,
-//                thresholder,
-//                geneOntology,
-//                this.transcriptContainer,
-//                this.mtcMethod);
-//
-//        this.dgeGoTerms = hbagoGenes.dasOverrepresetationAnalysis();
-//        this.dasGoTerms = hbagoTranscript.dgeOverrepresetationAnalysis();
-
+        this.dgeGoTerms = task.getDgeResults();
+        this.dasGoTerms = task.getDasResults();
+        this.thresholder = task.getIsoformSpecificThresholder();
     }
 
     @Override
@@ -250,22 +214,6 @@ public class IsopretServiceImpl implements IsopretService  {
         return dgeGoTerms;
     }
 
-    static class SortByPvalue implements Comparator<GoTerm2PValAndCounts>
-    {
-        // Used for sorting in ascending order of
-        // roll number
-        public int compare(GoTerm2PValAndCounts a, GoTerm2PValAndCounts b)
-        {
-            double diff = a.getRawPValue() - b.getRawPValue();
-            if (diff > 0) {
-                return 1;
-            } else if (diff < 0) {
-                return -1;
-            } else  {
-                return 0;
-            }
-        }
-    }
 
     private HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
                                                      AssociationContainer<TermId> associationContainer,
@@ -282,39 +230,6 @@ public class IsopretServiceImpl implements IsopretService  {
         }
     }
 
-    /**
-     * Return a sorted list of {@link HbaDealsGeneRow} objects
-     * @return Rows intended for display in the second tab
-     */
-    @Override
-    public List<HbaDealsGeneRow> getHbaDealsRows() {
-
-        for (var r : thresholder.getRawResults().values()) {
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
-            HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
-            double splicingThreshold = thresholder.getSplicingThreshold();
-            double expressionThreshold = thresholder.getExpressionThreshold();
-            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
-                    interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
-            AnnotatedGene agene = new AnnotatedGene(transcripts,
-                    transcriptToInterproHitMap,
-                    result,
-                    expressionThreshold,
-                    splicingThreshold);
-//            if (dasStudySet.contains(r.getGeneAccession().toTermId())) {
-//                DirectAndIndirectTermAnnotations annots = dasStudySet.getAnnotationMap().get(r.getGeneAccession().toTermId());
-//                Set<TermId> directDas = annots.getDirectAnnotated();
-//            }
-            Set<GoTermIdPlusLabel> goTerms = Set.of(); // TODO INTIIALZIED
-        }
-
-        return thresholder.getRawResults().
-                values().
-                stream()
-                .sorted()
-                .map(HbaDealsGeneRow::new)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public  Map<String, String> getResultsSummaryMap(){
@@ -334,6 +249,61 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
+    public Visualizable getVisualizableForGene(String symbol) {
+        if (! this.thresholder.getRawResults().containsKey(symbol)) {
+            LOGGER.error("Could not find HBADEALS results for {}.", symbol);
+            return null;
+        }
+        List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(symbol);
+        HbaDealsResult result = thresholder.getRawResults().get(symbol);
+        double splicingThreshold = thresholder.getSplicingThreshold();
+        double expressionThreshold = thresholder.getExpressionThreshold();
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+        AnnotatedGene agene = new AnnotatedGene(transcripts,
+                transcriptToInterproHitMap,
+                result,
+                expressionThreshold,
+                splicingThreshold);
+
+        Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
+        HtmlVisualizer visualizer = new HtmlVisualizer();
+        return new EnsemblVisualizable(agene, goTerms);
+    }
+
+    @Override
+    public List<Visualizable> getGeneVisualizables() {
+        int notfound = 0;
+        List<Visualizable> visualizables = new ArrayList<>();
+        for (var r : thresholder.getRawResults().values()) {
+            if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
+                notfound++;
+                continue;
+            }
+            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
+            HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
+            double splicingThreshold = thresholder.getSplicingThreshold();
+            double expressionThreshold = thresholder.getExpressionThreshold();
+            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                    interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+            AnnotatedGene agene = new AnnotatedGene(transcripts,
+                    transcriptToInterproHitMap,
+                    result,
+                    expressionThreshold,
+                    splicingThreshold);
+            Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
+            EnsemblVisualizable viz = new EnsemblVisualizable(agene, goTerms);
+            visualizables.add(viz);
+        }
+        if (notfound > 0) {
+            LOGGER.warn("Could not find transcript map for {} genes", notfound);
+        }
+       return visualizables;
+    }
+
+/*
+
+    @Override
     public String getHtmlForGene(String symbol) {
         if (! this.thresholder.getRawResults().containsKey(symbol)) {
             LOGGER.error("Could not find HBADEALS results for {}.", symbol);
@@ -351,10 +321,12 @@ public class IsopretServiceImpl implements IsopretService  {
                     expressionThreshold,
                     splicingThreshold);
 
-        Set<GoTermIdPlusLabel> goTerms = Set.of(); // TODO INTIIALZIED
+        Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
         HtmlVisualizer visualizer = new HtmlVisualizer();
-        return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms, 0));
+        return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms));
     }
+
+ */
 
     public Ontology getGeneOntology() {
         return this.geneOntology;

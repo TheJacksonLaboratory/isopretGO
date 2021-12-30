@@ -2,7 +2,6 @@ package org.jax.isopret.core.go;
 
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
-import org.monarchinitiative.phenol.analysis.GeneAnnotations;
 import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
@@ -49,10 +48,11 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
     public Map<TermId, DirectAndIndirectTermAnnotations> getAssociationMap(Set<TermId> annotatedItemTermIds) {
         // 1. Get all of the direct GO annotations to the genes. Key: domain item; value: annotating Ontlogy terms
         Map<TermId, Set<TermId>> directAnnotationMap = new HashMap<>();
-        int not_found = 0;
+        int domain_termId_not_found = 0;
+        int ontology_term_not_found = 0;
         for (TermId domainTermId : annotatedItemTermIds) {
             if (!this.associationMap.containsKey(domainTermId)) {
-                LOGGER.error("Could not find annotations for  {}", domainTermId.getValue());
+                domain_termId_not_found++;
                 continue;
             }
             IsopretAnnotations assocs = this.associationMap.get(domainTermId);
@@ -62,7 +62,7 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
                 // check if the term is in the ontology (sometimes, obsoletes are used in the bla32 files)
                 Term term = this.ontology.getTermMap().get(ontologyTermId);
                 if (term == null) {
-                    not_found++;
+                    ontology_term_not_found++;
                     LOGGER.warn("Unable to retrieve ontology term {} (omitted).", ontologyTermId.getValue());
                     continue;
                 }
@@ -71,8 +71,11 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
                 directAnnotationMap.computeIfAbsent(domainTermId, k -> new HashSet<>()).add(ontologyTermId);
             }
         }
-        if (not_found > 0) {
-            LOGGER.warn("Cound not find annotations for {} ontology term ids (are versions in synch?)", not_found);
+        if (domain_termId_not_found > 0) {
+            LOGGER.warn("Could not find {} domain item term ids.", domain_termId_not_found);
+        }
+        if (ontology_term_not_found > 0) {
+            LOGGER.warn("Could not find {} ontology term ids (are go.json/versions in synch?).", ontology_term_not_found);
         }
         Map<TermId, DirectAndIndirectTermAnnotations> annotationMap = new HashMap<>();
         for (Map.Entry<TermId, Set<TermId>> entry : directAnnotationMap.entrySet()) {

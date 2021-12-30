@@ -1,32 +1,44 @@
 package org.jax.isopret.core.visualization;
 
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.interpro.InterproEntry;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
+import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.svart.Contig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class acts as an interface between the HtmlVisualizer and the analysis results and
  * should be used if the input data represent Ensembl ids.
+ *
  * @author Peter N Robinson
  */
 public class EnsemblVisualizable implements Visualizable {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnsemblVisualizable.class);
 
-     /** Number of all annotated transcripts of some gene */
+    /**
+     * Number of all annotated transcripts of some gene
+     */
     private final int totalTranscriptCount;
 
-    /** All annotated transcripts of some gene that were expressed according to HBA deals */
+    /**
+     * All annotated transcripts of some gene that were expressed according to HBA deals
+     */
     private final List<Transcript> expressedTranscripts;
+
+    /**
+     * All annotated transcripts of a gene; just those transcripts that were expressed according to HBA deals
+     */
+    private final List<IsoformVisualizable> isoformVisualizables;
 
     private final HbaDealsResult hbaDealsResult;
 
@@ -34,21 +46,30 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final AnnotatedGene agene;
 
-    private final List<GoTermIdPlusLabel> goterms;
+    private final List<OntologyTermVisualizable> goterms;
 
     private final boolean differentiallyExpressed;
 
     private final boolean differentiallySpliced;
 
+    private final int significantIsoforms;
+
+    private final String isoformSvg;
+
+    private final int isoformSvgHeight;
+
+    private final String proteinSvg;
+
+    private final int proteinSvgHeight;
+
+
     private final double splicingThreshold;
 
     private final int i;
 
-    public EnsemblVisualizable(AnnotatedGene agene, Set<GoTermIdPlusLabel> goterms, int i) {
+    public EnsemblVisualizable(AnnotatedGene agene, Set<Term> goterms) {
         this.agene = agene;
-        List<GoTermIdPlusLabel> golist = new ArrayList<>(goterms);
-        Collections.sort(golist);
-        this.goterms = golist;
+        this.goterms = goterms.stream().map(OntologyTermVisualizable::new).collect(Collectors.toList());
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
         this.hbaDealsResult = agene.getHbaDealsResult();
@@ -57,10 +78,31 @@ public class EnsemblVisualizable implements Visualizable {
         this.differentiallyExpressed = agene.passesExpressionThreshold();
         this.differentiallySpliced = agene.passesSplicingThreshold();
         this.splicingThreshold = agene.getSplicingThreshold();
-        this.i = i;
+        this.i = 0;
+        this.significantIsoforms = (int) hbaDealsResult.getTranscriptMap().values().stream().filter(HbaDealsTranscriptResult::isSignificant).count();
+        this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().
+                stream().
+                map(EnsemblIsoformVisualizable::new)
+                .collect(Collectors.toList());
+        AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
+        this.isoformSvg = svggen.getSvg();
+        this.isoformSvgHeight = svggen.getSvgHeight();
+        svggen = ProteinSvgGenerator.factory(agene);
+
+        if (!agene.hasInterproAnnotations()) {
+            this.proteinSvg = ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
+            this.proteinSvgHeight = 50;
+        } else {
+            AbstractSvgGenerator psvggen = ProteinSvgGenerator.factory(agene);
+            this.proteinSvg = psvggen.getSvg();
+            this.proteinSvgHeight = svggen.getSvgHeight();
+        }
+
     }
 
-    public int getI() { return i; }
+    public int getI() {
+        return i;
+    }
 
     @Override
     public String getGeneSymbol() {
@@ -129,54 +171,21 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getIsoformSvg() {
-        AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
-        return svggen.getSvg();
+        return this.isoformSvg;
     }
 
     @Override
     public String getProteinSvg() {
-        try {
-            // Return a message if there are no prosite domains to display for this protein/gene.
-           if (! agene.hasInterproAnnotations()) {
-                return ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
-            }
-            AbstractSvgGenerator svggen = ProteinSvgGenerator.factory(agene);
-            return svggen.getSvg();
-        } catch (Exception e) {
-            LOGGER.error("Could not generate protein SVG: {}", e.getMessage());
-            return "<p>Could not generate protein SVG because: " + e.getMessage() + "</p>";
-        }
+        return this.proteinSvg;
     }
 
-    private List<String> getIsoformRow(HbaDealsTranscriptResult transcriptResult) {
-        List<String> row = new ArrayList<>();
-        String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
-        String a =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());
-        row.add(a);
-        row.add(String.format("%.3f",transcriptResult.getLog2FoldChange()));
-        String prob = String.format("%.2f", transcriptResult.getP()) + (transcriptResult.getP() <= splicingThreshold ? " (*)" : "");
-        row.add(prob);
-        return row;
-    }
 
     /**
-     * Return data to show the isoforms.
-     * We have isoform accession number as a HTML link, followed by isoform log fold change and isoform p value and
-     * corrected P value, that is for M rows, we return an M*4 matrix of strings intended to build an HTML table
-     * @return a matrix of data representing the contents of an HTML table for the isoforms
+     * @return a matrix of data to display the isoforms
      */
     @Override
-    public List<List<String>> getIsoformTableData() {
-        List<List<String>> rows = new ArrayList<>();
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = this.hbaDealsResult.getTranscriptMap();
-        for (Transcript transcript : this.expressedTranscripts) {
-            if (transcriptMap.containsKey(transcript.accessionId())) {
-                HbaDealsTranscriptResult transcriptResult = transcriptMap.get(transcript.accessionId());
-                var row = getIsoformRow(transcriptResult);
-                rows.add(row);
-            }
-        }
-        return rows;
+    public List<IsoformVisualizable> getIsoformVisualizable() {
+        return this.isoformVisualizables;
     }
 
     /**
@@ -196,8 +205,30 @@ public class EnsemblVisualizable implements Visualizable {
         return sortedList;
     }
 
+    /**
+     * Note that this gives us a list of nterpro entries that are used to annotate the isoforms
+     * The DisplayInterproAnnotation provides more detail about the locations of individual
+     * annotations and is used to generate the protein SVG
+     *
+     * @return Object to visualize Interpro entries
+     */
     @Override
-    public List<GoTermIdPlusLabel> getGoTerms() {
+    public List<InterproVisualizable> getInterproVisualizable() {
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> interproMap = this.agene.getTranscriptToInterproHitMap();
+        Set<InterproEntry> interpro = new HashSet<>();
+        for (AccessionNumber transcriptId : this.hbaDealsResult.getTranscriptMap().keySet()) {
+            if (interproMap.containsKey(transcriptId)) {
+                List<DisplayInterproAnnotation> diaList = interproMap.get(transcriptId);
+                for (var dia : diaList) {
+                    interpro.add(dia.getInterproEntry());
+                }
+            }
+        }
+        return interpro.stream().map(InterproVisualizable::new).sorted().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OntologyTermVisualizable> getGoTerms() {
         return this.goterms;
     }
 
@@ -207,7 +238,78 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
-    public boolean isDifferentiallySpliced(){
+    public boolean isDifferentiallySpliced() {
         return this.differentiallySpliced;
+    }
+
+    @Override
+    public String getNofMsplicing() {
+        if (isoformVisualizables.size() == 0) {
+            return "n/a";
+        }
+        return String.format("%d/%d", this.significantIsoforms, isoformVisualizables.size());
+    }
+
+    @Override
+    public double getBestSplicingPval() {
+        return hbaDealsResult.getSmallestSplicingP();
+    }
+
+    private final static String HTML_FOR_SVG_HEADER = """
+            <!doctype html>
+            <html class="no-js" lang="">
+
+            <head>
+              <meta charset="utf-8">
+              <meta http-equiv="x-ua-compatible" content="ie=edge">
+               <style>
+            html, body {
+               padding: 0;
+               margin: 20;
+               font-size:14px;
+            }
+
+            body {
+               font-family:"DIN Next", Helvetica, Arial, sans-serif;
+               line-height:1.25;
+               background-color:white   ;
+                max-width:1200px;
+                margin-left:auto;
+                margin-right:auto;
+             }
+            </style>
+            <body>
+            """;
+
+    private static final String HTML_FOR_SVG_FOOTER = """
+            </body>
+            </html>
+            """;
+
+
+    @Override
+    public String getIsoformHtml() {
+        String html = HTML_FOR_SVG_HEADER +
+                getIsoformSvg() +
+                HTML_FOR_SVG_FOOTER;
+        return html;
+    }
+
+    @Override
+    public String getProteinHtml() {
+        String html = HTML_FOR_SVG_HEADER +
+                getProteinSvg() +
+                HTML_FOR_SVG_FOOTER;
+        return html;
+    }
+
+    @Override
+    public int getIsoformSvgHeight() {
+        return this.isoformSvgHeight;
+    }
+
+    @Override
+    public int getProteinSvgHeight() {
+        return this.proteinSvgHeight;
     }
 }

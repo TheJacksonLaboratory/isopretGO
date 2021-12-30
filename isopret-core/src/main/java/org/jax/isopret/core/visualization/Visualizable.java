@@ -1,10 +1,16 @@
 package org.jax.isopret.core.visualization;
 
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 
 import java.util.List;
 
+/**
+ * Interface for classes that help to display the results
+ * for an indivudal gene. See {@link EnsemblVisualizable}
+ * for an implementation.
+ *
+ * @author Peter Robinson
+ */
 public interface Visualizable {
 
     String getGeneSymbol();
@@ -29,20 +35,35 @@ public interface Visualizable {
 
     String getIsoformSvg();
 
-   String getProteinSvg();
+    int getIsoformSvgHeight();
 
-   List<List<String>> getIsoformTableData();
+    String getIsoformHtml();
+
+    String getProteinSvg();
+
+    String getProteinHtml();
+
+    int getProteinSvgHeight();
+
+    List<IsoformVisualizable> getIsoformVisualizable();
 
 
-   List<GoTermIdPlusLabel> getGoTerms();
+    List<OntologyTermVisualizable> getGoTerms();
 
-   boolean isDifferentiallyExpressed();
+    boolean isDifferentiallyExpressed();
 
-   boolean isDifferentiallySpliced();
+    boolean isDifferentiallySpliced();
 
-   List<DisplayInterproAnnotation>  getInterproForExpressedTranscripts();
+    String getNofMsplicing();
 
-   int getI();
+    double getBestSplicingPval();
+
+    List<DisplayInterproAnnotation> getInterproForExpressedTranscripts();
+
+    List<InterproVisualizable> getInterproVisualizable();
+
+
+    int getI();
 
 
 }

@@ -1,7 +1,6 @@
 package org.jax.isopret.core.visualization;
 
 
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public class FxVisualizer {
 
     private final List<DisplayInterproAnnotation> interproData;
 
-    private final List<GoTermIdPlusLabel> goterms;
+    private final List<OntologyTermVisualizable> goterms;
 
     private final boolean differentiallyExpressed;
 

@@ -39,7 +39,8 @@ public class InterproMapper {
     }
 
     public Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap(AccessionNumber geneAccession) {
-       if (! geneAccession.isGene()) {
+       int notfound = 0;
+        if (! geneAccession.isGene()) {
            throw new IsopretRuntimeException("transcriptToInterproHitMap can only be called with gene ids but we got " + geneAccession);
        }
 
@@ -51,12 +52,15 @@ public class InterproMapper {
         Map<AccessionNumber, List<DisplayInterproAnnotation>> hitmap = new HashMap<>();
         for (InterproAnnotation annot : hits) {
             if (! this.interproDescription.containsKey(annot.getInterpro())) {
-                LOGGER.error("Could not find interpro Description for {}", annot);
+                notfound++;
                 continue;
             }
             DisplayInterproAnnotation display = new DisplayInterproAnnotation(annot, this.interproDescription.get(annot.getInterpro()));
             hitmap.putIfAbsent(annot.getEnst(), new ArrayList<>());
             hitmap.get(annot.getEnst()).add(display);
+        }
+        if (notfound > 0) {
+            LOGGER.error("Could not find interpro Description for {} items", notfound);
         }
         return hitmap;
     }

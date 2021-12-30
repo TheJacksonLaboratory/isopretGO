@@ -7,7 +7,7 @@
         </encoder>
     </appender>
     <logger name="org.jax.isopret" level="TRACE"/>
-    <logger name="org.monarchinitiative.phenol" level="INFO"/>
+    <logger name="org.monarchinitiative.phenol" level="ERROR"/>
     <logger name="org.springframework.boot" level="WARN"/>
     <root level="info">
         <appender-ref ref="STDOUT" />

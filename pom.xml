@@ -12,7 +12,7 @@
     </parent>
     <groupId>org.jax.isopret</groupId>
     <artifactId>isopret</artifactId>
-    <version>0.7.5</version>
+    <version>0.7.11</version>
     <modules>
         <module>isopret-core</module>
         <module>isopret-cli</module>
@@ -34,10 +34,10 @@
         <spring.version>4.3.8.RELEASE</spring.version>
         <jackson.fasterxml.version>2.11.4</jackson.fasterxml.version>
         <commons.io>2.8.0</commons.io>
-        <junit.version>5.8.1</junit.version>
+        <junit.version>5.8.2</junit.version>
         <junit.platform.version>1.7.0</junit.platform.version>
-        <jannovar.version>0.36</jannovar.version>
-        <svart.version>1.0.1</svart.version>
+        <jannovar.version>0.38</jannovar.version>
+        <svart.version>1.0.2</svart.version>
     </properties>
 
     <scm>
