@@ -94,8 +94,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         LOGGER.info("DGE: {} study set and {} population genes", dgeSignificant.size(), dgePopulation.size());
-        Map<TermId, DirectAndIndirectTermAnnotations> assocMap
-                = geneContainer.getAssociationMap(dgeSignificant);
+        var assocMap = geneContainer.getAssociationMap(dgeSignificant);
         this.dgeStudy = new StudySet("DGE Study", assocMap);
         assocMap = geneContainer.getAssociationMap(dgePopulation);
         this.dgePopulation = new StudySet("DGE Population", assocMap);
@@ -116,10 +115,9 @@ public class HbaDealsIsoformSpecificThresholder {
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         LOGGER.info("DAS: {} study set and {} population genes", dasIsoformStudy.size(), dasIsoformPopulation.size());
-
         assocMap = transcriptContainer.getAssociationMap(dasIsoformStudy);
         this.dasStudy = new StudySet("DAS Study", assocMap);
-        assocMap = geneContainer.getAssociationMap(dasIsoformPopulation);
+        assocMap = transcriptContainer.getAssociationMap(dasIsoformPopulation);
         this.dasPopulation = new StudySet("DAS Population", assocMap);
     }
 
