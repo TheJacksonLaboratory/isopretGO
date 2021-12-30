@@ -104,7 +104,7 @@ public class HtmlVisualizer implements Visualizer {
     private String getTranscriptBox(Visualizable vis) {
         final int EXPECTED_N_COLUMNS = 3;
         StringBuilder sb = new StringBuilder();
-        List<List<String>> tableData = vis.getIsoformTableData();
+        List<IsoformVisualizable> tableData = vis.getIsoformVisualizable();
         if (tableData.isEmpty()) {
             return "<p>No isoform data found.</p>\n";
         }
@@ -112,13 +112,10 @@ public class HtmlVisualizer implements Visualizer {
         int expressionIsoforms = vis.getExpressedTranscriptCount();
         sb.append(ISOFORM_TABLE_HEADER);
         for (var row : tableData) {
-            if (row.size() != EXPECTED_N_COLUMNS) {
-                // should never happen!
-                throw new IsopretRuntimeException("Malformed isoform row: " + row);
-            }
-            sb.append("<tr><td>").append(row.get(0)).append("</td>");
-            sb.append("<td>").append(row.get(1)).append("</td>");
-            sb.append("<td>").append(row.get(2)).append("</td></tr>\n");
+
+            sb.append("<tr><td>").append(row.transcriptAccession()).append("</td>");
+            sb.append("<td>").append(row.log2Foldchange()).append("</td>");
+            sb.append("<td>").append(row.isoformP()).append("</td></tr>\n");
         }
         sb.append("</table>\n");
         sb.append("<p>").append(expressionIsoforms).append(" transcripts were expressed in the data from ")

@@ -170,25 +170,8 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     /**
-     * Return data to show the isoforms.
-     * We have isoform accession number as a HTML link, followed by isoform log fold change and isoform p value and
-     * corrected P value, that is for M rows, we return an M*4 matrix of strings intended to build an HTML table
-     * @return a matrix of data representing the contents of an HTML table for the isoforms
+     * @return a matrix of data to display the isoforms
      */
-    @Override
-    public List<List<String>> getIsoformTableData() {
-        List<List<String>> rows = new ArrayList<>();
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = this.hbaDealsResult.getTranscriptMap();
-        for (Transcript transcript : this.expressedTranscripts) {
-            if (transcriptMap.containsKey(transcript.accessionId())) {
-                HbaDealsTranscriptResult transcriptResult = transcriptMap.get(transcript.accessionId());
-                var row = getIsoformRow(transcriptResult);
-                rows.add(row);
-            }
-        }
-        return rows;
-    }
-
     @Override
     public List<IsoformVisualizable> getIsoformVisualizable() {
         return this.isoformVisualizables;

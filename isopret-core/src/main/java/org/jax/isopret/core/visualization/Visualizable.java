@@ -36,8 +36,6 @@ public interface Visualizable {
 
    String getProteinSvg();
 
-   List<List<String>> getIsoformTableData();
-
    List<IsoformVisualizable> getIsoformVisualizable();
 
 
