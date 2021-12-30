@@ -245,12 +245,10 @@ public class AnalysisController implements Initializable {
                 return;
             }
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
-            String html = isopretService.getHtmlForGene(hbadealsResult.getGeneSymbol());
-            loader.setControllerFactory(c -> new HbaGeneController(hbadealsResult, html));
+            loader.setControllerFactory(c -> new HbaGeneController(hbadealsResult, this.isopretService));
             ScrollPane p = loader.load();
-            HbaGeneController gc2 = loader.getController();
-            //gc2.refreshGeneOntologyTable();
-            // TODO initialize as needed
+            HbaGeneController hbaGeneController = loader.getController();
+            hbaGeneController.refreshTables();
             tab.setContent(p);
             tabPane.getTabs().add(tab);
             tabPane.getSelectionModel().select(tab);

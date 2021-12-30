@@ -34,6 +34,8 @@ public interface Visualizable {
 
     String getIsoformSvg();
 
+    String getIsoformHtml();
+
    String getProteinSvg();
 
    List<IsoformVisualizable> getIsoformVisualizable();
@@ -50,6 +52,10 @@ public interface Visualizable {
     double getBestSplicingPval();
 
    List<DisplayInterproAnnotation>  getInterproForExpressedTranscripts();
+
+   List<InterproVisualizable> getInterproVisualizable();
+
+    String getProteinHtml();
 
    int getI();
 

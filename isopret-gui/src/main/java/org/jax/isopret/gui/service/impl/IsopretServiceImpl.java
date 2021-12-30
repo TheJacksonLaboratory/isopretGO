@@ -51,6 +51,7 @@ public class IsopretServiceImpl implements IsopretService  {
 
     private final Properties pgProperties;
     private final StringProperty downloadDirProp;
+    private final StringProperty hbaDealsFileProperty;
     private final DoubleProperty downloadCompletenessProp;
     private File hbaDealsFile = null;
     private GoMethod goMethod = GoMethod.TFT;
@@ -74,6 +75,7 @@ public class IsopretServiceImpl implements IsopretService  {
         } else {
             this.downloadDirProp = new SimpleStringProperty("");
         }
+        this.hbaDealsFileProperty = new SimpleStringProperty("");
         this.downloadCompletenessProp = new SimpleDoubleProperty(calculateDownloadCompleteness());
     }
 
@@ -140,12 +142,18 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public void setHbaDealsFile(File file) {
         this.hbaDealsFile = file;
+        this.hbaDealsFileProperty.setValue(file.getAbsolutePath());
         LOGGER.info("Set HBA-DEALS file to {}", this.hbaDealsFile);
     }
 
     @Override
     public StringProperty downloadDirProperty() {
         return this.downloadDirProp;
+    }
+
+    @Override
+    public StringProperty hbaDealsFileProperty() {
+        return hbaDealsFileProperty;
     }
 
     @Override

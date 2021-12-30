@@ -3,6 +3,7 @@ package org.jax.isopret.core.visualization;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.interpro.InterproEntry;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
@@ -158,16 +159,6 @@ public class EnsemblVisualizable implements Visualizable {
         }
     }
 
-    private List<String> getIsoformRow(HbaDealsTranscriptResult transcriptResult) {
-        List<String> row = new ArrayList<>();
-        String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
-        String a =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());
-        row.add(a);
-        row.add(String.format("%.3f",transcriptResult.getLog2FoldChange()));
-        String prob = String.format("%.2f", transcriptResult.getP()) + (transcriptResult.getP() <= splicingThreshold ? " (*)" : "");
-        row.add(prob);
-        return row;
-    }
 
     /**
      * @return a matrix of data to display the isoforms
@@ -192,6 +183,27 @@ public class EnsemblVisualizable implements Visualizable {
         List<DisplayInterproAnnotation> sortedList = new ArrayList<>(interpro);
         Collections.sort(sortedList);
         return sortedList;
+    }
+
+    /**
+     * Note that this gives us a list of nterpro entries that are used to annotate the isoforms
+     * The DisplayInterproAnnotation provides more detail about the locations of individual
+     * annotations and is used to generate the protein SVG
+     * @return
+     */
+    @Override
+    public List<InterproVisualizable> getInterproVisualizable() {
+        Map<AccessionNumber, List<DisplayInterproAnnotation>> interproMap = this.agene.getTranscriptToInterproHitMap();
+        Set<InterproEntry> interpro = new HashSet<>();
+        for (AccessionNumber transcriptId : this.hbaDealsResult.getTranscriptMap().keySet()) {
+            if (interproMap.containsKey(transcriptId)) {
+                List<DisplayInterproAnnotation> diaList = interproMap.get(transcriptId);
+                for (var dia : diaList) {
+                    interpro.add(dia.getInterproEntry());
+                }
+            }
+        }
+        return interpro.stream().map(InterproVisualizable::new).sorted().collect(Collectors.toList());
     }
 
     @Override
@@ -219,5 +231,52 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public double getBestSplicingPval() {
         return hbaDealsResult.getSmallestSplicingP();
+    }
+
+    private final static String HTML_FOR_SVG_HEADER = """
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+   <style>
+html, body {
+   padding: 0;
+   margin: 20;
+   font-size:14px;
+}
+
+body {
+   font-family:"DIN Next", Helvetica, Arial, sans-serif;
+   line-height:1.25;
+   background-color:white   ;
+    max-width:1200px;
+    margin-left:auto;
+    margin-right:auto;
+ }
+</style>
+<body>
+""";
+
+    private static final String HTML_FOR_SVG_FOOTER = """
+            </body>
+            </html>
+            """;
+
+
+    @Override
+    public String getIsoformHtml(){
+        String html = HTML_FOR_SVG_HEADER +
+                getIsoformSvg() +
+                 HTML_FOR_SVG_FOOTER;
+        return html;
+    }
+    @Override
+    public String getProteinHtml() {
+        String html = HTML_FOR_SVG_HEADER +
+                getProteinSvg() +
+                HTML_FOR_SVG_FOOTER;
+        return html;
     }
 }

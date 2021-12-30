@@ -31,6 +31,8 @@ public interface IsopretService {
 
     StringProperty downloadDirProperty();
 
+    StringProperty hbaDealsFileProperty();
+
     DoubleProperty downloadCompletenessProperty();
 
     void setHbaDealsFile(File file);
@@ -72,5 +74,6 @@ public interface IsopretService {
     Visualizable getVisualizableForGene(String symbol);
 
     List<Visualizable> getGeneVisualizables();
+
 
 }
