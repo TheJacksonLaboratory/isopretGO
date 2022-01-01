@@ -119,7 +119,7 @@ public class HtmlWriter extends AbstractWriter {
         for (AnnotatedGene annotatedGene : annotatedGeneList) {
             i++;
             Set<Term> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
-            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene, goTerms)));
+            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene)));
         }
         // record source of analysis
         data.put("hbadealsFile", hbadealsFile.getAbsolutePath());

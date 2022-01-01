@@ -47,9 +47,6 @@ public interface Visualizable {
 
     List<IsoformVisualizable> getIsoformVisualizable();
 
-
-    List<OntologyTermVisualizable> getGoTerms();
-
     boolean isDifferentiallyExpressed();
 
     boolean isDifferentiallySpliced();
@@ -62,7 +59,7 @@ public interface Visualizable {
 
     List<InterproVisualizable> getInterproVisualizable();
 
-
+    GoAnnotationMatrix getGoAnnotationMatrix();
     int getI();
 
 

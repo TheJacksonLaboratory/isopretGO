@@ -7,7 +7,6 @@ import org.jax.isopret.core.interpro.InterproEntry;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
-import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.svart.Contig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +45,6 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final AnnotatedGene agene;
 
-    private final List<OntologyTermVisualizable> goterms;
-
     private final boolean differentiallyExpressed;
 
     private final boolean differentiallySpliced;
@@ -65,11 +62,18 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final double splicingThreshold;
 
+    private final GoAnnotationMatrix annotationMatrix;
+
     private final int i;
 
-    public EnsemblVisualizable(AnnotatedGene agene, Set<Term> goterms) {
+    @Deprecated
+    public EnsemblVisualizable(AnnotatedGene agene){
+        this(agene, null);
+    }
+
+    public EnsemblVisualizable(AnnotatedGene agene, GoAnnotationMatrix goAnnotationMatrix) {
         this.agene = agene;
-        this.goterms = goterms.stream().map(OntologyTermVisualizable::new).collect(Collectors.toList());
+        this.annotationMatrix = goAnnotationMatrix;
         this.totalTranscriptCount = agene.getTranscripts().size();
         this.expressedTranscripts = agene.getExpressedTranscripts();
         this.hbaDealsResult = agene.getHbaDealsResult();
@@ -228,8 +232,8 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
-    public List<OntologyTermVisualizable> getGoTerms() {
-        return this.goterms;
+    public GoAnnotationMatrix getGoAnnotationMatrix() {
+        return this.annotationMatrix;
     }
 
     @Override

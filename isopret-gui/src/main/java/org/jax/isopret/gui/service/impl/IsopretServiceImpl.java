@@ -6,11 +6,9 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.IsopretDownloader;
@@ -18,15 +16,12 @@ import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
 import org.jax.isopret.core.visualization.EnsemblVisualizable;
-import org.jax.isopret.core.visualization.HtmlVisualizer;
+import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
-import org.jax.isopret.gui.service.model.GoAnnotationMatrix;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
@@ -256,9 +251,7 @@ public class IsopretServiceImpl implements IsopretService  {
                 expressionThreshold,
                 splicingThreshold);
         GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result.getGeneAccession());
-
-        Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
-        return new EnsemblVisualizable(agene, goTerms);
+        return new EnsemblVisualizable(agene, annotationMatrix);
     }
 
     @Override
@@ -281,8 +274,8 @@ public class IsopretServiceImpl implements IsopretService  {
                     result,
                     expressionThreshold,
                     splicingThreshold);
-            Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
-            EnsemblVisualizable viz = new EnsemblVisualizable(agene, goTerms);
+            GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result.getGeneAccession());
+            EnsemblVisualizable viz = new EnsemblVisualizable(agene, annotationMatrix);
             visualizables.add(viz);
         }
         if (notfound > 0) {
@@ -353,7 +346,6 @@ public class IsopretServiceImpl implements IsopretService  {
                 this.geneIdToTranscriptMap,
                 this.transcript2GoMap,
                 this.dgeGoTerms,
-                this.dasGoTerms,
                 accession);
     }
 }
