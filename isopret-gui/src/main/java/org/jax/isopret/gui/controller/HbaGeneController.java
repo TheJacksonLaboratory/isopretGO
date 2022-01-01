@@ -27,6 +27,7 @@ public class HbaGeneController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaGeneController.class.getName());
 
 
+
     @FXML
     private TableView<IsoformVisualizable> isoformTableView;
     @FXML
@@ -61,6 +62,8 @@ public class HbaGeneController implements Initializable {
     private WebView hbaGeneWebView;
     @FXML
     private WebView hbaProteinWebView;
+    @FXML
+    private WebView hbaGoWebView;
 
     private final IsopretService service;
 
@@ -111,6 +114,7 @@ public class HbaGeneController implements Initializable {
         interprTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
         WebEngine interprebEngine = hbaProteinWebView.getEngine();
         interprebEngine.loadContent(this.visualizable.getProteinHtml());
+
     }
 
     /**
@@ -146,6 +150,8 @@ public class HbaGeneController implements Initializable {
             interprTableView.setFixedCellSize(25);
             interprTableView.prefHeightProperty().bind(Bindings.size(interprTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             LOGGER.info("Loading isoform table");
+            WebEngine goEngine = hbaGoWebView.getEngine();
+            goEngine.loadContent(this.visualizable.getGoHtml());
         });
     }
 }

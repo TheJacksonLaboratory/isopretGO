@@ -204,6 +204,12 @@ public class IsopretServiceImpl implements IsopretService  {
         this.thresholder = task.getIsoformSpecificThresholder();
         this.geneIdToTranscriptMap = task.getGeneIdToTranscriptMap();
         this.transcript2GoMap = task.getTranscript2GoMap();
+        LOGGER.info("Finished setting data. ");
+        if (this.transcript2GoMap == null) {
+            LOGGER.error("transcript2GoMap == null");
+        } else {
+            LOGGER.info("transcript2GoMap n = {} entries", transcript2GoMap.size());
+        }
     }
 
     @Override

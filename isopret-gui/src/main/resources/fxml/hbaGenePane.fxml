@@ -53,6 +53,16 @@
                         </columnResizePolicy>
                     </TableView>
                     <WebView fx:id="hbaProteinWebView" prefHeight="861.0" prefWidth="1203.0" />
+                    <VBox>
+                        <HBox prefHeight="100.0" prefWidth="1200.0">
+                            <Label minWidth="300.0" text="TODO">
+                                <HBox.margin>
+                                    <Insets left="20.0" />
+                                </HBox.margin></Label>
+                        </HBox>
+                    </VBox>
+                    <WebView fx:id="hbaGoWebView" prefHeight="861.0" prefWidth="1203.0" />
+
                 </VBox>
             </ScrollPane>
         </VBox>

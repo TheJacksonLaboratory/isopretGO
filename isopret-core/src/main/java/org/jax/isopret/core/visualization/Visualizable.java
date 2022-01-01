@@ -60,6 +60,8 @@ public interface Visualizable {
     List<InterproVisualizable> getInterproVisualizable();
 
     GoAnnotationMatrix getGoAnnotationMatrix();
+
+    String getGoHtml();
     int getI();
 
 

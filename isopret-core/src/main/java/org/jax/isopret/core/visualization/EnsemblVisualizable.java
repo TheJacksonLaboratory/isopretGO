@@ -237,6 +237,12 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
+    public String getGoHtml() {
+        HtmlGoAnnotationMatrix htmlMatrix = new HtmlGoAnnotationMatrix(this.annotationMatrix);
+        return htmlMatrix.getHtml();
+    }
+
+    @Override
     public boolean isDifferentiallyExpressed() {
         return this.differentiallyExpressed;
     }

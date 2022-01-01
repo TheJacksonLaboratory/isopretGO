@@ -40,15 +40,15 @@ public class GoAnnotationMatrix {
      */
     public GoAnnotationMatrix(Ontology ontology,
                               Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap,
-                                Map<TermId, Set<TermId>> transcript2GoMap,
+                              Map<TermId, Set<TermId>> transcript2GoMap,
                               List<GoTerm2PValAndCounts> dgeGoTerms,
                               AccessionNumber accessionNumber){
         List<GoAnnotationRow> rows = new ArrayList<>();
         // The termId (key) of transcriptToGoMap corresponds to an accession number
         TermId accessionId = accessionNumber.toTermId();
         this.accession = accessionNumber.getAccessionString();
-        if (geneIdToTranscriptMap.containsKey(accessionNumber)) {
-            // collect all DGE Go terms
+        if (geneIdToTranscriptMap.containsKey(accessionNumber) && transcript2GoMap != null) {
+            // collect all DGE Go terms (over entire experiment)
             Set<TermId> significantGoSet = dgeGoTerms.stream()
                     .map(GoTerm2PValAndCounts::getGoTermId)
                     .collect(Collectors.toSet());
@@ -78,8 +78,11 @@ public class GoAnnotationMatrix {
                 boolean significant = significantGoSet.contains(goId);
                 List<Boolean> transcriptAnnotated = new ArrayList<>();
                 for (TermId transcriptId : transcriptIds) {
-                    boolean annot = transcript2GoMap.get(transcriptId).contains(goId);
-                    transcriptAnnotated.add(annot);
+                    if (transcript2GoMap.containsKey(transcriptId)) {
+                        transcriptAnnotated.add(transcript2GoMap.get(transcriptId).contains(goId));
+                    } else {
+                        transcriptAnnotated.add(false);
+                    }
                 }
                 GoAnnotationRow row = new GoAnnotationRow(goId, label, significant, transcriptAnnotated);
                 rows.add(row);

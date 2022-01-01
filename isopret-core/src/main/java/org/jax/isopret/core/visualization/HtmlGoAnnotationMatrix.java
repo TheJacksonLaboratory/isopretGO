@@ -4,14 +4,54 @@ import java.util.List;
 
 public class HtmlGoAnnotationMatrix {
 
+    private final String html;
 
-    public HtmlGoAnnotationMatrix(List<GoAnnotationRow> rows) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(HTML_HEADER);
-
+    public String getHtml() {
+        return html;
     }
 
+    public HtmlGoAnnotationMatrix(GoAnnotationMatrix matrix) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(HTML_HEADER);
+        sb.append(htmlTableHeader(matrix.getTranscripts()));
+        for (GoAnnotationRow row : matrix.getAnnotationRows()) {
+            sb.append(getRow(row));
+        }
+        sb.append(HTML_FOOTER);
+        html = sb.toString();
+    }
 
+    private String getRow(GoAnnotationRow row) {
+        String go = String.format("%s (%s)", row.getGoLabel(), row.getGoId());
+        StringBuilder sb = new StringBuilder();
+        if (row.isGoTermSignificant()) {
+            sb.append("<tr style=\"background-color:#90EE90\">");
+        } else {
+            sb.append("<tr>");
+        }
+        sb.append("<td>").append(go).append("</td>");
+        for (boolean b : row.getTranscriptAnnotated()) {
+            if (b) {
+                sb.append("<td>&#10003;</td>");
+            } else {
+                sb.append("<td>-</td>");
+            }
+        }
+        sb.append("</tr>");
+        return sb.toString();
+    }
+
+    private String htmlTableHeader(List<String> transcripts) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<table>");
+        sb.append("<tr>");
+        sb.append("<th>GO term</th>");
+        for (String transcript : transcripts) {
+            sb.append("<th><span>").append(transcript).append("</span></th>");
+        }
+        sb.append("</tr>");
+        return sb.toString();
+    }
 
     private final static String HTML_HEADER = """
             <!doctype html>
@@ -34,6 +74,20 @@ public class HtmlGoAnnotationMatrix {
                 max-width:1200px;
                 margin-left:auto;
                 margin-right:auto;
+             }
+             th
+             {
+               vertical-align: bottom;
+               text-align: center;
+             }
+             
+             th span
+             {
+               -ms-writing-mode: tb-rl;
+               -webkit-writing-mode: vertical-rl;
+               writing-mode: vertical-rl;
+               transform: rotate(180deg);
+               white-space: nowrap;
              }
             </style>
             <body>
