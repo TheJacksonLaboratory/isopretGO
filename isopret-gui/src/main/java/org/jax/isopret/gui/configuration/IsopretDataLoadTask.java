@@ -49,6 +49,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     private Map<TermId, Set<TermId>> transcriptToGoMap = Map.of();
 
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
+    /** Key: transcript id; value: set of Annotating GO Terms. */
+    private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
 
     private InterproMapper interproMapper = null;
 
@@ -85,6 +87,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     public HbaDealsIsoformSpecificThresholder getIsoformSpecificThresholder() {
         return isoformSpecificThresholder;
+    }
+
+    public Map<TermId, Set<TermId>> getTranscript2GoMap() {
+        return transcript2GoMap;
     }
 
     @Override
@@ -127,7 +133,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         } else {
             TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(isoformFunctionFile, geneOntology);
             Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
-            Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
+            this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
             updateProgress(0.40, 1);
             updateMessage(String.format("Loaded isoformFunctionFile %d transcript.", transcript2GoMap.size()));
             Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
