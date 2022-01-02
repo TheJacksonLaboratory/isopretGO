@@ -74,8 +74,6 @@ public class HbaDealsCommand extends IsopretCommand implements Callable<Integer>
 
         List<GoTerm2PValAndCounts> dasGoTerms = List.of();// hbago.overrepresetationAnalysis();
         List<GoTerm2PValAndCounts> dgeGoTerms =List.of();// hbago.overrepresetationAnalysis();
-//        dasGoTerms.sort(new SortByPvalue());
-//        dgeGoTerms.sort(new SortByPvalue());
 
         if (outputTsv) {
             LOGGER.trace("TSV output");
