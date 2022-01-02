@@ -57,13 +57,15 @@
                         <HBox prefHeight="100.0" prefWidth="1200.0">
                             <Label fx:id="goAnnotationsForGeneLabel" minWidth="300.0">
                                 <HBox.margin>
-                                    <Insets left="20.0" />
+                                    <Insets left="20.0" bottom="5"/>
                                 </HBox.margin></Label>
                         </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <Label text="Significant GO terms shown in green" />
-                     </children>
+                      <Label text="Significant GO terms shown in green" minWidth="300.0">
+                        <HBox.margin>
+                          <Insets left="20.0" />
+                        </HBox.margin>
+                      </Label>
                   </HBox>
                     </VBox>
                     <WebView fx:id="hbaGoWebView" prefHeight="861.0" prefWidth="1203.0" />
