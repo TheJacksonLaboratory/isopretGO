@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.HbaDealsGoAnalysis;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
@@ -17,14 +16,12 @@ import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
 import org.jax.isopret.core.visualization.EnsemblVisualizable;
-import org.jax.isopret.core.visualization.HtmlVisualizer;
+import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
@@ -61,12 +58,14 @@ public class IsopretServiceImpl implements IsopretService  {
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
     private HbaDealsIsoformSpecificThresholder thresholder = null;
-    //private GoAssociationContainer associationContainer = null;
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
     private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();
-    AssociationContainer<TermId> transcriptContainer = null;
-    AssociationContainer<TermId> geneContainer = null;
+    private AssociationContainer<TermId> transcriptContainer = null;
+    private AssociationContainer<TermId> geneContainer = null;
+    private Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap;
+    /** Key: transcript id; value: set of Annotating GO Terms. */
+    private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -203,6 +202,14 @@ public class IsopretServiceImpl implements IsopretService  {
         this.dgeGoTerms = task.getDgeResults();
         this.dasGoTerms = task.getDasResults();
         this.thresholder = task.getIsoformSpecificThresholder();
+        this.geneIdToTranscriptMap = task.getGeneIdToTranscriptMap();
+        this.transcript2GoMap = task.getTranscript2GoMap();
+        LOGGER.info("Finished setting data. ");
+        if (this.transcript2GoMap == null) {
+            LOGGER.error("transcript2GoMap == null");
+        } else {
+            LOGGER.info("transcript2GoMap n = {} entries", transcript2GoMap.size());
+        }
     }
 
     @Override
@@ -212,22 +219,6 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public List<GoTerm2PValAndCounts> getDgeGoTerms() {
         return dgeGoTerms;
-    }
-
-
-    private HbaDealsGoAnalysis getHbaDealsGoAnalysis(GoMethod goMethod,
-                                                     AssociationContainer<TermId> associationContainer,
-                                                     Ontology ontology,
-                                                     StudySet study,
-                                                     StudySet population,
-                                                     MtcMethod mtc) {
-        if (goMethod == GoMethod.PCunion) {
-            return HbaDealsGoAnalysis.parentChildUnion(ontology, associationContainer, study, population, mtc);
-        } else if (goMethod == GoMethod.PCintersect) {
-            return HbaDealsGoAnalysis.parentChildIntersect(ontology, associationContainer, study, population, mtc);
-        } else {
-            return HbaDealsGoAnalysis.termForTerm(ontology, associationContainer, study, population, mtc);
-        }
     }
 
 
@@ -265,10 +256,8 @@ public class IsopretServiceImpl implements IsopretService  {
                 result,
                 expressionThreshold,
                 splicingThreshold);
-
-        Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
-        HtmlVisualizer visualizer = new HtmlVisualizer();
-        return new EnsemblVisualizable(agene, goTerms);
+        GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result);
+        return new EnsemblVisualizable(agene, annotationMatrix);
     }
 
     @Override
@@ -291,8 +280,8 @@ public class IsopretServiceImpl implements IsopretService  {
                     result,
                     expressionThreshold,
                     splicingThreshold);
-            Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
-            EnsemblVisualizable viz = new EnsemblVisualizable(agene, goTerms);
+            GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result);
+            EnsemblVisualizable viz = new EnsemblVisualizable(agene, annotationMatrix);
             visualizables.add(viz);
         }
         if (notfound > 0) {
@@ -300,33 +289,6 @@ public class IsopretServiceImpl implements IsopretService  {
         }
        return visualizables;
     }
-
-/*
-
-    @Override
-    public String getHtmlForGene(String symbol) {
-        if (! this.thresholder.getRawResults().containsKey(symbol)) {
-            LOGGER.error("Could not find HBADEALS results for {}.", symbol);
-            return "ERROR TODO";
-        }
-        List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(symbol);
-        HbaDealsResult result = thresholder.getRawResults().get(symbol);
-        double splicingThreshold = thresholder.getSplicingThreshold();
-        double expressionThreshold = thresholder.getExpressionThreshold();
-        Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
-                interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
-        AnnotatedGene agene = new AnnotatedGene(transcripts,
-                    transcriptToInterproHitMap,
-                    result,
-                    expressionThreshold,
-                    splicingThreshold);
-
-        Set<Term> goTerms = Set.of(); // TODO INTIIALZIED
-        HtmlVisualizer visualizer = new HtmlVisualizer();
-        return visualizer.getHtml(new EnsemblVisualizable(agene, goTerms));
-    }
-
- */
 
     public Ontology getGeneOntology() {
         return this.geneOntology;
@@ -382,5 +344,22 @@ public class IsopretServiceImpl implements IsopretService  {
 
     public AssociationContainer<TermId> getGeneContainer() {
         return geneContainer;
+    }
+
+
+    public GoAnnotationMatrix getGoAnnotationMatrixForGene(HbaDealsResult result) {
+        AccessionNumber accession = result.getGeneAccession();
+        Set<TermId> expressedTranscriptSet = result.getTranscriptMap().keySet().stream()
+                .map(AccessionNumber::toTermId)
+                .collect(Collectors.toSet());
+        Set<TermId> significantGoSet = dgeGoTerms.stream()
+                .map(GoTerm2PValAndCounts::getGoTermId)
+                .collect(Collectors.toSet());
+        return new GoAnnotationMatrix(this.geneOntology,
+                this.geneIdToTranscriptMap,
+                this.transcript2GoMap,
+                significantGoSet,
+                accession,
+                expressedTranscriptSet);
     }
 }

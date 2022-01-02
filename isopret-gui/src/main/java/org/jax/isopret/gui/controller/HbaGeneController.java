@@ -27,6 +27,7 @@ public class HbaGeneController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaGeneController.class.getName());
 
 
+
     @FXML
     private TableView<IsoformVisualizable> isoformTableView;
     @FXML
@@ -50,6 +51,8 @@ public class HbaGeneController implements Initializable {
     @FXML
     private Label hbaGeneLabel;
     @FXML
+    private Label goAnnotationsForGeneLabel;
+    @FXML
     private Hyperlink geneHyperlink;
     @FXML
     private Label geneFoldChangeLabel;
@@ -61,6 +64,8 @@ public class HbaGeneController implements Initializable {
     private WebView hbaGeneWebView;
     @FXML
     private WebView hbaProteinWebView;
+    @FXML
+    private WebView hbaGoWebView;
 
     private final IsopretService service;
 
@@ -74,6 +79,7 @@ public class HbaGeneController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.hbaGeneLabel.setText(visualizable.getGeneSymbol());
+        this.goAnnotationsForGeneLabel.setText(String.format("Gene Ontology annotations for %s",visualizable.getGeneAccession()));
         String geneAccession = visualizable.getGeneAccession();
         geneHyperlink.setText(geneAccession);
 
@@ -111,6 +117,7 @@ public class HbaGeneController implements Initializable {
         interprTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
         WebEngine interprebEngine = hbaProteinWebView.getEngine();
         interprebEngine.loadContent(this.visualizable.getProteinHtml());
+
     }
 
     /**
@@ -139,13 +146,14 @@ public class HbaGeneController implements Initializable {
             isoformTableView.setFixedCellSize(25);
             isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             hbaGeneWebView.setMaxHeight(visualizable.getIsoformSvgHeight());
-            LOGGER.info("Loading isoform table");
+            hbaProteinWebView.setMaxHeight(visualizable.getProteinSvgHeight());
             interprTableView.getItems().clear();
             interprTableView.getItems().addAll(visualizable.getInterproVisualizable());
             interprTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             interprTableView.setFixedCellSize(25);
             interprTableView.prefHeightProperty().bind(Bindings.size(interprTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
-            LOGGER.info("Loading isoform table");
+            WebEngine goEngine = hbaGoWebView.getEngine();
+            goEngine.loadContent(this.visualizable.getGoHtml());
         });
     }
 }

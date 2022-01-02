@@ -17,7 +17,6 @@ import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.JannovarReader;
 import org.jax.isopret.core.transcript.Transcript;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -49,6 +48,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     private Map<TermId, Set<TermId>> transcriptToGoMap = Map.of();
 
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
+    /** Key: transcript id; value: set of Annotating GO Terms. */
+    private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
 
     private InterproMapper interproMapper = null;
 
@@ -61,10 +62,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     private final GoMethod overrepMethod;
     private final MtcMethod multipleTestingMethod;
 
-    private StudySet dgeStudy = null;
-    private StudySet dgePopulation = null;
-    private StudySet dasStudy = null;
-    private StudySet dasPopulation = null;
 
     private List<GoTerm2PValAndCounts> dgeResults = List.of();
     private List<GoTerm2PValAndCounts> dasResults = List.of();
@@ -85,6 +82,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     public HbaDealsIsoformSpecificThresholder getIsoformSpecificThresholder() {
         return isoformSpecificThresholder;
+    }
+
+    public Map<TermId, Set<TermId>> getTranscript2GoMap() {
+        return transcript2GoMap;
     }
 
     @Override
@@ -127,7 +128,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         } else {
             TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(isoformFunctionFile, geneOntology);
             Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
-            Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
+            this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
             updateProgress(0.40, 1);
             updateMessage(String.format("Loaded isoformFunctionFile %d transcript.", transcript2GoMap.size()));
             Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
@@ -209,22 +210,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateProgress(1.0, 1);
         updateMessage("Done");
         return 0;
-    }
-
-    public StudySet getDgeStudy() {
-        return dgeStudy;
-    }
-
-    public StudySet getDgePopulation() {
-        return dgePopulation;
-    }
-
-    public StudySet getDasStudy() {
-        return dasStudy;
-    }
-
-    public StudySet getDasPopulation() {
-        return dasPopulation;
     }
 
     public List<GoTerm2PValAndCounts> getDgeResults() {

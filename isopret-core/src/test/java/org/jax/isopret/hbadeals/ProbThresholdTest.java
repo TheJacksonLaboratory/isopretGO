@@ -21,7 +21,7 @@ yields 0.14
 public class ProbThresholdTest {
 
     private static  List<Double> pvals;
-    private static double desiredFDR = 0.01;
+    private static final double desiredFDR = 0.01;
     private static ProbThreshold probThreshold;
 
 

@@ -42,7 +42,7 @@ public class HtmlVisualizer implements Visualizer {
         String prob = String.format("%.2f", vis.getExpressionPval()) + (vis.isDifferentiallyExpressed() ? " (*)" : "");
         sb.append("<td>").append(prob).append("</td></tr>\n");
         sb.append("</table>\n");
-        List<OntologyTermVisualizable> goterms = vis.getGoTerms();
+        /*List<OntologyTermVisualizable> goterms = vis.getGoTerms();
         if (goterms.size() > 0) {
             sb.append("<p>Enriched GO terms associated with ").append(vis.getGeneSymbol()).append(".</p>\n");
             sb.append("<ul>\n");
@@ -50,7 +50,7 @@ public class HtmlVisualizer implements Visualizer {
                 sb.append("<li>").append(getGoAnchor(go)).append("</li>\n");
             }
             sb.append("</ul>\n");
-        }
+        }*/
         return sb.toString();
     }
 

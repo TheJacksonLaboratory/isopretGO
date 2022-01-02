@@ -21,7 +21,7 @@ import java.util.function.Predicate;
  * @author Peter N Robinson
  */
 public class ProteinSvgGenerator extends AbstractSvgGenerator {
-    Logger LOGGER = LoggerFactory.getLogger(ProteinSvgGenerator.class);
+    final Logger LOGGER = LoggerFactory.getLogger(ProteinSvgGenerator.class);
     private static final int SVG_WIDTH = 1050;
     private static final int HEIGHT_FOR_SV_DISPLAY = 160;
     private static final int HEIGHT_PER_DISPLAY_ITEM = 90;

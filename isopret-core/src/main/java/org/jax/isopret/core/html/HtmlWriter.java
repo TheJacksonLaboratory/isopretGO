@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  */
 @Deprecated
 public class HtmlWriter extends AbstractWriter {
-    Logger LOGGER = LoggerFactory.getLogger(HtmlWriter.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(HtmlWriter.class);
     int hbadeals = 0;
     int hbadealSig = 0;
     int foundTranscripts = 0;
@@ -119,7 +119,7 @@ public class HtmlWriter extends AbstractWriter {
         for (AnnotatedGene annotatedGene : annotatedGeneList) {
             i++;
             Set<Term> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
-            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene, goTerms)));
+            geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene)));
         }
         // record source of analysis
         data.put("hbadealsFile", hbadealsFile.getAbsolutePath());
