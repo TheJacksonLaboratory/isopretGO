@@ -63,10 +63,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     private final GoMethod overrepMethod;
     private final MtcMethod multipleTestingMethod;
 
-    private StudySet dgeStudy = null;
-    private StudySet dgePopulation = null;
-    private StudySet dasStudy = null;
-    private StudySet dasPopulation = null;
 
     private List<GoTerm2PValAndCounts> dgeResults = List.of();
     private List<GoTerm2PValAndCounts> dasResults = List.of();
@@ -215,22 +211,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateProgress(1.0, 1);
         updateMessage("Done");
         return 0;
-    }
-
-    public StudySet getDgeStudy() {
-        return dgeStudy;
-    }
-
-    public StudySet getDgePopulation() {
-        return dgePopulation;
-    }
-
-    public StudySet getDasStudy() {
-        return dasStudy;
-    }
-
-    public StudySet getDasPopulation() {
-        return dasPopulation;
     }
 
     public List<GoTerm2PValAndCounts> getDgeResults() {

@@ -55,11 +55,16 @@
                     <WebView fx:id="hbaProteinWebView" prefHeight="861.0" prefWidth="1203.0" />
                     <VBox>
                         <HBox prefHeight="100.0" prefWidth="1200.0">
-                            <Label minWidth="300.0" text="TODO">
+                            <Label fx:id="goAnnotationsForGeneLabel" minWidth="300.0">
                                 <HBox.margin>
                                     <Insets left="20.0" />
                                 </HBox.margin></Label>
                         </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Significant GO terms shown in green" />
+                     </children>
+                  </HBox>
                     </VBox>
                     <WebView fx:id="hbaGoWebView" prefHeight="861.0" prefWidth="1203.0" />
 

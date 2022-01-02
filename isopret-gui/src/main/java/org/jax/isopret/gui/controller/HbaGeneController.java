@@ -51,6 +51,8 @@ public class HbaGeneController implements Initializable {
     @FXML
     private Label hbaGeneLabel;
     @FXML
+    private Label goAnnotationsForGeneLabel;
+    @FXML
     private Hyperlink geneHyperlink;
     @FXML
     private Label geneFoldChangeLabel;
@@ -77,6 +79,7 @@ public class HbaGeneController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.hbaGeneLabel.setText(visualizable.getGeneSymbol());
+        this.goAnnotationsForGeneLabel.setText(String.format("Gene Ontology annotations for %s",visualizable.getGeneAccession()));
         String geneAccession = visualizable.getGeneAccession();
         geneHyperlink.setText(geneAccession);
 

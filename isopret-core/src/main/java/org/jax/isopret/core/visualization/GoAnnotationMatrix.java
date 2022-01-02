@@ -54,7 +54,7 @@ public class GoAnnotationMatrix {
                             .map(AccessionNumber::toTermId)
                             .collect(Collectors.toList());
             this.expressedTranscriptIds = transcriptIds.stream()
-                    .filter(id -> expressedTranscriptSet.contains(id))
+                    .filter(expressedTranscriptSet::contains)
                     .collect(Collectors.toList());
             LOGGER.info("Got {} transcript Ids for {}", transcriptIds.size(), accessionNumber.getAccessionString());
             LOGGER.info("Gene: {}", accessionNumber.getAccessionString());

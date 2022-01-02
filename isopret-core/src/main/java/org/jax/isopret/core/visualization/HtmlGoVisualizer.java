@@ -2,20 +2,11 @@ package org.jax.isopret.core.visualization;
 
 import java.util.List;
 
-public class HtmlGoVisualizer {
-
-
-    private final List<GoVisualizable> goTerms;
-    /**
-     * An identified that will be used to identify this table by JavaScript.
-     */
-    private final String id;
-
-    public HtmlGoVisualizer(List<GoVisualizable> goTerms, String id) {
-        this.goTerms = goTerms;
-        this.id = id;
-    }
-
+/**
+ * Convenience methods to build an HTML table with the findings of
+ * Gene Ontology analysis (goTerms). The id can be used to identify this table by JavaScript.
+ */
+public record HtmlGoVisualizer(List<GoVisualizable> goTerms, String id ) {
 
     /**
      * String for the header of a gene ontology table.

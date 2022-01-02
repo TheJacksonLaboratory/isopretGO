@@ -1,6 +1,5 @@
 package org.jax.isopret.core.visualization;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HtmlGoAnnotationMatrix {
@@ -96,6 +95,7 @@ public class HtmlGoAnnotationMatrix {
                writing-mode: vertical-rl;
                transform: rotate(180deg);
                white-space: nowrap;
+               padding: 5px 10px;
              }
             </style>
             <body>

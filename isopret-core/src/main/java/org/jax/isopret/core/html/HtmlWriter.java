@@ -31,7 +31,7 @@ import java.util.stream.Stream;
  */
 @Deprecated
 public class HtmlWriter extends AbstractWriter {
-    Logger LOGGER = LoggerFactory.getLogger(HtmlWriter.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(HtmlWriter.class);
     int hbadeals = 0;
     int hbadealSig = 0;
     int foundTranscripts = 0;
