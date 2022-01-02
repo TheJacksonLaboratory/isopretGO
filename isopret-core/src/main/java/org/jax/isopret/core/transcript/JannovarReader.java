@@ -35,7 +35,8 @@ public class JannovarReader {
         this.assembly = assembly;
         JannovarTxMapper jmapper = new JannovarTxMapper(assembly);
         symbolToTranscriptListMap = new HashMap<>();
-        geneIdToTranscriptMap = new HashMap<>();
+        Map<String,AccessionNumber> symbolToGeneIdMap = new HashMap<>();
+
         try {
             JannovarData jannovarData = new JannovarDataSerializer(jannovarSerFile.toString()).load();
             ImmutableMultimap<String, TranscriptModel> mp = jannovarData.getTmByGeneSymbol();
@@ -48,11 +49,19 @@ public class JannovarReader {
                         symbolToTranscriptListMap.get(symbol).add(transcript);
                         String geneAccessionString = tmod.getGeneID();
                         AccessionNumber geneId = AccessionNumber.ensemblGene(geneAccessionString);
-                        geneIdToTranscriptMap.putIfAbsent(geneId, new ArrayList<>());
-                        geneIdToTranscriptMap.get(geneId).add(transcript);
+                        symbolToGeneIdMap.putIfAbsent(symbol, geneId);
                     } else {
                         LOGGER.warn("Could not find Jannovar transcript model for {}.", symbol);
                     }
+                }
+            }
+            LOGGER.info("Parsed symbolToGeneIdMap with {} entries", symbolToGeneIdMap.size());
+            geneIdToTranscriptMap = new HashMap<>();
+            for (var entry : symbolToGeneIdMap.entrySet()) {
+                String symbol = entry.getKey();
+                AccessionNumber accessionNumber = entry.getValue();
+                if (symbolToTranscriptListMap.containsKey(symbol)) {
+                    geneIdToTranscriptMap.put(accessionNumber, symbolToTranscriptListMap.get(symbol));
                 }
             }
         } catch (SerializationException e) {

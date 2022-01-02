@@ -40,8 +40,8 @@ public class GoAnnotationRow implements Comparable<GoAnnotationRow> {
     */
     @Override
     public int compareTo(GoAnnotationRow that) {
-        return this.goTermSignificant && ! that.goTermSignificant ? 1 :
-                that.goTermSignificant && ! this.goTermSignificant ? -1 :
+        return this.goTermSignificant && ! that.goTermSignificant ? -1 :
+                that.goTermSignificant && ! this.goTermSignificant ? 1 :
                         this.goLabel.compareTo(that.goLabel);
     }
 }

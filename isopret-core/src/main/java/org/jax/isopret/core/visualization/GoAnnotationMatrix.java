@@ -45,7 +45,7 @@ public class GoAnnotationMatrix {
                               AccessionNumber accessionNumber){
         List<GoAnnotationRow> rows = new ArrayList<>();
         // The termId (key) of transcriptToGoMap corresponds to an accession number
-        TermId accessionId = accessionNumber.toTermId();
+       // TermId accessionId = accessionNumber.toTermId();
         this.accession = accessionNumber.getAccessionString();
         if (geneIdToTranscriptMap.containsKey(accessionNumber) && transcript2GoMap != null) {
             // collect all DGE Go terms (over entire experiment)
@@ -59,7 +59,14 @@ public class GoAnnotationMatrix {
                             .map(Transcript::accessionId)
                             .map(AccessionNumber::toTermId)
                             .collect(Collectors.toList());
+            LOGGER.info("Got {} transcript Ids for {}", transcriptIds.size(), accessionNumber.getAccessionString());
             this.transcripts = transcriptIds.stream().map(TermId::getValue).collect(Collectors.toList());
+            LOGGER.info("Gene: {}", accessionNumber.getAccessionString());
+            int i = 0;
+            for (String tr : transcripts) {
+                i++;
+                LOGGER.info("\t{}) {}", i, tr);
+            }
             // collect all GO terms that annotate at least one transcript
             Set<TermId> goIdSet = new HashSet<>();
             for (TermId transcriptId : transcriptIds) {
