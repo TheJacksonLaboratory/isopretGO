@@ -1,20 +1,28 @@
 package org.jax.isopret.core.visualization;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HtmlGoAnnotationMatrix {
 
     private final String html;
+    private final String allTranscriptsHtml;
 
-    public String getHtml() {
-        return html;
-    }
+
 
     public HtmlGoAnnotationMatrix(GoAnnotationMatrix matrix) {
         StringBuilder sb = new StringBuilder();
         sb.append(HTML_HEADER);
         sb.append(htmlTableHeader(matrix.getTranscripts()));
         for (GoAnnotationRow row : matrix.getAnnotationRows()) {
+            sb.append(getRow(row));
+        }
+        sb.append(HTML_FOOTER);
+        allTranscriptsHtml = sb.toString();
+        sb = new StringBuilder();
+        sb.append(HTML_HEADER);
+        sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
+        for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
             sb.append(getRow(row));
         }
         sb.append(HTML_FOOTER);
@@ -98,5 +106,11 @@ public class HtmlGoAnnotationMatrix {
             </html>
             """;
 
+    public String getHtml() {
+        return html;
+    }
 
+    public String getHtmlAllTranscripts() {
+        return allTranscriptsHtml;
+    }
 }

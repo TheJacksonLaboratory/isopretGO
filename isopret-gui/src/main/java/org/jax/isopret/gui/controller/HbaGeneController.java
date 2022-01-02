@@ -143,13 +143,12 @@ public class HbaGeneController implements Initializable {
             isoformTableView.setFixedCellSize(25);
             isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             hbaGeneWebView.setMaxHeight(visualizable.getIsoformSvgHeight());
-            LOGGER.info("Loading isoform table");
+            hbaProteinWebView.setMaxHeight(visualizable.getProteinSvgHeight());
             interprTableView.getItems().clear();
             interprTableView.getItems().addAll(visualizable.getInterproVisualizable());
             interprTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             interprTableView.setFixedCellSize(25);
             interprTableView.prefHeightProperty().bind(Bindings.size(interprTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
-            LOGGER.info("Loading isoform table");
             WebEngine goEngine = hbaGoWebView.getEngine();
             goEngine.loadContent(this.visualizable.getGoHtml());
         });

@@ -256,7 +256,7 @@ public class IsopretServiceImpl implements IsopretService  {
                 result,
                 expressionThreshold,
                 splicingThreshold);
-        GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result.getGeneAccession());
+        GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result);
         return new EnsemblVisualizable(agene, annotationMatrix);
     }
 
@@ -280,7 +280,7 @@ public class IsopretServiceImpl implements IsopretService  {
                     result,
                     expressionThreshold,
                     splicingThreshold);
-            GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result.getGeneAccession());
+            GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result);
             EnsemblVisualizable viz = new EnsemblVisualizable(agene, annotationMatrix);
             visualizables.add(viz);
         }
@@ -347,11 +347,19 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
 
-    public GoAnnotationMatrix getGoAnnotationMatrixForGene(AccessionNumber accession) {
+    public GoAnnotationMatrix getGoAnnotationMatrixForGene(HbaDealsResult result) {
+        AccessionNumber accession = result.getGeneAccession();
+        Set<TermId> expressedTranscriptSet = result.getTranscriptMap().keySet().stream()
+                .map(AccessionNumber::toTermId)
+                .collect(Collectors.toSet());
+        Set<TermId> significantGoSet = dgeGoTerms.stream()
+                .map(GoTerm2PValAndCounts::getGoTermId)
+                .collect(Collectors.toSet());
         return new GoAnnotationMatrix(this.geneOntology,
                 this.geneIdToTranscriptMap,
                 this.transcript2GoMap,
-                this.dgeGoTerms,
-                accession);
+                significantGoSet,
+                accession,
+                expressedTranscriptSet);
     }
 }
