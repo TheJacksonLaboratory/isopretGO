@@ -20,6 +20,7 @@ import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -362,4 +363,12 @@ public class IsopretServiceImpl implements IsopretService  {
                 accession,
                 expressedTranscriptSet);
     }
+
+    @Override
+    public GoComparison getGoComparison() {
+        // note that if we can access the button, then we have cnstructed the GO tab
+        // and the following three variables are not null
+        return new GoComparison(this.dgeGoTerms, this.dasGoTerms, this.geneOntology);
+    }
+
 }
