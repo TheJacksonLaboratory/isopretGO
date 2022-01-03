@@ -5,7 +5,6 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -42,8 +41,8 @@ public class GoComparison {
                         GoTerm2PValAndCounts::getAdjustedPValue));
         List<GoCompTerm> goCompTerms = new ArrayList<>();
         for (TermId goId : significantGoTerms) {
-            double dgeLog10P = -1*Math.log10(sigDgeMap.getOrDefault(goId, 0d));
-            double dasLog10P = -1*Math.log10(sigDasMap.getOrDefault(goId, 0d));
+            double dgeLog10P = -1*Math.log10(sigDgeMap.getOrDefault(goId, 1d));
+            double dasLog10P = -1*Math.log10(sigDasMap.getOrDefault(goId, 1d));
             Optional<String> opt = ontology.getTermLabel(goId);
             String label = opt.orElse("n/a"); // we should never get n/a
             GoCompTerm compTerm = new GoCompTerm(goId, label, dgeLog10P, dasLog10P);

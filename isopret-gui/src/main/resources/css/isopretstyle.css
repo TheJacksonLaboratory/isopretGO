@@ -135,7 +135,7 @@
     -fx-border-width: 0px;
 }
 
-#ipad-dark-grey {
+.ipad-dark-grey {
     -fx-background-color:
         linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
         linear-gradient(#020b02, #3a3a3a),
@@ -151,6 +151,6 @@
     -fx-text-fill: white;
     -fx-effect: dropshadow( three-pass-box , rgba(255,255,255,0.2) , 1, 0.0 , 0 , 1);
 }
-#ipad-dark-grey Text {
+.ipad-dark-grey Text {
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , -1 );
 }

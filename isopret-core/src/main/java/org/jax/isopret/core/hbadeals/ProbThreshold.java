@@ -20,7 +20,7 @@ public class ProbThreshold {
 
     /**
      * Calculate FDR for the {@link #DEFAULT_THRESHOLD} value of the desired FDR
-     * @param probabilities
+     * @param probabilities HBADEALS probabilities (PEP)
      */
     public ProbThreshold(List<Double> probabilities) {
         this(probabilities, DEFAULT_THRESHOLD);
