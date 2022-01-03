@@ -9,6 +9,8 @@ public class GoCompTerm implements Comparable<GoCompTerm> {
     private final double dge;
     private final double das;
 
+    private static final double THRESH = -1 * Math.log10(0.05);
+
 
     GoCompTerm(TermId tid, String label, double dge, double das) {
         this.tid = tid;
@@ -36,5 +38,17 @@ public class GoCompTerm implements Comparable<GoCompTerm> {
 
     public double getDas() {
         return das;
+    }
+
+    /**
+     * p-values are -log10
+     * @return
+     */
+    public boolean dgeSignificant() {
+        return this.dge >= THRESH;
+    }
+
+    public boolean dasSignificant() {
+        return this.das >= THRESH;
     }
 }
