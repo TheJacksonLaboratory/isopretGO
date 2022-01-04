@@ -14,7 +14,7 @@ import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.GoCompWidget;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;

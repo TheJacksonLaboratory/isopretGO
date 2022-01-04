@@ -24,7 +24,7 @@ import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -154,3 +154,6 @@
 .ipad-dark-grey Text {
     -fx-effect: dropshadow( one-pass-box , black , 0, 0.0 , 0 , -1 );
 }
+
+.default-color0.chart-bar { -fx-bar-fill: #003f5c; }
+.default-color1.chart-bar { -fx-bar-fill: #bc5090; }

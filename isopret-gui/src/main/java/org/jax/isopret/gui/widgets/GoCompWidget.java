@@ -39,13 +39,14 @@ public class GoCompWidget {
         int height = 30 * nSignificantGoTerms + 50;
         barChart.setMinHeight(height);
         //set first bar color
-        for(Node n:barChart.lookupAll(".default-color0.chart-bar")) {
-            n.setStyle("-fx-bar-fill: #003f5c;");
-        }
-        //second bar color
-        for(Node n:barChart.lookupAll(".default-color1.chart-bar")) {
-            n.setStyle("-fx-bar-fill: #bc5090;");
-        }
+//        barChart.get
+//        for(Node n:barChart.lookupAll(".default-color0.chart-bar")) {
+//            n.setStyle("-fx-bar-fill: #003f5c;");
+//        }
+//        //second bar color
+//        for(Node n:barChart.lookupAll(".default-color1.chart-bar")) {
+//            n.setStyle("-fx-bar-fill: #bc5090;");
+//        }
 
         XYChart.Series<Number, String> dataSeriesDGE = new XYChart.Series<>();
         dataSeriesDGE.setName("DGE");

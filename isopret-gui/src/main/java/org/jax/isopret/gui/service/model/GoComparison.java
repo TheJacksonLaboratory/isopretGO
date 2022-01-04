@@ -2,7 +2,7 @@ package org.jax.isopret.gui.service.model;
 
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 
 import java.util.*;
 import java.util.stream.Collectors;

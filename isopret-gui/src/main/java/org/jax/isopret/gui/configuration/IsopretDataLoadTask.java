@@ -20,7 +20,7 @@ import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.svart.GenomicAssemblies;
 import org.monarchinitiative.svart.GenomicAssembly;
 import org.slf4j.Logger;

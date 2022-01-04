@@ -12,7 +12,7 @@ import org.jax.isopret.core.html.HtmlWriter;
 import org.jax.isopret.core.html.TsvWriter;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 
 
 import org.slf4j.Logger;

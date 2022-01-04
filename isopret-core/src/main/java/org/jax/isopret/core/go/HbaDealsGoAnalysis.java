@@ -7,11 +7,11 @@ import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
-import org.monarchinitiative.phenol.stats.ParentChildIntersectionPValueCalculation;
-import org.monarchinitiative.phenol.stats.ParentChildUnionPValueCalculation;
-import org.monarchinitiative.phenol.stats.TermForTermPValueCalculation;
-import org.monarchinitiative.phenol.stats.mtc.*;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.ParentChildIntersectionPValueCalculation;
+import org.monarchinitiative.phenol.analysis.stats.ParentChildUnionPValueCalculation;
+import org.monarchinitiative.phenol.analysis.stats.TermForTermPValueCalculation;
+import org.monarchinitiative.phenol.analysis.stats.mtc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
