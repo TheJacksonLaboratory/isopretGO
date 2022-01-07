@@ -42,12 +42,15 @@ public class GoCompTerm implements Comparable<GoCompTerm> {
 
     /**
      * p-values are -log10
-     * @return
+     * @return true if this term is signficantly overrepresented for gene expression
      */
     public boolean dgeSignificant() {
         return this.dge >= THRESH;
     }
-
+    /**
+     * p-values are -log10
+     * @return true if this term is signficantly overrepresented for alternative splicing
+     */
     public boolean dasSignificant() {
         return this.das >= THRESH;
     }

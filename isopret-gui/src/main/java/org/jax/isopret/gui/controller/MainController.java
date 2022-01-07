@@ -27,10 +27,11 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.*;
 
 /**
  * A Java app to help design probes for Capture Hi-C
@@ -89,6 +90,7 @@ public class MainController implements Initializable {
     @Autowired
     ResourceLoader resourceLoader;
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Bindings.bindBidirectional(this.downloadDataSourceLabel.textProperty(), service.downloadDirProperty());
@@ -140,11 +142,15 @@ public class MainController implements Initializable {
         service.downloadSources(file);
     }
 
-
+    /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "TODO";
-        String lastChangedDate = "TODO";
+        String version = "0.7.5";
+        Instant lastTime = Instant.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                .withLocale( Locale.UK )
+                .withZone( ZoneId.systemDefault() );
+        String lastChangedDate = formatter.format(lastTime);
         PopupFactory.showAbout(version, lastChangedDate);
         e.consume();
     }
@@ -159,7 +165,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void isopretAnalysis(ActionEvent actionEvent) {
-        LOGGER.info("Do isopret analysis");
+        LOGGER.trace("Doing isopret analysis");
         Optional<File> downloadOpt = service.getDownloadDir();
         if (downloadOpt.isEmpty()) {
             PopupFactory.displayError("ERROR", "Could not find download directory");

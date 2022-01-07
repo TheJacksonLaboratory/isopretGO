@@ -113,7 +113,7 @@ public class PopupFactory {
 
     public static void showAbout(String versionString, String dateString) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("GOPHER");
+        alert.setTitle("Isoform Interpretation (isopret)");
         alert.setHeaderText(null);
         alert.setContentText(String.format("Version %s\nLast changed: %s", versionString, dateString));
         alert.showAndWait();

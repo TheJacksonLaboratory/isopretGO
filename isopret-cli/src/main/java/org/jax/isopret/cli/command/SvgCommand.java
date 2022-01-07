@@ -134,8 +134,7 @@ public class SvgCommand extends IsopretCommand implements Callable<Integer> {
             throw new IsopretRuntimeException(String.format("[ERROR] Could not find HBA-DEALS result for %s\n", this.geneSymbol));
         }
         LOGGER.trace("Get HBA-DEALS result for: {}", this.geneSymbol);
-        HbaDealsResult result = hbaDealsResults.get(this.geneSymbol);
-        return result;
+        return hbaDealsResults.get(this.geneSymbol);
     }
 
     /**

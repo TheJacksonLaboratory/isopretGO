@@ -32,6 +32,7 @@ import java.util.*;
 
 /**
  * This class organizes data input and preparation
+ * @author Peter N Robinson
  */
 public class IsopretDataLoadTask extends Task<Integer>  {
     private final Logger LOGGER = LoggerFactory.getLogger(IsopretDataLoadTask.class);
@@ -90,7 +91,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     @Override
     protected Integer call() {
-        boolean valid = true;
         updateProgress(0, 1); /* this will update the progress bar */
         updateMessage("Reading Gene Ontology file");
         updateProgress(0.05, 1);
@@ -124,7 +124,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
         if (! isoformFunctionFile.isFile()) {
             errors.add("Could not find \"isoform_function_list.txt\" in download directory");
-            valid = false;
+            return 1;
         } else {
             TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(isoformFunctionFile, geneOntology);
             Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
@@ -159,7 +159,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                     interproDescriptionFile.getAbsolutePath());
         }
         this.interproMapper = new InterproMapper(interproDescriptionFile, interproDomainsFile);
-        updateProgress(0.80, 1); /* this will update the progress bar */
+        updateProgress(0.70, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded InterproMapper with %d domains", interproMapper.getInterproDescription().size()));
 
         LOGGER.info(String.format("Loaded InterproMapper with %d domains", interproMapper.getInterproDescription().size()));
@@ -170,18 +170,18 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         }
         TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(predictionFile, geneOntology);
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
-        updateProgress(0.85, 1); /* this will update the progress bar */
+        updateProgress(0.80, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), hgncMap);
         Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
-        updateProgress(0.95, 1); /* this will update the progress bar */
+        updateProgress(0.90, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
         this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);
-        updateProgress(0.8, 1);
+        updateProgress(0.95, 1);
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         updateMessage("Finished loading data for isopret analysis.");
@@ -192,7 +192,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                 this.overrepMethod,
                 this.multipleTestingMethod);
         this.dgeResults = dgeGoAnalysis.overrepresetationAnalysis();
-        updateProgress(0.9, 1);
+        updateProgress(0.97, 1);
         updateMessage(String.format("Finished DGE overrepresentation analysis. %d overrepresented GO Terms",
                dgeResults.size()));
         LOGGER.info("Finished DGE GO analysis, n = {}", this.dgeResults.size());
@@ -229,7 +229,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             for (var transcript: transcriptList) {
                 var transcriptAcc = transcript.accessionId();
                 var transcriptTermId = transcriptAcc.toTermId();
-                //System.out.println(transcriptAcc.getAccessionString() +": " + geneAcc.getAccessionString());
                 accessionNumberMap.put(transcriptTermId, geneTermId);
             }
         }

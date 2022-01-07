@@ -265,13 +265,17 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<Visualizable> getGeneVisualizables() {
         int notfound = 0;
         List<Visualizable> visualizables = new ArrayList<>();
-        for (var r : thresholder.getRawResults().values()) {
-            if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
+        // sort the raw results according to minimum p-values
+        List<HbaDealsResult> results = thresholder.getRawResults().values()
+                .stream()
+                .sorted()
+                .collect(Collectors.toList());
+        for (HbaDealsResult result : results) {
+            if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
                 notfound++;
                 continue;
             }
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
-            HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
+            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
             double splicingThreshold = thresholder.getSplicingThreshold();
             double expressionThreshold = thresholder.getExpressionThreshold();
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =

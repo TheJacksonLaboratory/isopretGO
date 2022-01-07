@@ -299,18 +299,16 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getIsoformHtml() {
-        String html = HTML_FOR_SVG_HEADER +
+        return HTML_FOR_SVG_HEADER +
                 getIsoformSvg() +
                 HTML_FOR_SVG_FOOTER;
-        return html;
     }
 
     @Override
     public String getProteinHtml() {
-        String html = HTML_FOR_SVG_HEADER +
+        return HTML_FOR_SVG_HEADER +
                 getProteinSvg() +
                 HTML_FOR_SVG_FOOTER;
-        return html;
     }
 
     @Override

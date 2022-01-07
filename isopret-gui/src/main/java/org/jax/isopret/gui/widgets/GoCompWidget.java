@@ -1,6 +1,5 @@
 package org.jax.isopret.gui.widgets;
 
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class GoCompWidget {
-    Logger LOGGER = LoggerFactory.getLogger(GoCompWidget.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(GoCompWidget.class);
     private final GoComparison goComparison;
     private final int nSignificantGoTerms;
 
