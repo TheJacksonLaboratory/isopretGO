@@ -19,31 +19,15 @@ git checkout develop
 mvn install
 ```
 
+Isopret can then be built using standard maven:
 ```
 git clone https://github.com/TheJacksonLaboratory/isopret
 cd isopret
 mvn package
 ```
-This will create an executable in the ``target`` subdirectory. Run the following command to make sure
-the executable was created.
+This will create an executable app
 ```
-$ java -jar target/isopret.jar 
-Usage: isopret [-hV] [COMMAND]
-Isoform interpretation tool.
-  -h, --help      Show this help message and exit.
-  -V, --version   Print version information and exit.
-Commands:
-  download, D  Download files for prositometry
-  hbadeals, H  Analyze HBA-DEALS files
-  svg, V       Create SVG/PDF files for a specific gene
-  stats, S     Show descriptive statistics about data
-```
-
-## GUI
-
-A prototype GUI is available
-```
-java -jar isopret-gui/target/isopret-gui-0.7.0.jar
+java -jar isopret-gui/target/Isopret.jar
 ```
 
 Note that for now the Download button does not import all of the files we require for analysis. To
