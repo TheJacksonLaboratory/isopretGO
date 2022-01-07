@@ -15,6 +15,7 @@ import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.IsopretFxDownloadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
@@ -93,8 +94,8 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Bindings.bindBidirectional(this.downloadDataSourceLabel.textProperty(), service.downloadDirProperty());
-        Bindings.bindBidirectional(this.hbaDealsFileLabel.textProperty(), service.hbaDealsFileProperty());
+        this.downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
+        this.hbaDealsFileLabel.textProperty().bind(service.hbaDealsFileProperty());
         this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
         goChoiceBox.setItems(goMethodList);
         goChoiceBox.getSelectionModel().selectFirst();
@@ -139,7 +140,30 @@ public class MainController implements Initializable {
             PopupFactory.displayError("Error","Could not get directory for download.");
             return;
         }
-        service.downloadSources(file);
+        LOGGER.info("Downloading files for isopret to {}", file.getAbsolutePath());
+
+        IsopretFxDownloadTask task = new IsopretFxDownloadTask(file.getAbsolutePath());
+        this.transcriptDownloadPI.progressProperty().unbind();
+        this.transcriptDownloadPI.progressProperty().bind(task.progressProperty());
+        this.downloadDataSourceLabel.textProperty().unbind();
+        this.downloadDataSourceLabel.textProperty().bind(task.messageProperty());
+
+
+        task.setOnSucceeded(c -> {
+            LOGGER.info("Downloaded files for isopret to {}", file.getAbsolutePath());
+            service.setDownloadDir(file);
+            downloadDataSourceLabel.textProperty().unbind();
+            downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
+        });
+        task.setOnFailed(c -> {
+            LOGGER.info("Could not downloaded files for isopret to {}", file.getAbsolutePath());
+            service.setDownloadDir(null);
+        });
+        task.setOnCancelled(c -> {
+            LOGGER.info("download canceled");
+
+        });
+        new Thread(task).start();
     }
 
     /** Show version and last build time. */

@@ -133,10 +133,9 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public void downloadSources(File file){
-        IsopretDownloader downloader = new IsopretDownloader(file.getAbsolutePath(), true);
-        downloader.download();
+    public void setDownloadDir(File file){
         pgProperties.setProperty("downloaddir", file.getAbsolutePath());
+        this.downloadDirProp.setValue(file.getAbsolutePath());
     }
 
     @Override
@@ -148,6 +147,12 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public StringProperty downloadDirProperty() {
+        File f = new File(downloadDirProp.get());
+        if (! f.exists()) {
+            this.downloadDirProp.setValue("Download directory not set");
+        } else if (! f.isDirectory()) {
+            this.downloadDirProp.setValue("Error, download property set to file");
+        }
         return this.downloadDirProp;
     }
 
