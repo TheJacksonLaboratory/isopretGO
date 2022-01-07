@@ -11,7 +11,6 @@ import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.io.IsopretDownloader;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
@@ -133,10 +132,9 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public void downloadSources(File file){
-        IsopretDownloader downloader = new IsopretDownloader(file.getAbsolutePath(), true);
-        downloader.download();
+    public void setDownloadDir(File file){
         pgProperties.setProperty("downloaddir", file.getAbsolutePath());
+        this.downloadDirProp.setValue(file.getAbsolutePath());
     }
 
     @Override
@@ -148,6 +146,12 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public StringProperty downloadDirProperty() {
+        File f = new File(downloadDirProp.get());
+        if (! f.exists()) {
+            this.downloadDirProp.setValue("Download directory not set");
+        } else if (! f.isDirectory()) {
+            this.downloadDirProp.setValue("Error, download property set to file");
+        }
         return this.downloadDirProp;
     }
 
@@ -265,13 +269,17 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<Visualizable> getGeneVisualizables() {
         int notfound = 0;
         List<Visualizable> visualizables = new ArrayList<>();
-        for (var r : thresholder.getRawResults().values()) {
-            if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
+        // sort the raw results according to minimum p-values
+        List<HbaDealsResult> results = thresholder.getRawResults().values()
+                .stream()
+                .sorted()
+                .collect(Collectors.toList());
+        for (HbaDealsResult result : results) {
+            if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
                 notfound++;
                 continue;
             }
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
-            HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
+            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
             double splicingThreshold = thresholder.getSplicingThreshold();
             double expressionThreshold = thresholder.getExpressionThreshold();
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =

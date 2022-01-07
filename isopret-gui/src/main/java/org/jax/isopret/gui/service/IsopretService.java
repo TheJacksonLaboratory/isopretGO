@@ -28,7 +28,7 @@ public interface IsopretService {
      */
     boolean sourcesDownloaded();
 
-    void downloadSources(File file);
+    void setDownloadDir(File file);
 
     StringProperty downloadDirProperty();
 

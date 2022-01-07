@@ -17,7 +17,9 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * Command to download the {@code hp.obo} and {@code phenotype.hpoa} files that
- * we will need to run the LIRICAL approach.
+ * we will need to run Isopret. Note that this class is also used by
+ * the IsopretFxDonloader (a Task) so several of the methods are made public that
+ * do not need to be public for the CLI download.
  * @author Peter N Robinson
  */
 public class IsopretDownloader {
@@ -62,11 +64,31 @@ public class IsopretDownloader {
      * Download the files unless they are already present.
      */
     public void download() {
-        downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
+        downloadGoJson();
+        downloadGoAnnotationFile();
+        downloadJannovar();
+        downloadHgnc();
+    }
+
+    /**
+     * Download the go.json file
+     */
+    public void downloadGoJson() {
         downloadFileIfNeeded(GO_JSON, GO_JSON_URL);
+    }
+
+    public void downloadGoAnnotationFile() {
+        downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
+    }
+
+    public void downloadJannovar() {
         downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
+    }
+
+    public void downloadHgnc() {
         downloadFileIfNeeded(HGNC_FILENAME, HGNC_URL);
     }
+
 
 
     private void downloadGzipFileIfNeeded(String filename, String gzFilename, String webAddress) {

@@ -1,7 +1,6 @@
 package org.jax.isopret.gui.controller;
 
 
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,6 +14,7 @@ import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.IsopretFxDownloadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
@@ -27,10 +27,11 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.*;
 
 /**
  * A Java app to help design probes for Capture Hi-C
@@ -89,10 +90,12 @@ public class MainController implements Initializable {
     @Autowired
     ResourceLoader resourceLoader;
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Bindings.bindBidirectional(this.downloadDataSourceLabel.textProperty(), service.downloadDirProperty());
-        Bindings.bindBidirectional(this.hbaDealsFileLabel.textProperty(), service.hbaDealsFileProperty());
+        this.downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
+        this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
+        this.hbaDealsFileLabel.textProperty().bind(service.hbaDealsFileProperty());
         this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
         goChoiceBox.setItems(goMethodList);
         goChoiceBox.getSelectionModel().selectFirst();
@@ -137,14 +140,38 @@ public class MainController implements Initializable {
             PopupFactory.displayError("Error","Could not get directory for download.");
             return;
         }
-        service.downloadSources(file);
+        LOGGER.info("Downloading files for isopret to {}", file.getAbsolutePath());
+
+        IsopretFxDownloadTask task = new IsopretFxDownloadTask(file.getAbsolutePath());
+        this.transcriptDownloadPI.progressProperty().unbind();
+        this.transcriptDownloadPI.progressProperty().bind(task.progressProperty());
+        this.downloadDataSourceLabel.textProperty().unbind();
+        this.downloadDataSourceLabel.textProperty().bind(task.messageProperty());
+
+
+        task.setOnSucceeded(c -> {
+            LOGGER.info("Downloaded files for isopret to {}", file.getAbsolutePath());
+            service.setDownloadDir(file);
+            downloadDataSourceLabel.textProperty().unbind();
+            downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
+        });
+        task.setOnFailed(c -> {
+            LOGGER.info("Could not downloaded files for isopret to {}", file.getAbsolutePath());
+            service.setDownloadDir(null);
+        });
+        task.setOnCancelled(c -> LOGGER.info("download canceled"));
+        new Thread(task).start();
     }
 
-
+    /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "TODO";
-        String lastChangedDate = "TODO";
+        String version = "0.7.5";
+        Instant lastTime = Instant.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                .withLocale( Locale.UK )
+                .withZone( ZoneId.systemDefault() );
+        String lastChangedDate = formatter.format(lastTime);
         PopupFactory.showAbout(version, lastChangedDate);
         e.consume();
     }
@@ -159,7 +186,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void isopretAnalysis(ActionEvent actionEvent) {
-        LOGGER.info("Do isopret analysis");
+        LOGGER.trace("Doing isopret analysis");
         Optional<File> downloadOpt = service.getDownloadDir();
         if (downloadOpt.isEmpty()) {
             PopupFactory.displayError("ERROR", "Could not find download directory");
@@ -241,6 +268,8 @@ public class MainController implements Initializable {
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to perform isopret analysis",
                     exc);
+            this.analysisLabel.textProperty().unbind();
+            this.analysisLabel.textProperty().setValue("Analysis failed: " + exc.getMessage());
         });
         new Thread(task).start();
     }
