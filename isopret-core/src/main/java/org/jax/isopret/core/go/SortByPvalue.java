@@ -1,6 +1,6 @@
 package org.jax.isopret.core.go;
 
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 
 import java.util.Comparator;
 

@@ -67,8 +67,6 @@ public class TranscriptTest extends TestBase {
         Map<String, HbaDealsResult> hbadealmaps = getADARHbaDealsResultMap();
         assertTrue(hbadealmaps.containsKey("ADAR"));
         HbaDealsResult adarResult = hbadealmaps.get("ADAR"); // expressed genes
-
-        PrositeMapping psm = prositeMappingMap.get(adarGeneId);
         Map<AccessionNumber, List<DisplayInterproAnnotation>> annotList = Map.of(); // TODO
         AnnotatedGene atranscript = new AnnotatedGene(adarTranscripts, annotList, adarResult);
         assertEquals(atranscript.getSymbol(), "ADAR");

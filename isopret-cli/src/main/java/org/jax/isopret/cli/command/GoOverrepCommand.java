@@ -13,8 +13,8 @@ import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.*;
-import org.monarchinitiative.phenol.stats.mtc.*;
+import org.monarchinitiative.phenol.analysis.stats.*;
+import org.monarchinitiative.phenol.analysis.stats.mtc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -171,12 +171,11 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         } else {
             throw new IsopretRuntimeException("Did not recognise GO Method");
         }
-        var pvals = pvalcal.calculatePVals()
+        return pvalcal.calculatePVals()
                 .stream()
                 .filter(item -> item.passesThreshold(ALPHA))
                 .sorted()
                 .collect(Collectors.toList());
-        return pvals;
 
     }
 

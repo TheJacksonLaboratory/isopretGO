@@ -4,12 +4,17 @@ package org.jax.isopret.gui.controller;
 import javafx.application.HostServices;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GoComparison;
 import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.jax.isopret.gui.widgets.GoCompWidget;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -126,4 +131,11 @@ public class GeneOntologyController implements Initializable {
     }
 
 
+    @FXML
+    private void compareDgeDasBtncompareDgeDas(ActionEvent actionEvent) {
+        actionEvent.consume();
+        GoComparison comparison = isopretService.getGoComparison();
+        GoCompWidget widget = new GoCompWidget(comparison);
+        widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
+    }
 }

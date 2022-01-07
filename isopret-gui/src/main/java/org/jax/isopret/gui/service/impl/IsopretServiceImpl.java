@@ -11,7 +11,6 @@ import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.io.IsopretDownloader;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
@@ -20,10 +19,11 @@ import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,10 +132,9 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public void downloadSources(File file){
-        IsopretDownloader downloader = new IsopretDownloader(file.getAbsolutePath(), true);
-        downloader.download();
+    public void setDownloadDir(File file){
         pgProperties.setProperty("downloaddir", file.getAbsolutePath());
+        this.downloadDirProp.setValue(file.getAbsolutePath());
     }
 
     @Override
@@ -147,6 +146,12 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public StringProperty downloadDirProperty() {
+        File f = new File(downloadDirProp.get());
+        if (! f.exists()) {
+            this.downloadDirProp.setValue("Download directory not set");
+        } else if (! f.isDirectory()) {
+            this.downloadDirProp.setValue("Error, download property set to file");
+        }
         return this.downloadDirProp;
     }
 
@@ -264,13 +269,17 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<Visualizable> getGeneVisualizables() {
         int notfound = 0;
         List<Visualizable> visualizables = new ArrayList<>();
-        for (var r : thresholder.getRawResults().values()) {
-            if (! this.geneSymbolToTranscriptMap.containsKey(r.getSymbol())) {
+        // sort the raw results according to minimum p-values
+        List<HbaDealsResult> results = thresholder.getRawResults().values()
+                .stream()
+                .sorted()
+                .collect(Collectors.toList());
+        for (HbaDealsResult result : results) {
+            if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
                 notfound++;
                 continue;
             }
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(r.getSymbol());
-            HbaDealsResult result = thresholder.getRawResults().get(r.getSymbol());
+            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
             double splicingThreshold = thresholder.getSplicingThreshold();
             double expressionThreshold = thresholder.getExpressionThreshold();
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
@@ -362,4 +371,12 @@ public class IsopretServiceImpl implements IsopretService  {
                 accession,
                 expressedTranscriptSet);
     }
+
+    @Override
+    public GoComparison getGoComparison() {
+        // note that if we can access the button, then we have cnstructed the GO tab
+        // and the following three variables are not null
+        return new GoComparison(this.dgeGoTerms, this.dasGoTerms, this.geneOntology);
+    }
+
 }

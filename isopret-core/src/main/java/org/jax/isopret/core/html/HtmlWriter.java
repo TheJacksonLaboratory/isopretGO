@@ -11,10 +11,10 @@ import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
 import org.jax.isopret.core.visualization.*;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.Term;
 import org.monarchinitiative.phenol.ontology.data.TermId;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,10 +115,7 @@ public class HtmlWriter extends AbstractWriter {
             }
         }
         Collections.sort(annotatedGeneList);
-        int i = 0;
         for (AnnotatedGene annotatedGene : annotatedGeneList) {
-            i++;
-            Set<Term> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
             geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene)));
         }
         // record source of analysis

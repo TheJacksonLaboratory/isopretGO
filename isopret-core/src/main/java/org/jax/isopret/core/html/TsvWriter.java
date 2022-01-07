@@ -3,8 +3,8 @@ package org.jax.isopret.core.html;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
+import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
