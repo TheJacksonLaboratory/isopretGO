@@ -11,7 +11,6 @@ import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.io.IsopretDownloader;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;

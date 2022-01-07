@@ -115,10 +115,7 @@ public class HtmlWriter extends AbstractWriter {
             }
         }
         Collections.sort(annotatedGeneList);
-        int i = 0;
         for (AnnotatedGene annotatedGene : annotatedGeneList) {
-            i++;
-            Set<Term> goTerms = enrichedGeneAnnots.getOrDefault(annotatedGene.getSymbol(), new HashSet<>());
             geneVisualizations.add(visualizer.getHtml(new EnsemblVisualizable(annotatedGene)));
         }
         // record source of analysis

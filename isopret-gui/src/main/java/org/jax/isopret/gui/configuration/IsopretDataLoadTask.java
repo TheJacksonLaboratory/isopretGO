@@ -97,17 +97,16 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
         File goJsonFile = new File(downloadDirectory + File.separator + "go.json");
         if (!goJsonFile.isFile()) {
-            errors.add("Could not find Gene Ontology JSON file at " + goJsonFile.getAbsolutePath());
-            return 1;
+            throw new IsopretRuntimeException("Could not find Gene Ontology JSON file at " + goJsonFile.getAbsolutePath());
         }
         this.geneOntology = OntologyLoader.loadOntology(goJsonFile);
         updateMessage("Loaded Gene Ontology file");
         updateProgress(0.15, 1);
         File jannovarFile = new File(downloadDirectory + File.separator + "hg38_ensembl.ser");
         if (! jannovarFile.isFile()) {
-            errors.add("Could not find hg38_ensembl.ser (Jannovar file) at " +
+            String errorMsg = String.format("Could not find hg38_ensembl.ser (Jannovar file) at \"%s\"",
                     jannovarFile.getAbsolutePath());
-            return 1;
+            throw new IsopretRuntimeException(errorMsg);
         }
         JannovarReader jannovarReader = new JannovarReader(jannovarFile, assembly);
 
@@ -123,14 +122,13 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
         File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
         if (! isoformFunctionFile.isFile()) {
-            errors.add("Could not find \"isoform_function_list.txt\" in download directory");
-            return 1;
+            throw new IsopretRuntimeException("Could not find \"isoform_function_list.txt\" in download directory");
         } else {
             TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(isoformFunctionFile, geneOntology);
             Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
             this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
             updateProgress(0.40, 1);
-            updateMessage(String.format("Loaded isoformFunctionFile %d transcript.", transcript2GoMap.size()));
+            updateMessage(String.format("Loaded isoformFunctionFile (%d transcripts).", transcript2GoMap.size()));
             Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
             LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
             IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);

@@ -1,8 +1,5 @@
 package org.jax.isopret.core.go;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public enum GoMethod {
     TFT("Term-for-Term"), PCunion("Parent-Child-Union"), PCintersect("Parent-Child-Intersection"), MGSA("MGSA");
     private final String name;

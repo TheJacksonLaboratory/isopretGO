@@ -1,7 +1,6 @@
 package org.jax.isopret.gui.controller;
 
 
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -95,6 +94,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
+        this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
         this.hbaDealsFileLabel.textProperty().bind(service.hbaDealsFileProperty());
         this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
         goChoiceBox.setItems(goMethodList);
@@ -159,10 +159,7 @@ public class MainController implements Initializable {
             LOGGER.info("Could not downloaded files for isopret to {}", file.getAbsolutePath());
             service.setDownloadDir(null);
         });
-        task.setOnCancelled(c -> {
-            LOGGER.info("download canceled");
-
-        });
+        task.setOnCancelled(c -> LOGGER.info("download canceled"));
         new Thread(task).start();
     }
 
@@ -271,6 +268,8 @@ public class MainController implements Initializable {
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to perform isopret analysis",
                     exc);
+            this.analysisLabel.textProperty().unbind();
+            this.analysisLabel.textProperty().setValue("Analysis failed: " + exc.getMessage());
         });
         new Thread(task).start();
     }
