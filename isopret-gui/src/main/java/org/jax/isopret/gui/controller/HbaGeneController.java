@@ -1,6 +1,5 @@
 package org.jax.isopret.gui.controller;
 
-import javafx.application.HostServices;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
