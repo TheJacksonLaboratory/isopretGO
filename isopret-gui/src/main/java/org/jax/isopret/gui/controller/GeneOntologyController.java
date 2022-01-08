@@ -1,7 +1,5 @@
 package org.jax.isopret.gui.controller;
 
-
-import javafx.application.HostServices;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
@@ -10,10 +8,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.GoCompWidget;
+import org.jax.isopret.gui.widgets.GoDisplayWidget;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class GeneOntologyController implements Initializable {
     public TableColumn<GoTermAndPvalVisualized, String> adjpvalColumn;
     public TableColumn<GoTermAndPvalVisualized, Button> amigoColumn;
     private final String label;
+    private final GeneOntologyComparisonMode comparisonMode;
     private final String methodsLabel;
     private final String summaryLabel;
     public Label goTopLevelLabel;
@@ -55,12 +57,18 @@ public class GeneOntologyController implements Initializable {
 
     private final IsopretService isopretService;
 
+    private final HostServicesWrapper hostServices;
+    @FXML
+    private Button dgeOrDasGoBtn;
 
-    public GeneOntologyController(String topLevelLabel,  List<GoTerm2PValAndCounts> pvals, IsopretService service) {
-        this.label = topLevelLabel;
+
+    public GeneOntologyController(GeneOntologyComparisonMode mode, List<GoTerm2PValAndCounts> pvals, IsopretService service, HostServicesWrapper hostServicesWrapper) {
+        this.label = service.getGoLabel(mode);
+        comparisonMode = mode;
         this.methodsLabel = service.getGoMethods();
         this.summaryLabel = service.getGoSummary();
         this.isopretService = service;
+        this.hostServices = hostServicesWrapper;
         this.goPvals = pvals.stream()
                 .map(pval -> new GoTermAndPvalVisualized(pval, service.getGeneOntology()))
                 .collect(Collectors.toList());
@@ -92,9 +100,8 @@ public class GeneOntologyController implements Initializable {
         adjpvalColumn.setEditable(false);
         adjpvalColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPvalAdjFormated()));
 
-        HostServices hostServices = isopretService.getHostServices();
         if (hostServices == null) {
-            LOGGER.error("COuld not retrieve HostServices");
+            LOGGER.error("Could not retrieve HostServices");
         } else {
             amigoColumn.setSortable(false);
             amigoColumn.setEditable(false);
@@ -115,6 +122,11 @@ public class GeneOntologyController implements Initializable {
         this.goTopLevelLabel.setText(this.label);
         this.goMethodsLabel.setText(this.methodsLabel);
         this.goSummaryLabel.setText(this.summaryLabel);
+        if (this.comparisonMode.equals(GeneOntologyComparisonMode.DGE)) {
+            this.dgeOrDasGoBtn.setText("GO Enrichment (DGE)");
+        } else {
+            this.dgeOrDasGoBtn.setText("GO Enrichment (DAS)");
+        }
     }
 
 
@@ -128,6 +140,15 @@ public class GeneOntologyController implements Initializable {
             goPvalTableView.getItems().addAll(goPvals);
             goPvalTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         });
+    }
+
+
+    @FXML
+    private void dgeOrDasDisplayBtn(ActionEvent actionEvent) {
+        actionEvent.consume();
+        GoComparison comparison = isopretService.getGoComparison();
+        GoDisplayWidget widget = new GoDisplayWidget(comparison, this.comparisonMode);
+        widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
     }
 
 

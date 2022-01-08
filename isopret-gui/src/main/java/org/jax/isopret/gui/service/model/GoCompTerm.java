@@ -2,10 +2,18 @@ package org.jax.isopret.gui.service.model;
 
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
+/**
+ * Convenience class to help visualize GO terms in the GUI
+ * {@link #dge} is the negative decadic logarithm of the p-value of
+ * enrichment for the differential gene expression dataset and
+ * {@link #das} is the same for the differential alternative splicing dataset.
+ * @author Peter Robinson
+ */
 public class GoCompTerm implements Comparable<GoCompTerm> {
 
     private final TermId tid;
     private final String label;
+
     private final double dge;
     private final double das;
 
@@ -54,4 +62,9 @@ public class GoCompTerm implements Comparable<GoCompTerm> {
     public boolean dasSignificant() {
         return this.das >= THRESH;
     }
+
+    public boolean isSignificant() { return this.dasSignificant() || this.dgeSignificant(); }
+
+    public boolean dgePredominant() { return this.dge >= this.das; }
+    public boolean dasPredominant() { return this.das > this.dge; }
 }

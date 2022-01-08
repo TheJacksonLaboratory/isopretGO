@@ -1,6 +1,5 @@
 package org.jax.isopret.gui.controller;
 
-import javafx.application.HostServices;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
@@ -12,9 +11,11 @@ import javafx.scene.web.WebView;
 import org.jax.isopret.core.visualization.InterproVisualizable;
 import org.jax.isopret.core.visualization.IsoformVisualizable;
 import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -66,6 +67,9 @@ public class HbaGeneController implements Initializable {
     private WebView hbaProteinWebView;
     @FXML
     private WebView hbaGoWebView;
+
+    @Autowired
+    HostServicesWrapper hostServicesWrapper;
 
     private final IsopretService service;
 
@@ -127,13 +131,13 @@ public class HbaGeneController implements Initializable {
         geneHyperlink.setOnAction(e -> {
             String geneAccession = visualizable.getGeneAccession();
             String address = "https://www.ensembl.org/Homo_sapiens/Gene/Summary?db=core;g=" + geneAccession;
-            HostServices hostServices = service.getHostServices();
-            if (hostServices == null) {
-                LOGGER.info("TRY AGAIN");
-                hostServices = (HostServices) this.isoformTableView.getProperties().get("hostServices");
-            }
-            if (hostServices != null) {
-                hostServices.showDocument(address);
+            //HostServices hostServices = service.getHostServices();
+//            if (hostServicesWrapper == null) {
+//                LOGGER.info("TRY AGAIN");
+//                hostServices = (HostServices) this.isoformTableView.getProperties().get("hostServices");
+//            }
+            if (hostServicesWrapper != null) {
+                hostServicesWrapper.showDocument(address);
             } else {
                 LOGGER.error("Could not get reference to host services");
             }

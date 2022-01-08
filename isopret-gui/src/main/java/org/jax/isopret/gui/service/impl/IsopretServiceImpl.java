@@ -1,6 +1,5 @@
 package org.jax.isopret.gui.service.impl;
 
-import javafx.application.HostServices;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,7 +17,9 @@ import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -44,7 +45,7 @@ public class IsopretServiceImpl implements IsopretService  {
     File isopretSettingsFile;
 
     @Autowired
-    private HostServices hostServices;
+    private HostServicesWrapper hostServices;
 
     private final Properties pgProperties;
     private final StringProperty downloadDirProp;
@@ -304,16 +305,21 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public String getDasLabel() {
-        int n = this.dasGoTerms.size();
-        return "GO Overrepresentation analysis of differentially spliced isoforms: " + n + " significantly overrepresented terms.";
+    public String getGoLabel(GeneOntologyComparisonMode mode) {
+        switch (mode) {
+            case DAS -> {
+                int n = this.dasGoTerms.size();
+                return "GO Overrepresentation analysis of differentially spliced isoforms: " + n + " significantly overrepresented terms.";
+            }
+            case DGE -> {
+                int n = this.dgeGoTerms.size();
+                return "GO Overrepresentation analysis of differentially expressed genes: " + n + " significantly overrepresented terms.";
+            }
+        }
+        return ""; // should never happen but needed for compiler
     }
 
-    @Override
-    public String getDgeLabel() {
-        int n = this.dgeGoTerms.size();
-        return "GO Overrepresentation analysis of differentially expressed genes: " + n + " significantly overrepresented terms.";
-    }
+
     @Override
     public String getGoMethods() {
         StringBuilder sb = new StringBuilder();
@@ -343,7 +349,7 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public HostServices getHostServices() {
+    public HostServicesWrapper getHostServices() {
         return hostServices;
     }
 
@@ -376,7 +382,8 @@ public class IsopretServiceImpl implements IsopretService  {
     public GoComparison getGoComparison() {
         // note that if we can access the button, then we have cnstructed the GO tab
         // and the following three variables are not null
-        return new GoComparison(this.dgeGoTerms, this.dasGoTerms, this.geneOntology);
+        return new GoComparison(this.dgeGoTerms, this.dasGoTerms, this.geneOntology,
+                this.goMethod, this.mtcMethod);
     }
 
 }

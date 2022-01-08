@@ -11,7 +11,7 @@ build the executable with maven.
 ### Phenol
 We are using the latest develop version of phenol (1.6.4-SNAPSHOT), which needs to be instaled locally
 
-```aidl
+```
 git clone
 https://github.com/monarch-initiative/phenol
 cd phenol
