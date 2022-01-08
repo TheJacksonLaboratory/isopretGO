@@ -50,6 +50,14 @@ public class IsopretDownloader {
     private static final String HGNC_URL = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt";
     private static final String HGNC_FILENAME = "hgnc_complete_set.txt";
 
+    private static final String INTERPRO_DOMAIN_DESC_URL ="https://zenodo.org/record/5830905/files/interpro_domain_desc.txt?download=1";
+    private static final String INTERPRO_DOMAIN_DESC_FILENAME = "interpro_domain_desc.txt";
+
+    private static final String INTERPRO_DOMAINS_URL = "https://zenodo.org/record/5830905/files/interpro_domains.txt?download=1";
+    private static final String INTERPRO_DOMAINS_FILENAME = "interpro_domains.txt";
+
+    private static final String ISOFORM_FUNCTION_URL = "https://zenodo.org/record/5830905/files/isoform_function_list.txt?download=1";
+    private static final String ISOFORM_FUNCTION_FILENAME = "isoform_function_list.txt";
 
     public IsopretDownloader(String path){
         this(path,false);
@@ -68,6 +76,9 @@ public class IsopretDownloader {
         downloadGoAnnotationFile();
         downloadJannovar();
         downloadHgnc();
+        downloadInterproDomainDesc();
+        downloadInterproDomains();
+        downloadIsoformFunctionList();
     }
 
     /**
@@ -87,6 +98,18 @@ public class IsopretDownloader {
 
     public void downloadHgnc() {
         downloadFileIfNeeded(HGNC_FILENAME, HGNC_URL);
+    }
+
+    public void downloadInterproDomainDesc() {
+        downloadFileIfNeeded(INTERPRO_DOMAIN_DESC_FILENAME, INTERPRO_DOMAIN_DESC_URL);
+    }
+
+    public void downloadInterproDomains() {
+        downloadFileIfNeeded(INTERPRO_DOMAINS_FILENAME, INTERPRO_DOMAINS_URL);
+    }
+
+    public void downloadIsoformFunctionList() {
+        downloadFileIfNeeded(ISOFORM_FUNCTION_FILENAME, ISOFORM_FUNCTION_URL);
     }
 
 
