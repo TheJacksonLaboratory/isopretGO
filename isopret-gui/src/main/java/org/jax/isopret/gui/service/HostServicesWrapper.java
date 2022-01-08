@@ -8,15 +8,8 @@ import org.slf4j.LoggerFactory;
  * Host services are not always available (i.e. during unit tests). The {@link #isActive()} will return <code>false</code>
  * and {@link #showDocument(String)} will do nothing.
  */
-public final class HostServicesWrapper {
-
+public final record HostServicesWrapper(HostServices hostServices) {
     private static final Logger LOGGER = LoggerFactory.getLogger(HostServicesWrapper.class);
-
-    private final HostServices hostServices;
-
-    private HostServicesWrapper(HostServices hostServices) {
-        this.hostServices = hostServices;
-    }
 
     public static HostServicesWrapper wrap(HostServices hostServices) {
         return new HostServicesWrapper(hostServices);

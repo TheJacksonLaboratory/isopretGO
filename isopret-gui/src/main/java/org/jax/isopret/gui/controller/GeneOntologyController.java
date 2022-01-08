@@ -1,7 +1,5 @@
 package org.jax.isopret.gui.controller;
 
-
-import javafx.application.HostServices;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
@@ -96,9 +94,8 @@ public class GeneOntologyController implements Initializable {
         adjpvalColumn.setEditable(false);
         adjpvalColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPvalAdjFormated()));
 
-        //HostServices hostServices = isopretService.getHostServices();
         if (hostServices == null) {
-            LOGGER.error("COuld not retrieve HostServices");
+            LOGGER.error("Could not retrieve HostServices");
         } else {
             amigoColumn.setSortable(false);
             amigoColumn.setEditable(false);

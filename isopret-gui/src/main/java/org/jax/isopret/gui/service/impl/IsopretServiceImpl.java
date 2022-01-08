@@ -376,7 +376,8 @@ public class IsopretServiceImpl implements IsopretService  {
     public GoComparison getGoComparison() {
         // note that if we can access the button, then we have cnstructed the GO tab
         // and the following three variables are not null
-        return new GoComparison(this.dgeGoTerms, this.dasGoTerms, this.geneOntology);
+        return new GoComparison(this.dgeGoTerms, this.dasGoTerms, this.geneOntology,
+                this.goMethod, this.mtcMethod);
     }
 
 }
