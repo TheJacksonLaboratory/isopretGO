@@ -42,6 +42,8 @@ public class GoDisplayWidget {
     private final String goMethod;
     private final String mtcMethod;
 
+    private final GeneOntologyComparisonMode compMode;
+
 
 
 
@@ -56,6 +58,7 @@ public class GoDisplayWidget {
             this.body = dasBody;
             this.sigGoTerms = comparison.getDasSignificant();
         }
+        this.compMode = mode;
         this.goMethod = comparison.goMethod();
         this.mtcMethod = comparison.mtcMethod();
     }
@@ -70,19 +73,18 @@ public class GoDisplayWidget {
         barChart.setCategoryGap(2.0);
         int height = 30 * goTerms.size() + 50;
         barChart.setMinHeight(height);
-        XYChart.Series<Number, String> dataSeriesDGE = new XYChart.Series<>();
-        dataSeriesDGE.setName("DGE");
-        XYChart.Series<Number, String> dataSeriesDAS = new XYChart.Series<>();
-        dataSeriesDAS.setName("DAS");
+        XYChart.Series<Number, String> dataSeriesPvals = new XYChart.Series<>();
+        dataSeriesPvals.setName(compMode.name());
+
         for (GoCompTerm goComp : goTerms) {
             String label = goComp.getLabel();
-            double dge = goComp.getDge();
-            double das = goComp.getDas();
-            dataSeriesDGE.getData().add(new XYChart.Data<>(dge,label));
-            dataSeriesDAS.getData().add(new XYChart.Data<>(das, label));
+            double pval = switch (compMode) {
+                case DAS -> goComp.getDas();
+                case DGE -> goComp.getDge();
+            };
+            dataSeriesPvals.getData().add(new XYChart.Data<>(pval,label));
         }
-        barChart.getData().add(dataSeriesDGE);
-        barChart.getData().add(dataSeriesDAS);
+        barChart.getData().add(dataSeriesPvals);
         return barChart;
     }
 
