@@ -14,6 +14,7 @@ import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretFxDownloadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
@@ -89,6 +90,9 @@ public class MainController implements Initializable {
 
     @Autowired
     ResourceLoader resourceLoader;
+
+    @Autowired
+    HostServicesWrapper hostServicesWrapper;
 
 
     @Override
@@ -225,7 +229,7 @@ public class MainController implements Initializable {
                 }
                 FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
                 String topLevelDAS = service.getDgeLabel();
-                loader.setControllerFactory(c -> new GeneOntologyController(topLevelDAS,  service.getDgeGoTerms(), service));
+                loader.setControllerFactory(c -> new GeneOntologyController(topLevelDAS,  service.getDgeGoTerms(), service, hostServicesWrapper));
                 ScrollPane p = loader.load();
                 dgeTab = new Tab("DGE");
                 dgeTab.setId("DGE");
@@ -247,7 +251,7 @@ public class MainController implements Initializable {
                 }
                 FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
                 String dasLabel = service.getDasLabel();
-                loader.setControllerFactory(c -> new GeneOntologyController(dasLabel,  service.getDasGoTerms(), service));
+                loader.setControllerFactory(c -> new GeneOntologyController(dasLabel,service.getDasGoTerms(), service, hostServicesWrapper));
                 ScrollPane p = loader.load();
                 dasTab = new Tab("DAS");
                 dasTab.setId("DAS");

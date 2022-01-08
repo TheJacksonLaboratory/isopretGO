@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
@@ -55,12 +56,15 @@ public class GeneOntologyController implements Initializable {
 
     private final IsopretService isopretService;
 
+    private final HostServicesWrapper hostServices;
 
-    public GeneOntologyController(String topLevelLabel,  List<GoTerm2PValAndCounts> pvals, IsopretService service) {
+
+    public GeneOntologyController(String topLevelLabel, List<GoTerm2PValAndCounts> pvals, IsopretService service, HostServicesWrapper hostServicesWrapper) {
         this.label = topLevelLabel;
         this.methodsLabel = service.getGoMethods();
         this.summaryLabel = service.getGoSummary();
         this.isopretService = service;
+        this.hostServices = hostServicesWrapper;
         this.goPvals = pvals.stream()
                 .map(pval -> new GoTermAndPvalVisualized(pval, service.getGeneOntology()))
                 .collect(Collectors.toList());
@@ -92,7 +96,7 @@ public class GeneOntologyController implements Initializable {
         adjpvalColumn.setEditable(false);
         adjpvalColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getPvalAdjFormated()));
 
-        HostServices hostServices = isopretService.getHostServices();
+        //HostServices hostServices = isopretService.getHostServices();
         if (hostServices == null) {
             LOGGER.error("COuld not retrieve HostServices");
         } else {

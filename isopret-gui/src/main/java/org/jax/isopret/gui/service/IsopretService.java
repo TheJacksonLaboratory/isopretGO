@@ -1,6 +1,5 @@
 package org.jax.isopret.gui.service;
 
-import javafx.application.HostServices;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.visualization.Visualizable;
@@ -64,7 +63,7 @@ public interface IsopretService {
 
     String getGoSummary();
 
-    HostServices getHostServices();
+    HostServicesWrapper getHostServices();
 
     Visualizable getVisualizableForGene(String symbol);
 

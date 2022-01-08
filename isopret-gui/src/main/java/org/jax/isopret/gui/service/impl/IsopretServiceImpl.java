@@ -1,6 +1,5 @@
 package org.jax.isopret.gui.service.impl;
 
-import javafx.application.HostServices;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,6 +17,7 @@ import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
@@ -44,7 +44,7 @@ public class IsopretServiceImpl implements IsopretService  {
     File isopretSettingsFile;
 
     @Autowired
-    private HostServices hostServices;
+    private HostServicesWrapper hostServices;
 
     private final Properties pgProperties;
     private final StringProperty downloadDirProp;
@@ -343,7 +343,7 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public HostServices getHostServices() {
+    public HostServicesWrapper getHostServices() {
         return hostServices;
     }
 

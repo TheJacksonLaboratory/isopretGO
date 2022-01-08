@@ -25,6 +25,7 @@ import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -48,32 +49,29 @@ public class IsopretFxApplication extends Application {
 
     @Override
     public void start(Stage stage) {
-
         applicationContext.publishEvent(new StageReadyEvent(stage));
-        // (Simulation of heavy background work)
-        int numberOfUpdates = 10;
-        for (int i = 0; i < numberOfUpdates; i++) {
-            // Gradually update the loading bar
-            try {
-                notifyPreloader(new Preloader.ProgressNotification((double) i / numberOfUpdates));
-                Thread.sleep(3000L / numberOfUpdates);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
+    /**
+     * Note that we set headless mode to be false because SpringBoot seems to set it to true on Mac,
+     * which in turn stops getHostServices from working.
+     */
     @Override
     public void init() {
         ApplicationContextInitializer<GenericApplicationContext> initializer = genericApplicationContext -> {
             genericApplicationContext.registerBean(Application.class, () -> IsopretFxApplication.this);
             genericApplicationContext.registerBean(Parameters.class, this::getParameters);
-            genericApplicationContext.registerBean(HostServices.class, this::getHostServices);
+            genericApplicationContext.registerBean(HostServicesWrapper.class, this::getHostServicesWrapper);
         };
         applicationContext = new SpringApplicationBuilder(StockUiApplication.class)
                 .sources(IsopretFxApplication.class)
+                .headless(false)
                 .initializers(initializer).run();
 
+    }
+
+    private HostServicesWrapper getHostServicesWrapper() {
+        return HostServicesWrapper.wrap(getHostServices());
     }
 
     /**

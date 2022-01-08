@@ -5,6 +5,7 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -55,4 +56,23 @@ public class GoComparison {
     public List<GoCompTerm> getGoCompTermList() {
         return goCompTermList;
     }
+
+    private Predicate<GoCompTerm> dgePredominent = g -> g.getDge() >= g.getDas();
+    private Predicate<GoCompTerm> dasPredominent = g -> g.getDas() > g.getDge();
+
+
+    public List<GoCompTerm> getDgePredominentGoCompTerms() {
+        return goCompTermList.stream()
+                .filter(dgePredominent)
+                .collect(Collectors.toList());
+    }
+
+    public List<GoCompTerm> getDasPredominentGoCompTerms() {
+        return goCompTermList.stream()
+                .filter(dasPredominent)
+                .collect(Collectors.toList());
+    }
+
+
+
 }
