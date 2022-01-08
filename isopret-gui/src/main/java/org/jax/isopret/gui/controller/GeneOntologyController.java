@@ -14,6 +14,7 @@ import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.GoCompWidget;
+import org.jax.isopret.gui.widgets.GoDisplayWidget;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,8 @@ public class GeneOntologyController implements Initializable {
     private final IsopretService isopretService;
 
     private final HostServicesWrapper hostServices;
+    @FXML
+    private Button dgeOrDasGoBtn;
 
 
     public GeneOntologyController(GeneOntologyComparisonMode mode, List<GoTerm2PValAndCounts> pvals, IsopretService service, HostServicesWrapper hostServicesWrapper) {
@@ -119,6 +122,11 @@ public class GeneOntologyController implements Initializable {
         this.goTopLevelLabel.setText(this.label);
         this.goMethodsLabel.setText(this.methodsLabel);
         this.goSummaryLabel.setText(this.summaryLabel);
+        if (this.comparisonMode.equals(GeneOntologyComparisonMode.DGE)) {
+            this.dgeOrDasGoBtn.setText("GO Enrichment (DGE)");
+        } else {
+            this.dgeOrDasGoBtn.setText("GO Enrichment (DAS)");
+        }
     }
 
 
@@ -132,6 +140,15 @@ public class GeneOntologyController implements Initializable {
             goPvalTableView.getItems().addAll(goPvals);
             goPvalTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         });
+    }
+
+
+    @FXML
+    private void dgeOrDasDisplayBtn(ActionEvent actionEvent) {
+        actionEvent.consume();
+        GoComparison comparison = isopretService.getGoComparison();
+        GoDisplayWidget widget = new GoDisplayWidget(comparison, this.comparisonMode);
+        widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
     }
 
 

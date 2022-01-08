@@ -101,9 +101,10 @@ public class GoCompWidget {
        dgeVbox.setSpacing(15);
        VBox dasVbox = getBarChartPane("DAS", goComparison.getDasPredominentGoCompTerms());
        dasVbox.setSpacing(15);
-        Region r = new Region();
-        HBox.setHgrow(r, Priority.ALWAYS);
-        hbox.getChildren().addAll(dgeVbox, r, dasVbox);
+       Region r = new Region();
+       r.setMinWidth(20);
+       HBox.setHgrow(r, Priority.ALWAYS);
+       hbox.getChildren().addAll(dgeVbox, r, dasVbox);
        Font plain = Font.font("TimeRoman", 16);
        Font bold = Font.font("TimesRoman", FontWeight.BOLD, FontPosture.ITALIC, 16);
        Text text1 = new Text("Gene Ontology (GO) overenrichment analysis was performed using ");

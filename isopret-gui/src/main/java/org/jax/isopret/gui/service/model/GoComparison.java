@@ -23,6 +23,8 @@ public class GoComparison {
     private final List<GoCompTerm> dgeGoCompTermList;
     private final List<GoCompTerm> dasGoCompTermList;
 
+    private final List<GoCompTerm> goCompTermList;
+
     private final GoMethod goMethod;
     private final MtcMethod mtcMethod;
 
@@ -58,6 +60,8 @@ public class GoComparison {
             GoCompTerm compTerm = new GoCompTerm(goId, label, dgeLog10P, dasLog10P);
             goCompTerms.add(compTerm);
         }
+        Collections.sort(goCompTerms);
+        this.goCompTermList = List.copyOf(goCompTerms);
         List<GoCompTerm> dgeTerms = goCompTerms.stream().filter(GoCompTerm::dgePredominant).collect(Collectors.toList());
         List<GoCompTerm> dasTerms = goCompTerms.stream().filter(GoCompTerm::dasPredominant).collect(Collectors.toList());
         Collections.sort(dgeTerms);
@@ -81,6 +85,18 @@ public class GoComparison {
 
     public List<GoCompTerm> getDasPredominentGoCompTerms() {
         return this.dasGoCompTermList;
+    }
+
+    public List<GoCompTerm> getDgeSignificant() {
+        return this.dgeGoCompTermList.stream()
+                .filter(GoCompTerm::dgeSignificant)
+                .collect(Collectors.toList());
+    }
+
+    public List<GoCompTerm> getDasSignificant() {
+        return this.dgeGoCompTermList.stream()
+                .filter(GoCompTerm::dasSignificant)
+                .collect(Collectors.toList());
     }
 
     public String goMethod() {
