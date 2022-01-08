@@ -19,6 +19,7 @@ import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -304,16 +305,21 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public String getDasLabel() {
-        int n = this.dasGoTerms.size();
-        return "GO Overrepresentation analysis of differentially spliced isoforms: " + n + " significantly overrepresented terms.";
+    public String getGoLabel(GeneOntologyComparisonMode mode) {
+        switch (mode) {
+            case DAS -> {
+                int n = this.dasGoTerms.size();
+                return "GO Overrepresentation analysis of differentially spliced isoforms: " + n + " significantly overrepresented terms.";
+            }
+            case DGE -> {
+                int n = this.dgeGoTerms.size();
+                return "GO Overrepresentation analysis of differentially expressed genes: " + n + " significantly overrepresented terms.";
+            }
+        }
+        return ""; // should never happen but needed for compiler
     }
 
-    @Override
-    public String getDgeLabel() {
-        int n = this.dgeGoTerms.size();
-        return "GO Overrepresentation analysis of differentially expressed genes: " + n + " significantly overrepresented terms.";
-    }
+
     @Override
     public String getGoMethods() {
         StringBuilder sb = new StringBuilder();

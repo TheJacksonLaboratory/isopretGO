@@ -4,6 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
@@ -55,9 +56,7 @@ public interface IsopretService {
 
     Ontology getGeneOntology();
 
-    String getDasLabel();
-
-    String getDgeLabel();
+    String getGoLabel(GeneOntologyComparisonMode mode);
 
     String getGoMethods();
 

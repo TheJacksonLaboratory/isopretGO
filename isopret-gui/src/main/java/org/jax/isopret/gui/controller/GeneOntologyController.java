@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.GoCompWidget;
@@ -46,6 +47,7 @@ public class GeneOntologyController implements Initializable {
     public TableColumn<GoTermAndPvalVisualized, String> adjpvalColumn;
     public TableColumn<GoTermAndPvalVisualized, Button> amigoColumn;
     private final String label;
+    private final GeneOntologyComparisonMode comparisonMode;
     private final String methodsLabel;
     private final String summaryLabel;
     public Label goTopLevelLabel;
@@ -57,8 +59,9 @@ public class GeneOntologyController implements Initializable {
     private final HostServicesWrapper hostServices;
 
 
-    public GeneOntologyController(String topLevelLabel, List<GoTerm2PValAndCounts> pvals, IsopretService service, HostServicesWrapper hostServicesWrapper) {
-        this.label = topLevelLabel;
+    public GeneOntologyController(GeneOntologyComparisonMode mode, List<GoTerm2PValAndCounts> pvals, IsopretService service, HostServicesWrapper hostServicesWrapper) {
+        this.label = service.getGoLabel(mode);
+        comparisonMode = mode;
         this.methodsLabel = service.getGoMethods();
         this.summaryLabel = service.getGoSummary();
         this.isopretService = service;
