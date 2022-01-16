@@ -10,7 +10,8 @@ public enum InterproEntryType {
     FAMILY("Family"),
     HOMOLOGOUS_SUPERFAMILY("Homologous_superfamily"),
     PTM("PTM"),
-    REPEAT("Repeat");
+    REPEAT("Repeat"),
+    UNKNOWN("Knknown");
 
     private final String name;
 
@@ -29,7 +30,7 @@ public enum InterproEntryType {
             case "HOMOLOGOUS_SUPERFAMILY" -> HOMOLOGOUS_SUPERFAMILY;
             case "PTM" -> PTM;
             case "REPEAT" -> REPEAT;
-            default -> throw new IsopretRuntimeException("Did not recognize InterproEntryType:" + s);
+            default -> UNKNOWN;
         };
     }
 

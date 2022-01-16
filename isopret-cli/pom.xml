@@ -33,7 +33,7 @@
 
 
     <build>
-        <finalName>isopret</finalName>
+        <finalName>isopret-cli</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
