@@ -8,16 +8,7 @@ right now...
 isopret was developed under Java 17, which is required to build the app from source. To do so, clone this repository and
 build the executable with maven.
 
-### Phenol
-We are using the latest develop version of phenol (1.6.4-SNAPSHOT), which needs to be instaled locally
 
-```
-git clone
-https://github.com/monarch-initiative/phenol
-cd phenol
-git checkout develop
-mvn install
-```
 
 Isopret can then be built using standard maven:
 ```

@@ -11,7 +11,7 @@ Isopret uses the analysis (output) file of
 analyzes RNA-Seq data to determine differentially expression and differential
 splicing simultaneous. Isopret then performs
 Gene Ontology analysis using a Java 17 implementation of code from
-the `Ontlogizer <https://pubmed.ncbi.nlm.nih.gov/18511468/>`_.
+the `Ontologizer <https://pubmed.ncbi.nlm.nih.gov/18511468/>`_.
 
 
 
