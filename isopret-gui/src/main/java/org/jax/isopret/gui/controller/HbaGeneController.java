@@ -15,7 +15,6 @@ import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -68,16 +67,16 @@ public class HbaGeneController implements Initializable {
     @FXML
     private WebView hbaGoWebView;
 
-    @Autowired
-    HostServicesWrapper hostServicesWrapper;
+    private final HostServicesWrapper hostServicesWrapper;
 
     private final IsopretService service;
 
     private final Visualizable visualizable;
 
-    public HbaGeneController(Visualizable visualisable, IsopretService isoservice) {
+    public HbaGeneController(Visualizable visualisable, IsopretService isoservice, HostServicesWrapper wrapper) {
         this.visualizable = visualisable;
         this.service = isoservice;
+        this.hostServicesWrapper = wrapper;
     }
 
     @Override
@@ -131,11 +130,6 @@ public class HbaGeneController implements Initializable {
         geneHyperlink.setOnAction(e -> {
             String geneAccession = visualizable.getGeneAccession();
             String address = "https://www.ensembl.org/Homo_sapiens/Gene/Summary?db=core;g=" + geneAccession;
-            //HostServices hostServices = service.getHostServices();
-//            if (hostServicesWrapper == null) {
-//                LOGGER.info("TRY AGAIN");
-//                hostServices = (HostServices) this.isoformTableView.getProperties().get("hostServices");
-//            }
             if (hostServicesWrapper != null) {
                 hostServicesWrapper.showDocument(address);
             } else {

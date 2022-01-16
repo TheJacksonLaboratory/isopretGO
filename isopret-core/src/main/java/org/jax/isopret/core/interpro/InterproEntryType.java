@@ -1,7 +1,5 @@
 package org.jax.isopret.core.interpro;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
-
 public enum InterproEntryType {
     ACTIVE_SITE("Active_site"),
     BINDING_SITE("Binding_site"),

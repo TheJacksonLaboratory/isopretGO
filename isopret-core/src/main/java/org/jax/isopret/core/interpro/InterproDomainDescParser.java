@@ -30,7 +30,6 @@ public class InterproDomainDescParser {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             br.readLine(); // header
             while ((line=br.readLine()) != null) {
-                System.out.println(line);
                 String [] fields = line.split("\t");
                 if (fields.length != 3) {
                     throw new IsopretRuntimeException("Malformed isopret description line: " + line);
@@ -38,7 +37,7 @@ public class InterproDomainDescParser {
                 String id = fields[0];
                 InterproEntryType entryType = InterproEntryType.fromString(fields[1]);
                 if (entryType.equals(InterproEntryType.UNKNOWN)) {
-                    LOGGER.warn("Did not recognize entry type (%s) in line %s", entryType, line);
+                    LOGGER.warn("Did not recognize entry type ({}) in line {}", entryType, line);
                     continue;
                 }
                 String description = fields[2];

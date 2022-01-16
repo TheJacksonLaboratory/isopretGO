@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
 import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,11 @@ public class AnalysisController implements Initializable {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    private final HostServicesWrapper hostServicesWrapper;
 
+    public AnalysisController(HostServicesWrapper wrapper) {
+        this.hostServicesWrapper = wrapper;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -245,7 +250,7 @@ public class AnalysisController implements Initializable {
                 return;
             }
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
-            loader.setControllerFactory(c -> new HbaGeneController(hbadealsResult, this.isopretService));
+            loader.setControllerFactory(c -> new HbaGeneController(hbadealsResult, this.isopretService, this.hostServicesWrapper));
             ScrollPane p = loader.load();
             HbaGeneController hbaGeneController = loader.getController();
             hbaGeneController.refreshTables();
