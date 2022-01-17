@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * Map<String, List<Transcript>> geneSymbolToTranscriptMap = loadJannovarTranscriptMap();
  * int n_transcripts = geneSymbolToTranscriptMap.values()
  *       .stream()
- *       .map(e -> e.size())
+ *       .map(List::size)
  *       .reduce(0, Integer::sum);
  *  InterproMapper mapper = loadInterproMapper();
  *  String goVersion = geneOntology.getMetaInfo().getOrDefault("data-version", "n/a/");
@@ -116,7 +116,7 @@ public class IsopretStats {
             return this;
         }
 
-        public Builder goAssociations(int n) {
+        public Builder goAssociationsGenes(int n) {
             map.put("Number of GO associations",String.valueOf(n));
             return this;
         }
@@ -126,7 +126,7 @@ public class IsopretStats {
             return this;
         }
 
-        public Builder annotatingGoTermCount(int n) {
+        public Builder annotatingGoTermCountGenes(int n) {
             map.put("Number of GO terms used to annotate genes", String.valueOf(n));
             return this;
         }

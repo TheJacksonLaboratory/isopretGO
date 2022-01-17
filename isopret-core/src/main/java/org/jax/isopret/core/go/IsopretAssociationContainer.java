@@ -24,10 +24,16 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
     /** Gene Ontology object. */
     private final Ontology ontology;
 
+    private final int n_annotations;
+
     IsopretAssociationContainer(Ontology ontology,
                                 Map<TermId, IsopretAnnotations> assocMap){
         this.ontology = ontology;
         this.associationMap = assocMap;
+        n_annotations = assocMap.values()
+                .stream()
+                .map(IsopretAnnotations::getAnnotationCount)
+                .reduce(0, Integer::sum);
 
     }
 
@@ -107,5 +113,15 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
                 .flatMap(iga -> iga.getAnnotatingTermIds().stream())
                 .collect(Collectors.toSet());
         return tidset.size();
+    }
+
+    @Override
+    public int getTotalAnnotationCount() {
+        return this.n_annotations;
+    }
+
+    @Override
+    public int getAnnotatedDomainItemCount() {
+        return associationMap.size();
     }
 }
