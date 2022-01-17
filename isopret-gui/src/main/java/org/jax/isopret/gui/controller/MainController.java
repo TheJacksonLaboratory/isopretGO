@@ -9,14 +9,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
-import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretFxDownloadTask;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.widgets.IsopretStatsWidget;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -281,5 +283,37 @@ public class MainController implements Initializable {
 
     public TabPane getMainTabPaneRef() {
         return this.tabPane;
+    }
+
+    /**
+     * This method is called if the user chooses the help menu item and opens
+     * the readthedoc documentation in the system menu.
+     */
+    public void openRTDhelp(ActionEvent e) {
+        e.consume();
+        String READTHEDOCS_SITE = "https://isopret.readthedocs.io/en/latest/";
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Isopret Help");
+        alert.setHeaderText("Get help for Isopret");
+        alert.setContentText(String.format("A tutorial and detailed documentation for Isopret can be found at readthedocs: %s",READTHEDOCS_SITE));
+        ButtonType buttonTypeOne = new ButtonType("Open ReadTheDocs");
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == buttonTypeOne){
+            hostServicesWrapper.showDocument(READTHEDOCS_SITE);
+            alert.close();
+        } else {
+            alert.close();
+        }
+    }
+
+    public void showStats(ActionEvent actionEvent) {
+        IsopretStatsWidget widget = new IsopretStatsWidget(service.getIsopretStats());
+        widget.show();
+        actionEvent.consume();
     }
 }

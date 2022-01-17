@@ -33,7 +33,7 @@
                     <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#exitGui" text="Quit" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
-                    <MenuItem mnemonicParsing="false" text="Show settings of current project" />
+                    <MenuItem mnemonicParsing="false" text="Show settings of current project" onAction="#showStats"/>
                     <MenuItem mnemonicParsing="false" text="Set proxy" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Export">
@@ -45,7 +45,7 @@
             <Region styleClass="menu-bar" HBox.hgrow="SOMETIMES" />
             <MenuBar minHeight="30.0" minWidth="72.0" nodeOrientation="RIGHT_TO_LEFT" HBox.hgrow="NEVER">
                 <Menu mnemonicParsing="false" text="Help">
-                    <MenuItem accelerator="Shortcut+H" mnemonicParsing="false" text="Help" />
+                    <MenuItem accelerator="Shortcut+H" mnemonicParsing="false" onAction="#openRTDhelp" text="Help" />
                     <MenuItem mnemonicParsing="false" onAction="#about" text="About" />
                 </Menu>
             </MenuBar>

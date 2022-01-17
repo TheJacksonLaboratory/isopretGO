@@ -26,8 +26,8 @@ public class InterproDomainDescParser {
 
     private  Map<Integer, InterproEntry> getDescriptions(File file) {
         Map<Integer, InterproEntry> interpromap = new HashMap<>();
+        String line = null;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
             br.readLine(); // header
             while ((line=br.readLine()) != null) {
                 String [] fields = line.split("\t");
@@ -36,12 +36,17 @@ public class InterproDomainDescParser {
                 }
                 String id = fields[0];
                 InterproEntryType entryType = InterproEntryType.fromString(fields[1]);
+                if (entryType.equals(InterproEntryType.UNKNOWN)) {
+                    LOGGER.warn("Did not recognize entry type ({}) in line {}", entryType, line);
+                    continue;
+                }
                 String description = fields[2];
                 InterproEntry entry = new InterproEntry(id, entryType, description);
                 interpromap.put(entry.getId(),entry);
             }
         } catch (IOException e) {
-            throw new IsopretRuntimeException(e.getMessage());
+            String err = String.format("%s: %s", e.getMessage(), line);
+            throw new IsopretRuntimeException(err);
         }
         return interpromap;
     }

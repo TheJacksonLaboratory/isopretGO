@@ -31,7 +31,7 @@ public class GoDisplayWidget {
             These GO terms displayed overexpression in the set of differentially expressed genes set.
             """;
     private final static String dasBody = """
-            These GO terms displayed overexpression in the set of differentially expressed transcripts. 
+            These GO terms displayed overexpression in the set of differentially expressed transcripts.
             """;
 
     private final String title;

@@ -58,7 +58,8 @@ public abstract class IsopretCommand {
             }
             geneOntology = OntologyLoader.loadOntology(goJsonFile);
         }
-        LOGGER.info("Loaded Gene Ontology json file with {} terms.", geneOntology.getNonObsoleteTermIds());
+        int n_terms = geneOntology.countNonObsoleteTerms();
+        LOGGER.info("Loaded Gene Ontology json file with {} terms.", n_terms);
         return geneOntology;
     }
 
@@ -144,7 +145,6 @@ public abstract class IsopretCommand {
         }
         TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(predictionFile, geneOntology);
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
-
     }
 
     protected Map<TermId, Set<TermId>> loadTranscriptIdToGoTermsMap() {

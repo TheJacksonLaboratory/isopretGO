@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.jax.isopret</groupId>
         <artifactId>isopret</artifactId>
-        <version>0.8.2</version>
+        <version>0.8.3</version>
     </parent>
 
     <artifactId>isopret-cli</artifactId>
@@ -33,7 +33,7 @@
 
 
     <build>
-        <finalName>isopret</finalName>
+        <finalName>isopret-cli</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

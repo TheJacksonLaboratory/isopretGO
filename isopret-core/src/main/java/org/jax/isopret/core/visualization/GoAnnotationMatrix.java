@@ -56,8 +56,8 @@ public class GoAnnotationMatrix {
             this.expressedTranscriptIds = transcriptIds.stream()
                     .filter(expressedTranscriptSet::contains)
                     .collect(Collectors.toList());
-            LOGGER.info("Got {} transcript Ids for {}", transcriptIds.size(), accessionNumber.getAccessionString());
-            LOGGER.info("Gene: {}", accessionNumber.getAccessionString());
+            LOGGER.trace("Got {} transcript Ids for {}", transcriptIds.size(), accessionNumber.getAccessionString());
+            LOGGER.trace("Gene: {}", accessionNumber.getAccessionString());
 
             rows = allAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
             Collections.sort(rows);

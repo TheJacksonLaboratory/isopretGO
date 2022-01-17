@@ -19,10 +19,12 @@ import java.util.Set;
 /**
  * Our inference procedure generates a file called {@code isoform_function_list.txt} that
  * contains a list of isoforms with their inferred functions,
+ * <pre>
  * ENST00000380173	GO:2001303
  * ENST00000251535	GO:2001304
  * ENST00000609196	GO:2001311
  * (...)
+ * </pre>
  * This class parses the file and checks the syntax of the identifiers and also checks that the GO terms
  * are present in the ontology object
  * @author Peter N Robinson
@@ -62,9 +64,8 @@ public class TranscriptFunctionFileParser {
             throw new PhenolRuntimeException("Could not import isoform_function_list.txt :" + e.getMessage());
         }
         if (notFound.size() > 0) {
-            LOGGER.warn("Could not find " + notFound.size() + " terms in Ontology");
-            //LOGGER.warn(String.join("; ", notFound));
-
+            int n_missing = notFound.size(); // keep logger sane
+            LOGGER.warn("Could not find " + n_missing + " terms in Ontology");
         }
         transcriptIdToGoTermsMap = Map.copyOf(annotMap); // return immutable map
     }

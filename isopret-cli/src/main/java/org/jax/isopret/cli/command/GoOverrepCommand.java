@@ -1,5 +1,6 @@
 package org.jax.isopret.cli.command;
 
+import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
@@ -57,6 +58,11 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
             scope = CommandLine.ScopeType.INHERIT,
             description="Multiple-Testing-Correction for GO analysis")
     private String mtc = "Bonferroni";
+    @CommandLine.Option(names={"-v", "--verbose"}, description = "Show stats on commandline")
+    private boolean verbose = true;
+    @CommandLine.Option(names={"--outfile"}, description = "Name of output file to write stats")
+    private String outfile = null;
+
 
 
     @Override
@@ -132,7 +138,32 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
                 }
         }
         writeGoResultsToFile(dasGoTerms, dgeGoTerms, geneOntology);
-//
+        IsopretStats stats = null;
+        if (verbose || outfile != null) {
+            IsopretStats.Builder builder = new IsopretStats.Builder();
+            String goVersion = geneOntology.getMetaInfo().getOrDefault("data-version", "n/a/");
+            builder.geneOntologyVersion(goVersion)
+                    .hgncCount(hgncMap.size())
+                    .goAssociationsGenes(geneContainer.getTotalAnnotationCount())
+                    .gannotatedGeneCount(geneContainer.getAnnotatedDomainItemCount())
+                    .annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount())
+//                    .interproAnnotationCount(.getInterproAnnotationCount())
+//                    .interproDescriptionCount(mapper.getInterproDescriptionCount())
+                    .geneSymbolCount(geneIdToTranscriptMap.size())
+                    .transcriptsCount(transcriptIdToGoTermsMap.size());
+
+            stats = builder.build();
+        }
+        if (verbose) {
+            stats.display();
+        }
+        if (outfile != null) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outfile))) {
+                stats.write(writer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return 0;
     }
 

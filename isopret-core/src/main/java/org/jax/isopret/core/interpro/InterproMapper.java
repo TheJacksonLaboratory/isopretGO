@@ -38,6 +38,14 @@ public class InterproMapper {
         return interproAnnotation;
     }
 
+    public int getInterproDescriptionCount() {
+        return interproDescription.size();
+    }
+
+    public int getInterproAnnotationCount() {
+        return interproAnnotation.size();
+    }
+
     public Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap(AccessionNumber geneAccession) {
        int notfound = 0;
         if (! geneAccession.isGene()) {

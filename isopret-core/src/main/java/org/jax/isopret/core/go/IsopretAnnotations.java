@@ -43,4 +43,9 @@ public class IsopretAnnotations implements ItemAnnotations<TermId> {
     public boolean containsAnnotation(TermId tid) {
         return annotations.stream().anyMatch(a -> a.getTermId().equals(tid));
     }
+
+    @Override
+    public int getAnnotationCount() {
+        return annotations.size();
+    }
 }

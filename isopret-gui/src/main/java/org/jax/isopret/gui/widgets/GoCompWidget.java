@@ -28,12 +28,12 @@ public class GoCompWidget {
     private final static String dgeTitle = "DGE-predominant overrepresentation\n";
     private final static String dasTitle = "DAS-predominant overrepresentation\n";
     private final static String dgeBody = """
-            These GO terms displayed a higher degree of overexpression in the set of differentially expressed 
+            These GO terms displayed a higher degree of overexpression in the set of differentially expressed
             genes set than in the set of differentially expressed transcripts.
             """;
     private final static String dasBody = """
-            These GO terms displayed a higher degree of overexpression in the set of differentially 
-            expressed transcripts set than in the DGE set of differentially expressed genes. 
+            These GO terms displayed a higher degree of overexpression in the set of differentially
+            expressed transcripts set than in the DGE set of differentially expressed genes.
             """;
 
 
