@@ -1,6 +1,7 @@
-package org.jax.isopret.gui.configuration;
+package org.jax.isopret.gui.service;
 
 import javafx.concurrent.Task;
+import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.HbaDealsGoAnalysis;
@@ -73,12 +74,15 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private final List<String> errors;
 
+    private final IsopretStats.Builder isopretStatsBuilder;
+
     public IsopretDataLoadTask(File downloadDirectory, File hbaDealsFile, GoMethod goMethod, MtcMethod mtcMethod) {
         errors = new ArrayList<>();
         this.downloadDirectory = downloadDirectory;
         this.hbaDealsFile = hbaDealsFile;
         this.overrepMethod = goMethod;
         this.multipleTestingMethod = mtcMethod;
+        isopretStatsBuilder = new IsopretStats.Builder();
     }
 
     public HbaDealsIsoformSpecificThresholder getIsoformSpecificThresholder() {
@@ -99,6 +103,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         if (!goJsonFile.isFile()) {
             throw new IsopretRuntimeException("Could not find Gene Ontology JSON file at " + goJsonFile.getAbsolutePath());
         }
+        isopretStatsBuilder.info("GO file", goJsonFile.getAbsolutePath());
         this.geneOntology = OntologyLoader.loadOntology(goJsonFile);
         updateMessage("Loaded Gene Ontology file");
         updateProgress(0.15, 1);
@@ -108,6 +113,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                     jannovarFile.getAbsolutePath());
             throw new IsopretRuntimeException(errorMsg);
         }
+        isopretStatsBuilder.info("Jannovar file", jannovarFile.getAbsolutePath());
         JannovarReader jannovarReader = new JannovarReader(jannovarFile, assembly);
 
         updateProgress(0.20, 1);
@@ -118,25 +124,36 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateProgress(0.25, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
         LOGGER.info(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
+        isopretStatsBuilder.geneSymbolCount(geneIdToTranscriptMap.size());
+        int n_transcripts = geneIdToTranscriptMap.values()
+                .stream()
+                .map(List::size)
+                .reduce(0, Integer::sum);
+        isopretStatsBuilder.transcriptsCount(n_transcripts);
 
 
         File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
         if (! isoformFunctionFile.isFile()) {
             throw new IsopretRuntimeException("Could not find \"isoform_function_list.txt\" in download directory");
         } else {
+            isopretStatsBuilder.info("isoform function file", isoformFunctionFile.getAbsolutePath());
             TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(isoformFunctionFile, geneOntology);
             Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
             this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
             updateProgress(0.40, 1);
             updateMessage(String.format("Loaded isoformFunctionFile (%d transcripts).", transcript2GoMap.size()));
+
             Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
             LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
+            isopretStatsBuilder.gannotatedGeneCount(gene2GoMap.size());
             IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);
 
             transcriptContainer = isoContainerFac.transcriptContainer();
             geneContainer = isoContainerFac.geneContainer();
             updateProgress(0.55, 1);
             LOGGER.info("Loaded gene container with {} annotating terms", geneContainer.getAnnotatingTermCount());
+            isopretStatsBuilder.annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount());
+            isopretStatsBuilder.gannotatedGeneCount(geneContainer.getAnnotatedDomainItemCount());
             LOGGER.info("Loaded transcript container with {} annotating terms", transcriptContainer.getAnnotatingTermCount());
         }
 
@@ -268,4 +285,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     public AssociationContainer<TermId> getGeneContainer() {
         return geneContainer;
     }
+
+    public IsopretStats getIsopretStats() { return isopretStatsBuilder.build(); }
 }

@@ -54,9 +54,17 @@ import java.util.stream.Collectors;
 public class IsopretStats {
 
    private final Map<String, String> data;
+   /** errors and warnings encountered during the analysis */
+   private final Map<String, String> errors;
+    private final Map<String, String> warnings;
+    private final Map<String, String> info;
 
-    public IsopretStats(Map<String,String> data) {
+    public IsopretStats(Map<String,String> data, Map<String, String> errs,
+                        Map<String, String> warn, Map<String, String> info) {
         this.data = data;
+        this.errors = errs;
+        this.warnings = warn;
+        this.info = info;
     }
     /** Output to shell */
     public void display() {
@@ -86,15 +94,42 @@ public class IsopretStats {
         return data;
     }
 
+    public Map<String, String> getErrors() {
+        return errors;
+    }
+
+    public Map<String, String> getWarnings() {
+        return warnings;
+    }
+
+    public Map<String, String> getInfo() {
+        return info;
+    }
+
+    public Map<String,String> getAllEntries() {
+        Map<String, String> all = new LinkedHashMap<>();
+        all.putAll(data);
+        all.putAll(errors);
+        all.putAll(warnings);
+        all.putAll(info);
+        return all;
+    }
+
     /**
      * Convenient way of collecting data about the current run.
      */
     public static class Builder {
 
         private final Map<String, String> map;
+        private final Map<String, String> errors;
+        private final Map<String, String> warnings;
+        private final Map<String, String> info;
 
         public Builder() {
             map = new LinkedHashMap<>();
+            errors = new LinkedHashMap<>();
+            warnings = new LinkedHashMap<>();
+            info = new LinkedHashMap<>();
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
             // Quoted "Z" to indicate UTC, no timezone offset
             String nowAsISO = df.format(new Date());
@@ -151,13 +186,25 @@ public class IsopretStats {
             return this;
         }
 
+        public Builder error(String err) {
+            errors.put("[ERROR]", err);
+            return this;
+        }
 
+        public Builder warning(String w) {
+            warnings.put("[WARNING]", w);
+            return this;
+        }
 
+        public Builder info(String key, String value) {
+            info.put(String.format("[INFO] %s", key), value);
+            return this;
+        }
 
 
 
         public IsopretStats build() {
-            return new IsopretStats(map);
+            return new IsopretStats(map, errors, warnings, info);
         }
 
 

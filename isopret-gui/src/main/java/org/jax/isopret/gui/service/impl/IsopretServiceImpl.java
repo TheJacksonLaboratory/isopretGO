@@ -4,6 +4,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
@@ -16,7 +17,7 @@ import org.jax.isopret.core.transcript.Transcript;
 import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
-import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
@@ -67,6 +68,7 @@ public class IsopretServiceImpl implements IsopretService  {
     private Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap;
     /** Key: transcript id; value: set of Annotating GO Terms. */
     private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
+    private IsopretStats isopretStats = null;
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -210,6 +212,7 @@ public class IsopretServiceImpl implements IsopretService  {
         this.thresholder = task.getIsoformSpecificThresholder();
         this.geneIdToTranscriptMap = task.getGeneIdToTranscriptMap();
         this.transcript2GoMap = task.getTranscript2GoMap();
+        this.isopretStats = task.getIsopretStats();
         LOGGER.info("Finished setting data. ");
         if (this.transcript2GoMap == null) {
             LOGGER.error("transcript2GoMap == null");
@@ -384,6 +387,11 @@ public class IsopretServiceImpl implements IsopretService  {
         // and the following three variables are not null
         return new GoComparison(this.dgeGoTerms, this.dasGoTerms, this.geneOntology,
                 this.goMethod, this.mtcMethod);
+    }
+
+    @Override
+    public IsopretStats getIsopretStats() {
+        return isopretStats;
     }
 
 }

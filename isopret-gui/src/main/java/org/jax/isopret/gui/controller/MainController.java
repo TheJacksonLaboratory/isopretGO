@@ -14,10 +14,11 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
-import org.jax.isopret.gui.configuration.IsopretDataLoadTask;
+import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretFxDownloadTask;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.widgets.IsopretStatsWidget;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -302,11 +303,17 @@ public class MainController implements Initializable {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == buttonTypeOne){
+        if (result.isPresent() && result.get() == buttonTypeOne){
             hostServicesWrapper.showDocument(READTHEDOCS_SITE);
             alert.close();
         } else {
             alert.close();
         }
+    }
+
+    public void showStats(ActionEvent actionEvent) {
+        IsopretStatsWidget widget = new IsopretStatsWidget(service.getIsopretStats());
+        widget.show();
+        actionEvent.consume();
     }
 }
