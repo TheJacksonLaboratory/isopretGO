@@ -11,34 +11,54 @@ import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Class to collect descriptive statistics about the current run in a Map that
+ * can be used to output a TSV file or to show a ListView in JavaFX
+ * <pre>
+ * {@code
+ * Ontology geneOntology = loadGeneOntology();
+ * GoAssociationContainer container = loadGoAssociationContainer();
+ * Set<TermId> allAnnotated = container.getAllAnnotatedGenes();
+ * Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
+ * Map<String, List<Transcript>> geneSymbolToTranscriptMap = loadJannovarTranscriptMap();
+ * int n_transcripts = geneSymbolToTranscriptMap.values()
+ *       .stream()
+ *       .map(e -> e.size())
+ *       .reduce(0, Integer::sum);
+ *  InterproMapper mapper = loadInterproMapper();
+ *  String goVersion = geneOntology.getMetaInfo().getOrDefault("data-version", "n/a/");
+ *  IsopretStats.Builder builder = new IsopretStats.Builder();
+ *  builder.geneOntologyVersion(goVersion)
+ *                 .hgncCount(hgncMap.size())
+ *                 .goAssociations(container.getRawAssociations().size())
+ *                 .gannotatedGeneCount(container.getTotalNumberOfAnnotatedItems())
+ *                 .annotatingGoTermCount(container.getAnnotatingTermCount())
+ *                 .interproAnnotationCount(mapper.getInterproAnnotationCount())
+ *                 .interproDescriptionCount(mapper.getInterproDescriptionCount())
+ *                 .geneSymbolCount(geneSymbolToTranscriptMap.size())
+ *                 .transcriptsCount(n_transcripts);
+ *
+ *  IsopretStats stats = builder.build();
+ *  stats.display();
+ * }
+ * </pre>
+ * @author Peter N Robinson
+ */
 public class IsopretStats {
 
+   private final Map<String, String> data;
 
-    private final Ontology geneOntology;
-    private final GoAssociationContainer container;
-    private final Map<AccessionNumber, HgncItem> hgncMap;
-    private final Map<String, List<Transcript>> geneSymbolToTranscriptMap;
-    private final InterproMapper interproMapper;
-
-    public IsopretStats(Ontology go,
-                        GoAssociationContainer container,
-                        Map<AccessionNumber, HgncItem> hgncMap,
-                        Map<String, List<Transcript>> geneSymbolToTranscriptMap, InterproMapper mapper) {
-        this.geneOntology = go;
-        this.container = container;
-        this.hgncMap = hgncMap;
-        this.geneSymbolToTranscriptMap = geneSymbolToTranscriptMap;
-        this.interproMapper = mapper;
+    public IsopretStats(Map<String,String> data) {
+        this.data = data;
     }
-
-
-
+    /** Output to shell */
     public void display() {
         try (Writer stdout =  new BufferedWriter(new OutputStreamWriter(System.out))) {
             write(stdout);
@@ -46,7 +66,7 @@ public class IsopretStats {
             e.printStackTrace();
         }
     }
-
+    /** Output to TSV file. */
     public void writeToFile(String filename) {
         File file = new File(filename);
         try (Writer bw =  new BufferedWriter(new FileWriter(file))) {
@@ -57,60 +77,90 @@ public class IsopretStats {
     }
 
     public void write(Writer writer) throws IOException {
-        writer.write("### Isopret: Input data  ###\n\n");
-        writer.write("### Gene Ontology:\n");
-        String goVersion = geneOntology.getMetaInfo().getOrDefault("data-version", "n/a");
-        int n_terms = geneOntology.countNonObsoleteTerms();
-        writer.write("\tVersion: " + goVersion + "\n");
-        writer.write("\tTerms n=" + n_terms + "\n");
-        writer.write("### GO associations:\n");
-        int n_association_counts = container.getRawAssociations().size();
-        int n_annotating_go_terms = container.getAnnotatingTermCount();
-        int n_annotated_gene_count = container.getTotalNumberOfAnnotatedItems();
-        writer.write("\tAnnotations n=" + n_association_counts + "\n");
-        writer.write("\tNumber of GO terms used for annotations n=" + n_annotating_go_terms + "\n");
-        writer.write("\tNumber of annotated genes n=" + n_annotated_gene_count + "\n");
-        writer.write("### Human Gene Nomenclature Committee:\n");
-        writer.write("\tHGNC Map n=" + hgncMap.size() + "\n");
-        writer.write("### Jannovar Transcript Map:\n");
-        int n_genes = geneSymbolToTranscriptMap.size();
-        int n_isoforms = (int) geneSymbolToTranscriptMap.values().stream().mapToLong(Collection::size).sum();
-        double n_isoforms_per_gene = (double)n_isoforms/n_genes;
-        writer.write("\tGenes n=" + n_genes + "\n");
-        writer.write("\tIsoforms n=" + n_isoforms + "\n");
-        writer.write(String.format("\tMean isoforms per gene %.1f\n", n_isoforms_per_gene));
-        writer.write("### Interpro Annotations:\n");
-        summarizeDomains(writer);
-        summarizeAnnotations(writer);
-        writer.write("\n\n");
-    }
-
-
-
-    private void summarizeDomains(Writer writer) throws IOException {
-        Map<Integer, InterproEntry> interproDescriptionMap = interproMapper.getInterproDescription();
-        Map<InterproEntryType, Long> counts = interproDescriptionMap
-                .values()
-                .stream()
-                .map(InterproEntry::getEntryType)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-        writer.write("----- Domains ------------\n");
-        for (var entry : counts.entrySet()) {
-            writer.write(String.format("\t%s: %d.\n", entry.getKey().name(), entry.getValue()));
+        for (var entry : this.data.entrySet()) {
+            writer.write(String.format("%s\t%s\n", entry.getKey(), entry.getValue()));
         }
     }
 
-    private void summarizeAnnotations(Writer writer) throws IOException {
-        Map<AccessionNumber, List<InterproAnnotation>> transcriptIdToInterproAnnotationMap = interproMapper.getInterproAnnotation();
-        writer.write("----- Annotations ------------\n");
-        writer.write(String.format("\tTotal annotated transcripts: %d\n", transcriptIdToInterproAnnotationMap.size()));
-        long totalAnnotations =
-                transcriptIdToInterproAnnotationMap
-                        .values()
-                        .stream()
-                        .mapToInt(List::size)
-                        .sum();
-        writer.write(String.format("\tTotal annotations: %d\n", totalAnnotations));
+    public Map<String, String> getData() {
+        return data;
+    }
+
+    /**
+     * Convenient way of collecting data about the current run.
+     */
+    public static class Builder {
+
+        private final Map<String, String> map;
+
+        public Builder() {
+            map = new LinkedHashMap<>();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+            // Quoted "Z" to indicate UTC, no timezone offset
+            String nowAsISO = df.format(new Date());
+            map.put("Analysis performed on", nowAsISO);
+        }
+
+        public Builder version(String isopretVersion) {
+            map.put("Isopret version", isopretVersion);
+            return this;
+        }
+
+        public Builder geneOntologyVersion(String v) {
+            map.put("Gene Ontology version", v);
+            return this;
+        }
+
+        public Builder hgncCount(int n) {
+            map.put("Number of HGNC gene entries", String.valueOf(n));
+            return this;
+        }
+
+        public Builder goAssociations(int n) {
+            map.put("Number of GO associations",String.valueOf(n));
+            return this;
+        }
+
+        public Builder gannotatedGeneCount(int n) {
+            map.put("Number of annotated genes", String.valueOf(n));
+            return this;
+        }
+
+        public Builder annotatingGoTermCount(int n) {
+            map.put("Number of GO terms used to annotate genes", String.valueOf(n));
+            return this;
+        }
+
+        public Builder interproAnnotationCount(int n) {
+            map.put("Number of interpro annotations", String.valueOf(n));
+            return this;
+        }
+
+        public Builder interproDescriptionCount(int n) {
+            map.put("Number of of interpro descriptions", String.valueOf(n));
+            return this;
+        }
+
+        public Builder geneSymbolCount(int n) {
+            map.put("Number of of genes with annotated transcripts", String.valueOf(n));
+            return this;
+        }
+
+        public Builder transcriptsCount(int n) {
+            map.put("Number of of annotated transcripts", String.valueOf(n));
+            return this;
+        }
+
+
+
+
+
+
+        public IsopretStats build() {
+            return new IsopretStats(map);
+        }
+
+
     }
 
 
