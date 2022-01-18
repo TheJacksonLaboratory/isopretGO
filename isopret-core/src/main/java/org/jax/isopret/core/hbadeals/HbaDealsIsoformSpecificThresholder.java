@@ -139,7 +139,7 @@ public class HbaDealsIsoformSpecificThresholder {
         return this.dasStudy;
     }
 
-    public int getDasGeneCount() {
+    public int getDasIsoformCount() {
         return this.dasStudy.getAnnotatedItemCount();
     }
 

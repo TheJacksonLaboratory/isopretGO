@@ -14,8 +14,7 @@ public class IsopretFxDownloadTask extends Task<Void> {
     private final String downloadDir;
 
     public IsopretFxDownloadTask(String path) {
-        boolean overwrite = false;
-        downloader = new IsopretDownloader(path, overwrite);
+        downloader = new IsopretDownloader(path);
         this.downloadDir = path;
     }
 

@@ -2,6 +2,7 @@ package org.jax.isopret.core.visualization;
 
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class GoAnnotationRow implements Comparable<GoAnnotationRow> {
@@ -39,7 +40,7 @@ public class GoAnnotationRow implements Comparable<GoAnnotationRow> {
      * Sort first according to significance and then alphabetically.
     */
     @Override
-    public int compareTo(GoAnnotationRow that) {
+    public int compareTo(@NotNull GoAnnotationRow that) {
         return this.goTermSignificant && ! that.goTermSignificant ? -1 :
                 that.goTermSignificant && ! this.goTermSignificant ? 1 :
                         this.goLabel.compareTo(that.goLabel);

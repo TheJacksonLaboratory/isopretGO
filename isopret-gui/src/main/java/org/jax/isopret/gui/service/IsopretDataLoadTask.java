@@ -145,7 +145,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
             Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
             LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
-            isopretStatsBuilder.gannotatedGeneCount(gene2GoMap.size());
+            isopretStatsBuilder.annotatedGeneCount(gene2GoMap.size());
             IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);
 
             transcriptContainer = isoContainerFac.transcriptContainer();
@@ -153,8 +153,11 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             updateProgress(0.55, 1);
             LOGGER.info("Loaded gene container with {} annotating terms", geneContainer.getAnnotatingTermCount());
             isopretStatsBuilder.annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount());
-            isopretStatsBuilder.gannotatedGeneCount(geneContainer.getAnnotatedDomainItemCount());
+            isopretStatsBuilder.annotatedGeneCount(geneContainer.getAnnotatedDomainItemCount());
             LOGGER.info("Loaded transcript container with {} annotating terms", transcriptContainer.getAnnotatingTermCount());
+            isopretStatsBuilder.annotatingGoTermCountTranscripts(transcriptContainer.getAnnotatingTermCount());
+            isopretStatsBuilder.annotatedTranscripts(transcriptContainer.getAnnotatedDomainItemCount());
+
         }
 
         HgncParser hgncParser = new HgncParser();
@@ -162,6 +165,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateProgress(0.65, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
         LOGGER.info(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
+        isopretStatsBuilder.hgncCount(hgncMap.size());
 
         File interproDescriptionFile = new File(downloadDirectory + File.separator + "interpro_domain_desc.txt");
         File interproDomainsFile = new File(downloadDirectory + File.separator + "interpro_domains.txt");
@@ -173,11 +177,14 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             throw new IsopretRuntimeException("Could not find interpro_domain_desc.txt at " +
                     interproDescriptionFile.getAbsolutePath());
         }
+        isopretStatsBuilder.info("Interpro domains file", interproDomainsFile.getAbsolutePath());
+        isopretStatsBuilder.info("Interpro description file", interproDescriptionFile.getAbsolutePath());
         this.interproMapper = new InterproMapper(interproDescriptionFile, interproDomainsFile);
         updateProgress(0.70, 1); /* this will update the progress bar */
-        updateMessage(String.format("Loaded InterproMapper with %d domains", interproMapper.getInterproDescription().size()));
-
-        LOGGER.info(String.format("Loaded InterproMapper with %d domains", interproMapper.getInterproDescription().size()));
+        updateMessage(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
+        isopretStatsBuilder.interproDescriptionCount(interproMapper.getInterproDescriptionCount());
+        isopretStatsBuilder.interproAnnotationCount(interproMapper.getInterproAnnotationCount());
+        LOGGER.info(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
         File predictionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
         if (!predictionFile.isFile()) {
             throw new IsopretRuntimeException("Could not find isoform_function_list.txt at " +
@@ -201,12 +208,23 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         updateMessage("Finished loading data for isopret analysis.");
         LOGGER.info("Beginning DGE GO analysis");
+        isopretStatsBuilder.dasIsoformCount(isoformSpecificThresholder.getDasIsoformCount());
+        isopretStatsBuilder.dgeGeneCount(isoformSpecificThresholder.getDgeGeneCount());
+        isopretStatsBuilder.dasStudy(isoformSpecificThresholder.getDasStudy().getAnnotatedItemCount());
+        isopretStatsBuilder.dasPopulation(isoformSpecificThresholder.getDasPopulation().getAnnotatedItemCount());
+        isopretStatsBuilder.dgeStudy(isoformSpecificThresholder.getDgeStudy().getAnnotatedItemCount());
+        isopretStatsBuilder.dgePopulation(isoformSpecificThresholder.getDgePopulation().getAnnotatedItemCount());
+        isopretStatsBuilder.fdrThreshold(isoformSpecificThresholder.getFdrThreshold());
+        isopretStatsBuilder.expressionPthreshold(isoformSpecificThresholder.getExpressionThreshold());
+        isopretStatsBuilder.splicingPthreshold(isoformSpecificThresholder.getSplicingThreshold());
+
         HbaDealsGoAnalysis dgeGoAnalysis = new HbaDealsGoAnalysis(geneOntology,
                 isoformSpecificThresholder.getDgeStudy(),
                 isoformSpecificThresholder.getDgePopulation(),
                 this.overrepMethod,
                 this.multipleTestingMethod);
         this.dgeResults = dgeGoAnalysis.overrepresetationAnalysis();
+
         updateProgress(0.97, 1);
         updateMessage(String.format("Finished DGE overrepresentation analysis. %d overrepresented GO Terms",
                dgeResults.size()));

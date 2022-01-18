@@ -239,7 +239,7 @@ public class IsopretServiceImpl implements IsopretService  {
         } else {
             resultsMap.put("Observed genes", String.valueOf(thresholder.getTotalGeneCount()));
             resultsMap.put("Differentially expressed genes", String.valueOf(thresholder.getDgeGeneCount()));
-            resultsMap.put("Differentially spliced genes", String.valueOf(thresholder.getDasGeneCount()));
+            resultsMap.put("Differentially spliced genes", String.valueOf(thresholder.getDasIsoformCount()));
             resultsMap.put("FDR threshold", String.valueOf(thresholder.getFdrThreshold()));
             resultsMap.put("Significant DGE GO Terms", String.valueOf(this.dgeGoTerms.size()));
             resultsMap.put("Significant DAS GO Terms", String.valueOf(this.dasGoTerms.size()));

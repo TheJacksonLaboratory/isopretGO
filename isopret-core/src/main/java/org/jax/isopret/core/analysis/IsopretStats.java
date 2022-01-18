@@ -1,22 +1,9 @@
 package org.jax.isopret.core.analysis;
 
-import org.jax.isopret.core.hgnc.HgncItem;
-import org.jax.isopret.core.interpro.InterproAnnotation;
-import org.jax.isopret.core.interpro.InterproEntry;
-import org.jax.isopret.core.interpro.InterproEntryType;
-import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.Transcript;
-import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
-import org.monarchinitiative.phenol.ontology.data.Ontology;
-
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Class to collect descriptive statistics about the current run in a Map that
@@ -156,13 +143,23 @@ public class IsopretStats {
             return this;
         }
 
-        public Builder gannotatedGeneCount(int n) {
+        public Builder annotatedGeneCount(int n) {
             map.put("Number of annotated genes", String.valueOf(n));
             return this;
         }
 
         public Builder annotatingGoTermCountGenes(int n) {
             map.put("Number of GO terms used to annotate genes", String.valueOf(n));
+            return this;
+        }
+
+        public Builder annotatedTranscripts(int n) {
+            map.put("Number of annotated transcripts", String.valueOf(n));
+            return this;
+        }
+
+        public Builder annotatingGoTermCountTranscripts(int n) {
+            map.put("Number of GO terms used to annotate transcripts", String.valueOf(n));
             return this;
         }
 
@@ -177,7 +174,7 @@ public class IsopretStats {
         }
 
         public Builder geneSymbolCount(int n) {
-            map.put("Number of of genes with annotated transcripts", String.valueOf(n));
+            map.put("Number of genes with annotated transcripts", String.valueOf(n));
             return this;
         }
 
@@ -185,6 +182,64 @@ public class IsopretStats {
             map.put("Number of of annotated transcripts", String.valueOf(n));
             return this;
         }
+
+        public Builder dasIsoformCount(int n) {
+            map.put("Number of significantly differential isoforms", String.valueOf(n));
+            return this;
+        }
+
+        public Builder dgeGeneCount(int n) {
+            map.put("Number of significantly differential genes", String.valueOf(n));
+            return this;
+        }
+
+        public Builder dasPopulation(int n) {
+            map.put("DAS population size", String.valueOf(n));
+            return this;
+        }
+
+        public Builder dasStudy(int n) {
+            map.put("DAS study size", String.valueOf(n));
+            return this;
+        }
+
+        public Builder dgePopulation(int n) {
+            map.put("DGE population size", String.valueOf(n));
+            return this;
+        }
+
+        public Builder dgeStudy(int n) {
+            map.put("DGE study size", String.valueOf(n));
+            return this;
+        }
+
+        public Builder fdrThreshold(double x) {
+            map.put("Chosen FDR threshold", String.valueOf(x));
+            return this;
+        }
+
+        public Builder expressionPthreshold(double x) {
+            map.put("Probability threshold (expression)", String.valueOf(x));
+            return this;
+        }
+
+        public Builder splicingPthreshold(double x) {
+            map.put("Probability threshold (splicing)", String.valueOf(x));
+            return this;
+        }
+
+        public Builder dgeSigGoTermCount(int n) {
+            map.put("Significant GO terms (expression)", String.valueOf(n));
+            return this;
+        }
+
+        public Builder dasSigGoTermCount(int n) {
+            map.put("Significant GO terms (splicing)", String.valueOf(n));
+            return this;
+        }
+
+
+
 
         public Builder error(String err) {
             errors.put("[ERROR]", err);
