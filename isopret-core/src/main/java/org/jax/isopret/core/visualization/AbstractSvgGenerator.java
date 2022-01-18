@@ -51,9 +51,10 @@ public abstract class AbstractSvgGenerator {
      * @throws IOException if we cannot writ the SVG
      */
     private void writeHeader(Writer writer, boolean blackBorder) throws IOException {
-        String viewbox = String.format("preserveAspectRatio=\"xMidYMid meet\" viewBox=\"0 0 %d %d\" ",
+        //viewBox="0 0 800 1100" preserveAspectRatio="xMinYMin meet"
+        String viewbox = String.format("<svg viewBox=\"0 0 %d %d\" preserveAspectRatio=\"xMidYMid meet\" ",
                 this.SVG_WIDTH, this.SVG_HEIGHT);
-        writer.write("<svg width=\"1100" + viewbox + "\" ");
+        writer.write( viewbox );
         if (blackBorder) {
             writer.write("style=\"border:1px solid black\" ");
         }

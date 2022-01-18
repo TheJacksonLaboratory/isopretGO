@@ -14,5 +14,6 @@ analysis and is mainly intended to be used in bioinformatic pipelines.
 
    running-cmd
    running-gui
+   running-pdf
 
 
