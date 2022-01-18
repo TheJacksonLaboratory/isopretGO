@@ -145,7 +145,7 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
             builder.geneOntologyVersion(goVersion)
                     .hgncCount(hgncMap.size())
                     .goAssociationsGenes(geneContainer.getTotalAnnotationCount())
-                    .gannotatedGeneCount(geneContainer.getAnnotatedDomainItemCount())
+                    .annotatedGeneCount(geneContainer.getAnnotatedDomainItemCount())
                     .annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount())
 //                    .interproAnnotationCount(.getInterproAnnotationCount())
 //                    .interproDescriptionCount(mapper.getInterproDescriptionCount())

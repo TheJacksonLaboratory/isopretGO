@@ -9,11 +9,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.gui.configuration.ApplicationProperties;
 import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretFxDownloadTask;
@@ -92,6 +92,9 @@ public class MainController implements Initializable {
 
     @Autowired
     private Properties pgProperties;
+
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     @Autowired
     ResourceLoader resourceLoader;
@@ -175,7 +178,10 @@ public class MainController implements Initializable {
     /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "0.7.5";
+        String version = "0.8.4";
+        if (applicationProperties.getApplicationVersion() != null) {
+            version = applicationProperties.getApplicationVersion();
+        }
         Instant lastTime = Instant.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
                 .withLocale( Locale.UK )
@@ -290,29 +296,19 @@ public class MainController implements Initializable {
      * the readthedoc documentation in the system menu.
      */
     public void openRTDhelp(ActionEvent e) {
-        e.consume();
-        String READTHEDOCS_SITE = "https://isopret.readthedocs.io/en/latest/";
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Isopret Help");
-        alert.setHeaderText("Get help for Isopret");
-        alert.setContentText(String.format("A tutorial and detailed documentation for Isopret can be found at readthedocs: %s",READTHEDOCS_SITE));
-        ButtonType buttonTypeOne = new ButtonType("Open ReadTheDocs");
-        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
-        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == buttonTypeOne){
-            hostServicesWrapper.showDocument(READTHEDOCS_SITE);
-            alert.close();
-        } else {
-            alert.close();
-        }
+       PopupFactory.openRTD(hostServicesWrapper);
+       e.consume();
     }
 
     public void showStats(ActionEvent actionEvent) {
-        IsopretStatsWidget widget = new IsopretStatsWidget(service.getIsopretStats());
+        Optional<File> opt = service.getHbaDealsFileOpt();
+        if (opt.isEmpty()) {
+            PopupFactory.displayError("Error", "Cannot show stats before selecting HBA-DEALS file");
+            return;
+        }
+        File f = opt.get();
+        String basename = f.getName();
+        IsopretStatsWidget widget = new IsopretStatsWidget(service.getIsopretStats(), basename);
         widget.show();
         actionEvent.consume();
     }

@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.jax.isopret.gui.service.HostServicesWrapper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -171,4 +172,24 @@ public class PopupFactory {
     }
 
 
+    public static void openRTD(HostServicesWrapper hostServicesWrapper) {
+        String READTHEDOCS_SITE = "https://isopret.readthedocs.io/en/latest/";
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Isopret Help");
+        alert.setHeaderText("Get help for Isopret");
+        alert.setContentText(String.format("A tutorial and detailed documentation for Isopret can be found at readthedocs: %s",READTHEDOCS_SITE));
+        ButtonType buttonTypeOne = new ButtonType("Open ReadTheDocs");
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == buttonTypeOne){
+            hostServicesWrapper.showDocument(READTHEDOCS_SITE);
+            alert.close();
+        } else {
+            alert.close();
+        }
+    }
 }

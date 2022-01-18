@@ -3,6 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -12,13 +14,30 @@
 
 <ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
     <VBox prefHeight="887.0" prefWidth="1203.0">
+        <padding><Insets bottom="5" left="10" right="5" top="10" /></padding>
+        <spacing>10</spacing>
         <VBox fx:id="hbaGeneVbox" prefHeight="887.0" prefWidth="1203.0">
             <HBox prefHeight="100.0" prefWidth="1200.0">
                 <Label fx:id="hbaGeneLabel" minWidth="150.0" styleClass="mylabel" stylesheets="@../css/isopretstyle.css">
                <HBox.margin>
                   <Insets left="20.0" />
                </HBox.margin></Label>
-                <Hyperlink fx:id="geneHyperlink" minWidth="150.0" />
+                <Hyperlink fx:id="geneHyperlink" minWidth="150.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin></Hyperlink>
+            <MenuButton mnemonicParsing="false" text="Export">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#htmlSummaryExport" text="HTML Summary" />
+                <MenuItem mnemonicParsing="false" onAction="#geneSVGexport" text="Gene SVG" />
+                  <MenuItem mnemonicParsing="false" onAction="#genePDFexport" text="Gene PDF" />
+                  <MenuItem mnemonicParsing="false" onAction="#proteinSVGexport" text="Protein SVG" />
+                  <MenuItem mnemonicParsing="false" onAction="#proteinPDFexport" text="Protein PDF" />
+              </items>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </MenuButton>
             </HBox>
             <HBox prefHeight="100.0" prefWidth="1200.0">
                 <Label fx:id="geneFoldChangeLabel" minWidth="300.0">
@@ -42,7 +61,7 @@
                         </columnResizePolicy>
                     </TableView>
                     <WebView fx:id="hbaGeneWebView" prefHeight="861.0" prefWidth="1203.0" />
-                    <TableView fx:id="interprTableView" stylesheets="@../css/isopretstyle.css">
+                    <TableView fx:id="interproTableView" stylesheets="@../css/isopretstyle.css">
                         <columns>
                             <TableColumn fx:id="interproAccessionColumn" editable="false" maxWidth="-1.0" minWidth="300.0" prefWidth="300" resizable="false" text="Interpro Accession" />
                             <TableColumn fx:id="interproEntryType" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Entry type" />
@@ -57,11 +76,11 @@
                         <HBox prefHeight="100.0" prefWidth="1200.0">
                             <Label fx:id="goAnnotationsForGeneLabel" minWidth="300.0">
                                 <HBox.margin>
-                                    <Insets left="20.0" bottom="5"/>
+                                    <Insets bottom="5" left="20.0" />
                                 </HBox.margin></Label>
                         </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0">
-                      <Label text="Significant GO terms shown in green" minWidth="300.0">
+                      <Label minWidth="300.0" text="Significant GO terms shown in green">
                         <HBox.margin>
                           <Insets left="20.0" />
                         </HBox.margin>

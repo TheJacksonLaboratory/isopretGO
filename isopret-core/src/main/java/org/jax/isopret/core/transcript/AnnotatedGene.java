@@ -6,6 +6,7 @@ import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -25,13 +26,13 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     private final HbaDealsResult hbaDealsResult;
 
-    private final Optional<Boolean> differentiallyExpressed;
+    private final Boolean differentiallyExpressed;
 
-    private final Optional<Boolean> differentiallySpliced;
+    private final Boolean differentiallySpliced;
 
-    private final Optional<Double> expressionThreshold;
+    private final Double expressionThreshold;
 
-    private final Optional<Double> splicingThreshold;
+    private final Double splicingThreshold;
 
 
 
@@ -66,10 +67,10 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 expressedTranscriptMap.put(t, logFC);
             }
         }
-        this.differentiallySpliced = Optional.empty();
-        this.differentiallyExpressed = Optional.empty();
-        this.expressionThreshold = Optional.empty();
-        this.splicingThreshold = Optional.empty();
+        this.differentiallySpliced = null;
+        this.differentiallyExpressed = null;
+        this.expressionThreshold = null;
+        this.splicingThreshold = null;
     }
 
     public AnnotatedGene(List<Transcript> transcripts,
@@ -92,10 +93,10 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 .stream()
                 .filter(e -> result.transcriptExpressed(e.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        this.differentiallyExpressed = Optional.of(result.hasDifferentialExpressionResult(expressionThreshold));
-        this.differentiallySpliced = Optional.of(result.hasDifferentialSplicingResult(splicingThreshold));
-        this.expressionThreshold = Optional.of(expressionThreshold);
-        this.splicingThreshold = Optional.of(splicingThreshold);
+        this.differentiallyExpressed = result.hasDifferentialExpressionResult(expressionThreshold);
+        this.differentiallySpliced = result.hasDifferentialSplicingResult(splicingThreshold);
+        this.expressionThreshold = expressionThreshold;
+        this.splicingThreshold = splicingThreshold;
         expressedTranscriptMap = new HashMap<>();
         for (Transcript t: transcripts) {
             AccessionNumber accession = t.accessionId();
@@ -150,14 +151,14 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      * @return true if this gene is differentially expression
      */
     public boolean passesExpressionThreshold() {
-        return this.differentiallyExpressed.orElse(true);
+        return this.differentiallyExpressed == null ? true : this.differentiallyExpressed;
     }
     /**
      * If a differential expression threshold was provided, return its value. Otherwise we are not thresholding, return true
      * @return true if this gene is differentially spliced
      */
     public boolean passesSplicingThreshold() {
-        return this.differentiallySpliced.orElse(true);
+        return this.differentiallySpliced == null ? true : this.differentiallySpliced;
     }
 
     public boolean passesSplicingAndExpressionThreshold() {
@@ -165,7 +166,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     }
 
     public double getSplicingThreshold() {
-        return this.splicingThreshold.orElse(1.0);
+        return this.splicingThreshold == null ? 1.0 : this.splicingThreshold;
     }
 
     public Map<Transcript, Double> getUpregulatedExpressedTranscripts() {
@@ -189,7 +190,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      * We are sort by whether a gene is differentially spliced and then alphabetically
      */
     @Override
-    public int compareTo(AnnotatedGene that) {
+    public int compareTo(@NotNull AnnotatedGene that) {
         if (that==null) return 0;
         if (this.passesSplicingAndExpressionThreshold() && (!that.passesSplicingAndExpressionThreshold())) {
             return -1;
