@@ -79,7 +79,7 @@ public class HtmlWriter extends AbstractWriter {
         List<String> unidentifiedSymbols = new ArrayList<>();
         this.geneVisualizations = new ArrayList<>();
 
-        HtmlVisualizer visualizer = new HtmlVisualizer();
+        HtmlVisualizer visualizer = new HtmlVisualizer("todo");
         List<AnnotatedGene> annotatedGeneList = new ArrayList<>();
         int foundInterPro = 0;
         int missed = 0;

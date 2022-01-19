@@ -2,29 +2,32 @@ package org.jax.isopret.core.visualization;
 
 import java.util.List;
 
-public class HtmlGoAnnotationMatrix {
+public class HtmlGoAnnotationMatrixVisualizer {
 
     private final String html;
     private final String allTranscriptsHtml;
 
 
-
-    public HtmlGoAnnotationMatrix(GoAnnotationMatrix matrix) {
+    /**
+     *
+     * Build a table with go annotations without HTML header or foter
+     */
+    public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix) {
         StringBuilder sb = new StringBuilder();
-        sb.append(HTML_HEADER);
+        //sb.append(HTML_HEADER);
         sb.append(htmlTableHeader(matrix.getTranscripts()));
         for (GoAnnotationRow row : matrix.getAnnotationRows()) {
             sb.append(getRow(row));
         }
-        sb.append(HTML_FOOTER);
+        //sb.append(HTML_FOOTER);
         allTranscriptsHtml = sb.toString();
         sb = new StringBuilder();
-        sb.append(HTML_HEADER);
-        sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
-        for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
-            sb.append(getRow(row));
-        }
-        sb.append(HTML_FOOTER);
+//        sb.append(HTML_HEADER);
+//        sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
+//        for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
+//            sb.append(getRow(row));
+//        }
+//        sb.append(HTML_FOOTER);
         html = sb.toString();
     }
 
@@ -96,6 +99,7 @@ public class HtmlGoAnnotationMatrix {
                transform: rotate(180deg);
                white-space: nowrap;
                padding: 5px 10px;
+                margin: 0 auto;
              }
             </style>
             <body>

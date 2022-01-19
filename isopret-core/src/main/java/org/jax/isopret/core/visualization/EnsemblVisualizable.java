@@ -101,11 +101,26 @@ public class EnsemblVisualizable implements Visualizable {
             this.proteinSvg = psvggen.getSvg();
             this.proteinSvgHeight = svggen.getSvgHeight();
         }
-
     }
 
     public int getI() {
         return i;
+    }
+
+    @Override
+    public int getDifferentialTranscriptCount() {
+        double splicingThresh = agene.getSplicingThreshold();
+        int n_sig = (int) hbaDealsResult.getTranscriptMap().values()
+                .stream()
+                .filter(t -> t.isSignificant(splicingThresh))
+                .count();
+        return n_sig;
+    }
+
+    @Override
+    public int getCodingTranscriptCount() {
+        return (int) agene.getTranscripts().stream()
+                .filter(Transcript::isCoding).count();
     }
 
     @Override
@@ -143,7 +158,7 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
-    public String getGeneUrl() {
+    public String getGeneEnsemblUrl() {
         return getEnsemblUrl(getGeneAccession());
     }
 
@@ -238,7 +253,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getGoHtml() {
-        HtmlGoAnnotationMatrix htmlMatrix = new HtmlGoAnnotationMatrix(this.annotationMatrix);
+        HtmlGoAnnotationMatrixVisualizer htmlMatrix = new HtmlGoAnnotationMatrixVisualizer(this.annotationMatrix);
         return htmlMatrix.getHtml();
     }
 

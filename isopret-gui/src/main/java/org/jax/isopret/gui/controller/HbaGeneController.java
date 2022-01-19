@@ -12,9 +12,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.IOUtils;
-import org.jax.isopret.core.visualization.InterproVisualizable;
-import org.jax.isopret.core.visualization.IsoformVisualizable;
-import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.core.visualization.*;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
@@ -37,8 +35,6 @@ import java.util.ResourceBundle;
 @Scope("prototype")
 public class HbaGeneController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaGeneController.class.getName());
-
-
 
     @FXML
     private TableView<IsoformVisualizable> isoformTableView;
@@ -163,12 +159,41 @@ public class HbaGeneController implements Initializable {
             interproTableView.setFixedCellSize(25);
             interproTableView.prefHeightProperty().bind(Bindings.size(interproTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             WebEngine goEngine = hbaGoWebView.getEngine();
-            goEngine.loadContent(this.visualizable.getGoHtml());
+            String goTable = this.visualizable.getGoHtml();
+            String html = HtmlUtil.wrap(goTable);
+            goEngine.loadContent(html);
         });
     }
 
     @FXML private void htmlSummaryExport(ActionEvent e) {
 
+        Optional<File> opt =  service.getHbaDealsFileOpt();
+        if (opt.isEmpty()) {
+            PopupFactory.displayError("Error", "Could not get HBA-DEAL file name");
+            return;
+        }
+        File isopretFile = opt.get();
+        String basename = isopretFile.getName();
+        String genesymbol = visualizable.getGeneSymbol();
+        String fname = basename +"-" + genesymbol + "-isopret.html";
+        final HtmlVisualizer visualizer = new HtmlVisualizer(basename);
+        String html = visualizer.getHtml(this.visualizable);
+        html = HtmlUtil.wrap(html);
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HTML files (*.html)", "*.html");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setInitialFileName(fname);
+        Stage stage = (Stage) this.hbaGeneLabel.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+        if (file == null) {
+            PopupFactory.displayError("Error", "Could not retrieve file.");
+            return;
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write(html);
+        } catch (IOException ex) {
+            PopupFactory.displayException("Error", "Could not write html", ex);
+        }
     }
 
     @FXML private void geneSVGexport(ActionEvent e) {
@@ -315,6 +340,7 @@ public class HbaGeneController implements Initializable {
                 System.out.println(stdout);
             }
         } catch (IOException e) {
+            assert proc != null;
             proc.destroy();
             String errMsg =  String.format("Could not create PDF file - have you installed rsvg-convert?  (Exit code %d)", proc.exitValue());
             PopupFactory.displayException("Error", errMsg, e);

@@ -17,13 +17,17 @@ public interface Visualizable {
 
     String getGeneAccession();
 
-    String getGeneUrl();
+    String getGeneEnsemblUrl();
 
     String getChromosome();
+
+    int getDifferentialTranscriptCount();
 
     int getExpressedTranscriptCount();
 
     int getTotalTranscriptCount();
+
+    int getCodingTranscriptCount();
 
     double getExpressionPval();
 

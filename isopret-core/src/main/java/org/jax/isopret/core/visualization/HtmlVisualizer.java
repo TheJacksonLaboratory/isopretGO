@@ -9,50 +9,143 @@ import java.util.*;
 
 public class HtmlVisualizer implements Visualizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlVisualizer.class);
-    public HtmlVisualizer() {
+
+    public final String experiment;
+
+    public final String HBADEALS_A = """
+        <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6"
+         target=__blank>HBA-DEALS</a>
+         """;
+
+    public HtmlVisualizer(String experiment) {
+        this.experiment = experiment;
     }
 
+      /*
+      Create the HTML which will go here in the FreeMarker template
+      <article>
+        ${gene}
+      </article>
+     */
 
-    private final static String GENE_TABLE_HEADER = """
-            <table>
-              <thead>
-                <tr>
-                  <th>Gene</th>
-                  <th>Chrom.</th>
-                  <th>Log<sub>2</sub> fold change</th>
-                  <th>Probability (PEP)</th>
-                </tr>
-              </thead>
-            """;
-
-
-    private String getGoAnchor(OntologyTermVisualizable go) {
-        //QuickGO - https://www.ebi.ac.uk/QuickGO/term/GO:0006915
-        String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getTermId();
-        return String.format("<a href=\"%s\" target=\"_blank\">%s</a>\n", url, go.getTermLabel());
+    @Override
+    public String getHtml(Visualizable vis) {
+        return getGeneNameAndBadges(vis) +
+                getSingleGeneSummary(vis) +
+                getSingleGeneTranscriptSummary(vis) +
+                getTranscriptBox(vis) +
+                "<div class=\"svgrow\">\n" +
+                vis.getIsoformSvg() +
+                "</div>\n" +
+                getProteinDomainSummary(vis) +
+               getInterproBox(vis) + "\n" +
+                "<div class=\"svgrow\">\n" +
+                vis.getProteinSvg() +
+                "</div>\n" +
+                "<div class=\"svgrow\">\n" +
+                getGoSummary(vis) +
+                vis.getGoHtml() +
+             "</div>\n"
+                ;
     }
 
-    public String getGeneBox(Visualizable vis) {
+    public String getGeneNameAndBadges(Visualizable vis) {
         StringBuilder sb = new StringBuilder();
-        sb.append(GENE_TABLE_HEADER);
-        String a = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", vis.getGeneUrl(), vis.getGeneSymbol());
-        sb.append("<tr><td>").append(a).append("</td>");
-        sb.append("<td>").append(vis.getChromosome()).append("</td>\n");
-        sb.append(String.format("<td>%.2f</td>", vis.getExpressionLogFoldChange()));
-        String prob = String.format("%.2f", vis.getExpressionPval()) + (vis.isDifferentiallyExpressed() ? " (*)" : "");
-        sb.append("<td>").append(prob).append("</td></tr>\n");
-        sb.append("</table>\n");
-        /*List<OntologyTermVisualizable> goterms = vis.getGoTerms();
-        if (goterms.size() > 0) {
-            sb.append("<p>Enriched GO terms associated with ").append(vis.getGeneSymbol()).append(".</p>\n");
-            sb.append("<ul>\n");
-            for (var go : goterms) {
-                sb.append("<li>").append(getGoAnchor(go)).append("</li>\n");
-            }
-            sb.append("</ul>\n");
-        }*/
+        sb.append("<h1>").append(vis.getGeneSymbol());
+        if (vis.isDifferentiallyExpressed()) {
+            sb.append(" <span class=\"badge\">DGE</span> ");
+        }
+        if (vis.isDifferentiallySpliced()) {
+            sb.append(" <span class=\"badge\">DAS</span>");
+        }
+        sb.append("</h1>\n");
         return sb.toString();
     }
+
+
+    public String getSingleGeneSummary(Visualizable visualizable) {
+        String symbol = visualizable.getGeneSymbol();
+        String ensemblGeneAccession = visualizable.getGeneAccession();
+        int totalTranscriptCount = visualizable.getTotalTranscriptCount();;
+        int expressedTranscriptCount = visualizable.getExpressedTranscriptCount();;
+        String ensemblUrl = visualizable.getGeneEnsemblUrl();
+        String esemblAnchor = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", ensemblUrl, ensemblGeneAccession);
+        double expressionFC = visualizable.getExpressionFoldChange();
+        double expressionLogFc = visualizable.getExpressionLogFoldChange();
+        double expressionP = visualizable.getExpressionPval();
+        int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
+
+        return "<section>" +
+                "<a name=\"geneSummary\"></a>\n" +
+                "<article>" +
+                "<h2>Isopret summary for " + visualizable.getGeneSymbol() + "</h2>\n" +
+                "<p>" + symbol + " (" + esemblAnchor + ") had an expression fold change of " +
+                String.format("%.3f", expressionFC) + ", corresponding to a log<sub>2</sub> fold change of " +
+                String.format("%.3f", expressionLogFc) + ". The posterior error probability (PEP) according the the " + HBADEALS_A +
+                " analysis was " + String.format("%e", expressionP) + ".</p>" +
+                "<p>The gene has a total of " +
+                totalTranscriptCount + " annotated transcripts in Ensembl, of which " +
+                expressedTranscriptCount + " were expressed in the current experiment (" + experiment + "). " +
+                "Of these, " + signDiffIsoCount + " were found to be differentially spliced." +
+                "</p>\n" +
+                "</article>\n" +
+                "</section>\n";
+    }
+
+    public String getSingleGeneTranscriptSummary(Visualizable visualizable) {
+        String symbol = visualizable.getGeneSymbol();
+        int totalTranscriptCount = visualizable.getTotalTranscriptCount();;
+        int expressedTranscriptCount = visualizable.getExpressedTranscriptCount();;
+        int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
+        return "<section>" +
+                "<a name=\"isoSummary\"></a>\n" +
+                "<article>" +
+                "<H3>Isoform analysis</H3>\n" +
+                "<p>" + symbol + " has a total of " +
+                totalTranscriptCount + " transcripts annotated in Ensembl, of which " +
+                expressedTranscriptCount + " were expressed in the current experiment (" + experiment + ")." +
+                "Of these, " + signDiffIsoCount +
+                (signDiffIsoCount == 1 ? " was":"were") +
+                " found to be differentially spliced." +
+                "</p>\n" +
+                "</article>\n" +
+                "</section>\n";
+    }
+
+    public String getProteinDomainSummary(Visualizable visualizable) {
+        String symbol = visualizable.getGeneSymbol();
+        int totalInterproDomains = visualizable.getInterproForExpressedTranscripts().size();;
+        int codingTranscriptCount = visualizable.getCodingTranscriptCount();
+        int totalTranscriptCount = visualizable.getTotalTranscriptCount();
+
+        if (codingTranscriptCount == 0) {
+           return   "<section>" +
+                    "<a name=\"domainSummary\"></a>\n" +
+                    "<article>" +
+                    "<H3>Protein domain analysis</H3>\n" +
+                    "<p>" + symbol + " has a total of " +
+                    totalInterproDomains + " transcripts annotated in Ensembl, none of which " +
+                    " are coding.</p>" +
+                   "</article>\n" +
+                   "</section>\n";
+        }
+
+        return   "<section>" +
+                "<a name=\"domainSummary\"></a>\n" +
+                "<article>" +
+                "<H3>Protein domain analysis</H3>\n" +
+                "<p>" + symbol + " has a total of " +
+                totalTranscriptCount + " transcripts annotated in Ensembl, of which " +
+                codingTranscriptCount +
+                (codingTranscriptCount == 1? " is":" are") +
+                " coding." +
+                "Isoprot lists " + totalInterproDomains +
+                " domains for the coding isoforms." +
+                "</p>\n" +
+                "</article>\n" +
+                "</section>\n";
+    }
+
 
     private final static String INTERPRO_TABLE_HEADER = """
             <table>
@@ -89,6 +182,17 @@ public class HtmlVisualizer implements Visualizer {
     }
 
 
+    private String getGoAnchor(OntologyTermVisualizable go) {
+        //QuickGO - https://www.ebi.ac.uk/QuickGO/term/GO:0006915
+        String url = "https://www.ebi.ac.uk/QuickGO/term/" + go.getTermId();
+        return String.format("<a href=\"%s\" target=\"_blank\">%s</a>\n", url, go.getTermLabel());
+    }
+
+
+
+
+
+
     private final static String ISOFORM_TABLE_HEADER = """
             <table>
               <thead>
@@ -101,7 +205,6 @@ public class HtmlVisualizer implements Visualizer {
             """;
 
     private String getTranscriptBox(Visualizable vis) {
-        final int EXPECTED_N_COLUMNS = 3;
         StringBuilder sb = new StringBuilder();
         List<IsoformVisualizable> tableData = vis.getIsoformVisualizable();
         if (tableData.isEmpty()) {
@@ -111,62 +214,32 @@ public class HtmlVisualizer implements Visualizer {
         int expressionIsoforms = vis.getExpressedTranscriptCount();
         sb.append(ISOFORM_TABLE_HEADER);
         for (var row : tableData) {
-
             sb.append("<tr><td>").append(row.transcriptAccession()).append("</td>");
             sb.append("<td>").append(row.log2Foldchange()).append("</td>");
             sb.append("<td>").append(row.isoformP()).append("</td></tr>\n");
         }
         sb.append("</table>\n");
-        sb.append("<p>").append(expressionIsoforms).append(" transcripts were expressed in the data from ")
-                .append(totalIsoforms).append(" annotated transcripts.</p>\n");
         return sb.toString();
     }
 
 
-    public String getGeneNameAndBadges(Visualizable vis) {
-        StringBuilder sb = new StringBuilder();
-        int i = vis.getI();
-        sb.append("<h1>").append(i).append(") ").append(vis.getGeneSymbol());
-        if (vis.isDifferentiallyExpressed()) {
-            sb.append(" <span class=\"badge\">DGE</span> ");
-        }
-        if (vis.isDifferentiallySpliced()) {
-            sb.append(" <span class=\"badge\">DAS</span>");
-        }
-        sb.append("</h1>\n");
-        return sb.toString();
+    private String getGoSummary(Visualizable vis) {
+
+        return   "<section>" +
+                "<a name=\"goSummary\"></a>\n" +
+                "<article>" +
+                "<H3>Gene Ontology analysis</H3>\n" +
+                "<p>" + vis.getGeneSymbol() + " has a total of " +
+                999 + " Gene Ontology Annotations. The following" +
+                " table show the predictions of our algorithm as to how the annotations" +
+                "are distributed across the isoforms.</p>" +
+                "</article>\n" +
+                "</section>\n";
     }
 
 
-    /*
-      Create the HTML which will go here in the FreeMarker template
-      <article>
-        ${gene}
-      </article>
-     */
 
-    @Override
-    public String getHtml(Visualizable vis) {
-        return getGeneNameAndBadges(vis) +
-                "<article>\n" +
-                "<div class=\"generow\">\n" +
-                "<div class=\"column\" style=\"background-color:#F8F8F8;\">\n" +
-                getGeneBox(vis) + "\n" +
-                "</div>\n" +
-                "<div class=\"column\" style=\"background-color:#F0F0F0;\">\n" +
-                getInterproBox(vis) + "\n" +
-                "</div>\n" +
-                "<div class=\"column\" style=\"background-color:#F0F0F0;\">\n" +
-                getTranscriptBox(vis) + "\n" +
-                "</div>\n" +
-                "</div>\n" +
-                "<div class=\"svgrow\">\n" +
-                vis.getIsoformSvg() +
-                "</div>\n" +
-                "<div class=\"svgrow\">\n" +
-                vis.getProteinSvg() +
-                "</div>\n" +
-                "</article>\n";
-    }
+
+
 
 }
