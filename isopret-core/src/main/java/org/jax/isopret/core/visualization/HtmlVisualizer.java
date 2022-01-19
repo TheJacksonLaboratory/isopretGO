@@ -66,8 +66,8 @@ public class HtmlVisualizer implements Visualizer {
     public String getSingleGeneSummary(Visualizable visualizable) {
         String symbol = visualizable.getGeneSymbol();
         String ensemblGeneAccession = visualizable.getGeneAccession();
-        int totalTranscriptCount = visualizable.getTotalTranscriptCount();;
-        int expressedTranscriptCount = visualizable.getExpressedTranscriptCount();;
+        int totalTranscriptCount = visualizable.getTotalTranscriptCount();
+        int expressedTranscriptCount = visualizable.getExpressedTranscriptCount();
         String ensemblUrl = visualizable.getGeneEnsemblUrl();
         String esemblAnchor = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", ensemblUrl, ensemblGeneAccession);
         double expressionFC = visualizable.getExpressionFoldChange();
@@ -94,8 +94,8 @@ public class HtmlVisualizer implements Visualizer {
 
     public String getSingleGeneTranscriptSummary(Visualizable visualizable) {
         String symbol = visualizable.getGeneSymbol();
-        int totalTranscriptCount = visualizable.getTotalTranscriptCount();;
-        int expressedTranscriptCount = visualizable.getExpressedTranscriptCount();;
+        int totalTranscriptCount = visualizable.getTotalTranscriptCount();
+        int expressedTranscriptCount = visualizable.getExpressedTranscriptCount();
         int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
         return "<section>" +
                 "<a name=\"isoSummary\"></a>\n" +
@@ -114,7 +114,7 @@ public class HtmlVisualizer implements Visualizer {
 
     public String getProteinDomainSummary(Visualizable visualizable) {
         String symbol = visualizable.getGeneSymbol();
-        int totalInterproDomains = visualizable.getInterproForExpressedTranscripts().size();;
+        int totalInterproDomains = visualizable.getInterproForExpressedTranscripts().size();
         int codingTranscriptCount = visualizable.getCodingTranscriptCount();
         int totalTranscriptCount = visualizable.getTotalTranscriptCount();
 
@@ -210,8 +210,6 @@ public class HtmlVisualizer implements Visualizer {
         if (tableData.isEmpty()) {
             return "<p>No isoform data found.</p>\n";
         }
-        int totalIsoforms = vis.getTotalTranscriptCount();
-        int expressionIsoforms = vis.getExpressedTranscriptCount();
         sb.append(ISOFORM_TABLE_HEADER);
         for (var row : tableData) {
             sb.append("<tr><td>").append(row.transcriptAccession()).append("</td>");

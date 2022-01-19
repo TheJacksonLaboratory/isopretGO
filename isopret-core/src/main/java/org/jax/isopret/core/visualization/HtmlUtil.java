@@ -214,29 +214,39 @@ public class HtmlUtil {
                 margin-right:auto;
                 border: 1px solid black;
             }
-                        
-            table.posttest td {
-                line-height: 40px;
-            }
-                        
+                
+            /* TODO table.posttest can be DELETED */
+            table.posttest td { line-height: 40px; }
             table.posttest th  {font-size:1.5rem;}
-                        
             table.posttest tr:nth-child(even) {background: #F5F5F5}
             table.posttest tr:nth-child(odd) {background: #FFF}
             td.posttest {font-size:1.3rem;}
-                        
+                  /* TODO table.minimalistBlack can be DELETED */
             table.minimalistBlack th,
-            table.minimalistBlack td {
-            	border:2px solid #e0e3ea;
-            }
-                        
-            table.minimalistBlack.red td {
-            	background: red;
-            }
+            table.minimalistBlack td { border:2px solid #e0e3ea; }
+            table.minimalistBlack.red td { background: red;  }
                         
             td.red {
             	background-color:#f0f3fa;
             }
+            
+            gotable.th
+             {
+               vertical-align: bottom;
+               text-align: center;
+             }
+             
+             gotable.th,
+             gotable.span
+             {
+               -ms-writing-mode: tb-rl;
+               -webkit-writing-mode: vertical-rl;
+               writing-mode: vertical-rl;
+               transform: rotate(180deg);
+               white-space: nowrap;
+               padding: 5px 10px;
+                margin: 0 auto;
+             }
                         
                         
             a[name="othergenes"] table.goTable {

@@ -5,7 +5,6 @@ import java.util.List;
 public class HtmlGoAnnotationMatrixVisualizer {
 
     private final String html;
-    private final String allTranscriptsHtml;
 
 
     /**
@@ -14,20 +13,10 @@ public class HtmlGoAnnotationMatrixVisualizer {
      */
     public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix) {
         StringBuilder sb = new StringBuilder();
-        //sb.append(HTML_HEADER);
         sb.append(htmlTableHeader(matrix.getTranscripts()));
         for (GoAnnotationRow row : matrix.getAnnotationRows()) {
             sb.append(getRow(row));
         }
-        //sb.append(HTML_FOOTER);
-        allTranscriptsHtml = sb.toString();
-        sb = new StringBuilder();
-//        sb.append(HTML_HEADER);
-//        sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
-//        for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
-//            sb.append(getRow(row));
-//        }
-//        sb.append(HTML_FOOTER);
         html = sb.toString();
     }
 
@@ -85,13 +74,13 @@ public class HtmlGoAnnotationMatrixVisualizer {
                 margin-left:auto;
                 margin-right:auto;
              }
-             th
+             gotable.th
              {
                vertical-align: bottom;
                text-align: center;
              }
              
-             th span
+             gotable.th span
              {
                -ms-writing-mode: tb-rl;
                -webkit-writing-mode: vertical-rl;
@@ -114,7 +103,8 @@ public class HtmlGoAnnotationMatrixVisualizer {
         return html;
     }
 
-    public String getHtmlAllTranscripts() {
-        return allTranscriptsHtml;
+    public String getWrappedHtml() {
+        return HTML_HEADER + html + HTML_FOOTER;
     }
+
 }
