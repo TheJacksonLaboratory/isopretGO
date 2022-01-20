@@ -17,6 +17,7 @@ public class HtmlGoAnnotationMatrixVisualizer {
         for (GoAnnotationRow row : matrix.getAnnotationRows()) {
             sb.append(getRow(row));
         }
+        sb.append("</table>\n");
         html = sb.toString();
     }
 
@@ -42,7 +43,7 @@ public class HtmlGoAnnotationMatrixVisualizer {
 
     private String htmlTableHeader(List<String> transcripts) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<table>");
+        sb.append("<table class=\"gotable\">");
         sb.append("<tr>");
         sb.append("<th>GO term</th>");
         for (String transcript : transcripts) {

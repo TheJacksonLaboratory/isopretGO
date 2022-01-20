@@ -198,46 +198,16 @@ public class HtmlUtil {
             	border-bottom:1px solid white;
             }
                         
-            table.goTable {
-            	width:auto;
-            	min-width:50%;
-            }
-                        
-            table.goTable td {
-            	background-color:#f0f3fa;
-            }
-                        
-            table.posttest {
-            	width:auto;
-            	min-width:50%;
-            	margin-left:auto;
-                margin-right:auto;
-                border: 1px solid black;
-            }
-                
-            /* TODO table.posttest can be DELETED */
-            table.posttest td { line-height: 40px; }
-            table.posttest th  {font-size:1.5rem;}
-            table.posttest tr:nth-child(even) {background: #F5F5F5}
-            table.posttest tr:nth-child(odd) {background: #FFF}
-            td.posttest {font-size:1.3rem;}
-                  /* TODO table.minimalistBlack can be DELETED */
-            table.minimalistBlack th,
-            table.minimalistBlack td { border:2px solid #e0e3ea; }
-            table.minimalistBlack.red td { background: red;  }
-                        
-            td.red {
-            	background-color:#f0f3fa;
-            }
             
             gotable.th
              {
                vertical-align: bottom;
                text-align: center;
+               border-collapse: collapse;
+               border: 1px solid #000;
              }
              
-             gotable.th,
-             gotable.span
+             span
              {
                -ms-writing-mode: tb-rl;
                -webkit-writing-mode: vertical-rl;
@@ -247,66 +217,7 @@ public class HtmlUtil {
                padding: 5px 10px;
                 margin: 0 auto;
              }
-                        
-                        
-            a[name="othergenes"] table.goTable {
-                        
-            }
-                        
-            a[name="othergenes"] table.goTable td.disease {
-            	font-size:0.928rem;
-            	padding-top:0.35rem;
-            	padding-bottom:0.15rem;
-            	text-transform: lowercase
-            }
-                        
-            a[name="othergenes"] table.goTable > tbody > tr:nth-child(even) > td {
-            	background-color:white;
-            }
-                        
-            a[name="othergenes"] table.goTable > tbody > tr:hover > td {
-            	background-color:#cceaff;
-            }
-                        
-            a[name="othergenes"] table.goTable a {
-            	text-decoration: none;
-            	display:block;
-            }
-                        
-            a[name="othergenes"] table.goTable a:hover {
-            	text-decoration: underline;
-            }
-                        
-            a[name="othergenes"] table.goTable a::first-letter {
-            	text-transform: uppercase;
-            }
-                        
-            /* Create three equal columns that floats next to each other */
-            .column {
-              float: left;
-              width: 33%;
-              padding: 10px;
-            }
-                        
-                        
-            .generow{
-                width: 90%;
-                min-height: 100px;
-                margin: 0 auto;
-                display: -webkit-flex; /* Safari */
-                display: flex; /* Standard syntax */
-            }
-                        
-            .generow .column{
-                padding: 10px;
-                background: #dbdfe5;
-                -webkit-flex: 1; /* Safari */
-                -ms-flex: 1; /* IE 10 */
-                flex: 1; /* Standard syntax */
-            }
-            .generow .column.bg-alt{
-                background: #b4bac0;
-            }
+                       
                         
             .svgrow{
                 width: 90%;

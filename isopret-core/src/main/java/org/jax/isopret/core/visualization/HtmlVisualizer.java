@@ -42,8 +42,8 @@ public class HtmlVisualizer implements Visualizer {
                 "<div class=\"svgrow\">\n" +
                 vis.getProteinSvg() +
                 "</div>\n" +
-                "<div class=\"svgrow\">\n" +
                 getGoSummary(vis) +
+                "<div class=\"svgrow\">\n" +
                 vis.getGoHtml() +
              "</div>\n"
                 ;
