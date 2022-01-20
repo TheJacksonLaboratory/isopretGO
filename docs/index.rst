@@ -20,6 +20,7 @@ the `Ontologizer <https://pubmed.ncbi.nlm.nih.gov/18511468/>`_.
    :caption: Contents:
 
    setup
+   input
    running
    go-analysis
 
