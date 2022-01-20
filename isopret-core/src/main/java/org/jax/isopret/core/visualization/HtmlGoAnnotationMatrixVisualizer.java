@@ -2,29 +2,22 @@ package org.jax.isopret.core.visualization;
 
 import java.util.List;
 
-public class HtmlGoAnnotationMatrix {
+public class HtmlGoAnnotationMatrixVisualizer {
 
     private final String html;
-    private final String allTranscriptsHtml;
 
 
-
-    public HtmlGoAnnotationMatrix(GoAnnotationMatrix matrix) {
+    /**
+     *
+     * Build a table with go annotations without HTML header or foter
+     */
+    public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix) {
         StringBuilder sb = new StringBuilder();
-        sb.append(HTML_HEADER);
         sb.append(htmlTableHeader(matrix.getTranscripts()));
         for (GoAnnotationRow row : matrix.getAnnotationRows()) {
             sb.append(getRow(row));
         }
-        sb.append(HTML_FOOTER);
-        allTranscriptsHtml = sb.toString();
-        sb = new StringBuilder();
-        sb.append(HTML_HEADER);
-        sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
-        for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
-            sb.append(getRow(row));
-        }
-        sb.append(HTML_FOOTER);
+        sb.append("</table>\n");
         html = sb.toString();
     }
 
@@ -50,7 +43,7 @@ public class HtmlGoAnnotationMatrix {
 
     private String htmlTableHeader(List<String> transcripts) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<table>");
+        sb.append("<table class=\"gotable\">");
         sb.append("<tr>");
         sb.append("<th>GO term</th>");
         for (String transcript : transcripts) {
@@ -82,13 +75,13 @@ public class HtmlGoAnnotationMatrix {
                 margin-left:auto;
                 margin-right:auto;
              }
-             th
+             gotable.th
              {
                vertical-align: bottom;
                text-align: center;
              }
              
-             th span
+             gotable.th span
              {
                -ms-writing-mode: tb-rl;
                -webkit-writing-mode: vertical-rl;
@@ -96,6 +89,7 @@ public class HtmlGoAnnotationMatrix {
                transform: rotate(180deg);
                white-space: nowrap;
                padding: 5px 10px;
+                margin: 0 auto;
              }
             </style>
             <body>
@@ -110,7 +104,8 @@ public class HtmlGoAnnotationMatrix {
         return html;
     }
 
-    public String getHtmlAllTranscripts() {
-        return allTranscriptsHtml;
+    public String getWrappedHtml() {
+        return HTML_HEADER + html + HTML_FOOTER;
     }
+
 }

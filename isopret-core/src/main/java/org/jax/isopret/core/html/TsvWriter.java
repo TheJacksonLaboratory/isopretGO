@@ -17,6 +17,7 @@ import java.util.*;
  * Output a series of TSV files with "significant" differential HBA-DEALS results and the corresponding Study sets and
  * Gene Ontology analysis results.
  */
+@Deprecated
 public class TsvWriter extends AbstractWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(TsvWriter.class);
 

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Deprecated
 public abstract class AbstractWriter {
     protected static final Logger LOGGER = LoggerFactory.getLogger(TsvWriter.class);
     protected final String outprefix;

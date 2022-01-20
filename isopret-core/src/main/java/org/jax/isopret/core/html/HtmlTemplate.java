@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-
+@Deprecated
 public class HtmlTemplate {
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlTemplate.class);
     /** Map of data that will be used for the FreeMark template. */
