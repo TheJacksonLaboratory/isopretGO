@@ -5,7 +5,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.util.Pair;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
@@ -24,7 +23,6 @@ import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
-import org.jax.isopret.gui.service.model.GoCompTerm;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -363,8 +361,10 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public int totalSignificantGoTermsAnnotatingGene(Set<TermId> goIds) {
         // total significant terms in DGE/DAS
-        return Streams.concat(dgeGoTerms.stream().map(goIds::contains),
-                        dasGoTerms.stream().map(goIds::contains))
+        return Streams.concat(dgeGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
+                        filter(goIds::contains),
+                        dasGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
+                                filter(goIds::contains))
                 .collect(Collectors.toSet()).size();
     }
 

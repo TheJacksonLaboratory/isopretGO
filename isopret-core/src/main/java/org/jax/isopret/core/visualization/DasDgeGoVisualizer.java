@@ -67,7 +67,7 @@ public class DasDgeGoVisualizer {
 
 
     private String getCountString(int annot, int total) {
-        return String.format("%d/%d (%.1f%%", annot, total, 100*annot/total);
+        return String.format("%d/%d (%.1f%%", annot, total, 100.0*annot/total);
     }
 
     private String getRow(DasDgeGoVisualizable vis) {

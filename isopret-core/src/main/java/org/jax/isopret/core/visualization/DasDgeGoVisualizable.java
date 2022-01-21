@@ -11,14 +11,14 @@ public class DasDgeGoVisualizable implements Comparable<DasDgeGoVisualizable> {
     private final int dasStudyAnnotated;
     private final int dasPopTotal;
     private final int dasPopAnnotated;
-    private double dasP;
-    private double dasAdjP;
+    private final double dasP;
+    private final double dasAdjP;
     private final int dgeStudyTotal;
     private final int dgeStudyAnnotated;
     private final int dgePopTotal;
     private final int dgePopAnnotated;
-    private double dgeP;
-    private double dgeAdjP;
+    private final double dgeP;
+    private final double dgeAdjP;
 
 
     public DasDgeGoVisualizable(String goId, String goLabel, int dasStudyTotal, int dasStudyAnnotated, int dasPopTotal, int dasPopAnnotated, double dasP, double dasAdjP, int dgeStudyTotal, int dgeStudyAnnotated, int dgePopTotal, int dgePopAnnotated, double dgeP, double dgeAdjP) {

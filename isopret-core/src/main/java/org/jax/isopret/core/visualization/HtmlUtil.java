@@ -365,7 +365,7 @@ public class HtmlUtil {
     public static String cssWrap(String html) {
         return """
             <!doctype html>
-            <html class="no-js" lang="">          
+            <html class="no-js" lang="">
             <head>
               <meta charset="utf-8">
                 """ +
