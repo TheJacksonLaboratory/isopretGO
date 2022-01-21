@@ -1,5 +1,6 @@
 package org.jax.isopret.gui.service.impl;
 
+import com.google.common.collect.Streams;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,6 +15,7 @@ import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.visualization.DasDgeGoVisualizer;
 import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
@@ -351,6 +353,23 @@ public class IsopretServiceImpl implements IsopretService  {
         return "Gene Ontology (version: " + version +"), " + nterms + " terms.";
     }
 
+    /**
+     *
+     * @param goIds All GO ids that annotate some gene
+     * @return count of GO terms found to be significant and total count
+     */
+    @Override
+    public int totalSignificantGoTermsAnnotatingGene(Set<TermId> goIds) {
+        // total significant terms in DGE/DAS
+        return Streams.concat(dgeGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
+                        filter(goIds::contains),
+                        dasGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
+                                filter(goIds::contains))
+                .collect(Collectors.toSet()).size();
+    }
+
+
+
     @Override
     public HostServicesWrapper getHostServices() {
         return hostServices;
@@ -392,6 +411,19 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public IsopretStats getIsopretStats() {
         return isopretStats;
+    }
+
+    @Override
+    public String getGoReport() {
+        DasDgeGoVisualizer visualizer = new DasDgeGoVisualizer(geneOntology, dasGoTerms, dgeGoTerms);
+        return visualizer.getTsv();
+    }
+
+    @Override
+    public Optional<String> getGoReportDefaultFilename() {
+        if (hbaDealsFile == null) return Optional.empty();
+        String name = hbaDealsFile.getName() + "-" + mtcMethod.name() + "-" + goMethod.name() + ".tsv";
+        return Optional.of(name);
     }
 
 }

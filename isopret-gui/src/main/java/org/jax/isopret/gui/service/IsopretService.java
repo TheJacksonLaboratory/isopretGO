@@ -8,6 +8,7 @@ import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.io.File;
 import java.util.List;
@@ -70,5 +71,12 @@ public interface IsopretService {
 
     GoComparison getGoComparison();
 
+    int totalSignificantGoTermsAnnotatingGene(Set<TermId> goIds);
+
     IsopretStats getIsopretStats();
+
+
+    String getGoReport();
+
+    Optional<String>  getGoReportDefaultFilename();
 }

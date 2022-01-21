@@ -1,5 +1,6 @@
 package org.jax.isopret.gui.widgets;
 
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -120,7 +121,8 @@ public class GoCompWidget {
        text4.setFont(bold);
        text5.setFont(plain);
        TextFlow tflow = new TextFlow(text1, text2, text3, text4, text5);
-       VBox vb = new VBox(hbox, tflow);
+       VBox vb = new VBox(20, hbox, tflow);
+       vb.setPadding(new Insets(20, 20, 10, 20));
        Scene scene = new Scene(vb, 1200, 800);
 
         Stage newWindow = new Stage();

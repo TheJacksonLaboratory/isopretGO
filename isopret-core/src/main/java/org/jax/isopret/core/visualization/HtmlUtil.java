@@ -13,8 +13,13 @@ public class HtmlUtil {
               <title>Isopret: Isoform interpretation</title>
               <meta name="description" content="">
               <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                        
-              <style>
+              %s
+            </head>
+            """;
+
+
+    public static final String css = """
+                  <style>
                         
             * {
                 -moz-box-sizing: border-box;
@@ -205,6 +210,7 @@ public class HtmlUtil {
                text-align: center;
                border-collapse: collapse;
                border: 1px solid #000;
+               width: 95%;
              }
              
              span
@@ -305,19 +311,11 @@ public class HtmlUtil {
                 color: white;
                 cursor: pointer;
             }
-   
-            .badge{
-              font:  Arial, Helvetica, sans-serif;
-              font-size: x-large;
-              font-weight: bolder;
-              line-height: 1;
-              color: #f4f4f4;
-              background-color: #214fe0;
-              padding:0.25rem;
-            }
+  
             </style>
-            </head>
             """;
+
+
 
     public static final String htmlTop = """
             <body>
@@ -360,10 +358,23 @@ public class HtmlUtil {
 
 
     public static String wrap(String html) {
-        return header + htmlTop +  html + bottom;
+        return String.format(header, css) +
+                 htmlTop +  html + bottom;
     }
 
-
+    public static String cssWrap(String html) {
+        return """
+            <!doctype html>
+            <html class="no-js" lang="">
+            <head>
+              <meta charset="utf-8">
+                """ +
+                css +
+                "</head>\n" +
+               html
+                + " </body>\n" +
+                " </html>";
+    }
 
 
 

@@ -41,7 +41,6 @@ public class GoAnnotationMatrix {
                               Set<TermId> significantGoSet,
                               AccessionNumber accessionNumber,
                               Set<TermId> expressedTranscriptSet){
-        List<GoAnnotationRow> rows = new ArrayList<>();
         // The termId (key) of transcriptToGoMap corresponds to an accession number
        // TermId accessionId = accessionNumber.toTermId();
         this.accession = accessionNumber.getAccessionString();
@@ -58,8 +57,7 @@ public class GoAnnotationMatrix {
                     .collect(Collectors.toList());
             LOGGER.trace("Got {} transcript Ids for {}", transcriptIds.size(), accessionNumber.getAccessionString());
             LOGGER.trace("Gene: {}", accessionNumber.getAccessionString());
-
-            rows = allAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
+            List<GoAnnotationRow> rows = allAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
             Collections.sort(rows);
             annotationRows = List.copyOf(rows);
             rows = expressedAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
@@ -72,7 +70,6 @@ public class GoAnnotationMatrix {
             annotationRows = List.of();
             expressedAnnotationRows = List.of();
         }
-
     }
 
 
@@ -169,4 +166,9 @@ public class GoAnnotationMatrix {
         return  this.expressedTranscriptIds.stream().map(TermId::getValue).collect(Collectors.toList());
     }
 
+    public Set<TermId> getAllGoIds() {
+        return annotationRows.stream()
+                .map(GoAnnotationRow::getGoId)
+                .collect(Collectors.toSet());
+    }
 }

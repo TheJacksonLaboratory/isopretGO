@@ -30,7 +30,7 @@ public class HtmlVisualizer implements Visualizer {
 
     @Override
     public String getHtml(Visualizable vis) {
-        return getGeneNameAndBadges(vis) +
+        return  "<h1>" + vis.getGeneSymbol() + "</h1>\n" +
                 getSingleGeneSummary(vis) +
                 getSingleGeneTranscriptSummary(vis) +
                 getTranscriptBox(vis) +
@@ -49,18 +49,7 @@ public class HtmlVisualizer implements Visualizer {
                 ;
     }
 
-    public String getGeneNameAndBadges(Visualizable vis) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<h1>").append(vis.getGeneSymbol());
-        if (vis.isDifferentiallyExpressed()) {
-            sb.append(" <span class=\"badge\">DGE</span> ");
-        }
-        if (vis.isDifferentiallySpliced()) {
-            sb.append(" <span class=\"badge\">DAS</span>");
-        }
-        sb.append("</h1>\n");
-        return sb.toString();
-    }
+
 
 
     public String getSingleGeneSummary(Visualizable visualizable) {
