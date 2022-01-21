@@ -9,7 +9,6 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.effect.DropShadow?>
@@ -27,19 +26,13 @@
         <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
             <MenuBar minHeight="30.0" minWidth="183.0" HBox.hgrow="NEVER">
                 <Menu mnemonicParsing="false" text="File">
-                    <MenuItem accelerator="Shortcut+N" mnemonicParsing="false" text="New" />
-                    <MenuItem accelerator="Shortcut+S" mnemonicParsing="false" text="Save project" />
-                    <MenuItem mnemonicParsing="false" text="Save project and close" />
                     <MenuItem accelerator="Shortcut+Q" mnemonicParsing="false" onAction="#exitGui" text="Quit" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
-                    <MenuItem mnemonicParsing="false" text="Show settings of current project" onAction="#showStats"/>
-                    <MenuItem mnemonicParsing="false" text="Set proxy" />
+                    <MenuItem mnemonicParsing="false" onAction="#showStats" text="Show settings of current project" />
                 </Menu>
                 <Menu mnemonicParsing="false" text="Export">
-                    <MenuItem mnemonicParsing="false" text="Display report" />
-                    <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem mnemonicParsing="false" text="Export report" />
+                    <MenuItem mnemonicParsing="false" onAction="#exportGoReport" text="Export GO overrepresentation results" />
                 </Menu>
             </MenuBar>
             <Region styleClass="menu-bar" HBox.hgrow="SOMETIMES" />

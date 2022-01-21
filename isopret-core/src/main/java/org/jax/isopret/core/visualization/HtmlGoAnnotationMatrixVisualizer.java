@@ -2,23 +2,32 @@ package org.jax.isopret.core.visualization;
 
 import java.util.List;
 
+/**
+ * This class creates an HTML table with all of the GO annotations of
+ * a gene. GO terms that are significant for the study set are marked
+ * green.
+ * @author Peter N Robinson
+ */
 public class HtmlGoAnnotationMatrixVisualizer {
 
     private final String html;
-
 
     /**
      *
      * Build a table with go annotations without HTML header or foter
      */
     public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(htmlTableHeader(matrix.getTranscripts()));
-        for (GoAnnotationRow row : matrix.getAnnotationRows()) {
-            sb.append(getRow(row));
+        if (matrix.getAllGoIds().isEmpty()) {
+            this.html = "<p>No Gene Ontology annotations found.</p>";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append(htmlTableHeader(matrix.getTranscripts()));
+            for (GoAnnotationRow row : matrix.getAnnotationRows()) {
+                sb.append(getRow(row));
+            }
+            sb.append("</table>\n");
+            html = sb.toString();
         }
-        sb.append("</table>\n");
-        html = sb.toString();
     }
 
     private String getRow(GoAnnotationRow row) {

@@ -200,6 +200,18 @@ public class AnalysisController implements Initializable {
         });
     }
 
+    /**
+     * This is called when previous results are in the GUI and the user
+     * starts a new analysis.
+     */
+    public void clearPreviousResults() {
+        javafx.application.Platform.runLater(() -> {
+            hbaGeneResultTableView.getItems().clear(); /* clear previous rows, if any */
+            lviewKey.getItems().clear();
+            lviewValue.getItems().clear();
+        });
+    }
+
 
     /**
      * This method creates a new {@link Tab} populated with a viewpoint!
@@ -285,4 +297,6 @@ public class AnalysisController implements Initializable {
         label.prefWidthProperty().bind(stack.prefWidthProperty());
         col.setGraphic(stack);
     }
+
+
 }

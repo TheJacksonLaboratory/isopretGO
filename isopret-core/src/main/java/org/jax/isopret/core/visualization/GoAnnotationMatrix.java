@@ -169,4 +169,9 @@ public class GoAnnotationMatrix {
         return  this.expressedTranscriptIds.stream().map(TermId::getValue).collect(Collectors.toList());
     }
 
+    public Set<TermId> getAllGoIds() {
+        return annotationRows.stream()
+                .map(GoAnnotationRow::getGoId)
+                .collect(Collectors.toSet());
+    }
 }

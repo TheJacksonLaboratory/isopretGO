@@ -1,8 +1,10 @@
 package org.jax.isopret.core.visualization;
 
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for classes that help to display the results
@@ -66,7 +68,8 @@ public interface Visualizable {
     GoAnnotationMatrix getGoAnnotationMatrix();
 
     String getGoHtml();
-    int getI();
+
+    Set<TermId> getAnnotationGoIds();
 
 
 }

@@ -27,7 +27,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
@@ -202,6 +204,20 @@ public class MainController implements Initializable {
     @FXML
     private void isopretAnalysis(ActionEvent actionEvent) {
         LOGGER.trace("Doing isopret analysis");
+        // close any previous tabs, but keeping the setup and analysis tab
+        ObservableList<Tab> panes = this.tabPane.getTabs();
+        // If tabs are still open from a previous analysis, close them first
+        // collect tabs first then remove them -- avoids a ConcurrentModificationException
+        List<Tab> tabsToBeRemoved=new ArrayList<>();
+        // close all tabs except setup and analysis.
+        for (Tab tab : panes) {
+            String id=tab.getId();
+            if (id != null && (id.equals("setupTab") || id.equals("analysisTab") )) { continue; }
+            tabsToBeRemoved.add(tab);
+        }
+        this.tabPane.getTabs().removeAll(tabsToBeRemoved);
+        // clear the previous analysis result
+        this.analysisController.clearPreviousResults();
         Optional<File> downloadOpt = service.getDownloadDir();
         if (downloadOpt.isEmpty()) {
             PopupFactory.displayError("ERROR", "Could not find download directory");
@@ -311,5 +327,29 @@ public class MainController implements Initializable {
         IsopretStatsWidget widget = new IsopretStatsWidget(service.getIsopretStats(), basename);
         widget.show();
         actionEvent.consume();
+    }
+
+    public void exportGoReport(ActionEvent actionEvent) {
+        String report = service.getGoReport();
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.setTitle("Save GO Overrepresentation results");
+        Optional<String> opt = service.getGoReportDefaultFilename();
+        if (opt.isEmpty()) {
+            PopupFactory.displayError("Error", "could not retrieve file name");
+            return; // should never happen
+        }
+        chooser.setInitialFileName(opt.get());
+        File file = chooser.showSaveDialog(rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().equals("")) {
+            LOGGER.error("Could not get HBA-DEALS file");
+            PopupFactory.displayError("Error","Could not get HBA-DEALS file.");
+            return;
+        }
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            bw.write(report);
+        } catch (IOException e) {
+            PopupFactory.displayException("Error", "Could not write GO report", e);
+        }
     }
 }

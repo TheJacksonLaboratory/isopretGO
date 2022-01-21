@@ -10,6 +10,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.web.WebView?>
 
 <ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
@@ -73,19 +74,8 @@
                     </TableView>
                     <WebView fx:id="hbaProteinWebView" prefHeight="861.0" prefWidth="1203.0" />
                     <VBox>
-                        <HBox prefHeight="100.0" prefWidth="1200.0">
-                            <Label fx:id="goAnnotationsForGeneLabel" minWidth="300.0">
-                                <HBox.margin>
-                                    <Insets bottom="5" left="20.0" />
-                                </HBox.margin></Label>
-                        </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                      <Label minWidth="300.0" text="Significant GO terms shown in green">
-                        <HBox.margin>
-                          <Insets left="20.0" />
-                        </HBox.margin>
-                      </Label>
-                  </HBox>
+                         <TextFlow fx:id="goAnnotationsTextFlow" minWidth="1100.0">
+                                </TextFlow>
                     </VBox>
                     <WebView fx:id="hbaGoWebView" prefHeight="861.0" prefWidth="1203.0" />
 

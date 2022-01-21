@@ -74,7 +74,6 @@ public class GoComparison {
         terms.addAll(dasGoCompTermList);
         terms.addAll(dgeGoCompTermList);
         Collections.sort(terms);
-
         return terms;
     }
 
@@ -93,7 +92,7 @@ public class GoComparison {
     }
 
     public List<GoCompTerm> getDasSignificant() {
-        return this.dgeGoCompTermList.stream()
+        return this.dasGoCompTermList.stream()
                 .filter(GoCompTerm::dasSignificant)
                 .collect(Collectors.toList());
     }

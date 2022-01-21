@@ -7,6 +7,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
@@ -16,6 +20,7 @@ import org.jax.isopret.core.visualization.*;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -30,11 +35,13 @@ import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 @Component
 @Scope("prototype")
 public class HbaGeneController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaGeneController.class.getName());
+    public TextFlow goAnnotationsTextFlow;
 
     @FXML
     private TableView<IsoformVisualizable> isoformTableView;
@@ -58,8 +65,7 @@ public class HbaGeneController implements Initializable {
 
     @FXML
     private Label hbaGeneLabel;
-    @FXML
-    private Label goAnnotationsForGeneLabel;
+
     @FXML
     private Hyperlink geneHyperlink;
     @FXML
@@ -87,10 +93,32 @@ public class HbaGeneController implements Initializable {
         this.hostServicesWrapper = wrapper;
     }
 
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.hbaGeneLabel.setText(visualizable.getGeneSymbol());
-        this.goAnnotationsForGeneLabel.setText(String.format("Gene Ontology annotations for %s",visualizable.getGeneAccession()));
+        Text geneSymbolText = new Text(String.format("Gene Ontology annotations for %s (%s)\n",
+                visualizable.getGeneSymbol(),
+                visualizable.getGeneAccession()));
+        geneSymbolText.setFont(Font.font("Verdana", FontWeight.BOLD,16));
+        Set<TermId> annotatingGoTerms = visualizable.getAnnotationGoIds();
+        int total = annotatingGoTerms.size();
+        int signf = service.totalSignificantGoTermsAnnotatingGene(annotatingGoTerms);
+        Text explanation;
+        if (total == 0) {
+            explanation = new Text("No annotating GO terms were found");
+        } else if (signf == 1) {
+            explanation = new Text(String.format("%d GO terms annotate %s, of which 1 was significant for DGE or DAS",
+                    total, visualizable.getGeneSymbol()));
+        } else {
+            explanation = new Text(String.format("%d GO terms annotate %s, of which %d were significant for DGE or DAS",
+                    total, visualizable.getGeneSymbol(), signf));
+        }
+        explanation.setFont(Font.font("Verdana", FontWeight.NORMAL,12));
+        this.goAnnotationsTextFlow.getChildren().addAll(geneSymbolText, explanation);
+
+
         String geneAccession = visualizable.getGeneAccession();
         geneHyperlink.setText(geneAccession);
 
@@ -152,7 +180,7 @@ public class HbaGeneController implements Initializable {
             isoformTableView.setFixedCellSize(25);
             isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             hbaGeneWebView.setMaxHeight(visualizable.getIsoformSvgHeight());
-            hbaProteinWebView.setMaxHeight(visualizable.getProteinSvgHeight());
+            hbaProteinWebView.setMaxHeight(visualizable.getProteinSvgHeight()+30);
             interproTableView.getItems().clear();
             interproTableView.getItems().addAll(visualizable.getInterproVisualizable());
             interproTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -160,7 +188,7 @@ public class HbaGeneController implements Initializable {
             interproTableView.prefHeightProperty().bind(Bindings.size(interproTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             WebEngine goEngine = hbaGoWebView.getEngine();
             String goTable = this.visualizable.getGoHtml();
-            String html = HtmlUtil.wrap(goTable);
+            String html = HtmlUtil.cssWrap(goTable);
             goEngine.loadContent(html);
         });
     }

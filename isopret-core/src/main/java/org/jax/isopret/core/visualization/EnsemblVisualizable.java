@@ -7,6 +7,7 @@ import org.jax.isopret.core.interpro.InterproEntry;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.transcript.Transcript;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.Contig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,6 +251,12 @@ public class EnsemblVisualizable implements Visualizable {
     public GoAnnotationMatrix getGoAnnotationMatrix() {
         return this.annotationMatrix;
     }
+
+    @Override
+    public Set<TermId> getAnnotationGoIds() {
+        return this.annotationMatrix.getAllGoIds();
+    }
+
 
     @Override
     public String getGoHtml() {
