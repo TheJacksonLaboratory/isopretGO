@@ -17,9 +17,7 @@ public class Main implements Callable<Integer> {
         }
         CommandLine cline = new CommandLine(new Main())
                 .addSubcommand("download", new DownloadCommand())
-                .addSubcommand("test/resources/hbadeals", new HbaDealsCommand())
-                .addSubcommand("overrep", new GoOverrepCommand())
-                .addSubcommand("svg", new SvgCommand());
+                .addSubcommand("overrep", new GoOverrepCommand());
         cline.setToggleBooleanFlags(false);
         int exitCode = cline.execute(args);
         System.exit(exitCode);

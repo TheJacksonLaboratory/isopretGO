@@ -104,10 +104,6 @@ public class EnsemblVisualizable implements Visualizable {
         }
     }
 
-    public int getI() {
-        return i;
-    }
-
     @Override
     public int getDifferentialTranscriptCount() {
         double splicingThresh = agene.getSplicingThreshold();

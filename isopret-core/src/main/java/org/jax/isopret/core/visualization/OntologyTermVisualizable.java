@@ -8,7 +8,7 @@ public class OntologyTermVisualizable {
     private final String termLabel;
 
     public OntologyTermVisualizable(Term term) {
-        this.termId = term.getId().getValue();
+        this.termId = term.id().getValue();
         this.termLabel = term.getName();
     }
 

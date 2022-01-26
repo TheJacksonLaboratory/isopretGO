@@ -105,7 +105,7 @@ public class GoDisplayWidget {
         HBox hbox = new HBox();
 
         VBox dgeVbox = getBarChartPane();
-        dgeVbox.setSpacing(15);;
+        dgeVbox.setSpacing(15);
         hbox.getChildren().addAll(dgeVbox);
         Font plain = Font.font("TimeRoman", 16);
         Font bold = Font.font("TimesRoman", FontWeight.BOLD, FontPosture.ITALIC, 16);

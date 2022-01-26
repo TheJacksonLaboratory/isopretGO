@@ -151,14 +151,14 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      * @return true if this gene is differentially expression
      */
     public boolean passesExpressionThreshold() {
-        return this.differentiallyExpressed == null ? true : this.differentiallyExpressed;
+        return this.differentiallyExpressed == null || this.differentiallyExpressed;
     }
     /**
      * If a differential expression threshold was provided, return its value. Otherwise we are not thresholding, return true
      * @return true if this gene is differentially spliced
      */
     public boolean passesSplicingThreshold() {
-        return this.differentiallySpliced == null ? true : this.differentiallySpliced;
+        return this.differentiallySpliced == null || this.differentiallySpliced;
     }
 
     public boolean passesSplicingAndExpressionThreshold() {

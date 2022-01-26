@@ -164,6 +164,7 @@ public class AnalysisController implements Initializable {
         if (d == null) return "1.0";
         else if (d > 0.01) return String.format("%.3f", d);
         else if (d > 0.001) return String.format("%.4f", d);
+        else if (d == 0.0) return "0";
         else return fmt.format("%16.2e",d).toString();
     }
 

@@ -44,7 +44,7 @@ public class IsopretTermAnnotation implements TermAnnotation {
     @Override
     public int compareTo(TermAnnotation that) {
         return ComparisonChain.start()
-                .compare(this.getTermId(), that.getTermId())
+                .compare(this.getTermId(), that.getItemId())
                 .compare(this.getItemId(), that.getItemId())
                 .result();
     }
@@ -57,5 +57,10 @@ public class IsopretTermAnnotation implements TermAnnotation {
     @Override
     public String toString() {
         return "IsopretTermAnnotation [" + accessionNumber.getValue()+ ": " + goTermId.getValue() + "]";
+    }
+
+    @Override
+    public TermId id() { // TODO checkme
+        return accessionNumber;
     }
 }

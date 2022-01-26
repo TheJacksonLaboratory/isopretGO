@@ -36,12 +36,12 @@ public class IsopretAnnotations implements ItemAnnotations<TermId> {
 
     @Override
     public List<TermId> getAnnotatingTermIds() {
-        return this.annotations.stream().map(TermAnnotation::getTermId).collect(Collectors.toList());
+        return this.annotations.stream().map(TermAnnotation::getItemId).collect(Collectors.toList());
     }
 
     @Override
     public boolean containsAnnotation(TermId tid) {
-        return annotations.stream().anyMatch(a -> a.getTermId().equals(tid));
+        return annotations.stream().anyMatch(a -> a.getItemId().equals(tid));
     }
 
     @Override

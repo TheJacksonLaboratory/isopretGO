@@ -89,7 +89,12 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         LOGGER.info("About to create transcript container");
         IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology,transcriptIdToGoTermsMap, gene2GoMap);
         AssociationContainer<TermId> transcriptContainer = isoContainerFac.transcriptContainer();
+        LOGGER.info("transcriptContainer terms n={}", transcriptContainer.getAnnotatingTermCount());
+        LOGGER.info("transcriptContainer items n={}", transcriptContainer.getAnnotatedDomainItemCount());
         AssociationContainer<TermId> geneContainer = isoContainerFac.geneContainer();
+        LOGGER.info("geneContainer terms n={}", geneContainer.getAnnotatingTermCount());
+        LOGGER.info("geneContainer items n={}", geneContainer.getAnnotatedDomainItemCount());
+
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbadealsFile, hgncMap);
@@ -102,6 +107,8 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
                 geneContainer,
                 transcriptContainer);
         LOGGER.info("Initialized HBADealsThresholder");
+        LOGGER.info("isoThresholder.getDgePopulation().getAnnotatedItemCount()={}"
+                ,isoThresholder.getDgePopulation().getAnnotatedItemCount());
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
         LOGGER.info("Using Gene Ontology approach {}", goMethod.name());
