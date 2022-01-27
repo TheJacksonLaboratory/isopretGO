@@ -130,9 +130,7 @@ public class GeneOntologyController implements Initializable {
                 String termId = geneRow.getGoTermId();
                 TermId tid = TermId.of(termId);
                 Button btn = new Button("Export");
-                btn.setOnAction(e -> {
-                    openExport(tid);
-                });
+                btn.setOnAction(e -> openExport(tid));
                 // wrap it so it can be displayed in the TableView
                 return new ReadOnlyObjectWrapper<>(btn);
             });
@@ -200,10 +198,10 @@ public class GeneOntologyController implements Initializable {
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == buttonTypeOne){
+        if (result.isPresent() && result.get().equals(buttonTypeOne)){
             System.out.println("EXPORT FOR GENE Splicing");
             alert.close();
-        } else if (result.isPresent() && result.get() == buttonTypeTwo){
+        } else if (result.isPresent() && result.get().equals(buttonTypeTwo)){
             System.out.println("EXPORT FOR GENE Expression");
             alert.close();
         } else {
