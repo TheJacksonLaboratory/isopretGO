@@ -62,6 +62,20 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
         return mp;
     }
 
+    public List<TermId> getDomainItemsAnnotatedByGoTerm(TermId goTermId) {
+        List<TermId> domainItemList = new ArrayList<>();
+        if (associationMap.containsKey(goTermId)) {
+            IsopretAnnotations annotations = associationMap.get(goTermId);
+            for (TermAnnotation annot : annotations.getAnnotations()) {
+                //IsopretTermAnnotation ita = (IsopretTermAnnotation) annot;
+                domainItemList.add(annot.getItemId());
+            }
+        }
+        return domainItemList;
+    }
+
+
+
     @Override
     public Map<TermId, DirectAndIndirectTermAnnotations> getAssociationMap(Set<TermId> annotatedItemTermIds) {
         // 1. Get all of the direct GO annotations to the genes. Key: domain item; value: annotating Ontlogy terms

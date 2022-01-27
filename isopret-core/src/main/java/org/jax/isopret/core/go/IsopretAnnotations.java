@@ -4,6 +4,7 @@ import org.monarchinitiative.phenol.analysis.ItemAnnotations;
 import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,9 +31,15 @@ public class IsopretAnnotations implements ItemAnnotations<TermId> {
         return this.annotations;
     }
 
+    // TODO  -- cast needed with new phenol API, but will be refactored!
     @Override
     public List<TermId> getAnnotatingTermIds() {
-        return this.annotations.stream().map(TermAnnotation::getItemId).collect(Collectors.toList());
+        List<TermId> goTermIds = new ArrayList<>();
+        for (TermAnnotation tannot : this.annotations) {
+            IsopretTermAnnotation ita = (IsopretTermAnnotation) tannot;
+            goTermIds.add(ita.getTermId());
+        }
+        return goTermIds;
     }
 
     @Override

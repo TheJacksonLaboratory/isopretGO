@@ -423,4 +423,48 @@ public class IsopretServiceImpl implements IsopretService  {
         return Optional.of(name);
     }
 
+    @Override
+    public List<Visualizable> getDgeForGoTerm(TermId goId) {
+        double expThres = this.thresholder.getExpressionPepThreshold();
+        List<HbaDealsResult> dge = this.thresholder.getRawResults().values()
+                .stream()
+                .filter(h -> h.hasDifferentialExpressionResult(expThres))
+                .collect(Collectors.toList());
+        // now figure out which of these genes are annotated to goId
+        Map<TermId, List<TermId>> go2domainListMap = this.geneContainer.getOntologyTermToDomainItemsMap();
+        List<TermId> domainIds = go2domainListMap.getOrDefault(goId, new ArrayList<>());
+        Set<TermId> domainIdSet = new HashSet<>(domainIds);
+        List<String> symbols = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
+                .map(HbaDealsResult::getSymbol)
+                .collect(Collectors.toList());
+        // transform to visualizable
+        List<Visualizable> visualizables = new ArrayList<>();
+        for (String sym : symbols) {
+            visualizables.add(getVisualizableForGene(sym));
+        }
+        return visualizables;
+    }
+
+    @Override
+    public List<Visualizable> getDasForGoTerm(TermId goId) {
+        double splicingPepThreshold = this.thresholder.getSplicingPepThreshold();
+        List<HbaDealsResult> das = this.thresholder.getRawResults().values()
+                .stream()
+                .filter(h -> h.hasDifferentialSplicingResult(splicingPepThreshold))
+                .collect(Collectors.toList());
+        // now figure out which of these genes are annotated to goId
+        List<TermId> domainIds = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);
+              //  getOntologyTermToDomainItemsMap().getOrDefault(goId, new ArrayList<>());
+        Set<TermId> domainIdSet = new HashSet<>(domainIds);
+        List<String> symbols = das.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
+                .map(HbaDealsResult::getSymbol)
+                .collect(Collectors.toList());
+        // transform to visualizable
+        List<Visualizable> visualizables = new ArrayList<>();
+        for (String sym : symbols) {
+            visualizables.add(getVisualizableForGene(sym));
+        }
+        return visualizables;
+    }
+
 }
