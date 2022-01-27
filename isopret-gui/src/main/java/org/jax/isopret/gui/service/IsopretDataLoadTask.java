@@ -215,8 +215,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.dgeStudy(isoformSpecificThresholder.getDgeStudy().getAnnotatedItemCount());
         isopretStatsBuilder.dgePopulation(isoformSpecificThresholder.getDgePopulation().getAnnotatedItemCount());
         isopretStatsBuilder.fdrThreshold(isoformSpecificThresholder.getFdrThreshold());
-        isopretStatsBuilder.expressionPthreshold(isoformSpecificThresholder.getExpressionThreshold());
-        isopretStatsBuilder.splicingPthreshold(isoformSpecificThresholder.getSplicingThreshold());
+        isopretStatsBuilder.expressionPthreshold(isoformSpecificThresholder.getExpressionPepThreshold());
+        isopretStatsBuilder.splicingPthreshold(isoformSpecificThresholder.getSplicingPepThreshold());
 
         HbaDealsGoAnalysis dgeGoAnalysis = new HbaDealsGoAnalysis(geneOntology,
                 isoformSpecificThresholder.getDgeStudy(),

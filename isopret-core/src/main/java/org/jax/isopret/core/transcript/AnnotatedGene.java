@@ -6,7 +6,6 @@ import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -151,14 +150,14 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      * @return true if this gene is differentially expression
      */
     public boolean passesExpressionThreshold() {
-        return this.differentiallyExpressed == null ? true : this.differentiallyExpressed;
+        return this.differentiallyExpressed == null || this.differentiallyExpressed;
     }
     /**
      * If a differential expression threshold was provided, return its value. Otherwise we are not thresholding, return true
      * @return true if this gene is differentially spliced
      */
     public boolean passesSplicingThreshold() {
-        return this.differentiallySpliced == null ? true : this.differentiallySpliced;
+        return this.differentiallySpliced == null || this.differentiallySpliced;
     }
 
     public boolean passesSplicingAndExpressionThreshold() {
@@ -189,8 +188,9 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     /**
      * We are sort by whether a gene is differentially spliced and then alphabetically
      */
+    @SuppressWarnings("NullableProblems")
     @Override
-    public int compareTo(@NotNull AnnotatedGene that) {
+    public int compareTo(AnnotatedGene that) {
         if (that==null) return 0;
         if (this.passesSplicingAndExpressionThreshold() && (!that.passesSplicingAndExpressionThreshold())) {
             return -1;

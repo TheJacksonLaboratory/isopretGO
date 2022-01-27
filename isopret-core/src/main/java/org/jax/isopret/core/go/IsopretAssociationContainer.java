@@ -13,6 +13,14 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class extends a class from phenol and contains the information
+ * that we need to do GO analysis. isopret will initialize this class once for
+ * transcripts and once for genes. The key object in the class is the
+ * {@link #associationMap}. The keys for this map are the gene or transcript ids
+ * (expressed as TermIds), and the values are {@link IsopretAnnotations} objects
+ * that represent the annotated genes.
+ */
 public class IsopretAssociationContainer implements AssociationContainer<TermId> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(IsopretAssociationContainer.class);
@@ -37,6 +45,10 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
 
     }
 
+    /**
+     *
+     * @return map with key -- a GO term id, value -- list of annotated genes.
+     */
     @Override
     public Map<TermId, List<TermId>> getOntologyTermToDomainItemsMap() {
         Map<TermId, List<TermId>> mp = new HashMap<>();
@@ -63,8 +75,10 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
             }
             IsopretAnnotations assocs = this.associationMap.get(domainTermId);
             for (TermAnnotation termAnnotation : assocs.getAnnotations()) {
+                IsopretTermAnnotation ita = (IsopretTermAnnotation) termAnnotation;
+
                 /* In this step add the direct annotations only */
-                TermId ontologyTermId = termAnnotation.getTermId();
+                TermId ontologyTermId = ita.getTermId();
                 // check if the term is in the ontology (sometimes, obsoletes are used in the bla32 files)
                 Term term = this.ontology.getTermMap().get(ontologyTermId);
                 if (term == null) {

@@ -1,6 +1,7 @@
 package org.jax.isopret.gui.controller;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.jax.isopret.core.visualization.*;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -48,7 +50,7 @@ public class HbaGeneController implements Initializable {
     @FXML
     private TableColumn<IsoformVisualizable, String> accessionColumn;
     @FXML
-    private TableColumn<IsoformVisualizable, String> urlColumn;
+    private TableColumn<IsoformVisualizable, Button> urlColumn;
     @FXML
     private TableColumn<IsoformVisualizable, String> isoformLogFcColumn;
     @FXML
@@ -124,7 +126,7 @@ public class HbaGeneController implements Initializable {
 
         String fc = String.format("Gene expression fold-change: %.2f", visualizable.getExpressionFoldChange());
         geneFoldChangeLabel.setText(fc);
-        String prob = String.format("Probability (PEP): %.2f", visualizable.getExpressionPval());
+        String prob = String.format("Probability (PEP): %.2f", visualizable.getExpressionPep());
         this.geneProbabilityLabel.setText(prob);
         // isoform table
         accessionColumn.setSortable(false);
@@ -132,7 +134,19 @@ public class HbaGeneController implements Initializable {
         accessionColumn.setCellValueFactory(v ->  new ReadOnlyStringWrapper(v.getValue().transcriptAccession()));
         urlColumn.setEditable(false);
         urlColumn.setSortable(false);
-        urlColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper("todo"));
+        //urlColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper("todo"));
+
+        urlColumn.setCellValueFactory(cdf -> {
+            IsoformVisualizable vis = cdf.getValue();
+            String acc = vis.transcriptAccession();
+            String ensemblUrl = "https://www.ensembl.org/Homo_sapiens/Transcript/Summary?db=core;t=" +acc;            Button btn = new Button("Ensembl");
+            btn.setOnAction(e -> { this.hostServicesWrapper.showDocument(ensemblUrl);
+                LOGGER.trace(String.format("Calling URL: %s", ensemblUrl));
+            });
+            // wrap it so it can be displayed in the TableView
+            return new ReadOnlyObjectWrapper<>(btn);
+        });
+
         isoformLogFcColumn.setSortable(false);
         isoformLogFcColumn.setEditable(false);
         isoformLogFcColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().log2Foldchange()));

@@ -104,10 +104,6 @@ public class EnsemblVisualizable implements Visualizable {
         }
     }
 
-    public int getI() {
-        return i;
-    }
-
     @Override
     public int getDifferentialTranscriptCount() {
         double splicingThresh = agene.getSplicingThreshold();
@@ -169,7 +165,7 @@ public class EnsemblVisualizable implements Visualizable {
     }
 
     @Override
-    public double getExpressionPval() {
+    public double getExpressionPep() {
         return this.hbaDealsResult.getExpressionP();
     }
 
@@ -255,6 +251,16 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public Set<TermId> getAnnotationGoIds() {
         return this.annotationMatrix.getAllGoIds();
+    }
+
+    @Override
+    public DoublePepValue getExpressionPepValue() {
+        return new DoublePepValue(getExpressionPep(), isDifferentiallyExpressed());
+    }
+
+    @Override
+    public DoublePepValue getSplicingPepValue() {
+        return new DoublePepValue(getBestSplicingPval(), isDifferentiallySpliced());
     }
 
 

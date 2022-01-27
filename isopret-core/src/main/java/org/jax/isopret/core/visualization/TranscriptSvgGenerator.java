@@ -493,11 +493,8 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             double height = logFc * -factor;
             writer.write(SvgUtil.filledBox(boxstart, ypos, width, height, BLACK, RED));
         }
-        String txt = String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-size:24px;\">%s</text>\n",
-                xpos, ypos, PURPLE, getFormatedPvalue(logFc, prob, differential));
-        txt = SvgUtil.text(xpos, ypos,PURPLE, 12, getFormatedPvalue(logFc, prob, differential));
+        String txt = SvgUtil.text(xpos, ypos,PURPLE, 12, getFormatedPvalue(logFc, prob, differential));
         writer.write(txt);
-
     }
 
     /**

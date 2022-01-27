@@ -70,11 +70,7 @@ public class GoComparison {
     }
 
     public List<GoCompTerm> getGoCompTermList() {
-        List<GoCompTerm> terms = new ArrayList<>();
-        terms.addAll(dasGoCompTermList);
-        terms.addAll(dgeGoCompTermList);
-        Collections.sort(terms);
-        return terms;
+        return goCompTermList;
     }
 
     public List<GoCompTerm> getDgePredominentGoCompTerms() {

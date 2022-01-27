@@ -57,8 +57,6 @@ public class IsopretServiceImpl implements IsopretService  {
     private File hbaDealsFile = null;
     private GoMethod goMethod = GoMethod.TFT;
     private MtcMethod mtcMethod = MtcMethod.NONE;
-
-    private List<String> analysisErrors = null;
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
     private HbaDealsIsoformSpecificThresholder thresholder = null;
@@ -203,7 +201,6 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public void setData(IsopretDataLoadTask task) {
-        this.analysisErrors = task.getErrors();
         this.geneOntology = task.getGeneOntology();
         this.interproMapper = task.getInterproMapper();
         this.geneSymbolToTranscriptMap = task.getGeneSymbolToTranscriptMap();
@@ -258,8 +255,8 @@ public class IsopretServiceImpl implements IsopretService  {
         }
         List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(symbol);
         HbaDealsResult result = thresholder.getRawResults().get(symbol);
-        double splicingThreshold = thresholder.getSplicingThreshold();
-        double expressionThreshold = thresholder.getExpressionThreshold();
+        double splicingThreshold = thresholder.getSplicingPepThreshold();
+        double expressionThreshold = thresholder.getExpressionPepThreshold();
         Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
                 interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
         AnnotatedGene agene = new AnnotatedGene(transcripts,
@@ -286,8 +283,8 @@ public class IsopretServiceImpl implements IsopretService  {
                 continue;
             }
             List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
-            double splicingThreshold = thresholder.getSplicingThreshold();
-            double expressionThreshold = thresholder.getExpressionThreshold();
+            double splicingThreshold = thresholder.getSplicingPepThreshold();
+            double expressionThreshold = thresholder.getExpressionPepThreshold();
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
                     interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
             AnnotatedGene agene = new AnnotatedGene(transcripts,

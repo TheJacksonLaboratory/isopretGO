@@ -25,9 +25,9 @@ public class HbaDealsIsoformSpecificThresholder {
     private static final double DEFAULT_THRESHOLD = 0.05;
 
     /** Probability threshold for expression results that attains fdrThreshold FDR for expression. */
-    private final double expressionThreshold;
+    private final double expressionPepThreshold;
     /** Probability threshold for splicing results that attains fdrThreshold FDR for splicing. */
-    private final double splicingThreshold;
+    private final double splicingPepThreshold;
 
     private final StudySet dgeStudy;
     private final StudySet dgePopulation;
@@ -67,22 +67,22 @@ public class HbaDealsIsoformSpecificThresholder {
                 .stream()
                 .map(HbaDealsResult::getExpressionP)
                 .collect(Collectors.toList());
-        ProbThreshold probThresholdExpression = new ProbThreshold(expressionProbs, fdrThreshold);
-        this.expressionThreshold = probThresholdExpression.getQvalueThreshold();
-        LOGGER.info("Expression threshold {}", this.expressionThreshold);
+        PosteriorErrorProbThreshold probThresholdExpression = new PosteriorErrorProbThreshold(expressionProbs, fdrThreshold);
+        this.expressionPepThreshold = probThresholdExpression.getPepThreshold();
+        LOGGER.info("Expression PEP threshold {}", this.expressionPepThreshold);
         List<Double> splicingProbs = results
                 .values()
                 .stream()
                 .map(HbaDealsResult::getSplicingPlist)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
-        ProbThreshold probThresholdSplicing = new ProbThreshold(splicingProbs, fdrThreshold);
-        this.splicingThreshold = probThresholdSplicing.getQvalueThreshold();
-        LOGGER.info("Splicing threshold {}", this.expressionThreshold);
+        PosteriorErrorProbThreshold probThresholdSplicing = new PosteriorErrorProbThreshold(splicingProbs, fdrThreshold);
+        this.splicingPepThreshold = probThresholdSplicing.getPepThreshold();
+        LOGGER.info("Splicing PEP threshold {}", this.expressionPepThreshold);
         Set<TermId> dgeSignificant = results
                 .values()
                 .stream()
-                .filter(r -> r.getExpressionP() <= this.expressionThreshold)
+                .filter(r -> r.getExpressionP() <= this.expressionPepThreshold)
                 .map(HbaDealsResult::getGeneAccession)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
@@ -102,7 +102,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .values()
                 .stream()
                 .flatMap(r -> r.getTranscriptResults().stream())
-                .filter(tr -> tr.getP() <= splicingThreshold)
+                .filter(tr -> tr.getP() <= splicingPepThreshold)
                 .map(HbaDealsTranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
@@ -148,12 +148,12 @@ public class HbaDealsIsoformSpecificThresholder {
     }
 
 
-    public double getExpressionThreshold() {
-        return expressionThreshold;
+    public double getExpressionPepThreshold() {
+        return expressionPepThreshold;
     }
 
-    public double getSplicingThreshold() {
-        return splicingThreshold;
+    public double getSplicingPepThreshold() {
+        return splicingPepThreshold;
     }
 
 
