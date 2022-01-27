@@ -6,7 +6,6 @@ import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -189,8 +188,9 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     /**
      * We are sort by whether a gene is differentially spliced and then alphabetically
      */
+    @SuppressWarnings("NullableProblems")
     @Override
-    public int compareTo(@NotNull AnnotatedGene that) {
+    public int compareTo(AnnotatedGene that) {
         if (that==null) return 0;
         if (this.passesSplicingAndExpressionThreshold() && (!that.passesSplicingAndExpressionThreshold())) {
             return -1;

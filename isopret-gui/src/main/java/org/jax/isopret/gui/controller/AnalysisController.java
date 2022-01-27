@@ -13,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
+import org.jax.isopret.core.visualization.DoublePepValue;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
@@ -57,11 +58,11 @@ public class AnalysisController implements Initializable {
     @FXML
     private TableColumn<Visualizable, Double> foldChangeColumn;
     @FXML
-    private TableColumn<Visualizable, Double> geneProbabilityColumn;
+    private TableColumn<Visualizable, DoublePepValue> genePepColumn;
     @FXML
     private TableColumn<Visualizable, String> isoformCountColumn;
     @FXML
-    private TableColumn<Visualizable, Double> isoformProbabilityColumn;
+    private TableColumn<Visualizable, DoublePepValue> isoformPepColumn;
     @FXML
     private TableColumn<Visualizable, Button> visualizeColumn;
 
@@ -105,17 +106,22 @@ public class AnalysisController implements Initializable {
             }
         });
 
-        geneProbabilityColumn.setSortable(true);
-        geneProbabilityColumn.setEditable(false);
-        geneProbabilityColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getExpressionPval()));
-        geneProbabilityColumn.setCellFactory(c -> new TableCell<>() {
+        genePepColumn.setSortable(true);
+        genePepColumn.setEditable(false);
+        genePepColumn.setCellValueFactory(cdf ->
+                new ReadOnlyObjectWrapper<>(cdf.getValue().getExpressionPepValue()));
+        genePepColumn.setCellFactory(c -> new TableCell<>() {
             @Override
-            protected void updateItem(Double balance, boolean empty) {
-                super.updateItem(balance, empty);
-                if (balance == null || empty) {
+            protected void updateItem(DoublePepValue dpep, boolean empty) {
+                super.updateItem(dpep, empty);
+                if (dpep == null || empty) {
                     setText(null);
                 } else {
-                    setText(scientificNotation(balance));
+                    setText(scientificNotation(dpep.pep()));
+                    if (dpep.isSignificant()) {
+                        String color = getColorFromExpressionPep(dpep);
+                        setStyle("-fx-background-color: " + color);
+                    }
                 }
             }
         });
@@ -125,17 +131,21 @@ public class AnalysisController implements Initializable {
         isoformCountColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getNofMsplicing()));
 
 
-        isoformProbabilityColumn.setSortable(true);
-        isoformProbabilityColumn.setEditable(false);
-        isoformProbabilityColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getBestSplicingPval()));
-        isoformProbabilityColumn.setCellFactory(c -> new TableCell<>() {
+        isoformPepColumn.setSortable(true);
+        isoformPepColumn.setEditable(false);
+        isoformPepColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getSplicingPepValue()));
+        isoformPepColumn.setCellFactory(c -> new TableCell<>() {
             @Override
-            protected void updateItem(Double balance, boolean empty) {
-                super.updateItem(balance, empty);
-                if (balance == null || empty) {
+            protected void updateItem(DoublePepValue dpep, boolean empty) {
+                super.updateItem(dpep, empty);
+                if (dpep == null || empty) {
                     setText(null);
                 } else {
-                    setText(scientificNotation(balance));
+                    setText(scientificNotation(dpep.pep()));
+                    if (dpep.isSignificant()) {
+                        String color = getColorFromSplicingPep(dpep);
+                        setStyle("-fx-background-color: " + color);
+                    }
                 }
             }
         });
@@ -157,6 +167,30 @@ public class AnalysisController implements Initializable {
         hbaGeneResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
 
     }
+
+    static String getColorFromExpressionPep(DoublePepValue d) {
+        // from medium intense to very light
+        String [] greens = { "#48c9b0", "#76d7c4", "#a3e4d7", "#d1f2eb", "#e8f8f5" };
+        String [] yellows = {"#f4d03f", "#f7dc6f", "#f9e79f", "#fcf3cf", "#fef9e7" };
+        if (d.pep() == 0.0) return greens[0];
+        else if (d.pep() < 1e-6) return greens[1];
+        else if (d.pep() < 1e-3) return greens[2];
+        else if (d.pep() <= 0.05) return greens[3];
+        else if (d.isSignificant()) return greens[4];
+        else return "white";
+    }
+
+    static String getColorFromSplicingPep(DoublePepValue d) {
+        // from medium intense to very light
+        String [] yellows = {"#f4d03f", "#f7dc6f", "#f9e79f", "#fcf3cf", "#fef9e7" };
+        if (d.pep() == 0.0) return yellows[0];
+        else if (d.pep() < 1e-6) return yellows[1];
+        else if (d.pep() < 1e-3) return yellows[2];
+        else if (d.pep() <= 0.05) return yellows[3];
+        else if (d.isSignificant()) return yellows[4];
+        else return "white";
+    }
+
 
 
     public String scientificNotation(Double d) {

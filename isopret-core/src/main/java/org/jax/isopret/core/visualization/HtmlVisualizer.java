@@ -61,7 +61,7 @@ public class HtmlVisualizer implements Visualizer {
         String esemblAnchor = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", ensemblUrl, ensemblGeneAccession);
         double expressionFC = visualizable.getExpressionFoldChange();
         double expressionLogFc = visualizable.getExpressionLogFoldChange();
-        double expressionP = visualizable.getExpressionPval();
+        double expressionP = visualizable.getExpressionPep();
         int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
 
         return "<section>" +

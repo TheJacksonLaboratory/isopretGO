@@ -31,7 +31,7 @@ public interface Visualizable {
 
     int getCodingTranscriptCount();
 
-    double getExpressionPval();
+    double getExpressionPep();
 
     double getExpressionFoldChange();
 
@@ -71,5 +71,7 @@ public interface Visualizable {
 
     Set<TermId> getAnnotationGoIds();
 
+    DoublePepValue getExpressionPepValue();
+    DoublePepValue getSplicingPepValue();
 
 }

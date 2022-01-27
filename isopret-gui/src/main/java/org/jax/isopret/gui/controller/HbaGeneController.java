@@ -124,7 +124,7 @@ public class HbaGeneController implements Initializable {
 
         String fc = String.format("Gene expression fold-change: %.2f", visualizable.getExpressionFoldChange());
         geneFoldChangeLabel.setText(fc);
-        String prob = String.format("Probability (PEP): %.2f", visualizable.getExpressionPval());
+        String prob = String.format("Probability (PEP): %.2f", visualizable.getExpressionPep());
         this.geneProbabilityLabel.setText(prob);
         // isoform table
         accessionColumn.setSortable(false);

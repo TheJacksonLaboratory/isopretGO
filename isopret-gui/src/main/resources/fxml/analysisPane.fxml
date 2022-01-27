@@ -22,12 +22,12 @@
 
             <TableView fx:id="hbaGeneResultTableView" stylesheets="@../css/isopretstyle.css" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="symbolColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" resizable="false" text="Symbol" />
+                    <TableColumn fx:id="symbolColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" resizable="false" text="Gene" />
                     <TableColumn fx:id="accessionColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumntarget" text="Accession" />
                     <TableColumn fx:id="foldChangeColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Fold change" />
-                    <TableColumn fx:id="geneProbabilityColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Probability" />
+                    <TableColumn fx:id="genePepColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="PEP (Expression)" />
                     <TableColumn fx:id="isoformCountColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="sig./total isoforms" />
-                    <TableColumn fx:id="isoformProbabilityColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Splicing probability" />
+                    <TableColumn fx:id="isoformPepColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="PEP (Splicing)" />
                     <TableColumn fx:id="visualizeColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="Visualize" />
                 </columns>
                 <columnResizePolicy>

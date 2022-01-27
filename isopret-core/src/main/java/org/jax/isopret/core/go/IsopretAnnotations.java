@@ -8,14 +8,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class IsopretAnnotations implements ItemAnnotations<TermId> {
-
-
-
-
     /** TermId of the item (e.g., gene or transcript) for which this object stores 0 - n Associations (e.g., GO associations). */
     private final TermId annotatedItem;
 
-    /** List of annotations (associations of the annotatedItem with Ontology Terms. */
+    /** List of annotations (associations of the annotatedItem with Ontology Terms). */
     private final List<TermAnnotation> annotations;
 
     public IsopretAnnotations(TermId itemAccessionId, List<TermAnnotation> termAnnots) {
