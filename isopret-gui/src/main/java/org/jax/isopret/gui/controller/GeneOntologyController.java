@@ -6,7 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
@@ -16,6 +16,7 @@ import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.GoCompWidget;
 import org.jax.isopret.gui.widgets.GoDisplayWidget;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -38,15 +40,14 @@ public class GeneOntologyController implements Initializable {
     private final List<GoTermAndPvalVisualized> goPvals;
     /* Main pane of the GO Overpresentation tabs */
     public ScrollPane geneOntologyPane;
-    public HBox listviewHbox;
     public TableView<GoTermAndPvalVisualized> goPvalTableView;
     public TableColumn<GoTermAndPvalVisualized, String> termColumn;
-    public TableColumn<GoTermAndPvalVisualized, String> termIdColumn;
+    public TableColumn<GoTermAndPvalVisualized, Button> termIdColumn;
     public TableColumn<GoTermAndPvalVisualized, String> studyCountsColumn;
     public TableColumn<GoTermAndPvalVisualized, String> populationCountsColumn;
     public TableColumn<GoTermAndPvalVisualized, String> pvalColumn;
     public TableColumn<GoTermAndPvalVisualized, String> adjpvalColumn;
-    public TableColumn<GoTermAndPvalVisualized, Button> amigoColumn;
+    public TableColumn<GoTermAndPvalVisualized, Button> exportColumn;
     private final String label;
     private final GeneOntologyComparisonMode comparisonMode;
     private final String methodsLabel;
@@ -82,8 +83,27 @@ public class GeneOntologyController implements Initializable {
 
         termIdColumn.setSortable(false);
         termIdColumn.setEditable(false);
-        termIdColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getGoTermId()));
-
+        if (hostServices == null) {
+            termIdColumn.setCellValueFactory(cdf -> {
+                LOGGER.error("Could not retrieve HostServices");
+                GoTermAndPvalVisualized geneRow = cdf.getValue();
+                String termId = geneRow.getGoTermId();
+                Button btn = new Button(termId);
+                return new ReadOnlyObjectWrapper<>(btn);
+            });
+            } else {
+            termIdColumn.setCellValueFactory(cdf -> {
+                GoTermAndPvalVisualized geneRow = cdf.getValue();
+                String termId = geneRow.getGoTermId();
+                String amigoUrl = "http://amigo.geneontology.org/amigo/term/" + termId;
+                Button btn = new Button(termId);
+                btn.setOnAction(e -> { hostServices.showDocument(amigoUrl);
+                    LOGGER.trace(String.format("Calling URL: %s", amigoUrl));
+                });
+                // wrap it so it can be displayed in the TableView
+                return new ReadOnlyObjectWrapper<>(btn);
+            });
+        }
         studyCountsColumn.setSortable(false);
         studyCountsColumn.setEditable(false);
         studyCountsColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getStudyGeneRatio()));
@@ -103,15 +123,15 @@ public class GeneOntologyController implements Initializable {
         if (hostServices == null) {
             LOGGER.error("Could not retrieve HostServices");
         } else {
-            amigoColumn.setSortable(false);
-            amigoColumn.setEditable(false);
-            amigoColumn.setCellValueFactory(cdf -> {
+            exportColumn.setSortable(false);
+            exportColumn.setEditable(false);
+            exportColumn.setCellValueFactory(cdf -> {
                 GoTermAndPvalVisualized geneRow = cdf.getValue();
                 String termId = geneRow.getGoTermId();
-                String amigoUrl = "http://amigo.geneontology.org/amigo/term/" + termId;
-                Button btn = new Button("AmiGO");
-                btn.setOnAction(e -> { hostServices.showDocument(amigoUrl);
-                    LOGGER.trace(String.format("Calling URL: %s", amigoUrl));
+                TermId tid = TermId.of(termId);
+                Button btn = new Button("Export");
+                btn.setOnAction(e -> {
+                    openExport(tid);
                 });
                 // wrap it so it can be displayed in the TableView
                 return new ReadOnlyObjectWrapper<>(btn);
@@ -158,5 +178,36 @@ public class GeneOntologyController implements Initializable {
         GoComparison comparison = isopretService.getGoComparison();
         GoCompWidget widget = new GoCompWidget(comparison);
         widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
+    }
+
+    /**
+     * This method is called to export an HTML file with SVGs for all genes
+     * that are significant (either with respect to expression or splicing)
+     * and are annotated to a certain GO term
+     * @param goId The Gene Ontology term of interest
+     */
+    private void openExport(TermId goId) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Export " + goId);
+        alert.setHeaderText("Export Information about " + goId);
+        alert.setContentText(String.format("Export Information about differentially spliced genes annotated to %s",goId.getValue()));
+        ButtonType buttonTypeOne = new ButtonType("Splicing");
+        ButtonType buttonTypeTwo = new ButtonType("Expression");
+
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == buttonTypeOne){
+            System.out.println("EXPORT FOR GENE Splicing");
+            alert.close();
+        } else if (result.isPresent() && result.get() == buttonTypeTwo){
+            System.out.println("EXPORT FOR GENE Expression");
+            alert.close();
+        } else {
+            alert.close();
+        }
     }
 }
