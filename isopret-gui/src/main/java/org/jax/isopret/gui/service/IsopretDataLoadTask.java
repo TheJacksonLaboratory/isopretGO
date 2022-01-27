@@ -3,10 +3,7 @@ package org.jax.isopret.gui.service;
 import javafx.concurrent.Task;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.HbaDealsGoAnalysis;
-import org.jax.isopret.core.go.IsopretContainerFactory;
-import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
@@ -17,7 +14,6 @@ import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.JannovarReader;
 import org.jax.isopret.core.transcript.Transcript;
-import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -69,8 +65,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     private List<GoTerm2PValAndCounts> dasResults = List.of();
 
 
-    AssociationContainer<TermId> transcriptContainer = null;
-    AssociationContainer<TermId> geneContainer = null;
+    IsopretAssociationContainer transcriptContainer = null;
+    IsopretAssociationContainer geneContainer = null;
 
     private final List<String> errors;
 
@@ -296,11 +292,11 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         return geneSymbolToTranscriptMap;
     }
 
-    public AssociationContainer<TermId> getTranscriptContainer() {
+    public IsopretAssociationContainer getTranscriptContainer() {
         return transcriptContainer;
     }
 
-    public AssociationContainer<TermId> getGeneContainer() {
+    public IsopretAssociationContainer getGeneContainer() {
         return geneContainer;
     }
 

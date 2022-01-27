@@ -3,15 +3,12 @@ package org.jax.isopret.gui.service;
 import org.jax.isopret.core.visualization.HtmlUtil;
 import org.jax.isopret.core.visualization.HtmlVisualizer;
 import org.jax.isopret.core.visualization.Visualizable;
-import org.monarchinitiative.phenol.ontology.algo.OntologyAlgorithm;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class GoHtmlExporter {
 

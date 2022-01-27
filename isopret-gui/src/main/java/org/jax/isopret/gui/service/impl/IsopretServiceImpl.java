@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.go.GoMethod;
+import org.jax.isopret.core.go.IsopretAssociationContainer;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
@@ -63,8 +64,8 @@ public class IsopretServiceImpl implements IsopretService  {
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
     private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();
-    private AssociationContainer<TermId> transcriptContainer = null;
-    private AssociationContainer<TermId> geneContainer = null;
+    private IsopretAssociationContainer transcriptContainer = null;
+    private IsopretAssociationContainer geneContainer = null;
     private Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap;
     /** Key: transcript id; value: set of Annotating GO Terms. */
     private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
@@ -431,8 +432,7 @@ public class IsopretServiceImpl implements IsopretService  {
                 .filter(h -> h.hasDifferentialExpressionResult(expThres))
                 .collect(Collectors.toList());
         // now figure out which of these genes are annotated to goId
-        Map<TermId, List<TermId>> go2domainListMap = this.geneContainer.getOntologyTermToDomainItemsMap();
-        List<TermId> domainIds = go2domainListMap.getOrDefault(goId, new ArrayList<>());
+        List<TermId> domainIds = this.geneContainer.getDomainItemsAnnotatedByGoTerm(goId);
         Set<TermId> domainIdSet = new HashSet<>(domainIds);
         List<String> symbols = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
                 .map(HbaDealsResult::getSymbol)
@@ -454,7 +454,6 @@ public class IsopretServiceImpl implements IsopretService  {
                 .collect(Collectors.toList());
         // now figure out which of these genes are annotated to goId
         List<TermId> domainIds = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);
-              //  getOntologyTermToDomainItemsMap().getOrDefault(goId, new ArrayList<>());
         Set<TermId> domainIdSet = new HashSet<>(domainIds);
         List<String> symbols = das.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
                 .map(HbaDealsResult::getSymbol)

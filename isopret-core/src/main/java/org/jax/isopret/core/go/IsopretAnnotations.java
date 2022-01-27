@@ -6,7 +6,6 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class IsopretAnnotations implements ItemAnnotations<TermId> {
     /** TermId of the item (e.g., gene or transcript) for which this object stores 0 - n Associations (e.g., GO associations). */

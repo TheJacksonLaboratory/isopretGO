@@ -20,7 +20,6 @@ import org.apache.commons.io.IOUtils;
 import org.jax.isopret.core.visualization.*;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
-import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
