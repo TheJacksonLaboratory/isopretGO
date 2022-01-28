@@ -7,7 +7,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.Region;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jax.isopret.gui.service.GoHtmlExporter;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
@@ -15,6 +17,7 @@ import org.jax.isopret.gui.service.model.GoComparison;
 import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.GoCompWidget;
 import org.jax.isopret.gui.widgets.GoDisplayWidget;
+import org.jax.isopret.gui.widgets.PopupFactory;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -22,6 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -189,23 +196,56 @@ public class GeneOntologyController implements Initializable {
         alert.setTitle("Export " + goId);
         alert.setHeaderText("Export Information about " + goId);
         alert.setContentText(String.format("Export Information about differentially spliced genes annotated to %s",goId.getValue()));
-        ButtonType buttonTypeOne = new ButtonType("Splicing");
-        ButtonType buttonTypeTwo = new ButtonType("Expression");
-
+        ButtonType buttonTypeOne = new ButtonType("Export");
         ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get().equals(buttonTypeOne)){
-            System.out.println("EXPORT FOR GENE Splicing");
+        if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DAS)){
+            GoHtmlExporter export = GoHtmlExporter.splicing(goId, isopretService);
+            String html = export.export();
+            Optional<File> f = getDefaultFname("splicing", goId.getValue());
+            if (f.isEmpty()) {
+                PopupFactory.displayError("Error", "Could not retrieve file.");
+                return;
+            }
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(f.get()))) {
+                bw.write(html);
+            } catch (IOException e) {
+                PopupFactory.displayException("error", e.getMessage(), e);
+            }
             alert.close();
-        } else if (result.isPresent() && result.get().equals(buttonTypeTwo)){
-            System.out.println("EXPORT FOR GENE Expression");
-            alert.close();
+        } else if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DGE)){
+            GoHtmlExporter export = GoHtmlExporter.expression(goId, isopretService);
+            String html = export.export();
+            Optional<File> f = getDefaultFname("expressed", goId.getValue());
+            if (f.isEmpty()) {
+                PopupFactory.displayError("Error", "Could not retrieve file.");
+                return;
+            }
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(f.get()))) {
+                bw.write(html);
+            } catch (IOException e) {
+                PopupFactory.displayException("error", e.getMessage(), e);
+            }            alert.close();
         } else {
             alert.close();
         }
+    }
+
+    Optional<File> getDefaultFname(String type, String goId) {
+        Optional<File> hba = isopretService.getHbaDealsFileOpt();
+        String hbaName = hba.map(File::getName).orElse("hbadeals");
+        String fname = "isopret-" + type + "-" + goId + "-" + hbaName + ".html";
+        fname = fname.replaceAll(":", "_");
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HTML files (*.html)", "*.html");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setInitialFileName(fname);
+        Stage stage = (Stage) this.dgeOrDasGoBtn.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+        return Optional.ofNullable(file);
     }
 }

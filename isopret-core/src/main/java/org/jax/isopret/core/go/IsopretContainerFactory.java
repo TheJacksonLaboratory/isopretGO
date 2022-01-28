@@ -1,6 +1,5 @@
 package org.jax.isopret.core.go;
 
-import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -34,7 +33,7 @@ public class IsopretContainerFactory {
     }
 
 
-    private AssociationContainer<TermId> getContainer(Map<TermId, Set<TermId>> assocmap) {
+    private IsopretAssociationContainer getContainer(Map<TermId, Set<TermId>> assocmap) {
         Map<TermId, IsopretAnnotations> assocMap = new HashMap<>();
         for (var entry : assocmap.entrySet()) {
             var transcriptId = entry.getKey();
@@ -56,13 +55,13 @@ public class IsopretContainerFactory {
     }
 
 
-    public AssociationContainer<TermId> transcriptContainer() {
+    public IsopretAssociationContainer transcriptContainer() {
         LOGGER.info("Constructing transcript association container");
         return getContainer(this.transcript2associationMap);
     }
 
 
-    public AssociationContainer<TermId> geneContainer() {
+    public IsopretAssociationContainer geneContainer() {
         LOGGER.info("Constructing gene association container");
         return getContainer(this.gene2associationMap);
     }

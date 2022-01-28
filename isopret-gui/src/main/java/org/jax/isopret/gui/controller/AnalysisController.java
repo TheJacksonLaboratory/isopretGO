@@ -121,6 +121,8 @@ public class AnalysisController implements Initializable {
                     if (dpep.isSignificant()) {
                         String color = getColorFromExpressionPep(dpep);
                         setStyle("-fx-background-color: " + color);
+                    } else {
+                        setStyle("-fx-background-color: white");
                     }
                 }
             }
@@ -145,6 +147,8 @@ public class AnalysisController implements Initializable {
                     if (dpep.isSignificant()) {
                         String color = getColorFromSplicingPep(dpep);
                         setStyle("-fx-background-color: " + color);
+                    } else {
+                        setStyle("-fx-background-color: white");
                     }
                 }
             }

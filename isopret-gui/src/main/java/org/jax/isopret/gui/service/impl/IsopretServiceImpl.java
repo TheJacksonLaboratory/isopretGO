@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.go.GoMethod;
+import org.jax.isopret.core.go.IsopretAssociationContainer;
 import org.jax.isopret.core.go.MtcMethod;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
@@ -63,8 +64,8 @@ public class IsopretServiceImpl implements IsopretService  {
     private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
     private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();
-    private AssociationContainer<TermId> transcriptContainer = null;
-    private AssociationContainer<TermId> geneContainer = null;
+    private IsopretAssociationContainer transcriptContainer = null;
+    private IsopretAssociationContainer geneContainer = null;
     private Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap;
     /** Key: transcript id; value: set of Annotating GO Terms. */
     private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
@@ -421,6 +422,46 @@ public class IsopretServiceImpl implements IsopretService  {
         if (hbaDealsFile == null) return Optional.empty();
         String name = hbaDealsFile.getName() + "-" + mtcMethod.name() + "-" + goMethod.name() + ".tsv";
         return Optional.of(name);
+    }
+
+    @Override
+    public List<Visualizable> getDgeForGoTerm(TermId goId) {
+        double expThres = this.thresholder.getExpressionPepThreshold();
+        List<HbaDealsResult> dge = this.thresholder.getRawResults().values()
+                .stream()
+                .filter(h -> h.hasDifferentialExpressionResult(expThres))
+                .collect(Collectors.toList());
+        // now figure out which of these genes are annotated to goId
+        Set<TermId> domainIdSet = this.geneContainer.getDomainItemsAnnotatedByGoTerm(goId);
+        List<String> symbols = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
+                .map(HbaDealsResult::getSymbol)
+                .collect(Collectors.toList());
+        // transform to visualizable
+        List<Visualizable> visualizables = new ArrayList<>();
+        for (String sym : symbols) {
+            visualizables.add(getVisualizableForGene(sym));
+        }
+        return visualizables;
+    }
+
+    @Override
+    public List<Visualizable> getDasForGoTerm(TermId goId) {
+        double splicingPepThreshold = this.thresholder.getSplicingPepThreshold();
+        List<HbaDealsResult> das = this.thresholder.getRawResults().values()
+                .stream()
+                .filter(h -> h.hasDifferentialSplicingResult(splicingPepThreshold))
+                .collect(Collectors.toList());
+        // now figure out which of these genes are annotated to goId
+        Set<TermId> domainIdSet  = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);
+        List<String> symbols = das.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
+                .map(HbaDealsResult::getSymbol)
+                .collect(Collectors.toList());
+        // transform to visualizable
+        List<Visualizable> visualizables = new ArrayList<>();
+        for (String sym : symbols) {
+            visualizables.add(getVisualizableForGene(sym));
+        }
+        return visualizables;
     }
 
 }

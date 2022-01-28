@@ -79,4 +79,7 @@ public interface IsopretService {
     String getGoReport();
 
     Optional<String>  getGoReportDefaultFilename();
+
+    List<Visualizable> getDgeForGoTerm(TermId goId);
+    List<Visualizable> getDasForGoTerm(TermId goId);
 }

@@ -20,7 +20,6 @@ import org.apache.commons.io.IOUtils;
 import org.jax.isopret.core.visualization.*;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
-import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -363,11 +362,10 @@ public class HbaGeneController implements Initializable {
             writer.write(contents);
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            PopupFactory.displayException("Error", "Could not generate temp file to create PDF", e);
+            return;
         }
-        // Use this file to create the PDF
         Runtime rt = Runtime.getRuntime();
-
         String[] commands = {"rsvg-convert", "-f" , "pdf", "-o",
                 pdfFile.getAbsolutePath(), temp.getAbsolutePath() };
         Process proc = null;
@@ -382,7 +380,10 @@ public class HbaGeneController implements Initializable {
                 System.out.println(stdout);
             }
         } catch (IOException e) {
-            assert proc != null;
+            if (proc == null) {
+                PopupFactory.displayException("Error", "Null pointer process", e);
+                return;
+            }
             proc.destroy();
             String errMsg =  String.format("Could not create PDF file - have you installed rsvg-convert?  (Exit code %d)", proc.exitValue());
             PopupFactory.displayException("Error", errMsg, e);
