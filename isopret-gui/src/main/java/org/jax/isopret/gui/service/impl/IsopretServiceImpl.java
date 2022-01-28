@@ -432,8 +432,7 @@ public class IsopretServiceImpl implements IsopretService  {
                 .filter(h -> h.hasDifferentialExpressionResult(expThres))
                 .collect(Collectors.toList());
         // now figure out which of these genes are annotated to goId
-        List<TermId> domainIds = this.geneContainer.getDomainItemsAnnotatedByGoTerm(goId);
-        Set<TermId> domainIdSet = new HashSet<>(domainIds);
+        Set<TermId> domainIdSet = this.geneContainer.getDomainItemsAnnotatedByGoTerm(goId);
         List<String> symbols = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
                 .map(HbaDealsResult::getSymbol)
                 .collect(Collectors.toList());
@@ -453,8 +452,7 @@ public class IsopretServiceImpl implements IsopretService  {
                 .filter(h -> h.hasDifferentialSplicingResult(splicingPepThreshold))
                 .collect(Collectors.toList());
         // now figure out which of these genes are annotated to goId
-        List<TermId> domainIds = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);
-        Set<TermId> domainIdSet = new HashSet<>(domainIds);
+        Set<TermId> domainIdSet  = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);
         List<String> symbols = das.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
                 .map(HbaDealsResult::getSymbol)
                 .collect(Collectors.toList());

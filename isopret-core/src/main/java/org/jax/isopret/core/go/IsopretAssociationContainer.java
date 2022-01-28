@@ -62,16 +62,17 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
         return mp;
     }
 
-    public List<TermId> getDomainItemsAnnotatedByGoTerm(TermId goTermId) {
-        List<TermId> domainItemList = new ArrayList<>();
-        if (associationMap.containsKey(goTermId)) {
-            IsopretAnnotations annotations = associationMap.get(goTermId);
-            for (TermAnnotation annot : annotations.getAnnotations()) {
-                //IsopretTermAnnotation ita = (IsopretTermAnnotation) annot;
-                domainItemList.add(annot.getItemId());
+    public Set<TermId> getDomainItemsAnnotatedByGoTerm(TermId goTermId) {
+        Set<TermId> domainItemSet = new HashSet<>();
+        for (Map.Entry<TermId, IsopretAnnotations> entry : associationMap.entrySet()) {
+            TermId gene = entry.getKey();
+            for (TermId ontologyTermId : entry.getValue().getAnnotatingTermIds()) {
+                if (goTermId.equals(ontologyTermId)) {
+                    domainItemSet.add(gene);
+                }
             }
         }
-        return domainItemList;
+        return domainItemSet;
     }
 
 

@@ -196,16 +196,14 @@ public class GeneOntologyController implements Initializable {
         alert.setTitle("Export " + goId);
         alert.setHeaderText("Export Information about " + goId);
         alert.setContentText(String.format("Export Information about differentially spliced genes annotated to %s",goId.getValue()));
-        ButtonType buttonTypeOne = new ButtonType("Splicing");
-        ButtonType buttonTypeTwo = new ButtonType("Expression");
-
+        ButtonType buttonTypeOne = new ButtonType("Export");
         ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get().equals(buttonTypeOne)){
+        if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DAS)){
             GoHtmlExporter export = GoHtmlExporter.splicing(goId, isopretService);
             String html = export.export();
             Optional<File> f = getDefaultFname("splicing", goId.getValue());
@@ -219,7 +217,7 @@ public class GeneOntologyController implements Initializable {
                 PopupFactory.displayException("error", e.getMessage(), e);
             }
             alert.close();
-        } else if (result.isPresent() && result.get().equals(buttonTypeTwo)){
+        } else if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DGE)){
             GoHtmlExporter export = GoHtmlExporter.expression(goId, isopretService);
             String html = export.export();
             Optional<File> f = getDefaultFname("expressed", goId.getValue());
