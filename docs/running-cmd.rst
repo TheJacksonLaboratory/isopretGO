@@ -52,3 +52,8 @@ same directory to run isopret. The GUI uses the same functionality to download t
 that is chosen or created by the user; this directory can be used by both the command-line and the
 GUI version of isopret.
 
+The overrep command
+^^^^^^^^^^^^^^^^^^^
+
+This command performs Gene Ontology overrepresentation analysis.
+

@@ -447,15 +447,26 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public List<Visualizable> getDasForGoTerm(TermId goId) {
         double splicingPepThreshold = this.thresholder.getSplicingPepThreshold();
+        LOGGER.info("getDasForGoTerm, splicingPepThreshold={}", splicingPepThreshold);
         List<HbaDealsResult> das = this.thresholder.getRawResults().values()
                 .stream()
                 .filter(h -> h.hasDifferentialSplicingResult(splicingPepThreshold))
                 .collect(Collectors.toList());
+        LOGGER.info("getDasForGoTerm, das.size={}", das.size());
         // now figure out which of these genes are annotated to goId
         Set<TermId> domainIdSet  = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);
-        List<String> symbols = das.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
-                .map(HbaDealsResult::getSymbol)
-                .collect(Collectors.toList());
+        // when we get here, the domain ids are transcript ids.
+        LOGGER.info("getDasForGoTerm, domainIdSet.size={} for go={}", domainIdSet.size(), goId.getValue());
+        Set<String> symbols = new HashSet<>();
+        for (HbaDealsResult result : das) {
+            for (AccessionNumber transcriptAccession : result.getTranscriptMap().keySet()) {
+                if (domainIdSet.contains(transcriptAccession.toTermId())) {
+                    symbols.add(result.getSymbol());
+                    break; // done with this gene
+                }
+            }
+        }
+        LOGGER.info("getDasForGoTerm, symbols.size={} ", symbols.size());
         // transform to visualizable
         List<Visualizable> visualizables = new ArrayList<>();
         for (String sym : symbols) {
