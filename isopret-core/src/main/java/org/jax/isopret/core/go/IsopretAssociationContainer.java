@@ -62,12 +62,20 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
         return mp;
     }
 
+    /**
+     * Get all gene ids (or transcript ids) that are annotated to a given GO term
+     * (including descendents)
+     * @param goTermId GO term of interest
+     * @return all domain items that are annotated to this GO term
+     */
     public Set<TermId> getDomainItemsAnnotatedByGoTerm(TermId goTermId) {
         Set<TermId> domainItemSet = new HashSet<>();
+        Set<TermId> descendentSet = OntologyAlgorithm.getDescendents(this.ontology, goTermId);
+       // descendentSet.add(goTermId);
         for (Map.Entry<TermId, IsopretAnnotations> entry : associationMap.entrySet()) {
             TermId gene = entry.getKey();
             for (TermId ontologyTermId : entry.getValue().getAnnotatingTermIds()) {
-                if (goTermId.equals(ontologyTermId)) {
+                if (descendentSet.contains(ontologyTermId) || ontologyTermId.equals(goTermId)) {
                     domainItemSet.add(gene);
                 }
             }
