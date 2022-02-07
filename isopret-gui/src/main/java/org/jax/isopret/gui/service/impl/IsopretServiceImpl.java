@@ -47,10 +47,6 @@ public class IsopretServiceImpl implements IsopretService  {
     /** File for reading/writing settings. */
     @Autowired
     File isopretSettingsFile;
-
-    @Autowired
-    private HostServicesWrapper hostServices;
-
     private final Properties pgProperties;
     private final StringProperty downloadDirProp;
     private final StringProperty hbaDealsFileProperty;
@@ -213,6 +209,8 @@ public class IsopretServiceImpl implements IsopretService  {
         this.geneIdToTranscriptMap = task.getGeneIdToTranscriptMap();
         this.transcript2GoMap = task.getTranscript2GoMap();
         this.isopretStats = task.getIsopretStats();
+        this.goMethod = task.getOverrepMethod();
+        this.mtcMethod = task.getMultipleTestingMethod();
         LOGGER.info("Finished setting data. ");
         if (this.transcript2GoMap == null) {
             LOGGER.error("transcript2GoMap == null");
@@ -367,11 +365,6 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
 
-
-    @Override
-    public HostServicesWrapper getHostServices() {
-        return hostServices;
-    }
 
     public AssociationContainer<TermId> getTranscriptContainer() {
         return transcriptContainer;

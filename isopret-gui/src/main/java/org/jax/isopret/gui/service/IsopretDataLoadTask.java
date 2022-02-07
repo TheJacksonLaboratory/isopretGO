@@ -301,4 +301,12 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     }
 
     public IsopretStats getIsopretStats() { return isopretStatsBuilder.build(); }
+
+    public GoMethod getOverrepMethod() {
+        return overrepMethod;
+    }
+
+    public MtcMethod getMultipleTestingMethod() {
+        return multipleTestingMethod;
+    }
 }

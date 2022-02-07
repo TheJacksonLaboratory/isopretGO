@@ -36,7 +36,9 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
- * Controller that is use to display the DGE or DAS data
+ * Controller that is used to display the DGE or DAS data.
+ * The class is used for both DGE and DAS tabs, which is why it is given prototype scope
+ * @author Peter Robinson
  */
 @Component
 @Scope("prototype")
