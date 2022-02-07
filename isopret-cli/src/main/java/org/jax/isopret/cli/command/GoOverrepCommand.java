@@ -42,10 +42,6 @@ import java.util.stream.Collectors;
         description = "Q/C the transcript annotations")
 public class GoOverrepCommand extends IsopretCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoOverrepCommand.class);
-    @CommandLine.Option(names={"--trfx"},
-            required = true,
-            description = "transcript function file")
-    private String transcriptFx;
     @CommandLine.Option(names={"-b","--hbadeals"},
             scope = CommandLine.ScopeType.INHERIT,
             description ="HBA-DEALS output file" , required = true)
@@ -70,7 +66,6 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         Ontology geneOntology = loadGeneOntology();
         int n_go_terms = geneOntology.countNonObsoleteTerms();
         LOGGER.info("Loaded Gene Ontology with {} terms", n_go_terms);
-        //GoAssociationContainer container = loadGoAssociationContainer();
         Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
         LOGGER.info("Loaded HGNC map with {} genes", hgncMap.size());
         Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap = loadJannovarGeneIdToTranscriptMap();
@@ -81,6 +76,7 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         LOGGER.info("Loaded transcriptToGeneIdMap with {} entries", transcriptIdToGoTermsMap.size());
         // create and check the annotation containers for the inferred data
         LOGGER.info("Loading TranscriptFunctionFileParser");
+        String transcriptFx = this.downloadDirectory + File.separator + "";
         TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(transcriptFx), geneOntology);
         Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
         LOGGER.info("Loaded transcript2GoMap with {} entries", transcript2GoMap.size());

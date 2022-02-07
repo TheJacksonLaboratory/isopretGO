@@ -62,7 +62,7 @@ public class GoDisplayWidget {
         this.mtcMethod = comparison.mtcMethod();
     }
 
-    BarChart<Number, String > getBarChart(List<GoCompTerm> goTerms) {
+    BarChart<Number, String> getBarChart(List<GoCompTerm> goTerms) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("-log10(p-value)");
         CategoryAxis yAxis = new CategoryAxis();
@@ -74,7 +74,6 @@ public class GoDisplayWidget {
         barChart.setMinHeight(height);
         XYChart.Series<Number, String> dataSeriesPvals = new XYChart.Series<>();
         dataSeriesPvals.setName(compMode.name());
-
         for (GoCompTerm goComp : goTerms) {
             String label = goComp.getLabel();
             double pval = switch (compMode) {
@@ -103,7 +102,6 @@ public class GoDisplayWidget {
 
     public void show(Stage window) {
         HBox hbox = new HBox();
-
         VBox dgeVbox = getBarChartPane();
         dgeVbox.setSpacing(15);
         hbox.getChildren().addAll(dgeVbox);
@@ -132,8 +130,6 @@ public class GoDisplayWidget {
         // Set position of second window, related to primary window.
         newWindow.setX(window.getX() + 200);
         newWindow.setY(window.getY() + 100);
-
-
 
         newWindow.show();
     }

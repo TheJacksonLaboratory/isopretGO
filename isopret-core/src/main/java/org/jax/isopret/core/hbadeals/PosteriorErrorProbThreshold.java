@@ -1,7 +1,10 @@
 package org.jax.isopret.core.hbadeals;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This class is used to calculate the threshold posterior error proibability (PEP) threshold that achieves a desired
@@ -60,7 +63,7 @@ public class PosteriorErrorProbThreshold {
      * Together, this calculates the posterior error probability (PEP) threshold needed to attain a desired FDR
      * @return the posterior error probability (PEP) threshold associated with the q-value threshold to reach the desired FDR
      */
-    public double getPepThreshold() {
+    public double getPepThresholdBisection() {
         Collections.sort(this.probabilities);
         double p_threshold = 0.0;
         double min_p = 0.0;
@@ -84,6 +87,58 @@ public class PosteriorErrorProbThreshold {
         // though we do not have any actual values of zero
         double pep =  this.probabilities.stream().filter(p -> p <= finalP_threshold).mapToDouble(p->p).max().orElse(0);
         return Math.min(pep, MAX_PEP);
+    }
+
+
+    /**
+     *  # Look for a p-val threshold between 0.01 and 0.25
+     *   s <- seq(0.01,0.25,0.01)
+     *   # sum(vals<=p) gives the number of values below or equal to p
+     *   # sum(vals[vals<=p]) gives the sum of vals
+     *   # the quotient returns the mean of all vals below p
+     *   h0.de <- unlist(lapply(s,function(p) { sum(vals[vals<=p])/sum(vals<=p) }))
+     *   # which(h0.de<=fdr) returns the indices for which h0.de<=fdr
+     *   # by design this is a series such as 1 2 ... k
+     *   # max(which(h0.de<=fdr)) returns the largest (rightmost) such index
+     *   # s[...] returns the corresponding value of the sequence of 0.01, 0.02,..,0.25
+     *   exp.thresh <- s[max(which(h0.de<=fdr))]
+     * @return posterior error probability threshold
+     */
+    public double getPepThreshold() {
+        Collections.sort(this.probabilities);
+        // get a sequence of numbers between 0.01 and 0.25 -- these
+        // are the candidate PEP thresholds
+        List<Double> s = IntStream.iterate(1, i -> i + 1)
+                .limit(25)
+                .boxed()
+                .map(d -> 0.01 * d)
+                .toList();
+        List<Double> h0de = new ArrayList<>();
+        for (double candidatePepThreshold : s) {
+            double sumValues = 0d;
+            int nBelowThresh = 0;
+            for (double p : probabilities) {
+                if (p < candidatePepThreshold) {
+                    sumValues += p;
+                    nBelowThresh++;
+                } else {
+                    break;
+                }
+            }
+            h0de.add(sumValues/nBelowThresh);
+        }
+        for (int i=0;i<h0de.size(); ++i) {
+            if (h0de.get(i) > this.fdrThreshold) {
+                if (i>0) {
+                    // return largest prethreshold value
+                    return s.get(i-1);
+                } else {
+                    return 0; // cannot reach FDR with current results
+                }
+            }
+        }
+        // if we get here, we are at our max allowable PEP threshold of 0.25
+        return MAX_PEP;
     }
 
     /**
