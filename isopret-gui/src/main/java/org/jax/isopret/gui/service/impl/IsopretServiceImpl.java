@@ -254,7 +254,7 @@ public class IsopretServiceImpl implements IsopretService  {
             LOGGER.error("Could not find HBADEALS results for {}.", symbol);
             return null;
         }
-        List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(symbol);
+        List<Transcript> transcripts = this.geneSymbolToTranscriptMap.getOrDefault(symbol, List.of());
         HbaDealsResult result = thresholder.getRawResults().get(symbol);
         double splicingThreshold = thresholder.getSplicingPepThreshold();
         double expressionThreshold = thresholder.getExpressionPepThreshold();
@@ -277,7 +277,7 @@ public class IsopretServiceImpl implements IsopretService  {
         List<HbaDealsResult> results = thresholder.getRawResults().values()
                 .stream()
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         for (HbaDealsResult result : results) {
             if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
                 notfound++;
@@ -430,12 +430,12 @@ public class IsopretServiceImpl implements IsopretService  {
         List<HbaDealsResult> dge = this.thresholder.getRawResults().values()
                 .stream()
                 .filter(h -> h.hasDifferentialExpressionResult(expThres))
-                .collect(Collectors.toList());
+                .toList();
         // now figure out which of these genes are annotated to goId
         Set<TermId> domainIdSet = this.geneContainer.getDomainItemsAnnotatedByGoTerm(goId);
         List<String> symbols = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
                 .map(HbaDealsResult::getSymbol)
-                .collect(Collectors.toList());
+                .toList();
         // transform to visualizable
         List<Visualizable> visualizables = new ArrayList<>();
         for (String sym : symbols) {
@@ -451,7 +451,7 @@ public class IsopretServiceImpl implements IsopretService  {
         List<HbaDealsResult> das = this.thresholder.getRawResults().values()
                 .stream()
                 .filter(h -> h.hasDifferentialSplicingResult(splicingPepThreshold))
-                .collect(Collectors.toList());
+                .toList();
         LOGGER.info("getDasForGoTerm, das.size={}", das.size());
         // now figure out which of these genes are annotated to goId
         Set<TermId> domainIdSet  = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);

@@ -82,12 +82,12 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         if (!isCoding()) {
             return Optional.empty();
         } else {
-            return Optional.of(cdsRegion);
+            return Optional.ofNullable(cdsRegion);
         }
     }
 
     public Optional<Position> cdsStart() {
-        if (!isCoding()) {
+        if (cdsRegion == null || !isCoding()) {
             return Optional.empty();
         } else {
             return Optional.of(cdsRegion.startPosition());
@@ -95,7 +95,7 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
     }
 
     public Optional<Position> cdsEnd() {
-        if (!isCoding()) {
+        if (cdsRegion == null || !isCoding()) {
             return Optional.empty();
         } else {
             return Optional.of(cdsRegion.endPosition());

@@ -99,7 +99,6 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
             IsopretAnnotations assocs = this.associationMap.get(domainTermId);
             for (TermAnnotation termAnnotation : assocs.getAnnotations()) {
                 IsopretTermAnnotation ita = (IsopretTermAnnotation) termAnnotation;
-
                 /* In this step add the direct annotations only */
                 TermId ontologyTermId = ita.getTermId();
                 // check if the term is in the ontology (sometimes, obsoletes are used in the bla32 files)

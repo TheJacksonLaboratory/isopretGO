@@ -111,8 +111,8 @@ public class PosteriorErrorProbThreshold {
         List<Double> s = IntStream.iterate(1, i -> i + 1)
                 .limit(25)
                 .boxed()
-                .map(d -> 0.01*d)
-                .collect(Collectors.toList());
+                .map(d -> 0.01 * d)
+                .toList();
         List<Double> h0de = new ArrayList<>();
         for (double candidatePepThreshold : s) {
             double sumValues = 0d;
