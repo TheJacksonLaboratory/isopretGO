@@ -21,7 +21,6 @@ import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.GoAnnotationMatrix;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.service.IsopretDataLoadTask;
-import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;

@@ -25,14 +25,14 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
     private Transcript(Contig contig,
                        Strand strand,
                        CoordinateSystem coordinateSystem,
-                       Position start,
-                       Position end,
+                       int start,
+                       int end,
                        AccessionNumber accessionId,
                        String hgvsSymbol,
                        boolean isCoding,
                        GenomicRegion cds,
                        List<GenomicRegion> exons) {
-        super(contig, strand, coordinateSystem, start, end);
+        super(contig, strand, Coordinates.of(coordinateSystem, start, end));
         if (isCoding) {
             this.cdsRegion = cds;
         } else {
@@ -57,8 +57,8 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         return new Transcript(contig,
                 strand,
                 coordinateSystem,
-                Position.of(start),
-                Position.of(end),
+                start,
+                end,
                 accessionId,
                 hgvsSymbol,
                 isCoding,
@@ -86,25 +86,27 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         }
     }
 
-    public Optional<Position> cdsStart() {
+    public Optional<Integer> cdsStart() {
         if (cdsRegion == null || !isCoding()) {
             return Optional.empty();
         } else {
-            return Optional.of(cdsRegion.startPosition());
+            return Optional.of(cdsRegion.start());
         }
     }
 
-    public Optional<Position> cdsEnd() {
+    public Optional<Integer> cdsEnd() {
         if (cdsRegion == null || !isCoding()) {
             return Optional.empty();
         } else {
-            return Optional.of(cdsRegion.endPosition());
+            return Optional.of(cdsRegion.end());
         }
     }
 
     public List<GenomicRegion> exons() {
         return exons;
     }
+
+
 
     /**
      * Returns an array whose entries correspond to the lengths of exons that are part of the CDS.
@@ -122,28 +124,8 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
 
     @Override
     public Transcript withStrand(Strand other) {
-        if (this.strand() == other) {
-            return this;
-        } else {
-            Position spos = startPosition().invert(this.coordinateSystem(), contig());
-            // Position cdsStartOnPositive = cdsStart.invert(contig, coordinateSystem);
-            Position endpos = endPosition().invert(this.coordinateSystem(), contig());
-            List<GenomicRegion> exonsWithOther = new ArrayList<>(exons.size());
-            for (int i = exons.size() - 1; i >= 0; i--) {
-                GenomicRegion exon = exons.get(i);
-                exonsWithOther.add(exon.withStrand(other));
-            }
-            return new Transcript(contig(),
-                    strand(),
-                    coordinateSystem(),
-                    endpos,
-                    spos,
-                    accessionId,
-                    hgvsSymbol,
-                    isCoding,
-                    isCoding ? cdsRegion.withStrand(other) : null,
-                    exonsWithOther);
-        }
+        // not needed
+        throw new UnsupportedOperationException("withStrand operation not supported");
     }
 
     public int getMrnaLength() {
@@ -157,56 +139,31 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         if (!this.isCoding) {
             return 0;
         }
-        Transcript t;
-        if (strand() == Strand.NEGATIVE) {
-            t = this.withStrand(Strand.POSITIVE);
-        } else {
-            t = this;
-        }
         int cdsNtCount = 0;
         int i=0;
-        for (GenomicRegion exon : t.exons()) {
+        for (GenomicRegion exon : exons()) {
             cdsNtCount += exon.overlapLength(cdsRegion);
         }
         // TODO -- Figure out what is going on here
         // lots of transcripts do not have 3n nt according to our calcs.
-//        if (cdsNtCount % 3 != 0) {
+        if (cdsNtCount % 3 != 0) {
 //            // should never happen
 //            // a small number of Ensembl entries seem to be 3n+1 or 3n+2
 //            // this should not matter fo visualization but log the error
-//            LOGGER.error("Invalid CDS length determined for " + t.accessionId() + ": " + cdsNtCount + " (bp not a multiple of 3)");
-//        }
+            LOGGER.error("Invalid CDS length determined for " + accessionId() + ": " + cdsNtCount + " (bp not a multiple of 3)");
+        }
         return cdsNtCount / 3 - 1; // remove one aa so we do not count the stop codon
     }
 
     @Override
     public Transcript withCoordinateSystem(CoordinateSystem other) {
-        if (coordinateSystem() == other) {
-            return this;
-        } else {
-            List<GenomicRegion> exonsWithCoordinateSystem = new ArrayList<>(exons.size());
-            for (GenomicRegion region : exons) {
-                GenomicRegion exon = region.withCoordinateSystem(other);
-                exonsWithCoordinateSystem.add(exon);
-            }
-            //  CDS is null if noncoding
-            return new Transcript(contig(),
-                    strand(),
-                    coordinateSystem(),
-                    Position.of(startWithCoordinateSystem(other)),
-                    Position.of(endWithCoordinateSystem(other)),
-                    accessionId,
-                    hgvsSymbol,
-                    isCoding,
-                    isCoding ? cdsRegion.withCoordinateSystem(other) : null,
-                    exonsWithCoordinateSystem);
-        }
-
+        // not needed
+        throw new UnsupportedOperationException("withStrand operation not supported");
     }
 
 
     @Override
-    protected Transcript newRegionInstance(Contig contig, Strand strand, CoordinateSystem coordinateSystem, Position startPosition, Position endPosition) {
+    protected Transcript newRegionInstance(Contig contig, Strand strand, Coordinates  coordinates) {
         return null;
     }
 

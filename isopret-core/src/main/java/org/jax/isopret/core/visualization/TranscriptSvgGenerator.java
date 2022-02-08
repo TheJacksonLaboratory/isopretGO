@@ -117,13 +117,13 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         this.hbaDealsResult = annotatedGene.getHbaDealsResult();
 
         this.genomicMinPos = affectedTranscripts.stream()
-                .map(t -> t.withStrand(Strand.POSITIVE))
-                .mapToInt(GenomicRegion::start)
+                //.map(t -> t.withStrand(Strand.POSITIVE))
+                .mapToInt(t -> t.startOnStrandWithCoordinateSystem(Strand.POSITIVE, CoordinateSystem.zeroBased()))
                 .min()
                 .orElse(0);
         this.genomicMaxPos = affectedTranscripts.stream()
-                .map(t -> t.withStrand(Strand.POSITIVE))
-                .mapToInt(GenomicRegion::end)
+               // .map(t -> t.withStrand(Strand.POSITIVE))
+                .mapToInt(t -> t.endOnStrandWithCoordinateSystem(Strand.POSITIVE,CoordinateSystem.zeroBased()))
                 .max()
                 .orElse(this.genomicMinPos + 1000); // We should never actually need the orElse
         this.genomicSpan = this.genomicMaxPos - this.genomicMinPos;
@@ -187,6 +187,15 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         writer.write(rect);
     }
 
+    private  List<GenomicRegion> exonsOnPositiveStrand(Transcript tmod) {
+        if (tmod.strand().isPositive()) return tmod.exons();
+        List<GenomicRegion> posExons = new ArrayList<>(tmod.exons().size());
+        for (int i = tmod.exons().size() - 1; i >= 0; i--) {
+            posExons.add(tmod.exons().get(i).withStrand(Strand.POSITIVE));
+        }
+        return posExons;
+    }
+
 
     /**
      * This method writes one Jannovar transcript as a cartoon where the UTRs are shown in one color and the
@@ -198,13 +207,13 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @throws IOException if we cannot write.
      */
     private void writeCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
-        Transcript transcript = tmod.withStrand(Strand.POSITIVE);
         // guaranteed not null for coding
-        @SuppressWarnings("OptionalGetWithoutIsPresent") GenomicRegion cds = transcript.cdsRegion().get();
+        @SuppressWarnings("OptionalGetWithoutIsPresent") GenomicRegion cds = tmod.cdsRegion()
+                .map(cd -> cd.withStrand(Strand.POSITIVE)).get();
 
         double cdsStart = translateGenomicToSvg(cds.start());
         double cdsEnd = translateGenomicToSvg(cds.end());
-        List<GenomicRegion> exons = transcript.exons();
+        List<GenomicRegion> exons = exonsOnPositiveStrand(tmod);
         double minX = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
         // write a line for UTR, otherwise write a box
@@ -228,12 +237,12 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         }
         writeIntrons(exons, ypos, writer);
         writeTranscriptName(tmod, minX, maxX, ypos, writer);
-        writeFoldChange(transcript.accessionId(), ypos, writer);
+        writeFoldChange(tmod.accessionId(), ypos, writer);
     }
 
     private void writeNonCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
-        Transcript transcript = tmod.withStrand(Strand.POSITIVE);
-        List<GenomicRegion> exons = transcript.exons();
+        //Transcript transcript = tmod.withStrand(Strand.POSITIVE);
+        List<GenomicRegion> exons = exonsOnPositiveStrand(tmod);
         double minX = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
         // write a line for UTR, otherwise write a box
@@ -245,8 +254,8 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             writeUtrExon(exonStart, exonEnd, ypos, writer);
         }
         writeIntrons(exons, ypos, writer);
-        writeTranscriptName(transcript, minX, maxX, ypos, writer);
-        writeFoldChange(transcript.accessionId(), ypos, writer);
+        writeTranscriptName(tmod, minX, maxX, ypos, writer);
+        writeFoldChange(tmod.accessionId(), ypos, writer);
     }
 
 
@@ -332,6 +341,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             intronEnds.add(current.start());
         }
         for (int i = 0; i < intronStarts.size(); i++) {
+
             double startpos = translateGenomicToSvg(intronStarts.get(i));
             double endpos = translateGenomicToSvg(intronEnds.get(i));
             double midpoint = 0.5 * (startpos + endpos);

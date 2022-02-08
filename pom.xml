@@ -12,7 +12,7 @@
     </parent>
     <groupId>org.jax.isopret</groupId>
     <artifactId>isopret</artifactId>
-    <version>0.8.11</version>
+    <version>0.8.12</version>
     <modules>
         <module>isopret-core</module>
         <module>isopret-cli</module>
@@ -37,7 +37,7 @@
         <junit.version>5.8.2</junit.version>
         <junit.platform.version>1.7.0</junit.platform.version>
         <jannovar.version>0.38</jannovar.version>
-        <svart.version>1.0.2</svart.version>
+        <svart.version>2.0.0-RC1</svart.version>
     </properties>
 
     <scm>
