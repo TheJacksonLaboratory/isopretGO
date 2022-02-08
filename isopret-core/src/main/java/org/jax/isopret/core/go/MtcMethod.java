@@ -22,7 +22,7 @@ public enum MtcMethod {
 
     public static MtcMethod fromString(String mtc) {
         switch (mtc.toLowerCase()) {
-            case "benjamini-yochberg":
+            case "benjamini-hochberg":
             case "bh":
                 return BENJAMINI_HOCHBERG;
             case "benjamini-yekutieli":
