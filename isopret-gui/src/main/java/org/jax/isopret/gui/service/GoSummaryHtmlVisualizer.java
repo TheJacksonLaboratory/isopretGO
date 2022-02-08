@@ -209,24 +209,4 @@ public class GoSummaryHtmlVisualizer implements Visualizer {
         return sb.toString();
     }
 
-
-    private String getGoSummary(Visualizable vis) {
-
-        return   "<section>" +
-                "<a name=\"goSummary\"></a>\n" +
-                "<article>" +
-                "<H3>Gene Ontology analysis</H3>\n" +
-                "<p>" + vis.getGeneSymbol() + " has a total of " +
-                999 + " Gene Ontology Annotations. The following" +
-                " table show the predictions of our algorithm as to how the annotations" +
-                "are distributed across the isoforms.</p>" +
-                "</article>\n" +
-                "</section>\n";
-    }
-
-
-
-
-
-
 }

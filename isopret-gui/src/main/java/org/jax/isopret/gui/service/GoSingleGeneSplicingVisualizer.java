@@ -5,7 +5,7 @@ import org.jax.isopret.core.visualization.Visualizable;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 
-public class GoSingleGeneSplicingVisualizer extends GoHtmlExporter{
+public class GoSingleGeneSplicingVisualizer extends GoAnnotatedGenesVisualizer {
 
     private final int nGenesWithDifferentialSplicing;
     private final int nDifferentialIsoforms;
@@ -29,9 +29,8 @@ public class GoSingleGeneSplicingVisualizer extends GoHtmlExporter{
         sb.append(htmlHeader);
         sb.append(htmlTop());
         sb.append(getGeneULwithLinks());
-        final GoSummaryHtmlVisualizer visualizer = new GoSummaryHtmlVisualizer(basename);
         for (var viz : annotatedGenes) {
-            String html = visualizer.getHtml(viz);
+            String html = getHtml(viz);
             sb.append(wrapInArticle(html, viz.getGeneSymbol()));
         }
         sb.append(bottom);
