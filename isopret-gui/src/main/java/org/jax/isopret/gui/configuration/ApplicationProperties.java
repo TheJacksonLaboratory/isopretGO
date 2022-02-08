@@ -13,7 +13,7 @@ public class ApplicationProperties {
 
     @Autowired
     public ApplicationProperties(@Value("${application.title}") String uiTitle,
-                                 @Value("${application.version") String version) {
+                                 @Value("${application.version}") String version) {
         this.applicationUiTitle = uiTitle;
         this.applicationVersion = version;
     }
