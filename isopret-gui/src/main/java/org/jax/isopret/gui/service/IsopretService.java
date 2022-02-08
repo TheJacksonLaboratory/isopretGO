@@ -63,8 +63,6 @@ public interface IsopretService {
 
     String getGoSummary();
 
-    HostServicesWrapper getHostServices();
-
     Visualizable getVisualizableForGene(String symbol);
 
     List<Visualizable> getGeneVisualizables();

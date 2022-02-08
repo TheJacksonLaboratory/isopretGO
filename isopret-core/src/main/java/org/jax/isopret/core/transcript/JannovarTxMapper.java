@@ -5,6 +5,7 @@ import de.charite.compbio.jannovar.reference.TranscriptModel;
 
 import org.monarchinitiative.svart.*;
 
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ record JannovarTxMapper(GenomicAssembly assembly) {
         // process exons
         List<GenomicRegion> exons = new ArrayList<>();
         for (GenomeInterval exon : tm.getExonRegions()) {
-            exons.add(GenomicRegion.of(contig, strand, CoordinateSystem.zeroBased(), Position.of(exon.getBeginPos()), Position.of(exon.getEndPos())));
+            exons.add(GenomicRegion.of(contig, strand, CoordinateSystem.zeroBased(), exon.getBeginPos(), exon.getEndPos()));
         }
 
         AccessionNumber transcriptAccession = AccessionNumber.ensemblTranscript(tm.getAccession());

@@ -25,7 +25,7 @@ public class IsopretFxDownloadTask extends Task<Void> {
 
     @Override
     protected Void call() {
-        long totalDownloads = 7;
+        long totalDownloads = 8;
         long i = 0;
         this.updateProgress(i, totalDownloads);
         updateMessage("Starting go.json download...");
@@ -46,8 +46,11 @@ public class IsopretFxDownloadTask extends Task<Void> {
         updateMessage("Starting interpro domain description download");
         downloader.downloadInterproDomainDesc();
         this.updateProgress(++i, totalDownloads);
-        updateMessage("Starting isoform function list download");
-        downloader.downloadIsoformFunctionList();
+        updateMessage("Starting isoform function (MF) download");
+        downloader.downloadIsoformFunctionMfList();
+        updateProgress(++i, totalDownloads);
+        updateMessage("Starting isoform function (BP) download");
+        downloader.downloadIsoformFunctionBpList();
         updateProgress(++i, totalDownloads);
         updateMessage("Finished download to " + downloadDir);
         return null;

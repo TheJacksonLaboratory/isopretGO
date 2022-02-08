@@ -18,8 +18,8 @@ import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
-import org.monarchinitiative.svart.GenomicAssemblies;
-import org.monarchinitiative.svart.GenomicAssembly;
+import org.monarchinitiative.svart.assembly.GenomicAssemblies;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,12 +128,12 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.transcriptsCount(n_transcripts);
 
 
-        File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
+        File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list_mf.txt");
         if (! isoformFunctionFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find \"isoform_function_list.txt\" in download directory");
+            throw new IsopretRuntimeException("Could not find \"isoform_function_list_mf.txt\" in download directory");
         } else {
             isopretStatsBuilder.info("isoform function file", isoformFunctionFile.getAbsolutePath());
-            TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(isoformFunctionFile, geneOntology);
+            TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
             Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
             this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
             updateProgress(0.40, 1);
@@ -181,12 +181,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.interproDescriptionCount(interproMapper.getInterproDescriptionCount());
         isopretStatsBuilder.interproAnnotationCount(interproMapper.getInterproAnnotationCount());
         LOGGER.info(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
-        File predictionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
-        if (!predictionFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find isoform_function_list.txt at " +
-                    predictionFile.getAbsolutePath());
-        }
-        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(predictionFile, geneOntology);
+
+        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
         updateProgress(0.80, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
@@ -272,14 +268,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         return geneIdToTranscriptMap;
     }
 
-    public Map<AccessionNumber, HgncItem> getHgncMap() {
-        return hgncMap;
-    }
-
-    public Map<TermId, Set<TermId>> getTranscriptToGoMap() {
-        return transcriptToGoMap;
-    }
-
     public InterproMapper getInterproMapper() {
         return interproMapper;
     }
@@ -301,4 +289,12 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     }
 
     public IsopretStats getIsopretStats() { return isopretStatsBuilder.build(); }
+
+    public GoMethod getOverrepMethod() {
+        return overrepMethod;
+    }
+
+    public MtcMethod getMultipleTestingMethod() {
+        return multipleTestingMethod;
+    }
 }

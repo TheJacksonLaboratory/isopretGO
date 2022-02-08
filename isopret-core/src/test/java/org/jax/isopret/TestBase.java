@@ -7,8 +7,8 @@ import org.jax.isopret.core.interpro.*;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.JannovarReader;
 import org.jax.isopret.core.transcript.Transcript;
-import org.monarchinitiative.svart.GenomicAssemblies;
-import org.monarchinitiative.svart.GenomicAssembly;
+import org.monarchinitiative.svart.assembly.GenomicAssemblies;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 
 import java.io.File;
 import java.net.URL;

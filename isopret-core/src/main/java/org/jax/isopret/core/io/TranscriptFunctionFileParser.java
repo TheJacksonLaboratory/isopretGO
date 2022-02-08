@@ -1,5 +1,6 @@
 package org.jax.isopret.core.io;
 
+import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -36,13 +37,14 @@ public class TranscriptFunctionFileParser {
      */
     private final  Map<TermId, Set<TermId>> transcriptIdToGoTermsMap;
 
-    public TranscriptFunctionFileParser(File transcriptFunctionFile, Ontology ontology) {
+
+    private static Map<TermId, Set<TermId>> parseFunctionFile(File file, Ontology ontology) {
         Map<TermId, Set<TermId>> annotMap = new HashMap<>();
         Set<String> notFound = new HashSet<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(transcriptFunctionFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line = br.readLine();
             if (! line.startsWith("Ensembl.ID\tGo.Terms")) {
-                throw new PhenolRuntimeException("Malformed header of isoform_function_list.txt: " + line);
+                throw new PhenolRuntimeException("Malformed header of " + file.getName() + ": " + line);
             }
             while ((line = br.readLine()) != null) {
                 String [] fields = line.split("\t");
@@ -67,7 +69,28 @@ public class TranscriptFunctionFileParser {
             int n_missing = notFound.size(); // keep logger sane
             LOGGER.warn("Could not find " + n_missing + " terms in Ontology");
         }
-        transcriptIdToGoTermsMap = Map.copyOf(annotMap); // return immutable map
+        return annotMap; // return immutable map
+    }
+
+
+    public TranscriptFunctionFileParser(File downloadDirectory, Ontology ontology) {
+        File predictionFileMf = new File(downloadDirectory + File.separator + "isoform_function_list_mf.txt");
+        if (!predictionFileMf.isFile()) {
+            throw new IsopretRuntimeException("Could not find isoform_function_list_mf.txt at " +
+                    predictionFileMf.getAbsolutePath());
+        }
+        Map<TermId, Set<TermId>> annotMapMf = parseFunctionFile(predictionFileMf, ontology);
+        File predictionFileBp = new File(downloadDirectory + File.separator + "isoform_function_list_bp.txt");
+        if (!predictionFileBp.isFile()) {
+            throw new IsopretRuntimeException("Could not find isoform_function_list_bp.txt at " +
+                    predictionFileBp.getAbsolutePath());
+        }
+        Map<TermId, Set<TermId>> annotMapBp = parseFunctionFile(predictionFileBp, ontology);
+        for (var entry : annotMapBp.entrySet()) {
+            annotMapMf.putIfAbsent(entry.getKey(), new HashSet<>());
+            annotMapMf.get(entry.getKey()).addAll(entry.getValue());
+        }
+        transcriptIdToGoTermsMap = Map.copyOf(annotMapMf); // immutable map
     }
 
     public Map<TermId, Set<TermId>> getTranscriptIdToGoTermsMap() {

@@ -6,7 +6,7 @@ import de.charite.compbio.jannovar.data.JannovarDataSerializer;
 import de.charite.compbio.jannovar.data.SerializationException;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.monarchinitiative.svart.GenomicAssembly;
+import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

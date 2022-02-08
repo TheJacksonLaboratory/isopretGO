@@ -9,7 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jax.isopret.gui.service.GoHtmlExporter;
+import org.jax.isopret.gui.service.GoAnnotatedGenesVisualizer;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
@@ -36,7 +36,9 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
- * Controller that is use to display the DGE or DAS data
+ * Controller that is used to display the DGE or DAS data.
+ * The class is used for both DGE and DAS tabs, which is why it is given prototype scope
+ * @author Peter Robinson
  */
 @Component
 @Scope("prototype")
@@ -204,7 +206,7 @@ public class GeneOntologyController implements Initializable {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DAS)){
-            GoHtmlExporter export = GoHtmlExporter.splicing(goId, isopretService);
+            GoAnnotatedGenesVisualizer export = GoAnnotatedGenesVisualizer.splicing(goId, isopretService);
             String html = export.export();
             Optional<File> f = getDefaultFname("splicing", goId.getValue());
             if (f.isEmpty()) {
@@ -218,7 +220,7 @@ public class GeneOntologyController implements Initializable {
             }
             alert.close();
         } else if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DGE)){
-            GoHtmlExporter export = GoHtmlExporter.expression(goId, isopretService);
+            GoAnnotatedGenesVisualizer export = GoAnnotatedGenesVisualizer.expression(goId, isopretService);
             String html = export.export();
             Optional<File> f = getDefaultFname("expressed", goId.getValue());
             if (f.isEmpty()) {

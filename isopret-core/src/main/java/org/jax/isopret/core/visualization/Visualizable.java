@@ -74,4 +74,6 @@ public interface Visualizable {
     DoublePepValue getExpressionPepValue();
     DoublePepValue getSplicingPepValue();
 
+    int getGoTableWidth();
+
 }

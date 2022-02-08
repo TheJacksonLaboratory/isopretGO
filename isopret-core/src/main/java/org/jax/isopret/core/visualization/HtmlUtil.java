@@ -18,9 +18,8 @@ public class HtmlUtil {
             """;
 
 
-    public static final String css = """
-                  <style>
-                        
+    public static final String cssTop = """
+            <style>
             * {
                 -moz-box-sizing: border-box;
                 -webkit-box-sizing: border-box;
@@ -202,17 +201,10 @@ public class HtmlUtil {
             	background-color: #e0e3ea;
             	border-bottom:1px solid white;
             }
-                        
-            
-            gotable.th
-             {
-               vertical-align: bottom;
-               text-align: center;
-               border-collapse: collapse;
-               border: 1px solid #000;
-               width: 95%;
-             }
-             
+            """;
+
+
+    public static final String cssBottom = """
              span
              {
                -ms-writing-mode: tb-rl;
@@ -223,8 +215,7 @@ public class HtmlUtil {
                padding: 5px 10px;
                 margin: 0 auto;
              }
-                       
-                        
+                             
             .svgrow{
                 width: 90%;
                 min-height: 100px;
@@ -232,7 +223,17 @@ public class HtmlUtil {
                 display: -webkit-flex; /* Safari */
                 display: flex; /* Standard syntax */
             }
+                
+            div.go {
+               border: 0.5rem outset black;
+                border-radius: 4px;
+                font: 1rem sans-serif;
+                margin: 1rem;
+                padding: 1rem;
+                outline-offset: 0.5rem;
+            }
                         
+                                
             footer {
             	background-color: #05396b;
             	color: white;
@@ -253,55 +254,7 @@ public class HtmlUtil {
             a.svg:hover, a.svg:active {
               outline: dotted 1px blue;
             }
-                        
-            .features-title {
-              background-color: #05396b;
-              color: white;
-            }
-                        
-            .features-title:nth-child(1) {
-              border-right: 2px solid white;
-            }
-                        
-            .features-data {
-              background-color: #e0e3ea;
-            }
-                        
-            .features-data:nth-child(1) {
-              border-right: 2px solid white;
-            }
-            .no-list-style {
-              list-style-type: none;
-            }
-                        
-            .tooltip {
-              position: relative;
-              display: inline-block;
-              border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-              outline: none;
-              width: 150px;
-              min-width: 150px;
-              max-width: 250px;
-            }
-                        
-            /* Tooltip text */
-            .tooltip .tooltiptext {
-              visibility: hidden;
-              background-color: black;
-              color: #fff;
-              text-align: left;
-              padding: 5px 0;
-              border-radius: 6px;
-              /* Position the tooltip text - see examples below! */
-              position: absolute;
-              z-index: 1;
-            }
-                        
-            /* Show the tooltip text when you mouse over the tooltip container */
-            .tooltip:hover .tooltiptext {
-              visibility: visible;
-            }
-                        
+
             .table-btn {
                 display: block;
                 font-weight: bold;
@@ -314,6 +267,24 @@ public class HtmlUtil {
   
             </style>
             """;
+
+
+    public static final String css = cssTop +
+            """
+            table.go {
+             border-collapse: collapse;
+              border: 1px solid black;
+            }
+            table.go td.{
+                max-width:100%;
+                 border: 1px solid black;
+            }
+            
+            table.go th {
+                max-width:100%;
+                border: 1px solid black;
+            }
+            """ + cssBottom;
 
 
 
@@ -329,8 +300,6 @@ public class HtmlUtil {
             """;
 
 
-    public static final String intro = """
-            """;
 
     public static final String bottom = """
            <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
@@ -377,6 +346,13 @@ public class HtmlUtil {
     }
 
 
+    public static String wrapWithGoTableWidth(String html, int goTableWidth) {
+        String cssMid1 = "table.go {border-collapse: collapse;border: 1px solid black;width: " + goTableWidth +"px;}\n";
+        String cssMid2 = "table.go td {max-width:100%;border: 1px solid black;width: 30px;}\n";
+        String cssMid3 = "table.go th {max-width:100%;border: 1px solid black;width: 30px;}\n";
 
-
+        String cssString = cssTop + cssMid1 + cssMid2 + cssMid3 + cssBottom;
+        return String.format(header, cssString) +
+                htmlTop +  html + bottom;
+    }
 }
