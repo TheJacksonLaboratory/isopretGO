@@ -219,7 +219,7 @@ public class HbaGeneController implements Initializable {
         String fname = basename +"-" + genesymbol + "-isopret.html";
         final HtmlVisualizer visualizer = new HtmlVisualizer(basename);
         String html = visualizer.getHtml(this.visualizable);
-        html = HtmlUtil.wrap(html);
+        html = HtmlUtil.wrapWithGoTableWidth(html, visualizable.getGoTableWidth());
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HTML files (*.html)", "*.html");
         fileChooser.getExtensionFilters().add(extFilter);
@@ -354,7 +354,7 @@ public class HbaGeneController implements Initializable {
          -f pdf -o mygraph.pdf mygraph.svg
          */
         // get temp file and save SVG
-        File temp = null;
+        File temp;
         try {
             temp = File.createTempFile(getRandomString(), ".svg");
             temp.deleteOnExit(); //Delete when JVM exits

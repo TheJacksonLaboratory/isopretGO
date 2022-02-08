@@ -143,7 +143,7 @@ public abstract class GoAnnotatedGenesVisualizer {
                 <tr>
                   <th class="go">Interpro id</th>
                   <th class="go">Name</th>
-                  <th> class="go">Type</th>
+                  <th class="go">Type</th>
                 </tr>
               </thead>
             """;

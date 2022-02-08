@@ -263,6 +263,11 @@ public class EnsemblVisualizable implements Visualizable {
         return new DoublePepValue(getBestSplicingPval(), isDifferentiallySpliced());
     }
 
+    @Override
+    public int getGoTableWidth() {
+        return  400 + 30 * getTotalTranscriptCount();
+    }
+
 
     @Override
     public String getGoHtml() {

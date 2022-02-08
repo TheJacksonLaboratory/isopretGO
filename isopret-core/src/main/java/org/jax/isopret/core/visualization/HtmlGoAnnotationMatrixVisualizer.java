@@ -52,11 +52,11 @@ public class HtmlGoAnnotationMatrixVisualizer {
 
     private String htmlTableHeader(List<String> transcripts) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<table class=\"gotable\">");
+        sb.append("<table class=\"go\">");
         sb.append("<tr>");
-        sb.append("<th>GO term</th>");
+        sb.append("<th width=\"400px\";>GO term</th>");
         for (String transcript : transcripts) {
-            sb.append("<th><span>").append(transcript).append("</span></th>");
+            sb.append("<th width=\"30px\";><span>").append(transcript).append("</span></th>");
         }
         sb.append("</tr>");
         return sb.toString();

@@ -18,9 +18,8 @@ public class HtmlUtil {
             """;
 
 
-    public static final String css = """
-                  <style>
-                        
+    public static final String cssTop = """
+            <style>
             * {
                 -moz-box-sizing: border-box;
                 -webkit-box-sizing: border-box;
@@ -202,17 +201,10 @@ public class HtmlUtil {
             	background-color: #e0e3ea;
             	border-bottom:1px solid white;
             }
-            
-            td.go {
-                max-width:100%;
-                white-space:nowrap;
-            }
-            
-             th.go {
-                max-width:100%;
-                white-space:nowrap;
-            }
+            """;
 
+
+    public static final String cssBottom = """
              span
              {
                -ms-writing-mode: tb-rl;
@@ -277,6 +269,24 @@ public class HtmlUtil {
             """;
 
 
+    public static final String css = cssTop +
+            """
+            table.go {
+             border-collapse: collapse;
+              border: 1px solid black;
+            }
+            table.go td.{
+                max-width:100%;
+                 border: 1px solid black;
+            }
+            
+            table.go th {
+                max-width:100%;
+                border: 1px solid black;
+            }
+            """ + cssBottom;
+
+
 
     public static final String htmlTop = """
             <body>
@@ -290,8 +300,6 @@ public class HtmlUtil {
             """;
 
 
-    public static final String intro = """
-            """;
 
     public static final String bottom = """
            <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
@@ -338,6 +346,13 @@ public class HtmlUtil {
     }
 
 
+    public static String wrapWithGoTableWidth(String html, int goTableWidth) {
+        String cssMid1 = "table.go {border-collapse: collapse;border: 1px solid black;width: " + goTableWidth +"px;}\n";
+        String cssMid2 = "table.go td {max-width:100%;border: 1px solid black;width: 30px;}\n";
+        String cssMid3 = "table.go th {max-width:100%;border: 1px solid black;width: 30px;}\n";
 
-
+        String cssString = cssTop + cssMid1 + cssMid2 + cssMid3 + cssBottom;
+        return String.format(header, cssString) +
+                htmlTop +  html + bottom;
+    }
 }

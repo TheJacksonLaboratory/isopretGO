@@ -7,6 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * This class generates HTML code to visualize individual genes.
+ * It generates two main kinds of files. The first is to export one page with all
+ * information on a single gene ({@link #getHtml(Visualizable)}. The other
+ * generates a slightly shorter version of this and is intended for the page
+ * that contains all genes annotated to some GO term ({@link #getShortHtml(Visualizable)}.
+ * @author Peter Robinson
+ */
 public class HtmlVisualizer implements Visualizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlVisualizer.class);
 
@@ -50,6 +58,63 @@ public class HtmlVisualizer implements Visualizer {
     }
 
 
+    protected String wrapInArticle(String html, String geneSym) {
+        return "<a name=\"" + geneSym + "\"></a>" +
+                "<article>" +
+                "<h2>" + geneSym + "</h2>" +
+                html +
+                "</article>\n";
+    }
+
+
+    @Override
+    public String getShortHtml(Visualizable visualizable) {
+        String html = getShortSingleGeneSummary(visualizable) +
+                getTranscriptBox(visualizable) +
+                "<div class=\"svgrow\">\n" +
+                visualizable.getIsoformSvg() +
+                "</div>\n" +
+                getProteinDomainSummary(visualizable) +
+                getInterproBox(visualizable) + "\n" +
+                "<div class=\"svgrow\">\n" +
+                visualizable.getProteinSvg() +
+                "</div>\n</div>\n";
+        return wrapInArticle(html, visualizable.getGeneSymbol());
+    }
+
+    /**
+     * Show a short summary of the gene and its transcripts.
+     * @param visualizable {@link Visualizable} object representing a gene
+     * @return HTML code with a summary of the gene
+     */
+    private String getShortSingleGeneSummary(Visualizable visualizable) {
+        String symbol = visualizable.getGeneSymbol();
+        String ensemblGeneAccession = visualizable.getGeneAccession();
+        int totalTranscriptCount = visualizable.getTotalTranscriptCount();
+        int expressedTranscriptCount = visualizable.getExpressedTranscriptCount();
+        String ensemblUrl = visualizable.getGeneEnsemblUrl();
+        String esemblAnchor = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", ensemblUrl, ensemblGeneAccession);
+        double expressionFC = visualizable.getExpressionFoldChange();
+        double expressionLogFc = visualizable.getExpressionLogFoldChange();
+        double expressionP = visualizable.getExpressionPep();
+        int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
+        return  "<p>" + symbol + " (" + esemblAnchor + ") had an expression fold change of " +
+                String.format("%.3f", expressionFC) + ", corresponding to a log<sub>2</sub> fold change of " +
+                String.format("%.3f", expressionLogFc) + ". The posterior error probability (PEP) according the the " + HBADEALS_A +
+                " analysis was " + String.format("%e", expressionP) + ".</p>" +
+                "<p>The gene has a total of " +
+                totalTranscriptCount + " annotated transcripts in Ensembl, of which " +
+                expressedTranscriptCount + " were expressed in the current experiment (" + experiment + "). " +
+                "Of these, " + signDiffIsoCount + " were found to be differentially spliced." +
+                "</p>\n" +
+                "<p>" + symbol + " has a total of " +
+                totalTranscriptCount + " transcripts annotated in Ensembl, of which " +
+                expressedTranscriptCount + " were expressed in the current experiment (" + experiment + ")." +
+                "Of these, " + signDiffIsoCount +
+                (signDiffIsoCount == 1 ? " was":"were") +
+                " found to be differentially spliced." +
+                "</p>\n";
+    }
 
 
     public String getSingleGeneSummary(Visualizable visualizable) {
@@ -217,9 +282,9 @@ public class HtmlVisualizer implements Visualizer {
                 "<article>" +
                 "<H3>Gene Ontology analysis</H3>\n" +
                 "<p>" + vis.getGeneSymbol() + " has a total of " +
-                999 + " Gene Ontology Annotations. The following" +
+                vis.getAnnotationGoIds().size() + " Gene Ontology Annotations. The following" +
                 " table show the predictions of our algorithm as to how the annotations" +
-                "are distributed across the isoforms.</p>" +
+                " are distributed across the isoforms.</p>" +
                 "</article>\n" +
                 "</section>\n";
     }
