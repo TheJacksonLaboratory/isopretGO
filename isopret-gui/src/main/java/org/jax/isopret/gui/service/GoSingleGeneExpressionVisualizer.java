@@ -3,7 +3,7 @@ package org.jax.isopret.gui.service;
 import org.jax.isopret.core.visualization.HtmlUtil;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
-public class GoSingleGeneExpressionVisualizer extends GoHtmlExporter {
+public class GoSingleGeneExpressionVisualizer extends GoAnnotatedGenesVisualizer {
 
 
 
@@ -23,9 +23,8 @@ public class GoSingleGeneExpressionVisualizer extends GoHtmlExporter {
         sb.append(htmlHeader);
         sb.append(htmlTop());
         sb.append(getGeneULwithLinks());
-        final GoSummaryHtmlVisualizer visualizer = new GoSummaryHtmlVisualizer(basename);
         for (var viz : annotatedGenes) {
-            String html = visualizer.getHtml(viz);
+            String html = getHtml(viz);
             html = HtmlUtil.wrap(html);
             sb.append(html);
         }
