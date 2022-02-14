@@ -25,8 +25,7 @@ public class GoSingleGeneExpressionVisualizer extends GoAnnotatedGenesVisualizer
         sb.append(getGeneULwithLinks());
         for (var viz : annotatedGenes) {
             String html = getHtml(viz);
-            html = HtmlUtil.wrap(html);
-            sb.append(html);
+            sb.append(wrapInArticle(html, viz.getGeneSymbol()));
         }
         sb.append(bottom);
         return sb.toString();
