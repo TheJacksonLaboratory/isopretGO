@@ -155,8 +155,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
             isopretStatsBuilder.annotatedTranscripts(transcriptContainer.getAnnotatedDomainItemCount());
 
         }
-
-        HgncParser hgncParser = new HgncParser();
+        File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
+        HgncParser hgncParser = new HgncParser(hgncFile);
         this.hgncMap = hgncParser.ensemblMap();
         updateProgress(0.65, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));

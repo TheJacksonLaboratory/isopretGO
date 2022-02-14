@@ -64,9 +64,6 @@ public class GeneOntologyController implements Initializable {
     private final GeneOntologyComparisonMode comparisonMode;
     private final String methodsLabel;
     private final String summaryLabel;
-    public Label goTopLevelLabel;
-    public Label goMethodsLabel;
-    public Label goSummaryLabel;
 
     private final IsopretService isopretService;
 
@@ -184,7 +181,7 @@ public class GeneOntologyController implements Initializable {
         actionEvent.consume();
         GoComparison comparison = isopretService.getGoComparison();
         GoDisplayWidget widget = new GoDisplayWidget(comparison, this.comparisonMode);
-        widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
+        widget.show((Stage) this.geneOntologyPane.getScene().getWindow());
     }
 
 
@@ -193,7 +190,7 @@ public class GeneOntologyController implements Initializable {
         actionEvent.consume();
         GoComparison comparison = isopretService.getGoComparison();
         GoCompWidget widget = new GoCompWidget(comparison);
-        widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
+        widget.show((Stage) this.geneOntologyPane.getScene().getWindow());
     }
 
     /**
