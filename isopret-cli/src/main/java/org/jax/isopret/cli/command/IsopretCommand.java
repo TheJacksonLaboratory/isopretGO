@@ -112,7 +112,8 @@ public abstract class IsopretCommand {
      */
     protected Map<AccessionNumber, HgncItem> loadHgncMap() {
         if (hgncMap == null) {
-            HgncParser hgncParser = new HgncParser();
+            File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
+            HgncParser hgncParser = new HgncParser(hgncFile);
             hgncMap = hgncParser.ensemblMap();
             LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
         }

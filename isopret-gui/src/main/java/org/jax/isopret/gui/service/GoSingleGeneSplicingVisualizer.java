@@ -41,8 +41,8 @@ public class GoSingleGeneSplicingVisualizer extends GoAnnotatedGenesVisualizer {
         StringBuilder sb = new StringBuilder();
         sb.append("<p>A total of ").append(annotatedGenes.size()).append(" genes that are annotated to ");
         sb.append(this.geneOntologyLabel).append(" (").append(geneOntologyId.getValue()).append(") were ");
-        sb.append("identifed as differentially spliced.");
-        sb.append("A total of ").append(nDifferentialIsoforms).append(" differentially splicing isoforms were associated with these genes.");
+        sb.append("identified as differentially spliced. ");
+        sb.append("A total of ").append(nDifferentialIsoforms).append(" differentially spliced isoforms were associated with these genes.");
         sb.append("</p>");
         sb.append("<ul>\n");
         for (var viz : annotatedGenes) {

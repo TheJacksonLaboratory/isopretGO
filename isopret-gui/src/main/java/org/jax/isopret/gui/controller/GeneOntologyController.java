@@ -7,6 +7,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.Region;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.jax.isopret.gui.service.GoAnnotatedGenesVisualizer;
@@ -61,13 +64,11 @@ public class GeneOntologyController implements Initializable {
     private final GeneOntologyComparisonMode comparisonMode;
     private final String methodsLabel;
     private final String summaryLabel;
-    public Label goTopLevelLabel;
-    public Label goMethodsLabel;
-    public Label goSummaryLabel;
 
     private final IsopretService isopretService;
 
     private final HostServicesWrapper hostServices;
+    public TextFlow goMethodsFlow;
     @FXML
     private Button dgeOrDasGoBtn;
 
@@ -146,9 +147,14 @@ public class GeneOntologyController implements Initializable {
         }
 
         goPvalTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
-        this.goTopLevelLabel.setText(this.label);
-        this.goMethodsLabel.setText(this.methodsLabel);
-        this.goSummaryLabel.setText(this.summaryLabel);
+        Text text1 = new Text(this.label + "\n");
+        text1.setFont(Font.font("Verdana", 16));
+        Text text2 = new Text(this.methodsLabel);
+        text2.setFont(Font.font("Verdana", 14));
+        Text text3 = new Text(this.summaryLabel);
+        text3.setFont(Font.font("Verdana", 14));
+        this.goMethodsFlow.getChildren().addAll(text1, text2, text3);
+
         if (this.comparisonMode.equals(GeneOntologyComparisonMode.DGE)) {
             this.dgeOrDasGoBtn.setText("GO Enrichment (DGE)");
         } else {
@@ -175,7 +181,7 @@ public class GeneOntologyController implements Initializable {
         actionEvent.consume();
         GoComparison comparison = isopretService.getGoComparison();
         GoDisplayWidget widget = new GoDisplayWidget(comparison, this.comparisonMode);
-        widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
+        widget.show((Stage) this.geneOntologyPane.getScene().getWindow());
     }
 
 
@@ -184,7 +190,7 @@ public class GeneOntologyController implements Initializable {
         actionEvent.consume();
         GoComparison comparison = isopretService.getGoComparison();
         GoCompWidget widget = new GoCompWidget(comparison);
-        widget.show((Stage) this.goSummaryLabel.getScene().getWindow());
+        widget.show((Stage) this.geneOntologyPane.getScene().getWindow());
     }
 
     /**

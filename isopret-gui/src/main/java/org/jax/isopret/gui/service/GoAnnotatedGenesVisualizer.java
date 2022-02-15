@@ -119,8 +119,7 @@ public abstract class GoAnnotatedGenesVisualizer {
     }
 
     public String getHtml(Visualizable vis) {
-        return  " <a name=\"" + vis.getGeneSymbol() +"\"></a><h2>" + vis.getGeneSymbol() + "</h2>" +
-                "<div class=\"go\">\n" +
+        return "<div class=\"go\">\n" +
                 getSingleGeneSummary(vis) +
                 getTranscriptBox(vis) +
                 "<div class=\"svgrow\">\n" +

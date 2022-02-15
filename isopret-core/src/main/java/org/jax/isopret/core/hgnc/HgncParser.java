@@ -9,8 +9,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,28 +83,20 @@ public class HgncParser {
 
     private final List<HgncItem> itemList;
 
-    public HgncParser() {
-        Path path = Paths.get("data", "hgnc_complete_set.txt");
-        File f = path.toFile();
-        if (! f.isFile()) {
-            throw new IsopretRuntimeException("Could not find HGNC file at " + f.getAbsolutePath() + ". Did you run the download command?");
-        }
-        itemList = initHgncItems(f.getAbsolutePath());
-    }
 
     /**
      * Parse the HGNC file
-     * @param hgncPath path to the hgnc_complete_set.txt file
+     * @param hgncFile path to the hgnc_complete_set.txt file
      */
-    public HgncParser(String hgncPath) {
-        itemList = initHgncItems(hgncPath);
+    public HgncParser(File hgncFile) {
+        itemList = initHgncItems(hgncFile);
     }
 
-    private List<HgncItem> initHgncItems(String hgncPath) {
+    private List<HgncItem> initHgncItems(File hgncFile) {
         List<HgncItem> items = new ArrayList<>();
         int less_than_24_fields = 0;
         int well_formed_lines = 0;
-        try (BufferedReader br = new BufferedReader(new FileReader(hgncPath))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(hgncFile))) {
             String line = br.readLine();
             if (! line.startsWith("hgnc_id")) {
                 throw new IsopretRuntimeException("Malformed HGNC header line: " + line);

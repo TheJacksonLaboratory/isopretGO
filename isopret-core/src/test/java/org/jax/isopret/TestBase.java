@@ -49,7 +49,7 @@ public class TestBase {
     private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
 
 
-    protected static final HgncParser hgncParser = new HgncParser(hgncPath);
+    protected static final HgncParser hgncParser = new HgncParser(new File(hgncPath));
 
     private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
     private static Map<String, HbaDealsResult> hbaDealsResultMap = null;

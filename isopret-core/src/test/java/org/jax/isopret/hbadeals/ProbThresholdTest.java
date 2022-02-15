@@ -22,7 +22,7 @@ public class ProbThresholdTest {
 
     private static  List<Double> pvals;
     private static final double desiredFDR = 0.01;
-    private static double DELTA = 0.0001;
+    private static final double DELTA = 0.0001;
     private static PosteriorErrorProbThreshold probThreshold;
 
 
