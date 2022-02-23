@@ -190,7 +190,7 @@ public class HbaGeneController implements Initializable {
             isoformTableView.getItems().clear();
             isoformTableView.getItems().addAll(visualizable.getIsoformVisualizable());
             isoformTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-            isoformTableView.setFixedCellSize(25);
+            isoformTableView.setFixedCellSize(30);
             isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             hbaGeneWebView.setMaxHeight(visualizable.getIsoformSvgHeight());
             hbaProteinWebView.setMaxHeight(visualizable.getProteinSvgHeight()+30);
