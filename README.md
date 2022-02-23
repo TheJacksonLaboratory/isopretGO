@@ -5,6 +5,8 @@ functions that are affected by differential alternative splicing. Isopret is
 available as a Java desktop application. Most users should download the latest version from the
 Releases page.
 
+
+
 ## Background
 [Gene Ontology](http://geneontology.org/) traditionally has provided
 annotations for genes rather than for specific isoforms. However, in 
@@ -22,6 +24,15 @@ for genes and isoforms in a case-control cohort that has been studied
 by RNA-seq. We have previously publised [HBA-DEALS](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6),
 a hierarchical Bayesian algorithm that performs such an analysis, and this
 is the recommended input file.
+
+## Note to Macintosh users
+
+Isopret requires Java 17 and makes use of `JavaFX <https://openjfx.io/>`_ to implement the
+graphical user interface (GUI). We have noticed that JavaFX GUI apps including isopret have crashed on
+Macintosh laptops with the new ARM M1 chip when using Oracles SDK (version 17.0.2). We
+have used `Azul Zulu <https://www.azul.com/downloads/?package=jdk>`_ JDKs on M1 Macintoshes and
+could run Isopret and other JavaFX apps without problems.
+
 
 ### Further information
 
