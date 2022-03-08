@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../css/isopretstyle.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.MainController">
+<BorderPane fx:id="rootNode" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../css/isopretstyle.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.MainController">
     <top>
         <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
             <MenuBar minHeight="30.0" minWidth="183.0" HBox.hgrow="NEVER">
@@ -33,6 +33,7 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Export">
                     <MenuItem mnemonicParsing="false" onAction="#exportGoReport" text="Export GO overrepresentation results" />
+               <MenuItem mnemonicParsing="false" onAction="#exportInterproReport" text="Export Interpro domain overrepresentation" />
                 </Menu>
             </MenuBar>
             <Region styleClass="menu-bar" HBox.hgrow="SOMETIMES" />

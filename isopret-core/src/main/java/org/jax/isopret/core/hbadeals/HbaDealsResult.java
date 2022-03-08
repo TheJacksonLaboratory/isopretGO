@@ -69,6 +69,18 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
         return Collections.unmodifiableMap(transcriptMap);
     }
 
+    /**
+     * Only expressed transcripts are added to the HBA-DEALS results file.
+     * @return Number of expressed transcripts observed for this gene.
+     */
+    public int getExpressedTranscriptCount() {
+        return transcriptMap.size();
+    }
+
+    public int getSignificantTranscriptCount(double pepThreshold) {
+        return (int) this.transcriptMap.values().stream().filter(r -> r.getP() <= pepThreshold).count();
+    }
+
     public boolean hasDifferentialExpressionResult(double threshold) { return this.expressionP < threshold; }
 
 

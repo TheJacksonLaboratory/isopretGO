@@ -13,11 +13,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.gui.InterproOverrepVisualizer;
 import org.jax.isopret.gui.configuration.ApplicationProperties;
-import org.jax.isopret.gui.service.IsopretDataLoadTask;
-import org.jax.isopret.gui.service.HostServicesWrapper;
-import org.jax.isopret.gui.service.IsopretFxDownloadTask;
-import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.*;
 import org.jax.isopret.gui.widgets.IsopretStatsWidget;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
@@ -342,8 +340,9 @@ public class MainController implements Initializable {
         chooser.setInitialFileName(opt.get());
         File file = chooser.showSaveDialog(rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().equals("")) {
-            LOGGER.error("Could not get HBA-DEALS file");
-            PopupFactory.displayError("Error","Could not get HBA-DEALS file.");
+            String msg = "Could not get  GO Overrepresentation file for saving";
+            LOGGER.error(msg);
+            PopupFactory.displayError("Error",msg);
             return;
         }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
@@ -351,5 +350,34 @@ public class MainController implements Initializable {
         } catch (IOException e) {
             PopupFactory.displayException("Error", "Could not write GO report", e);
         }
+    }
+
+    public void exportInterproReport(ActionEvent actionEvent) {
+        double splicingPepThreshold = service.getSplicingPepThreshold();
+        InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
+        List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.setTitle("Save Isopret domain Overrepresentation results");
+        Optional<String> opt = service.getGoReportDefaultFilename();
+        if (opt.isEmpty()) {
+            PopupFactory.displayError("Error", "could not retrieve file name");
+            return; // should never happen
+        }
+        chooser.setInitialFileName(opt.get());
+        File file = chooser.showSaveDialog(rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().equals("")) {
+            String msg = "Could not get Isopret domain overrepresentation file for saving";
+            LOGGER.error(msg);
+            PopupFactory.displayError("Error",msg);
+            return;
+        }
+        InterproOverrepVisualizer visualizer = new InterproOverrepVisualizer(results);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            bw.write(visualizer.getTsv());
+        } catch (IOException e) {
+            PopupFactory.displayException("Error", "Could not write GO report", e);
+        }
+
     }
 }
