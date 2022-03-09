@@ -136,15 +136,10 @@ public abstract class IsopretCommand {
 
 
     private void runTranscriptFunctionFileParser() {
-        File predictionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
-        if (!predictionFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find isoform_function_list.txt at " +
-                    predictionFile.getAbsolutePath());
-        }
         if (geneOntology == null) {
             loadGeneOntology();
         }
-        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(predictionFile, geneOntology);
+        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(new File(downloadDirectory), geneOntology);
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
     }
 

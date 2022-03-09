@@ -37,21 +37,18 @@ import java.util.stream.Collectors;
  * (...)
  * This command compares the function with the original GO genewise annotations
  */
-@CommandLine.Command(name = "transcriptqc",
+@CommandLine.Command(name = "GO",
         mixinStandardHelpOptions = true,
-        description = "Q/C the transcript annotations")
+        description = "Gene Ontology Overrepresentation")
 public class GoOverrepCommand extends IsopretCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoOverrepCommand.class);
     @CommandLine.Option(names={"-b","--hbadeals"},
-            scope = CommandLine.ScopeType.INHERIT,
             description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
     @CommandLine.Option(names={"-c","--calculation"},
-            scope = CommandLine.ScopeType.INHERIT,
             description ="Ontologizer calculation (Term-for-Term, PC-Union, PC-Intersection)" )
     private String ontologizerCalculation = "Term-for-Term";
     @CommandLine.Option(names={"--mtc"},
-            scope = CommandLine.ScopeType.INHERIT,
             description="Multiple-Testing-Correction for GO analysis")
     private String mtc = "Bonferroni";
     @CommandLine.Option(names={"-v", "--verbose"}, description = "Show stats on commandline")
@@ -76,8 +73,7 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         LOGGER.info("Loaded transcriptToGeneIdMap with {} entries", transcriptIdToGoTermsMap.size());
         // create and check the annotation containers for the inferred data
         LOGGER.info("Loading TranscriptFunctionFileParser");
-        String transcriptFx = this.downloadDirectory + File.separator + "";
-        TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(transcriptFx), geneOntology);
+        TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(downloadDirectory), geneOntology);
         Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
         LOGGER.info("Loaded transcript2GoMap with {} entries", transcript2GoMap.size());
         Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
