@@ -136,15 +136,10 @@ public abstract class IsopretCommand {
 
 
     private void runTranscriptFunctionFileParser() {
-        File predictionFile = new File(downloadDirectory + File.separator + "isoform_function_list.txt");
-        if (!predictionFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find isoform_function_list.txt at " +
-                    predictionFile.getAbsolutePath());
-        }
         if (geneOntology == null) {
             loadGeneOntology();
         }
-        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(predictionFile, geneOntology);
+        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(new File(downloadDirectory), geneOntology);
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
     }
 
@@ -162,8 +157,19 @@ public abstract class IsopretCommand {
     }
 
 
+    /**
+     *
+     * @param category either gene-ontology or interpro
+     * @param hbaDealsFileName e.g., SRP149366_70.txt
+     * @return e.g., gene-ontology-overrep-SRP149366_70.tsv
+     */
+    protected String getDefaultOutfileName(String category, String hbaDealsFileName) {
+        File f = new File(hbaDealsFileName);
+        String basename = f.getName();
+        String hbaWithoutExtension =  basename.replaceFirst("[.][^.]+$", "");
+        return hbaWithoutExtension + "-overrep-" + category + ".tsv";
 
-
+    }
 
 
 
