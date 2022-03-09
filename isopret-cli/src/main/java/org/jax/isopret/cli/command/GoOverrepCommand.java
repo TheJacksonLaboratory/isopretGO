@@ -10,6 +10,7 @@ import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.visualization.DasDgeGoVisualizer;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -137,8 +138,8 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
                 }
         }
         writeGoResultsToFile(dasGoTerms, dgeGoTerms, geneOntology);
-        IsopretStats stats = null;
-        if (verbose || outfile != null) {
+
+        if (verbose) {
             IsopretStats.Builder builder = new IsopretStats.Builder();
             String goVersion = geneOntology.getMetaInfo().getOrDefault("data-version", "n/a/");
             builder.geneOntologyVersion(goVersion)
@@ -149,18 +150,10 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
                     .geneSymbolCount(geneIdToTranscriptMap.size())
                     .transcriptsCount(transcriptIdToGoTermsMap.size());
 
-            stats = builder.build();
-        }
-        if (verbose) {
+            IsopretStats stats = builder.build();
             stats.display();
         }
-        if (outfile != null) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outfile))) {
-                stats.write(writer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
         return 0;
     }
 
@@ -210,7 +203,12 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
     private void writeGoResultsToFile(List<GoTerm2PValAndCounts> dasGoTerms,
                                       List<GoTerm2PValAndCounts> dgeGoTerms,
                                       Ontology geneOntology) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("isopret-out.txt"))) {
+
+        if (outfile == null) {
+            outfile = getDefaultOutfileName("gene-ontology", hbadealsFile);
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outfile))) {
             for (var cts : dasGoTerms) {
                 if (cts.passesThreshold(0.05))
                     try {

@@ -60,17 +60,8 @@ public class EnsemblVisualizable implements Visualizable {
 
     private final int proteinSvgHeight;
 
-
-    private final double splicingThreshold;
-
     private final GoAnnotationMatrix annotationMatrix;
 
-    private final int i;
-
-    @Deprecated
-    public EnsemblVisualizable(AnnotatedGene agene){
-        this(agene, null);
-    }
 
     public EnsemblVisualizable(AnnotatedGene agene, GoAnnotationMatrix goAnnotationMatrix) {
         this.agene = agene;
@@ -82,8 +73,6 @@ public class EnsemblVisualizable implements Visualizable {
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
         this.differentiallyExpressed = agene.passesExpressionThreshold();
         this.differentiallySpliced = agene.passesSplicingThreshold();
-        this.splicingThreshold = agene.getSplicingThreshold();
-        this.i = 0;
         this.significantIsoforms = (int) hbaDealsResult.getTranscriptMap().values().stream().filter(HbaDealsTranscriptResult::isSignificant).count();
         this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().
                 stream().
@@ -104,14 +93,16 @@ public class EnsemblVisualizable implements Visualizable {
         }
     }
 
+    /**
+     * @return count of differential transcripts for this gene.
+     */
     @Override
     public int getDifferentialTranscriptCount() {
         double splicingThresh = agene.getSplicingThreshold();
-        int n_sig = (int) hbaDealsResult.getTranscriptMap().values()
+        return (int) hbaDealsResult.getTranscriptMap().values()
                 .stream()
                 .filter(t -> t.isSignificant(splicingThresh))
                 .count();
-        return n_sig;
     }
 
     @Override

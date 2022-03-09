@@ -157,8 +157,19 @@ public abstract class IsopretCommand {
     }
 
 
+    /**
+     *
+     * @param category either gene-ontology or interpro
+     * @param hbaDealsFileName e.g., SRP149366_70.txt
+     * @return e.g., gene-ontology-overrep-SRP149366_70.tsv
+     */
+    protected String getDefaultOutfileName(String category, String hbaDealsFileName) {
+        File f = new File(hbaDealsFileName);
+        String basename = f.getName();
+        String hbaWithoutExtension =  basename.replaceFirst("[.][^.]+$", "");
+        return hbaWithoutExtension + "-overrep-" + category + ".tsv";
 
-
+    }
 
 
 

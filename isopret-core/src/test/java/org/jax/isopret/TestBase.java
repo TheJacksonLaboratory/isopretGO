@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class TestBase {
 
@@ -35,7 +36,7 @@ public class TestBase {
         assert url != null;
         hgncPath = url.getPath();
         final URL url2 = classloader.getResource("interpro/ADAR_interpro_domain_desc.txt");
-        INTERPRO_ADAR_DOMAIN_DESC = url2.getPath();
+        INTERPRO_ADAR_DOMAIN_DESC = Objects.requireNonNull(url2).getPath();
         File f = new File(INTERPRO_ADAR_DOMAIN_DESC);
         System.out.println(INTERPRO_ADAR_DOMAIN_DESC + " :" + f.isFile());
     }
