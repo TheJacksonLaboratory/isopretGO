@@ -49,6 +49,8 @@ public class MainController implements Initializable {
     private final static Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
     public Tab dgeTab;
     public Tab dasTab;
+    public Tab interproTab;
+
     @FXML
     private Label hbaDealsFileLabel;
     @FXML
@@ -72,9 +74,6 @@ public class MainController implements Initializable {
     /** The tab pane with setup, analysis, gene views. etc */
     @FXML
     TabPane tabPane;
-    /** The 'first' tab of IsopretFX for setting things up.  */
-    @FXML
-    private Tab setupTab;
     /** The 'second' tab of IsopretFX that shows a summary of the analysis and a list of Viewpoints.  */
     @FXML
     private Tab analysisTab;
@@ -178,7 +177,7 @@ public class MainController implements Initializable {
     /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "0.8.12";
+        String version = "0.9.1";
         if (applicationProperties.getApplicationVersion() != null) {
             version = applicationProperties.getApplicationVersion();
         }
@@ -262,6 +261,8 @@ public class MainController implements Initializable {
                 this.tabPane.getTabs().add(dgeTab);
                 GeneOntologyController gc1 = loader.getController();
                 gc1.refreshGeneOntologyTable();
+                interproTab = new Tab("Interpro");
+                interproTab.setClosable(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -286,6 +287,34 @@ public class MainController implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            // now for interpro
+            try {
+                Resource r = resourceLoader.getResource(
+                        "classpath:fxml/interproPane.fxml");
+                if (! r.exists()) {
+                    LOGGER.error("Could not initialize Interpro pane (fxml file not found)");
+                    return;
+                }
+                FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
+                double splicingPepThreshold = service.getSplicingPepThreshold();
+                InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
+                List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+                Collections.sort(results);
+                loader.setControllerFactory(c -> new InterproController(results,  hostServicesWrapper));
+                ScrollPane p = loader.load();
+                interproTab = new Tab("Interpro");
+                interproTab.setId("Interpro");
+                interproTab.setClosable(false);
+                interproTab.setContent(p);
+                this.tabPane.getTabs().add(interproTab);
+                InterproController interproController = loader.getController();
+                interproController.refreshTable();
+
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
         });
         task.setOnFailed(eh -> {

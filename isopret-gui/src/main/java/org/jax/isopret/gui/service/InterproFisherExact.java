@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class InterproFisherExact {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproFisherExact.class);
@@ -19,6 +20,8 @@ public class InterproFisherExact {
     private final int populationSize;
     private final int studySize;
     private final Hypergeometric hypergeometric;
+    private final static int MINIMUM_TERM_COUNT_TO_TEST = 2;
+    private final Predicate<Integer> hasAtLeastMinCount = num -> num >= MINIMUM_TERM_COUNT_TO_TEST;
 
     public InterproFisherExact(List<AnnotatedGene> annotatedGeneList, double splicingPepThreshold) {
         populationSize = calculatePopulationSize(annotatedGeneList);
@@ -66,23 +69,31 @@ public class InterproFisherExact {
                 .sum();
     }
 
+    private int getNumberOfEffectiveTests() {
+       return (int)this.studySetInterproCounts.values().stream().filter(hasAtLeastMinCount).count();
+    }
+
 
     public List<InterproOverrepResult> calculateInterproOverrepresentation() {
         List<InterproOverrepResult> results = new ArrayList<>();
+        int n_tests = getNumberOfEffectiveTests();
         for (int interproId : this.interproIdToDisplay.keySet()) {
             DisplayInterproAnnotation display = this.interproIdToDisplay.get(interproId);
             int populationAnnotated = this.populationSetInterproCounts.get(interproId);
             int studyAnnotated = this.studySetInterproCounts.getOrDefault(interproId, 0);
-
+            if (studyAnnotated < MINIMUM_TERM_COUNT_TO_TEST) {
+                continue;
+            }
             double raw_pval = hypergeometric.phypergeometric(populationSize,
                    populationAnnotated,
                     studySize,
                     studyAnnotated);
+            double bonferroni_pval = Math.min(1.0,raw_pval * n_tests);
 
             String interproAccession = display.getInterproEntry().getIntroproAccession();
             String interproDescription = display.getInterproEntry().getDescription();
             InterproOverrepResult ipresult = new InterproOverrepResult(interproAccession,interproDescription, populationSize, populationAnnotated,
-                    studySize, studyAnnotated, raw_pval);
+                    studySize, studyAnnotated, raw_pval, bonferroni_pval);
             results.add(ipresult);
         }
         return results;
