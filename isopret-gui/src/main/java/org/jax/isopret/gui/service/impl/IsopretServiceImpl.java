@@ -300,6 +300,40 @@ public class IsopretServiceImpl implements IsopretService  {
        return visualizables;
     }
 
+    @Override
+    public List<AnnotatedGene> getAnnotatedGeneList() {
+        int notfound = 0;
+        List<AnnotatedGene> annotatedGenes = new ArrayList<>();
+        // sort the raw results according to minimum p-values
+        List<HbaDealsResult> results = thresholder.getRawResults().values()
+                .stream()
+                .sorted()
+                .toList();
+        for (HbaDealsResult result : results) {
+            if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
+                notfound++;
+                continue;
+            }
+            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
+            double splicingThreshold = thresholder.getSplicingPepThreshold();
+            double expressionThreshold = thresholder.getExpressionPepThreshold();
+            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                    interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+            AnnotatedGene agene = new AnnotatedGene(transcripts,
+                    transcriptToInterproHitMap,
+                    result,
+                    expressionThreshold,
+                    splicingThreshold);
+            annotatedGenes.add(agene);
+        }
+        if (notfound > 0) {
+            LOGGER.warn("Could not find transcript map for {} genes", notfound);
+        }
+        return annotatedGenes;
+    }
+
+
+
     public Ontology getGeneOntology() {
         return this.geneOntology;
     }
@@ -465,6 +499,11 @@ public class IsopretServiceImpl implements IsopretService  {
             visualizables.add(getVisualizableForGene(sym));
         }
         return visualizables;
+    }
+
+    @Override
+    public double getSplicingPepThreshold() {
+        return thresholder.getSplicingPepThreshold();
     }
 
 }

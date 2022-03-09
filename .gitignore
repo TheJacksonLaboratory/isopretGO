@@ -31,3 +31,6 @@ hs_err_pid*
 /isopret-cli/isopret-cli.iml
 /isopret-gui/isopret-gui.iml
 /isopret-out.txt
+/isopret-cli/target/
+/isopret-core/target/
+/isopret-gui/target/

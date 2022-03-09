@@ -146,12 +146,14 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
         }
         // TODO -- Figure out what is going on here
         // lots of transcripts do not have 3n nt according to our calcs.
-        if (cdsNtCount % 3 != 0) {
-//            // should never happen
+        // This is a bug upstream in Jannovar that could affect only our visualizations by a very small amount
+        // we cannot fix this without moving away from Jannovar.
+        //  if (cdsNtCount % 3 != 0) {
+            // should never happen
 //            // a small number of Ensembl entries seem to be 3n+1 or 3n+2
 //            // this should not matter fo visualization but log the error
-            LOGGER.error("Invalid CDS length determined for " + accessionId() + ": " + cdsNtCount + " (bp not a multiple of 3)");
-        }
+           // LOGGER.error("Invalid CDS length determined for " + accessionId() + ": " + cdsNtCount + " (bp not a multiple of 3)");
+        //  }
         return cdsNtCount / 3 - 1; // remove one aa so we do not count the stop codon
     }
 

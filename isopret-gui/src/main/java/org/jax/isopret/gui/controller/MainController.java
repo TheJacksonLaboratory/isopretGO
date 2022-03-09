@@ -13,11 +13,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jax.isopret.core.go.GoMethod;
 import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.gui.InterproOverrepVisualizer;
 import org.jax.isopret.gui.configuration.ApplicationProperties;
-import org.jax.isopret.gui.service.IsopretDataLoadTask;
-import org.jax.isopret.gui.service.HostServicesWrapper;
-import org.jax.isopret.gui.service.IsopretFxDownloadTask;
-import org.jax.isopret.gui.service.IsopretService;
+import org.jax.isopret.gui.service.*;
 import org.jax.isopret.gui.widgets.IsopretStatsWidget;
 import org.jax.isopret.gui.widgets.PopupFactory;
 import org.slf4j.Logger;
@@ -51,6 +49,8 @@ public class MainController implements Initializable {
     private final static Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
     public Tab dgeTab;
     public Tab dasTab;
+    public Tab interproTab;
+
     @FXML
     private Label hbaDealsFileLabel;
     @FXML
@@ -74,9 +74,6 @@ public class MainController implements Initializable {
     /** The tab pane with setup, analysis, gene views. etc */
     @FXML
     TabPane tabPane;
-    /** The 'first' tab of IsopretFX for setting things up.  */
-    @FXML
-    private Tab setupTab;
     /** The 'second' tab of IsopretFX that shows a summary of the analysis and a list of Viewpoints.  */
     @FXML
     private Tab analysisTab;
@@ -180,7 +177,7 @@ public class MainController implements Initializable {
     /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "0.8.12";
+        String version = "0.9.1";
         if (applicationProperties.getApplicationVersion() != null) {
             version = applicationProperties.getApplicationVersion();
         }
@@ -264,6 +261,8 @@ public class MainController implements Initializable {
                 this.tabPane.getTabs().add(dgeTab);
                 GeneOntologyController gc1 = loader.getController();
                 gc1.refreshGeneOntologyTable();
+                interproTab = new Tab("Interpro");
+                interproTab.setClosable(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -288,6 +287,34 @@ public class MainController implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            // now for interpro
+            try {
+                Resource r = resourceLoader.getResource(
+                        "classpath:fxml/interproPane.fxml");
+                if (! r.exists()) {
+                    LOGGER.error("Could not initialize Interpro pane (fxml file not found)");
+                    return;
+                }
+                FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(r.getURL()));
+                double splicingPepThreshold = service.getSplicingPepThreshold();
+                InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
+                List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+                Collections.sort(results);
+                loader.setControllerFactory(c -> new InterproController(results,  hostServicesWrapper));
+                ScrollPane p = loader.load();
+                interproTab = new Tab("Interpro");
+                interproTab.setId("Interpro");
+                interproTab.setClosable(false);
+                interproTab.setContent(p);
+                this.tabPane.getTabs().add(interproTab);
+                InterproController interproController = loader.getController();
+                interproController.refreshTable();
+
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
         });
         task.setOnFailed(eh -> {
@@ -342,8 +369,9 @@ public class MainController implements Initializable {
         chooser.setInitialFileName(opt.get());
         File file = chooser.showSaveDialog(rootNode.getScene().getWindow());
         if (file==null || file.getAbsolutePath().equals("")) {
-            LOGGER.error("Could not get HBA-DEALS file");
-            PopupFactory.displayError("Error","Could not get HBA-DEALS file.");
+            String msg = "Could not get  GO Overrepresentation file for saving";
+            LOGGER.error(msg);
+            PopupFactory.displayError("Error",msg);
             return;
         }
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
@@ -351,5 +379,34 @@ public class MainController implements Initializable {
         } catch (IOException e) {
             PopupFactory.displayException("Error", "Could not write GO report", e);
         }
+    }
+
+    public void exportInterproReport(ActionEvent actionEvent) {
+        double splicingPepThreshold = service.getSplicingPepThreshold();
+        InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
+        List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.setTitle("Save Isopret domain Overrepresentation results");
+        Optional<String> opt = service.getGoReportDefaultFilename();
+        if (opt.isEmpty()) {
+            PopupFactory.displayError("Error", "could not retrieve file name");
+            return; // should never happen
+        }
+        chooser.setInitialFileName(opt.get());
+        File file = chooser.showSaveDialog(rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().equals("")) {
+            String msg = "Could not get Isopret domain overrepresentation file for saving";
+            LOGGER.error(msg);
+            PopupFactory.displayError("Error",msg);
+            return;
+        }
+        InterproOverrepVisualizer visualizer = new InterproOverrepVisualizer(results);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            bw.write(visualizer.getTsv());
+        } catch (IOException e) {
+            PopupFactory.displayException("Error", "Could not write GO report", e);
+        }
+
     }
 }

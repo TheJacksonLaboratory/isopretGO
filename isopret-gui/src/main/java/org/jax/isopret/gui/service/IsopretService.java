@@ -3,6 +3,7 @@ package org.jax.isopret.gui.service;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
+import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
@@ -80,4 +81,7 @@ public interface IsopretService {
 
     List<Visualizable> getDgeForGoTerm(TermId goId);
     List<Visualizable> getDasForGoTerm(TermId goId);
+
+    List<AnnotatedGene> getAnnotatedGeneList();
+    double getSplicingPepThreshold();
 }

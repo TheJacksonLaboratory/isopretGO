@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * (...)
  * This command compares the function with the original GO genewise annotations
  */
-@CommandLine.Command(name = "transcriptqc", aliases = {"T"},
+@CommandLine.Command(name = "transcriptqc",
         mixinStandardHelpOptions = true,
         description = "Q/C the transcript annotations")
 public class GoOverrepCommand extends IsopretCommand implements Callable<Integer> {
@@ -150,8 +150,6 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
                     .goAssociationsGenes(geneContainer.getTotalAnnotationCount())
                     .annotatedGeneCount(geneContainer.getAnnotatedDomainItemCount())
                     .annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount())
-//                    .interproAnnotationCount(.getInterproAnnotationCount())
-//                    .interproDescriptionCount(mapper.getInterproDescriptionCount())
                     .geneSymbolCount(geneIdToTranscriptMap.size())
                     .transcriptsCount(transcriptIdToGoTermsMap.size());
 

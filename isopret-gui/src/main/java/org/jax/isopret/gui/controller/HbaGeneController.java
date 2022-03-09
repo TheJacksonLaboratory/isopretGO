@@ -190,7 +190,7 @@ public class HbaGeneController implements Initializable {
             isoformTableView.getItems().clear();
             isoformTableView.getItems().addAll(visualizable.getIsoformVisualizable());
             isoformTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-            isoformTableView.setFixedCellSize(25);
+            isoformTableView.setFixedCellSize(30);
             isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
             hbaGeneWebView.setMaxHeight(visualizable.getIsoformSvgHeight());
             hbaProteinWebView.setMaxHeight(visualizable.getProteinSvgHeight()+30);
@@ -248,7 +248,7 @@ public class HbaGeneController implements Initializable {
         String basename = isopretFile.getName();
         String genesymbol = visualizable.getGeneSymbol();
         String fname = basename +"-" + genesymbol + "-isoforms.svg";
-        saveStringToFile(svg, fname);
+        saveSvgToFile(svg, fname);
     }
 
     @FXML private void genePDFexport(ActionEvent e) {
@@ -280,7 +280,7 @@ public class HbaGeneController implements Initializable {
         String basename = isopretFile.getName();
         String genesymbol = visualizable.getGeneSymbol();
         String fname = basename +"-" + genesymbol + "-domains.svg";
-        saveStringToFile(svg, fname);
+        saveSvgToFile(svg, fname);
 
     }
 
@@ -302,7 +302,7 @@ public class HbaGeneController implements Initializable {
         saveToPdf(visualizable.getProteinSvg(), optFile.get());
     }
 
-    private void saveStringToFile(String contents, String fname) {
+    private void saveSvgToFile(String contents, String fname) {
         LOGGER.info("Saving data to {}", fname);
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SVG files (*.svg)", "*.svg");
@@ -331,6 +331,9 @@ public class HbaGeneController implements Initializable {
         return Optional.ofNullable(file);
     }
 
+    /**
+     * @return "random" string to make a temp file
+     */
     public String getRandomString() {
         int numChars = 30;
         final Random RAND = new Random();
@@ -343,16 +346,16 @@ public class HbaGeneController implements Initializable {
             char c = (char) index;
             sb.append(c);
         }
-        if (sb.length() < 5) {
-            sb.append("temp"); // do not understand, but once we got just "k"
-        }
+        sb.append("-temp");
         return sb.toString();
     }
 
+    /**
+     * Creates a PDF file using {@code rsvg-convert -f pdf -o mygraph.pdf mygraph.svg}
+     * @param contents SVG code
+     * @param pdfFile path to write the corresponding PDF file
+     */
     private void saveToPdf(String contents, File pdfFile) {
-         /*
-         -f pdf -o mygraph.pdf mygraph.svg
-         */
         // get temp file and save SVG
         File temp;
         try {
