@@ -13,7 +13,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.jax.isopret.gui.service.HostServicesWrapper;
-import org.jax.isopret.gui.service.InterproOverrepResult;
+import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

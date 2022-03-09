@@ -27,6 +27,7 @@ public class InterproDomainDescParser {
     private  Map<Integer, InterproEntry> getDescriptions(File file) {
         Map<Integer, InterproEntry> interpromap = new HashMap<>();
         String line = null;
+        int unrecognized = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             br.readLine(); // header
             while ((line=br.readLine()) != null) {
@@ -37,7 +38,7 @@ public class InterproDomainDescParser {
                 String id = fields[0];
                 InterproEntryType entryType = InterproEntryType.fromString(fields[1]);
                 if (entryType.equals(InterproEntryType.UNKNOWN)) {
-                    LOGGER.warn("Did not recognize entry type ({}) in line {}", entryType, line);
+                    LOGGER.warn("Did not recognize entry type ({}) from {}", entryType, line);
                     continue;
                 }
                 String description = fields[2];
