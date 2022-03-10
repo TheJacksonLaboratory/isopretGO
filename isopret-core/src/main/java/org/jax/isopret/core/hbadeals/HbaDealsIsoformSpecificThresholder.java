@@ -116,8 +116,10 @@ public class HbaDealsIsoformSpecificThresholder {
         LOGGER.info("DAS: {} study set and {} population genes", dasIsoformStudy.size(), dasIsoformPopulation.size());
         assocMap = transcriptContainer.getAssociationMap(dasIsoformStudy);
         this.dasStudy = new StudySet("DAS Study", assocMap);
+        LOGGER.info("DAS: study set {} annotated items",dasStudy.getAnnotatedItemCount());
         assocMap = transcriptContainer.getAssociationMap(dasIsoformPopulation);
         this.dasPopulation = new StudySet("DAS Population", assocMap);
+        LOGGER.info("DAS: Population set {} annotated items",dasPopulation.getAnnotatedItemCount());
     }
 
 

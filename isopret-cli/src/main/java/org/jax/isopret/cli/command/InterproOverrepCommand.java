@@ -56,12 +56,15 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
     @Override
     public Integer call() {
         interproMapper = getInterproMapper();
+        LOGGER.info("Got interpro mapper");
         List<AnnotatedGene> annotatedGeneList = getAnnotatedGeneList();
+        LOGGER.info("Got {} Annotated genes.", annotatedGeneList.size());
         if (splicingPepThreshold == null) {
             throw new IsopretRuntimeException("Could not calculate splicing PEP threshold (should never happen!)");
         }
         InterproFisherExact ife = new InterproFisherExact(annotatedGeneList, splicingPepThreshold);
         List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+        LOGGER.info("Got {} InterproOverrepResults.", results.size());
         InterproOverrepVisualizer visualizer = new InterproOverrepVisualizer(results);
         if (outfile == null) {
             outfile = getDefaultOutfileName("interpro", hbadealsFile);
@@ -99,11 +102,14 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
         IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcriptToGoMap, gene2GoMap);
         LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
         transcriptContainer = isoContainerFac.transcriptContainer();
+        LOGGER.info("Got transcriptContainer with {} domain items", transcriptContainer.getAnnotatedDomainItemCount());
         geneContainer = isoContainerFac.geneContainer();
+        LOGGER.info("Got geneContainer with {} domain items", geneContainer.getAnnotatedDomainItemCount());
         HbaDealsIsoformSpecificThresholder thresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);
+        LOGGER.info("Got thresholder with {} DAS isoforms", thresholder.getDasIsoformCount());
         return thresholder;
     }
 
@@ -134,15 +140,21 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
                 .stream()
                 .sorted()
                 .toList();
+        LOGGER.info("Got {} raw results from thresholder", results.size());
+        int c = 0;
+        double splicingThreshold = thresholder.getSplicingPepThreshold();
+        double expressionThreshold = thresholder.getExpressionPepThreshold();
+        InterproMapper interproMapper = getInterproMapper();
         for (HbaDealsResult result : results) {
+            c++;
+            if (c % 100==0) {
+                LOGGER.info("results {} not found {}", c, notfound);
+            }
             if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
                 notfound++;
                 continue;
             }
             List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
-            double splicingThreshold = thresholder.getSplicingPepThreshold();
-            double expressionThreshold = thresholder.getExpressionPepThreshold();
-            InterproMapper interproMapper = getInterproMapper();
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
                     interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
             AnnotatedGene agene = new AnnotatedGene(transcripts,
@@ -170,8 +182,7 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
             throw new IsopretRuntimeException("Could not find interpro_domain_desc.txt at " +
                     interproDescriptionFile.getAbsolutePath());
         }
-        InterproMapper interproMapper = new InterproMapper(interproDescriptionFile, interproDomainsFile);
-        return interproMapper;
+        return new InterproMapper(interproDescriptionFile, interproDomainsFile);
     }
 
 
