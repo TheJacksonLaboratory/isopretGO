@@ -6,9 +6,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.IsopretAssociationContainer;
-import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
@@ -25,7 +23,9 @@ import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
+import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
@@ -266,6 +266,38 @@ public class IsopretServiceImpl implements IsopretService  {
         return new EnsemblVisualizable(agene, annotationMatrix);
     }
 
+
+
+    @Override
+    public List<Visualizable> getGeneVisualizables(Set<String> includedSymbols) {
+        List<Visualizable> visualizables = new ArrayList<>();
+        // sort the raw results according to minimum p-values
+        List<HbaDealsResult> results = thresholder.getRawResults().values()
+                .stream()
+                .sorted()
+                .toList();
+        for (HbaDealsResult result : results) {
+            if (! includedSymbols.contains(result.getSymbol()) ||
+                    this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
+                continue;
+            }
+            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
+            double splicingThreshold = thresholder.getSplicingPepThreshold();
+            double expressionThreshold = thresholder.getExpressionPepThreshold();
+            Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                    interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+            AnnotatedGene agene = new AnnotatedGene(transcripts,
+                    transcriptToInterproHitMap,
+                    result,
+                    expressionThreshold,
+                    splicingThreshold);
+            GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result);
+            EnsemblVisualizable viz = new EnsemblVisualizable(agene, annotationMatrix);
+            visualizables.add(viz);
+        }
+        return visualizables;
+    }
+
     @Override
     public List<Visualizable> getGeneVisualizables() {
         int notfound = 0;
@@ -504,6 +536,22 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public double getSplicingPepThreshold() {
         return thresholder.getSplicingPepThreshold();
+    }
+    @Override
+    public Map<GoTermIdPlusLabel, Integer> getGoAnnotationsForTranscript(Set<TermId> annotatedItemTermIds) {
+        Map<GoTermIdPlusLabel, Integer> countMap = new HashMap<>();
+        Map<TermId, IsopretAnnotations> annotMap =   transcriptContainer.getAssociationMap();
+
+        for (IsopretAnnotations annots : annotMap.values()) {
+            for (TermAnnotation a : annots.getAnnotations()) {
+                IsopretTermAnnotation itanot = (IsopretTermAnnotation) a;
+                TermId goId = itanot.getTermId();
+                String label = geneOntology.getTermLabel(goId).orElse("n/a");
+                GoTermIdPlusLabel gtlab = new GoTermIdPlusLabel(goId,label);
+                countMap.merge(gtlab, 1, Integer::sum);
+            }
+        }
+        return countMap;
     }
 
 }

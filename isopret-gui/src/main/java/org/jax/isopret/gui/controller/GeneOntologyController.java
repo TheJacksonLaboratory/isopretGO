@@ -12,7 +12,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jax.isopret.gui.service.GoAnnotatedGenesVisualizer;
+import org.jax.isopret.gui.service.AnnotatedGenesVisualizer;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
@@ -212,7 +212,7 @@ public class GeneOntologyController implements Initializable {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DAS)){
-            GoAnnotatedGenesVisualizer export = GoAnnotatedGenesVisualizer.splicing(goId, isopretService);
+            AnnotatedGenesVisualizer export = AnnotatedGenesVisualizer.splicing(goId, isopretService);
             String html = export.export();
             Optional<File> f = getDefaultFname("splicing", goId.getValue());
             if (f.isEmpty()) {
@@ -226,7 +226,7 @@ public class GeneOntologyController implements Initializable {
             }
             alert.close();
         } else if (result.isPresent() && result.get().equals(buttonTypeOne) && this.comparisonMode.equals(GeneOntologyComparisonMode.DGE)){
-            GoAnnotatedGenesVisualizer export = GoAnnotatedGenesVisualizer.expression(goId, isopretService);
+            AnnotatedGenesVisualizer export = AnnotatedGenesVisualizer.expression(goId, isopretService);
             String html = export.export();
             Optional<File> f = getDefaultFname("expressed", goId.getValue());
             if (f.isEmpty()) {

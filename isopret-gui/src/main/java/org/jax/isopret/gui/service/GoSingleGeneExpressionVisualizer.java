@@ -3,7 +3,7 @@ package org.jax.isopret.gui.service;
 import org.jax.isopret.core.visualization.HtmlUtil;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
-public class GoSingleGeneExpressionVisualizer extends GoAnnotatedGenesVisualizer {
+public class GoSingleGeneExpressionVisualizer extends AnnotatedGenesVisualizer {
 
 
 
@@ -15,7 +15,7 @@ public class GoSingleGeneExpressionVisualizer extends GoAnnotatedGenesVisualizer
 
     public String getTitle() {
         return String.format("Isopret: %d differentially expressed genes annotated to %s (%s)",
-                this.annotatedGenes.size(),  this.geneOntologyLabel, this.geneOntologyId.getValue());
+                this.annotatedGenes.size(),  this.termLabel, this.geneOntologyId.getValue());
     }
 
     public String export() {
@@ -34,7 +34,7 @@ public class GoSingleGeneExpressionVisualizer extends GoAnnotatedGenesVisualizer
     private String getGeneULwithLinks() {
         StringBuilder sb = new StringBuilder();
         sb.append("<p>A total of ").append(annotatedGenes.size()).append(" genes that are annotated to ");
-        sb.append(this.geneOntologyLabel).append(" (").append(geneOntologyId.getValue()).append(") were ");
+        sb.append(this.termLabel).append(" (").append(geneOntologyId.getValue()).append(") were ");
         sb.append("identifed as differentially expressed.");
         sb.append("</p>");
         sb.append("<ul>\n");
@@ -58,7 +58,7 @@ public class GoSingleGeneExpressionVisualizer extends GoAnnotatedGenesVisualizer
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
                 %s
                 </head>
-                """, this.geneOntologyLabel, this.geneOntologyId, HtmlUtil.css);
+                """, this.termLabel, this.geneOntologyId, HtmlUtil.css);
     }
 
 }

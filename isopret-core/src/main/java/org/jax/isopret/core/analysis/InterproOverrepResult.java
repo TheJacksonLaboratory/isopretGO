@@ -14,22 +14,18 @@ public record InterproOverrepResult(String interproAccession,
 
 
     public String getStudyCounts() {
-        return String.format("%d/%d", studyAnnotated, studyTotal);
+        String perc = getPercentage( studyAnnotated, studyTotal);
+        return String.format("%d/%d (%s)", studyAnnotated, studyTotal, perc);
     }
 
-    public String getStudyPercentage() {
-        return getPerecentage( studyAnnotated, studyTotal);
-    }
 
     public String getPopulationCounts() {
-        return String.format("%d/%d", populationAnnotated, populationTotal);
+        String perc = getPercentage( populationAnnotated, populationTotal);
+        return String.format("%d/%d (%s)", populationAnnotated, populationTotal, perc);
     }
 
-    public String getPopulationPercentage() {
-        return getPerecentage( populationAnnotated, populationTotal);
-    }
 
-    private String getPerecentage(int numerator, int denominator) {
+    private String getPercentage(int numerator, int denominator) {
         if (denominator == 0.0) {
             return "0%";
         } else {
