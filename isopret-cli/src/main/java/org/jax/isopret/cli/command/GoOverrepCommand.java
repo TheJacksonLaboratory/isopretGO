@@ -10,7 +10,6 @@ import org.jax.isopret.core.hgnc.HgncItem;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.Transcript;
-import org.jax.isopret.core.visualization.DasDgeGoVisualizer;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;

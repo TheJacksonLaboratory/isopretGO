@@ -1,4 +1,4 @@
-package org.jax.isopret.gui.service;
+package org.jax.isopret.core.analysis;
 
 import java.util.Formatter;
 
