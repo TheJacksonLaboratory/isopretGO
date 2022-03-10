@@ -85,3 +85,28 @@ The options are
 +------------------+--------------------------------------------------------------------------------------+
 
 
+The interpro command
+^^^^^^^^^^^^^^^^^^^^
+
+This command performs interpro domain overrepresentation analysis. The download command must be run before
+running this command. The ``--hbadeals`` option is required and indicates the path to an HBA-DEALS output file.
+
+.. code-block:: java
+
+    java -jar isopret-cli.jar interpro --hbadeals <path>
+
+
+
+The options are
+
++------------------+--------------------------------------------------------------------------------------+
+|  Option          |   Explanation                                                                        |
++==================+======================================================================================+
+| -b,--hbadeals    | Path to HBA-DEALS output file (required)                                             |
++------------------+--------------------------------------------------------------------------------------+
+| -d,--download    | data download directory (``data`` by default)                                        |
++------------------+--------------------------------------------------------------------------------------+
+| --outfile        | Name of output file to write stats (default gene-ontology-overrep-{input}.tsv        |
++------------------+--------------------------------------------------------------------------------------+
+
+

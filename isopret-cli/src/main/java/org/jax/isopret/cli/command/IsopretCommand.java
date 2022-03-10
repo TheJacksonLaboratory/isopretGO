@@ -89,7 +89,7 @@ public abstract class IsopretCommand {
     }
 
 
-    protected Map<String, List<Transcript>> loadJannovarTranscriptMap() {
+    protected Map<String, List<Transcript>> loadJannovarSymbolToTranscriptMap() {
         if (jannovarReader == null) {
             jannovarReader = new JannovarReader(jannovarTranscriptFile(), assembly);
             LOGGER.info("Loaded JannovarReader with {} symbols",

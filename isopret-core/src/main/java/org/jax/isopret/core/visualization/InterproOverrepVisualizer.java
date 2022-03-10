@@ -1,6 +1,6 @@
-package org.jax.isopret.gui;
+package org.jax.isopret.core.visualization;
 
-import org.jax.isopret.gui.service.InterproOverrepResult;
+import org.jax.isopret.core.analysis.InterproOverrepResult;
 
 import java.io.StringWriter;
 import java.util.Collections;
