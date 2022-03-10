@@ -20,6 +20,7 @@ import org.jax.isopret.gui.service.IsopretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -69,7 +70,7 @@ public class AnalysisController implements Initializable {
 
     @Autowired
     private IsopretService isopretService;
-    @Autowired
+    @Autowired @Lazy
     private MainController mainController;
     @Autowired
     private ResourceLoader resourceLoader;
