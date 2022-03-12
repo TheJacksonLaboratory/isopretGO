@@ -7,7 +7,6 @@ import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.jax.isopret.core.visualization.HtmlUtil;
-import org.jax.isopret.core.visualization.Visualizable;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +28,10 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
     /** GO annotations for differential isoforms. */
     private final Map<GoTermIdPlusLabel, Integer> countsMap;
 
-    private final List<Visualizable> visualizables;
-
     public InterproAnnotatedGenesVisualizer(InterproOverrepResult interpro, IsopretService isopretService) {
         super(interpro, isopretService);
         this.interproResult = interpro;
-        String targetInterproAccession = this.interproResult.interproAccession();
+        int targetInterproId = this.interproResult.interproEntry().getId();
         double splicingPepThreshold = isopretService.getSplicingPepThreshold();
         List<AnnotatedGene> annotatedGeneList = isopretService.getAnnotatedGeneList();
         this.includedGenes = new ArrayList<>();
@@ -42,14 +39,27 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         for (AnnotatedGene gene : annotatedGeneList) {
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptMap = gene.getTranscriptToInterproHitMap();
             boolean includeThisGene = false;
+            if (gene.passesSplicingThreshold())
             for (HbaDealsTranscriptResult tresult: gene.getHbaDealsResult().getTranscriptResults()) {
                 if (tresult.isSignificant(splicingPepThreshold)) {
                     AccessionNumber acc = tresult.getTranscriptId();
-                    if (transcriptMap.containsKey(acc) && transcriptMap.get(acc).stream()
-                            .anyMatch(d -> d.getInterproEntry().getIntroproAccession().equals(targetInterproAccession))){
-                        includeThisGene = true;
-                        transcriptAccessions.add(acc.toTermId());
+                    List<DisplayInterproAnnotation> dialist = transcriptMap.get(acc);
+                    if (dialist == null) {
+                        // no annotations for this transcript, which is expected for some
+                        continue;
                     }
+                    for (var dia : dialist) {
+                        if (dia.getInterproEntry().getId() == targetInterproId) {
+                            includeThisGene = true;
+                            transcriptAccessions.add(acc.toTermId());
+                        }
+                        //studySetInterproCounts.merge(interpoId, 1, Integer::sum); // increment, start at 1 if was absent
+                    }
+//                    if (transcriptMap.containsKey(acc) && transcriptMap.get(acc).stream()
+//                            .anyMatch(d -> d.getInterproEntry().getId() == targetInterproId)){
+//                        includeThisGene = true;
+//                        transcriptAccessions.add(acc.toTermId());
+//                    }
                 }
             }
             if (includeThisGene) {
@@ -65,7 +75,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
                 .stream()
                 .map(AnnotatedGene::getSymbol)
                 .collect(Collectors.toSet());
-        this.visualizables = isopretService.getGeneVisualizables(includedSymbols);
+        this.visualizableList = isopretService.getGeneVisualizables(includedSymbols);
     }
 
 
@@ -75,7 +85,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         sb.append(htmlTop());
         sb.append(getGoTable());
         sb.append(getGeneULwithLinks());
-        for (var viz : visualizables) {
+        for (var viz : visualizableList) {
             String html = getHtml(viz);
             sb.append(wrapInArticle(html, viz.getGeneSymbol()));
         }
@@ -204,7 +214,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         sb.append(this.termLabel).append(" (").append(interproId).append(") were ");
         sb.append("identified as differentially spliced. ");
         sb.append("</p>");
-        for (var viz : visualizables) {
+        for (var viz : visualizableList) {
             sb.append("<li><a href=\"#").append(viz.getGeneSymbol()).append("\">").append(viz.getGeneSymbol()).append("</a></li>");
         }
         sb.append("<br/><br/>");

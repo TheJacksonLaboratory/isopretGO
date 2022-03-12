@@ -37,6 +37,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class IsopretServiceImpl implements IsopretService  {
@@ -421,7 +422,7 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public int totalSignificantGoTermsAnnotatingGene(Set<TermId> goIds) {
         // total significant terms in DGE/DAS
-        return Streams.concat(dgeGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
+        return Stream.concat(dgeGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
                         filter(goIds::contains),
                         dasGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
                                 filter(goIds::contains))

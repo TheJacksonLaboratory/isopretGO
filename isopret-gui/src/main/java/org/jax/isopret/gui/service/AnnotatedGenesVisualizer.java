@@ -24,7 +24,7 @@ public abstract class AnnotatedGenesVisualizer {
     protected final TermId geneOntologyId;
     protected final String interproId;
     protected final String termLabel;
-    protected  List<Visualizable> annotatedGenes;
+    protected  List<Visualizable> visualizableList;
     public final String experiment;
 
     public AnnotatedGenesVisualizer(TermId goId, IsopretService isopretService) {
@@ -41,8 +41,8 @@ public abstract class AnnotatedGenesVisualizer {
 
     public AnnotatedGenesVisualizer(InterproOverrepResult interpro, IsopretService isopretService) {
         this.geneOntologyId = null;
-        this.interproId = interpro.interproAccession();
-        this.termLabel = interpro.interproDescription();
+        this.interproId = interpro.interproEntry().getIntroproAccession();
+        this.termLabel = interpro.interproEntry().getDescription();
         Optional<File> opt = isopretService.getHbaDealsFileOpt();
         basename = opt.map(File::getName).orElse("n/a");
         this.htmlHeader = header();

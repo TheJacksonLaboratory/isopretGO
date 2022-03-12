@@ -2,6 +2,7 @@ package org.jax.isopret.core.analysis;
 
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.interpro.InterproEntry;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
 import org.monarchinitiative.phenol.analysis.stats.Hypergeometric;
@@ -23,6 +24,11 @@ public class InterproFisherExact {
     private final static int MINIMUM_TERM_COUNT_TO_TEST = 2;
     private final Predicate<Integer> hasAtLeastMinCount = num -> num >= MINIMUM_TERM_COUNT_TO_TEST;
 
+    /**
+     *
+     * @param annotatedGeneList list of all genes with at least one read in the experiment
+     * @param splicingPepThreshold posterior error probability (PEP) threshold calculated for this experiment for splicing
+     */
     public InterproFisherExact(List<AnnotatedGene> annotatedGeneList, double splicingPepThreshold) {
         populationSize = calculatePopulationSize(annotatedGeneList);
         studySize = calculateStudysetSize(annotatedGeneList, splicingPepThreshold);
@@ -90,9 +96,8 @@ public class InterproFisherExact {
                     studyAnnotated);
             double bonferroni_pval = Math.min(1.0,raw_pval * n_tests);
 
-            String interproAccession = display.getInterproEntry().getIntroproAccession();
-            String interproDescription = display.getInterproEntry().getDescription();
-            InterproOverrepResult ipresult = new InterproOverrepResult(interproAccession,interproDescription, populationSize, populationAnnotated,
+            InterproEntry interproEntry = display.getInterproEntry();
+            InterproOverrepResult ipresult = new InterproOverrepResult(interproEntry, populationSize, populationAnnotated,
                     studySize, studyAnnotated, raw_pval, bonferroni_pval);
             results.add(ipresult);
         }

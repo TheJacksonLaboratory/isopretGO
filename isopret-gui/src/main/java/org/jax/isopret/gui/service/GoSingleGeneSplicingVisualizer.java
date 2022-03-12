@@ -12,9 +12,9 @@ public class GoSingleGeneSplicingVisualizer extends AnnotatedGenesVisualizer {
 
     public GoSingleGeneSplicingVisualizer(TermId goId, IsopretService isopretService) {
         super(goId, isopretService);
-        this.annotatedGenes = isopretService.getDasForGoTerm(goId);
-        nGenesWithDifferentialSplicing = annotatedGenes.size();
-        nDifferentialIsoforms = annotatedGenes.stream()
+        this.visualizableList = isopretService.getDasForGoTerm(goId);
+        nGenesWithDifferentialSplicing = visualizableList.size();
+        nDifferentialIsoforms = visualizableList.stream()
                 .map(Visualizable::getDifferentialTranscriptCount)
                 .reduce(0, Integer::sum);
     }
@@ -29,7 +29,7 @@ public class GoSingleGeneSplicingVisualizer extends AnnotatedGenesVisualizer {
         sb.append(htmlHeader);
         sb.append(htmlTop());
         sb.append(getGeneULwithLinks());
-        for (var viz : annotatedGenes) {
+        for (var viz : visualizableList) {
             String html = getHtml(viz);
             sb.append(wrapInArticle(html, viz.getGeneSymbol()));
         }
@@ -39,13 +39,13 @@ public class GoSingleGeneSplicingVisualizer extends AnnotatedGenesVisualizer {
 
     private String getGeneULwithLinks() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<p>A total of ").append(annotatedGenes.size()).append(" genes that are annotated to ");
+        sb.append("<p>A total of ").append(visualizableList.size()).append(" genes that are annotated to ");
         sb.append(this.termLabel).append(" (").append(geneOntologyId.getValue()).append(") were ");
         sb.append("identified as differentially spliced. ");
         sb.append("A total of ").append(nDifferentialIsoforms).append(" differentially spliced isoforms were associated with these genes.");
         sb.append("</p>");
         sb.append("<ul>\n");
-        for (var viz : annotatedGenes) {
+        for (var viz : visualizableList) {
             sb.append("<li><a href=\"#").append(viz.getGeneSymbol()).append("\">").append(viz.getGeneSymbol()).append("</a></li>");
         }
         sb.append("</ul>");

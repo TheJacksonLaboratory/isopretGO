@@ -116,7 +116,7 @@ public class InterproController implements Initializable {
 
         Text text1 = new Text( "Interpro Overrepresentation Analysis\n");
         text1.setFont(Font.font("Verdana", 16));
-        Text text2 = new Text(" Interpro domain annotations were counted for each expressed transcript (population set). " +
+        Text text2 = new Text("Interpro domain annotations were counted for each expressed transcript (population set). " +
                "Annotations for differentially spliced transcripts (study set) were counted. Overrepresentation " +
                 "analysis was performed using a Fischer Exact Test. P-values were corrected using the Bonferroni procedure.");
         text2.setFont(Font.font("Verdana", 12));

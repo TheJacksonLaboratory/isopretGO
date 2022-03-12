@@ -9,13 +9,13 @@ public class GoSingleGeneExpressionVisualizer extends AnnotatedGenesVisualizer {
 
     public GoSingleGeneExpressionVisualizer(TermId goId, IsopretService isopretService) {
         super(goId, isopretService);
-        this.annotatedGenes = isopretService.getDgeForGoTerm(goId);
+        this.visualizableList = isopretService.getDgeForGoTerm(goId);
     }
 
 
     public String getTitle() {
         return String.format("Isopret: %d differentially expressed genes annotated to %s (%s)",
-                this.annotatedGenes.size(),  this.termLabel, this.geneOntologyId.getValue());
+                this.visualizableList.size(),  this.termLabel, this.geneOntologyId.getValue());
     }
 
     public String export() {
@@ -23,7 +23,7 @@ public class GoSingleGeneExpressionVisualizer extends AnnotatedGenesVisualizer {
         sb.append(htmlHeader);
         sb.append(htmlTop());
         sb.append(getGeneULwithLinks());
-        for (var viz : annotatedGenes) {
+        for (var viz : visualizableList) {
             String html = getHtml(viz);
             sb.append(wrapInArticle(html, viz.getGeneSymbol()));
         }
@@ -33,12 +33,12 @@ public class GoSingleGeneExpressionVisualizer extends AnnotatedGenesVisualizer {
 
     private String getGeneULwithLinks() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<p>A total of ").append(annotatedGenes.size()).append(" genes that are annotated to ");
+        sb.append("<p>A total of ").append(visualizableList.size()).append(" genes that are annotated to ");
         sb.append(this.termLabel).append(" (").append(geneOntologyId.getValue()).append(") were ");
         sb.append("identifed as differentially expressed.");
         sb.append("</p>");
         sb.append("<ul>\n");
-        for (var viz : annotatedGenes) {
+        for (var viz : visualizableList) {
             sb.append("<li>").append(viz.getGeneSymbol()).append("</li>");
         }
         sb.append("</ul>");

@@ -1,9 +1,10 @@
 package org.jax.isopret.core.analysis;
 
+import org.jax.isopret.core.interpro.InterproEntry;
+
 import java.util.Formatter;
 
-public record InterproOverrepResult(String interproAccession,
-                                    String interproDescription,
+public record InterproOverrepResult(InterproEntry interproEntry,
                                     int populationTotal,
                                     int populationAnnotated,
                                     int studyTotal,
@@ -32,6 +33,14 @@ public record InterproOverrepResult(String interproAccession,
             double p = numerator/(double) denominator;
             return String.format("%.2f%%", 100.0*p);
         }
+    }
+
+    public String interproAccession() {
+        return interproEntry.getIntroproAccession();
+    }
+
+    public String interproDescription() {
+        return interproEntry.getDescription();
     }
 
     public String getRawP() {
