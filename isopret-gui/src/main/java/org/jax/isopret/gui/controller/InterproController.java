@@ -51,8 +51,7 @@ public class InterproController implements Initializable {
     @FXML private TableColumn<InterproOverrepResult, Button>  exportColumn;
 
 
-    @Autowired
-    private IsopretService isopretService;
+
     @Autowired
     private MainController mainController;
     @Autowired
@@ -62,11 +61,13 @@ public class InterproController implements Initializable {
     private final HostServicesWrapper hostServicesWrapper;
 
     private final List<InterproOverrepResult> interproResults;
+    private final IsopretService isopretService;
 
 
-    public InterproController(List<InterproOverrepResult> results, HostServicesWrapper wrapper) {
+    public InterproController(List<InterproOverrepResult> results, IsopretService service, HostServicesWrapper wrapper) {
         this.hostServicesWrapper = wrapper;
         this.interproResults = results;
+        this.isopretService = service;
     }
 
     @Override
@@ -133,6 +134,7 @@ public class InterproController implements Initializable {
          * @param interproResult The Interpro term (protein domain etc) of interest
          */
         private void openExport(InterproOverrepResult interproResult) {
+            LOGGER.info("Exporting HTML for Interpro result {}", interproResult);
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Export " + interproResult.interproAccession());
             alert.setHeaderText("Export Information about " + interproResult.interproDescription());

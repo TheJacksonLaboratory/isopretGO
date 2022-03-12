@@ -23,7 +23,6 @@ import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -545,10 +544,12 @@ public class IsopretServiceImpl implements IsopretService  {
         for (IsopretAnnotations annots : annotMap.values()) {
             for (TermAnnotation a : annots.getAnnotations()) {
                 IsopretTermAnnotation itanot = (IsopretTermAnnotation) a;
-                TermId goId = itanot.getTermId();
-                String label = geneOntology.getTermLabel(goId).orElse("n/a");
-                GoTermIdPlusLabel gtlab = new GoTermIdPlusLabel(goId,label);
-                countMap.merge(gtlab, 1, Integer::sum);
+                if (annotatedItemTermIds.contains(itanot.getItemId())) {
+                    TermId goId = itanot.getTermId();
+                    String label = geneOntology.getTermLabel(goId).orElse("n/a");
+                    GoTermIdPlusLabel gtlab = new GoTermIdPlusLabel(goId, label);
+                    countMap.merge(gtlab, 1, Integer::sum);
+                }
             }
         }
         return countMap;

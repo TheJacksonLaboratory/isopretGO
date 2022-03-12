@@ -6,10 +6,11 @@ import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.transcript.AccessionNumber;
 import org.jax.isopret.core.transcript.AnnotatedGene;
-import org.jax.isopret.core.visualization.GoAnnotationRow;
 import org.jax.isopret.core.visualization.HtmlUtil;
 import org.jax.isopret.core.visualization.Visualizable;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  * @author Peter Robinson
  */
 public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(InterproAnnotatedGenesVisualizer.class);
     private final InterproOverrepResult interproResult;
     /** Genes we will include in the HTML display. */
     private final  List<AnnotatedGene> includedGenes;
@@ -44,7 +45,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
             for (HbaDealsTranscriptResult tresult: gene.getHbaDealsResult().getTranscriptResults()) {
                 if (tresult.isSignificant(splicingPepThreshold)) {
                     AccessionNumber acc = tresult.getTranscriptId();
-                    if (transcriptMap.get(acc).stream()
+                    if (transcriptMap.containsKey(acc) && transcriptMap.get(acc).stream()
                             .anyMatch(d -> d.getInterproEntry().getIntroproAccession().equals(targetInterproAccession))){
                         includeThisGene = true;
                         transcriptAccessions.add(acc.toTermId());
@@ -58,6 +59,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         // when we get here, we want to display only the genes in "incudedGenes".
         // let's get a Table with their GO annotations.
         Set<TermId> geneIds = new HashSet<>();
+        LOGGER.info("Gettings transcripts for interpro output. n={}", transcriptAccessions.size());
         this.countsMap = isopretService.getGoAnnotationsForTranscript(transcriptAccessions);
         Set<String> includedSymbols = includedGenes
                 .stream()
@@ -73,7 +75,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         sb.append(htmlTop());
         sb.append(getGoTable());
         sb.append(getGeneULwithLinks());
-        for (var viz : annotatedGenes) {
+        for (var viz : visualizables) {
             String html = getHtml(viz);
             sb.append(wrapInArticle(html, viz.getGeneSymbol()));
         }
@@ -175,7 +177,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
                 %s
                 </head>
                 """,
-                this.interproResult.interproDescription(), this.interproResult.interproAccession(), HtmlUtil.css);
+                this.termLabel, this.interproId, HtmlUtil.css);
     }
 
     protected static final String bottom = """
@@ -192,14 +194,14 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
 
     public String getTitle() {
         return String.format("Isopret: %d differentially spliced genes annotated to %s (%s)",
-                includedGenes.size(), this.interproResult.interproDescription(), this.interproResult.interproAccession());
+                includedGenes.size(), this.termLabel, this.interproId);
     }
 
 
     private String getGeneULwithLinks() {
         StringBuilder sb = new StringBuilder();
         sb.append("<p>A total of ").append(includedGenes.size()).append(" genes that are annotated to ");
-        sb.append(this.interproResult.interproDescription()).append(" (").append(this.interproResult.interproAccession()).append(") were ");
+        sb.append(this.termLabel).append(" (").append(interproId).append(") were ");
         sb.append("identified as differentially spliced. ");
         sb.append("</p>");
         for (var viz : visualizables) {
