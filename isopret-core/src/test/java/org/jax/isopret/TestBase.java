@@ -1,12 +1,11 @@
 package org.jax.isopret;
 
+import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.*;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.JannovarReader;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.*;
 import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 
@@ -14,16 +13,19 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class TestBase {
 
-    private static final String hgncPath;
-    protected static final String INTERPRO_ADAR_DOMAIN_DESC;
-
-
+    protected static final String hgncPath;
+    private static final String INTERPRO_ADAR_DOMAIN_DESC;
+    protected static final AccessionNumber adarAccession = AccessionNumber.ensemblGene("ENSG00000160710");
+    protected static final Path JANNOVAR_ADAR_PATH = Paths.get("src/test/resources/jannovar/hg38_ensembl_ADAR.ser");
+    protected static final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
+    protected static final Map<AccessionNumber, GeneModel> ensemblMap;
     static {
         String cp = System.getProperty("java.class.path");
         String [] resources = cp.split(":");
@@ -39,31 +41,32 @@ public class TestBase {
         INTERPRO_ADAR_DOMAIN_DESC = Objects.requireNonNull(url2).getPath();
         File f = new File(INTERPRO_ADAR_DOMAIN_DESC);
         System.out.println(INTERPRO_ADAR_DOMAIN_DESC + " :" + f.isFile());
+        JannovarReader reader = new JannovarReader(JANNOVAR_ADAR_PATH.toAbsolutePath().toString(), assembly);
+        Map<GeneSymbolAccession, List<Transcript>> transcriptListMap = reader.getGeneToTranscriptListMap();
+        HgncParser hgncParser = new HgncParser(new File(hgncPath), transcriptListMap);
+        ensemblMap = hgncParser.ensemblMap();
     }
 
 
     protected static final Path INTERPRO_ADAR_PATH = Paths.get("src/test/resources/interpro/ADAR_interpro.txt");
     private static final Map<Integer, InterproEntry> interproDomainMap = InterproDomainDescParser.getInterproDescriptionMap(new File(INTERPRO_ADAR_DOMAIN_DESC));
     private static final Map<AccessionNumber, List<InterproAnnotation>> annotationMap = InterproDomainParser.getInterproAnnotationMap(INTERPRO_ADAR_PATH.toFile());
-    private static final Path JANNOVAR_ADAR_PATH = Paths.get("src/test/resources/jannovar/hg38_ensembl_ADAR.ser");
-    private static final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
     private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
 
 
-    protected static final HgncParser hgncParser = new HgncParser(new File(hgncPath));
 
     private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
     private static Map<String, HbaDealsResult> hbaDealsResultMap = null;
 
 
 
-    public static Map<String, HbaDealsResult> getADARHbaDealsResultMap () {
-        if (hbaDealsResultMap == null) {
-            final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString(), hgncParser.ensemblMap());
-            hbaDealsResultMap = parser.getHbaDealsResultMap();
-        }
-        return hbaDealsResultMap;
-    }
+//    public static Map<String, HbaDealsResult> getADARHbaDealsResultMap () {
+//        if (hbaDealsResultMap == null) {
+//            final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString(), hgncParser.ensemblMap());
+//            hbaDealsResultMap = parser.getHbaDealsResultMap();
+//        }
+//        return hbaDealsResultMap;
+//    }
 
 
     public static GenomicAssembly getHg38() {
@@ -71,11 +74,15 @@ public class TestBase {
     }
 
     public static Map<String, List<Transcript>> getADARToTranscriptMap() {
-        if (symbolToTranscriptMap == null) {
-            JannovarReader reader = new JannovarReader(JANNOVAR_ADAR_PATH.toAbsolutePath().toString(), assembly);
-            symbolToTranscriptMap = reader.getSymbolToTranscriptListMap();
+
+        Map<String, List<Transcript>> wrapper = new HashMap<>();
+        if (! ensemblMap.containsKey(adarAccession)) {
+            // should really never happen!
+            throw new IsopretRuntimeException("Could not find gene model for ADAR in test");
         }
-        return symbolToTranscriptMap;
+        GeneModel model = ensemblMap.get(adarAccession);
+        wrapper.put(model.geneSymbol(), model.transcriptList());
+        return wrapper;
     }
 
 

@@ -1,7 +1,8 @@
 package org.jax.isopret.core.visualization;
 
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.GeneModel;
+import org.jax.isopret.core.model.Transcript;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -27,8 +28,7 @@ public class GoAnnotationMatrix {
     private final List<GoAnnotationRow> expressedAnnotationRows;
 
     /**
-     *
-     * @param ontology reference to Gene Ontology
+     *  @param ontology reference to Gene Ontology
      * @param geneIdToTranscriptMap map from gene ids to corresponding transcript ids
      * @param transcript2GoMap GO annotations for transcripts
      * @param significantGoSet signficant GO terms
@@ -36,7 +36,7 @@ public class GoAnnotationMatrix {
      * @param expressedTranscriptSet Transcripts that are expressed in the RNA-seq experiment/HBADEALS result
      */
     public GoAnnotationMatrix(Ontology ontology,
-                              Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap,
+                              Map<AccessionNumber, GeneModel> geneIdToTranscriptMap,
                               Map<TermId, Set<TermId>> transcript2GoMap,
                               Set<TermId> significantGoSet,
                               AccessionNumber accessionNumber,
@@ -47,7 +47,7 @@ public class GoAnnotationMatrix {
         if (geneIdToTranscriptMap.containsKey(accessionNumber) && transcript2GoMap != null) {
             // if this is the case then we have isoforms all is Good
             this. transcriptIds =
-                    geneIdToTranscriptMap.get(accessionNumber)
+                    geneIdToTranscriptMap.get(accessionNumber).transcriptList()
                             .stream()
                             .map(Transcript::accessionId)
                             .map(AccessionNumber::toTermId)
@@ -74,7 +74,7 @@ public class GoAnnotationMatrix {
 
 
     List<GoAnnotationRow> expressedAnnotationRows(Ontology ontology,
-                                                  Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap,
+                                                  Map<AccessionNumber, GeneModel> geneIdToTranscriptMap,
                                                   Map<TermId, Set<TermId>> transcript2GoMap,
                                                   Set<TermId> significantGoSet) {
         // collect all GO terms that annotate at least one transcript
@@ -109,7 +109,7 @@ public class GoAnnotationMatrix {
     }
 
     List<GoAnnotationRow> allAnnotationRows(Ontology ontology,
-                                            Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap,
+                                            Map<AccessionNumber, GeneModel> geneIdToTranscriptMap,
                                             Map<TermId, Set<TermId>> transcript2GoMap,
                                             Set<TermId> significantGoSet) {
         // collect all GO terms that annotate at least one transcript

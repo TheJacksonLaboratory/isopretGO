@@ -1,4 +1,4 @@
-package org.jax.isopret.core.transcript;
+package org.jax.isopret.core.model;
 
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.TranscriptModel;

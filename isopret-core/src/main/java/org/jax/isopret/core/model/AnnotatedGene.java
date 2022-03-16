@@ -1,8 +1,9 @@
-package org.jax.isopret.core.transcript;
+package org.jax.isopret.core.model;
 
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.interpro.InterproEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,11 +88,34 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         return transcriptToInterproHitMap;
     }
 
+    /**
+     * This function counts each interpro domain only once (this is important because
+     * some proteins have multiple of the same domain).
+     * @return
+     */
+    public Map<AccessionNumber, Set<Integer>> getTranscriptToUniqueInterproMap() {
+        Map<AccessionNumber, Set<Integer>> uniqCountMap = new HashMap<>();
+        for (Map.Entry<AccessionNumber, List<DisplayInterproAnnotation>> entry : transcriptToInterproHitMap.entrySet()) {
+            AccessionNumber acc = entry.getKey();
+            Set<Integer> interproSet = entry.getValue().stream()
+                    .map(DisplayInterproAnnotation::getInterproEntry)
+                    .map(InterproEntry::getId)
+                    .collect(Collectors.toSet());
+            uniqCountMap.put(acc, interproSet);
+        }
+        return uniqCountMap;
+
+    }
+
     public int getTranscriptCount() {
         return expressedTranscripts.size();
     }
 
-    public String getSymbol() { return this.hbaDealsResult.getSymbol(); }
+    public String getSymbol() { return this.hbaDealsResult.getGeneModel().geneSymbol(); }
+
+    public AccessionNumber getGeneAccessionNumber() {
+        return hbaDealsResult.getGeneAccession();
+    }
 
     public int getCodingTranscriptCount() {
         return (int) this.expressedTranscripts
@@ -181,7 +205,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         } else if (that.passesSplicingThreshold() && (!this.passesSplicingThreshold())) {
             return 1;
         } else {
-            return this.getHbaDealsResult().getSymbol().compareTo(that.getHbaDealsResult().getSymbol());
+            return this.getSymbol().compareTo(that.getSymbol());
         }
     }
 

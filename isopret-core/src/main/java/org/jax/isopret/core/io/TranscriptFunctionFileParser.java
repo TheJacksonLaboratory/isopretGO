@@ -1,7 +1,7 @@
 package org.jax.isopret.core.io;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.model.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;

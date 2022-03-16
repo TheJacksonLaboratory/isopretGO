@@ -1,6 +1,6 @@
 package org.jax.isopret.core.hbadeals;
 
-import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.model.AccessionNumber;
 
 public class HbaDealsTranscriptResult {
     private final AccessionNumber transcript;

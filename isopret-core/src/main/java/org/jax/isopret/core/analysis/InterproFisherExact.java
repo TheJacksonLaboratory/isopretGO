@@ -3,8 +3,8 @@ package org.jax.isopret.core.analysis;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.AnnotatedGene;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.AnnotatedGene;
 import org.monarchinitiative.phenol.analysis.stats.Hypergeometric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,25 +38,22 @@ public class InterproFisherExact {
         hypergeometric = new Hypergeometric();
         for (var agene : annotatedGeneList) {
             Map<AccessionNumber, List<DisplayInterproAnnotation>> m = agene.getTranscriptToInterproHitMap();
-            for (var dialist : m.values()) {
-                for (var dia : dialist) {
-                    int interpoId = dia.getInterproEntry().getId();
-                    populationSetInterproCounts.merge(interpoId, 1, Integer::sum); // increment, start at 1 if was absent
-                    interproIdToDisplay.putIfAbsent(interpoId, dia);
-                }
-            }
+            Map<AccessionNumber, Set<Integer>> uniqIntproSetMap = agene.getTranscriptToUniqueInterproMap();
             Set<HbaDealsTranscriptResult> results = agene.getHbaDealsResult().getTranscriptResults();
             for (var res : results) {
+                AccessionNumber accession = res.getTranscriptId();
+                if (! uniqIntproSetMap.containsKey(accession)) {
+                    // should never happen!
+                    System.err.printf("Could not find interpro for accession " + accession);
+                    continue;
+                }
+                for (int interpro : uniqIntproSetMap.get(accession)) {
+                    populationSetInterproCounts.merge(interpro, 1, Integer::sum);
+                }
+
                 if (res.isSignificant(splicingPepThreshold)) {
-                    AccessionNumber accession = res.getTranscriptId();
-                    List<DisplayInterproAnnotation> dialist = m.get(accession);
-                    if (dialist == null) {
-                        LOGGER.warn("Could not find annotations for {}", accession);
-                        continue;
-                    }
-                    for (var dia : dialist) {
-                        int interpoId = dia.getInterproEntry().getId();
-                        studySetInterproCounts.merge(interpoId, 1, Integer::sum); // increment, start at 1 if was absent
+                    for (int interpro : uniqIntproSetMap.get(accession)) {
+                        studySetInterproCounts.merge(interpro, 1, Integer::sum);
                     }
                 }
             }

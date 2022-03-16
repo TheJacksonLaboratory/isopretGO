@@ -4,8 +4,8 @@ import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.core.go.GoTermIdPlusLabel;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.AnnotatedGene;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.AnnotatedGene;
 import org.jax.isopret.core.visualization.HtmlUtil;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -71,11 +71,11 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         Set<TermId> geneIds = new HashSet<>();
         LOGGER.info("Gettings transcripts for interpro output. n={}", transcriptAccessions.size());
         this.countsMap = isopretService.getGoAnnotationsForTranscript(transcriptAccessions);
-        Set<String> includedSymbols = includedGenes
+        Set<AccessionNumber> includedEnsgSet = includedGenes
                 .stream()
-                .map(AnnotatedGene::getSymbol)
+                .map(AnnotatedGene::getGeneAccessionNumber)
                 .collect(Collectors.toSet());
-        this.visualizableList = isopretService.getGeneVisualizables(includedSymbols);
+        this.visualizableList = isopretService.getGeneVisualizables(includedEnsgSet);
     }
 
 

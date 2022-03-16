@@ -6,10 +6,11 @@ import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hgnc.HgncItem;
+import org.jax.isopret.core.model.GeneModel;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.GeneSymbolAccession;
+import org.jax.isopret.core.model.Transcript;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -63,13 +64,13 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         Ontology geneOntology = loadGeneOntology();
         int n_go_terms = geneOntology.countNonObsoleteTerms();
         LOGGER.info("Loaded Gene Ontology with {} terms", n_go_terms);
-        Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
+        Map<AccessionNumber, GeneModel> hgncMap = loadHgncMap();
         LOGGER.info("Loaded HGNC map with {} genes", hgncMap.size());
-        Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap = loadJannovarGeneIdToTranscriptMap();
-        LOGGER.info("Loaded geneId-to-transcript map with {} genes", geneIdToTranscriptMap.size());
+        Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionToTranscriptMap = loadJannovarSymbolToTranscriptMap();
+        LOGGER.info("Loaded geneId-to-transcript map with {} genes", geneSymbolAccessionToTranscriptMap.size());
         Map<TermId, Set<TermId>> transcriptIdToGoTermsMap = loadTranscriptIdToGoTermsMap();
         LOGGER.info("Loaded transcriptIdToGoTermsMap with {} entries", transcriptIdToGoTermsMap.size());
-        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneIdToTranscriptMap);
+        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneSymbolAccessionToTranscriptMap);
         LOGGER.info("Loaded transcriptToGeneIdMap with {} entries", transcriptIdToGoTermsMap.size());
         // create and check the annotation containers for the inferred data
         LOGGER.info("Loading TranscriptFunctionFileParser");
@@ -90,7 +91,7 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbadealsFile, hgncMap);
-        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
        // HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
         MtcMethod mtcMethod = MtcMethod.fromString(mtc);
@@ -146,7 +147,7 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
                     .goAssociationsGenes(geneContainer.getTotalAnnotationCount())
                     .annotatedGeneCount(geneContainer.getAnnotatedDomainItemCount())
                     .annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount())
-                    .geneSymbolCount(geneIdToTranscriptMap.size())
+                    .geneSymbolCount(geneSymbolAccessionToTranscriptMap.size())
                     .transcriptsCount(transcriptIdToGoTermsMap.size());
 
             IsopretStats stats = builder.build();
@@ -235,11 +236,11 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
 
 
 
-    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<AccessionNumber, List<Transcript>> gene2transcript) {
+    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<GeneSymbolAccession, List<Transcript>> gene2transcript) {
         Map<TermId, TermId> accessionNumberMap = new HashMap<>();
         for (var entry : gene2transcript.entrySet()) {
             var geneAcc = entry.getKey();
-            var geneTermId = geneAcc.toTermId();
+            var geneTermId = geneAcc.accession().toTermId();
             var transcriptList = entry.getValue();
             for (var transcript: transcriptList) {
                 var transcriptAcc = transcript.accessionId();
