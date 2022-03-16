@@ -100,8 +100,9 @@ public class HgncParser {
         Map<AccessionNumber, GeneModel> ensemblMap = new HashMap<>();
         int less_than_24_fields = 0;
         int well_formed_lines = 0;
+        String line = null;
         try (BufferedReader br = new BufferedReader(new FileReader(hgncFile))) {
-            String line = br.readLine();
+            line = br.readLine();
             if (! line.startsWith("hgnc_id")) {
                 throw new IsopretRuntimeException("Malformed HGNC header line: " + line);
             }
@@ -112,6 +113,12 @@ public class HgncParser {
                     continue;
                 } else {
                     well_formed_lines++;
+                }
+                // some lines do not have an ENSEMBL id -- about 20 or so, and they can be ignored.
+                //ENSG00000160710
+                if (fields[ENSEMBL_GENE_ID].length() < 15) {
+                    LOGGER.trace("Malformed HGNC line ({}) with no Ensembl id\n", line);
+                    continue;
                 }
                 AccessionNumber ensemblGeneAcc = AccessionNumber.ensemblGene(fields[ENSEMBL_GENE_ID]);
                 GeneSymbolAccession gsa = new GeneSymbolAccession(fields[GENE_SYMBOL], ensemblGeneAcc);
@@ -129,6 +136,7 @@ public class HgncParser {
                 }
             }
         } catch (IOException e) {
+            String msg = String.format("Could not parse the HGNC file (%s). Error for line (%s)", e.getMessage(), line);
             throw new IsopretRuntimeException("Could not parse the HGNC file: " + e.getMessage());
         }
         LOGGER.trace("{} HGNC lines with less than 24 fields skipped.", less_than_24_fields);

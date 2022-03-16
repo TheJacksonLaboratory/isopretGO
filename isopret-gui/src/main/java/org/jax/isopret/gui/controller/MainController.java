@@ -302,6 +302,7 @@ public class MainController implements Initializable {
                 double splicingPepThreshold = service.getSplicingPepThreshold();
                 InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
                 List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+                LOGGER.info("Got {} interpro overrepresentation results.", results.size());
                 Collections.sort(results);
                 loader.setControllerFactory(c -> new InterproController(results, service, hostServicesWrapper));
                 ScrollPane p = loader.load();

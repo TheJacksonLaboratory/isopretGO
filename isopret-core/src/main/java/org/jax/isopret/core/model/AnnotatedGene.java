@@ -93,14 +93,17 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      * some proteins have multiple of the same domain).
      * @return
      */
-    public Map<AccessionNumber, Set<Integer>> getTranscriptToUniqueInterproMap() {
-        Map<AccessionNumber, Set<Integer>> uniqCountMap = new HashMap<>();
+    public Map<AccessionNumber, Set<InterproEntry>> getTranscriptToUniqueInterproMap() {
+        Map<AccessionNumber, Set<InterproEntry>> uniqCountMap = new HashMap<>();
+        Set<Integer> alreadySeen = new HashSet<>();
         for (Map.Entry<AccessionNumber, List<DisplayInterproAnnotation>> entry : transcriptToInterproHitMap.entrySet()) {
             AccessionNumber acc = entry.getKey();
-            Set<Integer> interproSet = entry.getValue().stream()
-                    .map(DisplayInterproAnnotation::getInterproEntry)
-                    .map(InterproEntry::getId)
-                    .collect(Collectors.toSet());
+            // Note that DisplayInterproAnnotation can be unique because of different positions
+            // for this function, we only want to count any one Interpro Entry once
+            Set<InterproEntry> interproSet = entry.getValue()
+                            .stream()
+                                    .map(DisplayInterproAnnotation::getInterproEntry)
+                                            .collect(Collectors.toSet());
             uniqCountMap.put(acc, interproSet);
         }
         return uniqCountMap;
