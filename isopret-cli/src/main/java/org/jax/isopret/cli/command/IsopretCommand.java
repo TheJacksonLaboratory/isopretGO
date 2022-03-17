@@ -1,5 +1,6 @@
 package org.jax.isopret.cli.command;
 
+import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
@@ -129,7 +130,7 @@ public abstract class IsopretCommand {
     }
 
 
-    private void runTranscriptFunctionFileParser() {
+    private void runTranscriptFunctionFileParser() throws IsopretException {
         if (geneOntology == null) {
             loadGeneOntology();
         }
@@ -137,7 +138,7 @@ public abstract class IsopretCommand {
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
     }
 
-    protected Map<TermId, Set<TermId>> loadTranscriptIdToGoTermsMap() {
+    protected Map<TermId, Set<TermId>> loadTranscriptIdToGoTermsMap() throws IsopretException {
         if (transcriptToGoMap == null)
             runTranscriptFunctionFileParser();
         return transcriptToGoMap;

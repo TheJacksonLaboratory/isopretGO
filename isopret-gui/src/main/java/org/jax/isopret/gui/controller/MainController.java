@@ -1,6 +1,7 @@
 package org.jax.isopret.gui.controller;
 
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -40,6 +41,7 @@ import java.util.*;
 
 import static org.jax.isopret.gui.service.model.GeneOntologyComparisonMode.DAS;
 import static org.jax.isopret.gui.service.model.GeneOntologyComparisonMode.DGE;
+import static org.jax.isopret.gui.widgets.PopupFactory.displayIsopretThrown;
 
 /**
  * A Java app to help design probes for Capture Hi-C
@@ -173,13 +175,18 @@ public class MainController implements Initializable {
             service.setDownloadDir(null);
         });
         task.setOnCancelled(c -> LOGGER.info("download canceled"));
-        new Thread(task).start();
+        Thread t = new Thread(task);
+        Thread.UncaughtExceptionHandler h = (thread, throwable) -> Platform.runLater(() -> {
+            displayIsopretThrown(throwable);
+        });
+        t.setUncaughtExceptionHandler(h);
+        t.start();
     }
 
     /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "0.9.1";
+        String version = "0.9.7";
         if (applicationProperties.getApplicationVersion() != null) {
             version = applicationProperties.getApplicationVersion();
         }
@@ -330,7 +337,12 @@ public class MainController implements Initializable {
             this.analysisLabel.textProperty().unbind();
             this.analysisLabel.textProperty().setValue("Analysis failed: " + exc.getMessage());
         });
-        new Thread(task).start();
+        Thread t = new Thread(task);
+        Thread.UncaughtExceptionHandler h = (thread, throwable) -> Platform.runLater(() -> {
+            displayIsopretThrown(throwable);
+        });
+        t.setUncaughtExceptionHandler(h);
+        t.start();
     }
 
     public TabPane getMainTabPaneRef() {

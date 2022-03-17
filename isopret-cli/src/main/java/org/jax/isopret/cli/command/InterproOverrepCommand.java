@@ -2,6 +2,7 @@ package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
+import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.go.IsopretAssociationContainer;
 import org.jax.isopret.core.go.IsopretContainerFactory;
@@ -55,7 +56,7 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
     private InterproMapper interproMapper = null;
 
     @Override
-    public Integer call() {
+    public Integer call() throws IsopretException {
         interproMapper = getInterproMapper();
         LOGGER.info("Got interpro mapper");
         List<AnnotatedGene> annotatedGeneList = getAnnotatedGeneList();
@@ -90,7 +91,7 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
     }
 
 
-    private HbaDealsIsoformSpecificThresholder getThresholder(String hbaDealsFilePath) {
+    private HbaDealsIsoformSpecificThresholder getThresholder(String hbaDealsFilePath) throws IsopretException {
         Map<AccessionNumber, GeneModel> hgncMap = loadHgncMap();
         HbaDealsParser hbaParser = new HbaDealsParser(hbaDealsFilePath, hgncMap);
         Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
@@ -129,7 +130,7 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
         return Map.copyOf(accessionNumberMap); // immutable copy
     }
 
-    public List<AnnotatedGene> getAnnotatedGeneList() {
+    public List<AnnotatedGene> getAnnotatedGeneList() throws IsopretException{
         int notfound = 0;
         HbaDealsIsoformSpecificThresholder thresholder = getThresholder(hbadealsFile);
         this.splicingPepThreshold = thresholder.getSplicingPepThreshold();

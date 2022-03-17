@@ -53,22 +53,17 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
                             includeThisGene = true;
                             transcriptAccessions.add(acc.toTermId());
                         }
-                        //studySetInterproCounts.merge(interpoId, 1, Integer::sum); // increment, start at 1 if was absent
                     }
-//                    if (transcriptMap.containsKey(acc) && transcriptMap.get(acc).stream()
-//                            .anyMatch(d -> d.getInterproEntry().getId() == targetInterproId)){
-//                        includeThisGene = true;
-//                        transcriptAccessions.add(acc.toTermId());
-//                    }
                 }
             }
             if (includeThisGene) {
+                LOGGER.info("Including gene {} for interpro export", gene.getSymbol());
                 includedGenes.add(gene);
             }
         }
         // when we get here, we want to display only the genes in "incudedGenes".
         // let's get a Table with their GO annotations.
-        Set<TermId> geneIds = new HashSet<>();
+        LOGGER.info("Total of {} included genes", includedGenes.size());
         LOGGER.info("Gettings transcripts for interpro output. n={}", transcriptAccessions.size());
         this.countsMap = isopretService.getGoAnnotationsForTranscript(transcriptAccessions);
         Set<AccessionNumber> includedEnsgSet = includedGenes
@@ -108,21 +103,17 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
     }
 
     private String getRow(GoTermIdPlusLabel goTermIdPlusLabel, Integer count) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<tr><td>").append(goTermIdPlusLabel.getLabel()).append("</td>");
-        sb.append("<td>").append(goTermIdPlusLabel.getId()).append("</td>");
-        sb.append("<td>").append(count).append("</td></tr>\n");
-        return sb.toString();
+        return "<tr><td>" + goTermIdPlusLabel.getLabel() + "</td>" +
+                "<td>" + goTermIdPlusLabel.getId() + "</td>" +
+                "<td>" + count + "</td></tr>\n";
     }
 
     private String htmlTableHeader() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<table class=\"go\">");
-        sb.append("<tr>");
-        sb.append("<th width=\"400px\";>GO term</th><th>id</th>\"");
-        sb.append("<th>Annotated transcripts</th>");
-        sb.append("</tr>");
-        return sb.toString();
+        return "<table class=\"go\">" +
+                "<tr>" +
+                "<th width=\"400px\";>GO term</th><th>id</th>\"" +
+                "<th>Annotated transcripts</th>" +
+                "</tr>";
     }
 
     private final static String HTML_HEADER = """

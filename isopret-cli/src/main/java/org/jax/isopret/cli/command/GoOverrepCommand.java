@@ -1,6 +1,7 @@
 package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.analysis.IsopretStats;
+import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
@@ -60,7 +61,7 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
 
 
     @Override
-    public Integer call() {
+    public Integer call() throws IsopretException {
         Ontology geneOntology = loadGeneOntology();
         int n_go_terms = geneOntology.countNonObsoleteTerms();
         LOGGER.info("Loaded Gene Ontology with {} terms", n_go_terms);
