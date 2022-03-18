@@ -32,8 +32,8 @@ public class InterproOverrepVisualizer {
             double raw_p = res.rawPval();
             double corrected_p = Math.min(1.0, N*raw_p);
             writer.write(String.format("%s\t%s\t%d\t%d\t%d\t%d\t%e\t%e\n",
-                    res.interproAccession(),
-                    res.interproDescription(),
+                    res.interproEntry().getIntroproAccession(),
+                    res.interproEntry().getDescription(),
                     res.populationAnnotated(),
                     res.populationTotal(),
                     res.studyAnnotated(),

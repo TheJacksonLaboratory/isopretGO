@@ -1,11 +1,13 @@
 package org.jax.isopret.core.visualization;
 
+import org.jax.isopret.core.model.Transcript;
+
 import java.util.List;
 
 /**
- * This class creates an HTML table with all of the GO annotations of
- * a gene. GO terms that are significant for the study set are marked
- * green.
+ * This class creates an HTML table with the GO annotations of
+ * a gene for all of its expressed transcripts. GO terms that
+ * are significant for the study set are marked green.
  * @author Peter N Robinson
  */
 public class HtmlGoAnnotationMatrixVisualizer {
@@ -16,13 +18,13 @@ public class HtmlGoAnnotationMatrixVisualizer {
      *
      * Build a table with go annotations without HTML header or foter
      */
-    public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix) {
+    public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix, List<Transcript> expressedTranscripts) {
         if (matrix.getAllGoIds().isEmpty()) {
             this.html = "<p>No Gene Ontology annotations found.</p>";
         } else {
             StringBuilder sb = new StringBuilder();
-            sb.append(htmlTableHeader(matrix.getTranscripts()));
-            for (GoAnnotationRow row : matrix.getAnnotationRows()) {
+            sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
+            for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
                 sb.append(getRow(row));
             }
             sb.append("</table>\n");
@@ -54,9 +56,9 @@ public class HtmlGoAnnotationMatrixVisualizer {
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"go\">");
         sb.append("<tr>");
-        sb.append("<th width=\"400px\";>GO term</th>");
+        sb.append("<th width=\"375px\";>GO term</th>");
         for (String transcript : transcripts) {
-            sb.append("<th width=\"30px\";><span>").append(transcript).append("</span></th>");
+            sb.append("<th width=\"28px\";><span>").append(transcript).append("</span></th>");
         }
         sb.append("</tr>");
         return sb.toString();
@@ -84,6 +86,12 @@ public class HtmlGoAnnotationMatrixVisualizer {
                 margin-left:auto;
                 margin-right:auto;
              }
+             
+             gotable, gotable.th, gotable.td {
+                 border: 0.5px solid;
+                 border-collapse: collapse;
+             }
+
              gotable.th
              {
                vertical-align: bottom;
@@ -97,7 +105,7 @@ public class HtmlGoAnnotationMatrixVisualizer {
                writing-mode: vertical-rl;
                transform: rotate(180deg);
                white-space: nowrap;
-               padding: 5px 10px;
+               padding: 5px 8px;
                 margin: 0 auto;
              }
             </style>

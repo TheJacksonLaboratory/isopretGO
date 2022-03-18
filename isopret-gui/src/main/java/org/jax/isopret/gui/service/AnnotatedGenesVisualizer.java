@@ -1,5 +1,6 @@
 package org.jax.isopret.gui.service;
 
+import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
 import org.jax.isopret.core.visualization.IsoformVisualizable;
@@ -11,7 +12,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class GoAnnotatedGenesVisualizer {
+public abstract class AnnotatedGenesVisualizer {
 
     private final String HBADEALS_A = """
         <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6"
@@ -21,14 +22,27 @@ public abstract class GoAnnotatedGenesVisualizer {
     protected final String htmlHeader;
     protected final String basename;
     protected final TermId geneOntologyId;
-    protected final String geneOntologyLabel;
-    protected  List<Visualizable> annotatedGenes;
+    protected final String interproId;
+    protected final String termLabel;
+    protected  List<Visualizable> visualizableList;
     public final String experiment;
 
-    public GoAnnotatedGenesVisualizer(TermId goId, IsopretService isopretService) {
+    public AnnotatedGenesVisualizer(TermId goId, IsopretService isopretService) {
         this.geneOntologyId = goId;
         Ontology ontology = isopretService.getGeneOntology();
-        this.geneOntologyLabel = ontology.getTermLabel(goId).orElse("n/a");
+        this.termLabel = ontology.getTermLabel(goId).orElse("n/a");
+        interproId = null;
+        Optional<File> opt = isopretService.getHbaDealsFileOpt();
+        basename = opt.map(File::getName).orElse("n/a");
+        this.htmlHeader = header();
+        Optional<File> optHba =  isopretService.getHbaDealsFileOpt();
+        this.experiment = optHba.map(File::getName).orElse("n/a");
+    }
+
+    public AnnotatedGenesVisualizer(InterproOverrepResult interpro, IsopretService isopretService) {
+        this.geneOntologyId = null;
+        this.interproId = interpro.interproEntry().getIntroproAccession();
+        this.termLabel = interpro.interproEntry().getDescription();
         Optional<File> opt = isopretService.getHbaDealsFileOpt();
         basename = opt.map(File::getName).orElse("n/a");
         this.htmlHeader = header();
@@ -52,11 +66,11 @@ public abstract class GoAnnotatedGenesVisualizer {
             """;
 
 
-    public static GoAnnotatedGenesVisualizer splicing(TermId goId, IsopretService isopretService) {
+    public static AnnotatedGenesVisualizer splicing(TermId goId, IsopretService isopretService) {
         return new GoSingleGeneSplicingVisualizer(goId, isopretService);
     }
 
-    public static GoAnnotatedGenesVisualizer expression(TermId goId, IsopretService isopretService) {
+    public static AnnotatedGenesVisualizer expression(TermId goId, IsopretService isopretService) {
         return new GoSingleGeneExpressionVisualizer(goId, isopretService);
     }
 

@@ -1,16 +1,17 @@
 package org.jax.isopret.cli.command;
 
+import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
-import org.jax.isopret.core.hgnc.HgncItem;
-import org.jax.isopret.core.hgnc.HgncParser;
+import org.jax.isopret.core.model.GeneModel;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.JannovarReader;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.GeneSymbolAccession;
+import org.jax.isopret.core.model.JannovarReader;
+import org.jax.isopret.core.model.Transcript;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -37,10 +38,11 @@ public abstract class IsopretCommand {
 
     private JannovarReader jannovarReader = null;
 
-    private  Map<AccessionNumber, HgncItem> hgncMap = null;
+    protected   Map<AccessionNumber, GeneModel> hgncMap = null;
     /** Key ensembl transcript id; values: annotating go terms .*/
-    private Map<TermId, Set<TermId>> transcriptToGoMap = null;
+    protected Map<TermId, Set<TermId>> transcriptToGoMap = null;
 
+    protected Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap = null;
 
     @CommandLine.Option(names={"-d","--download"},
             scope = CommandLine.ScopeType.INHERIT,
@@ -89,36 +91,16 @@ public abstract class IsopretCommand {
     }
 
 
-    protected Map<String, List<Transcript>> loadJannovarSymbolToTranscriptMap() {
-        if (jannovarReader == null) {
+    protected Map<GeneSymbolAccession, List<Transcript>> loadJannovarSymbolToTranscriptMap() {
+        if (jannovarReader == null || geneSymbolAccessionListMap == null) {
             jannovarReader = new JannovarReader(jannovarTranscriptFile(), assembly);
+            geneSymbolAccessionListMap = jannovarReader.getGeneToTranscriptListMap();
             LOGGER.info("Loaded JannovarReader with {} symbols",
-                    jannovarReader.getSymbolToTranscriptListMap().size());
+                    jannovarReader.getGeneToTranscriptListMap().size());
         }
-        return jannovarReader.getSymbolToTranscriptListMap();
+        return geneSymbolAccessionListMap;
     }
 
-    protected Map<AccessionNumber, List<Transcript>> loadJannovarGeneIdToTranscriptMap() {
-        if (jannovarReader == null) {
-            jannovarReader = new JannovarReader(jannovarTranscriptFile(), assembly);
-            LOGGER.info("Loaded JannovarReader with {} genes",
-                    jannovarReader.getGeneIdToTranscriptMap().size());
-        }
-        return jannovarReader.getGeneIdToTranscriptMap();
-    }
-
-    /**
-     * @return map with key: Ensembl Gene ID and value: the corresponding {@link HgncItem} object
-     */
-    protected Map<AccessionNumber, HgncItem> loadHgncMap() {
-        if (hgncMap == null) {
-            File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
-            HgncParser hgncParser = new HgncParser(hgncFile);
-            hgncMap = hgncParser.ensemblMap();
-            LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
-        }
-        return hgncMap;
-    }
 
     protected InterproMapper loadInterproMapper() {
         File interproDescriptionFile = new File(downloadDirectory + File.separator + "interpro_domain_desc.txt");
@@ -135,7 +117,7 @@ public abstract class IsopretCommand {
     }
 
 
-    private void runTranscriptFunctionFileParser() {
+    private void runTranscriptFunctionFileParser() throws IsopretException {
         if (geneOntology == null) {
             loadGeneOntology();
         }
@@ -143,15 +125,15 @@ public abstract class IsopretCommand {
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
     }
 
-    protected Map<TermId, Set<TermId>> loadTranscriptIdToGoTermsMap() {
+    protected Map<TermId, Set<TermId>> loadTranscriptIdToGoTermsMap() throws IsopretException {
         if (transcriptToGoMap == null)
             runTranscriptFunctionFileParser();
         return transcriptToGoMap;
     }
 
-    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, HgncItem> hgncMap, String hbadealsPath) {
+    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, GeneModel> hgncMap, String hbadealsPath) {
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsPath, hgncMap);
-        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         return new HbaDealsThresholder(hbaDealsResults);
     }

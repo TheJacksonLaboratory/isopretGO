@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.jax.isopret.core.except.IsopretFileNotFoundException;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 
 import java.io.PrintWriter;
@@ -191,5 +192,35 @@ public class PopupFactory {
         } else {
             alert.close();
         }
+    }
+
+
+    public static void displayIsopretThrown(Throwable exception) {
+        String title = "Exception";
+        if (exception instanceof IsopretFileNotFoundException) {
+            title = "File Not Found";
+        }
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);//print the stack trace to the print writer
+        TextArea textArea = new TextArea(sw.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        Label label = new Label("The exception stacktrace was:");
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+        expContent.add(textArea, 0, 1);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Exception Dialog");
+        alert.setHeaderText(title);
+        alert.setContentText(exception.getMessage());
+        // Set expandable Exception into the dialog pane.
+        alert.getDialogPane().setExpandableContent(expContent);
+        alert.showAndWait();
     }
 }

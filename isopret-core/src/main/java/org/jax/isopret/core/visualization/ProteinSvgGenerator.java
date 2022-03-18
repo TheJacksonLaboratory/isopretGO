@@ -3,9 +3,9 @@ package org.jax.isopret.core.visualization;
 
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.AnnotatedGene;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.AnnotatedGene;
+import org.jax.isopret.core.model.Transcript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,7 +182,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
 
     private void writeExcuse(StringWriter swriter) {
         String svg = "<text>" +
-                "No protein domains for " + this.annotatedGene.getHbaDealsResult().getSymbol() +
+                "No protein domains for " + this.annotatedGene.getHbaDealsResult().getGeneModel() +
                 "  </text>";
         swriter.write(svg);
     }

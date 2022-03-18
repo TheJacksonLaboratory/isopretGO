@@ -1,7 +1,9 @@
 package org.jax.isopret.core.io;
 
+import org.jax.isopret.core.except.IsopretException;
+import org.jax.isopret.core.except.IsopretFileNotFoundException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.model.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -73,11 +75,10 @@ public class TranscriptFunctionFileParser {
     }
 
 
-    public TranscriptFunctionFileParser(File downloadDirectory, Ontology ontology) {
+    public TranscriptFunctionFileParser(File downloadDirectory, Ontology ontology) throws IsopretException {
         File predictionFileMf = new File(downloadDirectory + File.separator + "isoform_function_list_mf.txt");
         if (!predictionFileMf.isFile()) {
-            throw new IsopretRuntimeException("Could not find isoform_function_list_mf.txt at " +
-                    predictionFileMf.getAbsolutePath());
+            throw new IsopretFileNotFoundException("isoform_function_list_mf.txt", predictionFileMf.getAbsolutePath());
         }
         Map<TermId, Set<TermId>> annotMapMf = parseFunctionFile(predictionFileMf, ontology);
         File predictionFileBp = new File(downloadDirectory + File.separator + "isoform_function_list_bp.txt");

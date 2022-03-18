@@ -32,6 +32,10 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
     /** Gene Ontology object. */
     private final Ontology ontology;
 
+    public Map<TermId, IsopretAnnotations> getAssociationMap() {
+        return associationMap;
+    }
+
     private final int n_annotations;
 
     IsopretAssociationContainer(Ontology ontology,

@@ -4,9 +4,9 @@ package org.jax.isopret.core.visualization;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.AnnotatedGene;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.AnnotatedGene;
+import org.jax.isopret.core.model.Transcript;
 import org.monarchinitiative.svart.*;
 
 import java.io.IOException;
@@ -455,7 +455,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     private void writeGeneExpression(Writer writer, int ypos) throws IOException {
         double xpos = this.scaleMaxPos/2.0;
-        String symbol = this.hbaDealsResult.getSymbol();
+        String symbol = this.hbaDealsResult.getGeneModel().geneSymbol();
         double boxlen = 15 * symbol.length();
         writer.write(SvgUtil.boldItalicText(xpos, ypos, DARKBLUE, 24, symbol));
        // ypos += 20;

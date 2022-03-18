@@ -2,19 +2,22 @@ package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
+import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.go.IsopretAssociationContainer;
 import org.jax.isopret.core.go.IsopretContainerFactory;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hgnc.HgncItem;
+import org.jax.isopret.core.hgnc.HgncParser;
+import org.jax.isopret.core.model.GeneModel;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.AnnotatedGene;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.AnnotatedGene;
+import org.jax.isopret.core.model.GeneSymbolAccession;
+import org.jax.isopret.core.model.Transcript;
 import org.jax.isopret.core.visualization.InterproOverrepVisualizer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -47,14 +50,14 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
     /** Key ensembl transcript id; values: annotating go terms .*/
     private Map<TermId, Set<TermId>> transcriptToGoMap = Map.of();
 
-    private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
+    private Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionToTranscriptMap = Map.of();
 
     private Double splicingPepThreshold = null;
 
     private InterproMapper interproMapper = null;
 
     @Override
-    public Integer call() {
+    public Integer call() throws IsopretException {
         interproMapper = getInterproMapper();
         LOGGER.info("Got interpro mapper");
         List<AnnotatedGene> annotatedGeneList = getAnnotatedGeneList();
@@ -89,15 +92,18 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
     }
 
 
-    private HbaDealsIsoformSpecificThresholder getThresholder(String hbaDealsFilePath) {
-        Map<AccessionNumber, HgncItem> hgncMap = loadHgncMap();
+    private HbaDealsIsoformSpecificThresholder getThresholder(String hbaDealsFilePath) throws IsopretException {
+        File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
+        geneSymbolAccessionToTranscriptMap = loadJannovarSymbolToTranscriptMap();
+        HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
+        Map<AccessionNumber, GeneModel> hgncMap  = hgncParser.ensemblMap();
+        LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
         HbaDealsParser hbaParser = new HbaDealsParser(hbaDealsFilePath, hgncMap);
-        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         Ontology ontology = getGeneOntology();
         TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(downloadDirectory), ontology);
         this.transcriptToGoMap = fxnparser.getTranscriptIdToGoTermsMap();
-        Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap = loadJannovarGeneIdToTranscriptMap();
-        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneIdToTranscriptMap);
+        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneSymbolAccessionToTranscriptMap);
         Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
         IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcriptToGoMap, gene2GoMap);
         LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
@@ -114,11 +120,11 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
     }
 
 
-    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<AccessionNumber, List<Transcript>> gene2transcript) {
+    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<GeneSymbolAccession, List<Transcript>> gene2transcript) {
         Map<TermId, TermId> accessionNumberMap = new HashMap<>();
         for (var entry : gene2transcript.entrySet()) {
             var geneAcc = entry.getKey();
-            var geneTermId = geneAcc.toTermId();
+            var geneTermId = geneAcc.accession().toTermId();
             var transcriptList = entry.getValue();
             for (var transcript: transcriptList) {
                 var transcriptAcc = transcript.accessionId();
@@ -129,11 +135,11 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
         return Map.copyOf(accessionNumberMap); // immutable copy
     }
 
-    public List<AnnotatedGene> getAnnotatedGeneList() {
+    public List<AnnotatedGene> getAnnotatedGeneList() throws IsopretException{
         int notfound = 0;
         HbaDealsIsoformSpecificThresholder thresholder = getThresholder(hbadealsFile);
         this.splicingPepThreshold = thresholder.getSplicingPepThreshold();
-        this.geneSymbolToTranscriptMap = loadJannovarSymbolToTranscriptMap();
+        this.geneSymbolAccessionToTranscriptMap = loadJannovarSymbolToTranscriptMap();
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();
         // sort the raw results according to minimum p-values
         List<HbaDealsResult> results = thresholder.getRawResults().values()
@@ -150,11 +156,11 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
             if (c % 100==0) {
                 LOGGER.info("results {} not found {}", c, notfound);
             }
-            if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
+            if (! this.geneSymbolAccessionToTranscriptMap.containsKey(result.getGeneSymbolAccession())) {
                 notfound++;
                 continue;
             }
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
+            List<Transcript> transcripts = this.geneSymbolAccessionToTranscriptMap.get(result.getGeneSymbolAccession());
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
                     interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
             AnnotatedGene agene = new AnnotatedGene(transcripts,

@@ -1,4 +1,4 @@
-package org.jax.isopret.core.transcript;
+package org.jax.isopret.core.model;
 
 import org.monarchinitiative.svart.*;
 import org.slf4j.Logger;

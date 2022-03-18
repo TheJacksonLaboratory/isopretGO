@@ -110,14 +110,16 @@ public class HbaGeneController implements Initializable {
         if (total == 0) {
             explanation = new Text("No annotating GO terms were found");
         } else if (signf == 1) {
-            explanation = new Text(String.format("%d GO terms annotate %s, of which 1 was significant for DGE or DAS",
+            explanation = new Text(String.format("%d GO terms annotate %s, of which 1 was significant for DGE or DAS.\n",
                     total, visualizable.getGeneSymbol()));
         } else {
-            explanation = new Text(String.format("%d GO terms annotate %s, of which %d were significant for DGE or DAS",
+            explanation = new Text(String.format("%d GO terms annotate %s, of which %d were significant for DGE or DAS.\n",
                     total, visualizable.getGeneSymbol(), signf));
         }
         explanation.setFont(Font.font("Verdana", FontWeight.NORMAL,12));
-        this.goAnnotationsTextFlow.getChildren().addAll(geneSymbolText, explanation);
+        Text transcriptText = new Text(String.format("%s has %d transcripts, of which %d were found to be expressed in this dataset and are shown here.\n",
+                visualizable.getGeneSymbol(), visualizable.getTotalTranscriptCount(), visualizable.getExpressedTranscriptCount()));
+        this.goAnnotationsTextFlow.getChildren().addAll(geneSymbolText, explanation,transcriptText);
 
 
         String geneAccession = visualizable.getGeneAccession();

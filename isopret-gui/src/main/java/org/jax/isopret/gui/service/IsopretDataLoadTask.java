@@ -2,18 +2,20 @@ package org.jax.isopret.gui.service;
 
 import javafx.concurrent.Task;
 import org.jax.isopret.core.analysis.IsopretStats;
+import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hgnc.HgncItem;
+import org.jax.isopret.core.model.GeneModel;
 import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.JannovarReader;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.GeneSymbolAccession;
+import org.jax.isopret.core.model.JannovarReader;
+import org.jax.isopret.core.model.Transcript;
 import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -39,13 +41,10 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private Ontology geneOntology;
 
-    private Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap;
-
-    private Map<AccessionNumber, HgncItem> hgncMap = Map.of();
+    private Map<AccessionNumber, GeneModel> geneSymbolToModelMap = Map.of();
     /** Key ensembl transcript id; values: annotating go terms .*/
     private Map<TermId, Set<TermId>> transcriptToGoMap = Map.of();
 
-    private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
     /** Key: transcript id; value: set of Annotating GO Terms. */
     private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
 
@@ -90,7 +89,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     }
 
     @Override
-    protected Integer call() {
+    protected Integer call() throws IsopretException {
         updateProgress(0, 1); /* this will update the progress bar */
         updateMessage("Reading Gene Ontology file");
         updateProgress(0.05, 1);
@@ -111,57 +110,50 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         }
         isopretStatsBuilder.info("Jannovar file", jannovarFile.getAbsolutePath());
         JannovarReader jannovarReader = new JannovarReader(jannovarFile, assembly);
-
         updateProgress(0.20, 1);
-        updateMessage(String.format("Loaded JannovarReader with %d gene symbols.", jannovarReader.getSymbolToTranscriptListMap().size()));
-        LOGGER.info(String.format("Loaded JannovarReader with %d gene symbols.", jannovarReader.getSymbolToTranscriptListMap().size()));
-        this.geneIdToTranscriptMap = jannovarReader.getGeneIdToTranscriptMap();
-        this.geneSymbolToTranscriptMap = jannovarReader.getSymbolToTranscriptListMap();
+        Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionListMap = jannovarReader.getGeneToTranscriptListMap();
+        updateMessage(String.format("Loaded JannovarReader with %d genes.", geneSymbolAccessionListMap.size()));
         updateProgress(0.25, 1); /* this will update the progress bar */
-        updateMessage(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
-        LOGGER.info(String.format("Loaded geneIdToTranscriptMap with %d gene symbols.", geneIdToTranscriptMap.size()));
-        isopretStatsBuilder.geneSymbolCount(geneIdToTranscriptMap.size());
-        int n_transcripts = geneIdToTranscriptMap.values()
+        updateMessage(String.format("Loaded geneSymbolAccessionListMap with %d gene symbols.", geneSymbolAccessionListMap.size()));
+        isopretStatsBuilder.geneSymbolCount(geneSymbolAccessionListMap.size());
+        int n_transcripts = geneSymbolAccessionListMap.values()
                 .stream()
                 .map(List::size)
                 .reduce(0, Integer::sum);
         isopretStatsBuilder.transcriptsCount(n_transcripts);
 
-
         File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list_mf.txt");
-        if (! isoformFunctionFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find \"isoform_function_list_mf.txt\" in download directory");
-        } else {
-            isopretStatsBuilder.info("isoform function file", isoformFunctionFile.getAbsolutePath());
-            TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
-            Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(this.geneIdToTranscriptMap);
-            this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
-            updateProgress(0.40, 1);
-            updateMessage(String.format("Loaded isoformFunctionFile (%d transcripts).", transcript2GoMap.size()));
 
-            Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
-            LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
-            isopretStatsBuilder.annotatedGeneCount(gene2GoMap.size());
-            IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);
+        isopretStatsBuilder.info("isoform function file", isoformFunctionFile.getAbsolutePath());
+        TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
+        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneSymbolAccessionListMap);
+        this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
+        updateProgress(0.40, 1);
+        updateMessage(String.format("Loaded isoformFunctionFile (%d transcripts).", transcript2GoMap.size()));
 
-            transcriptContainer = isoContainerFac.transcriptContainer();
-            geneContainer = isoContainerFac.geneContainer();
-            updateProgress(0.55, 1);
-            LOGGER.info("Loaded gene container with {} annotating terms", geneContainer.getAnnotatingTermCount());
-            isopretStatsBuilder.annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount());
-            isopretStatsBuilder.annotatedGeneCount(geneContainer.getAnnotatedDomainItemCount());
-            LOGGER.info("Loaded transcript container with {} annotating terms", transcriptContainer.getAnnotatingTermCount());
-            isopretStatsBuilder.annotatingGoTermCountTranscripts(transcriptContainer.getAnnotatingTermCount());
-            isopretStatsBuilder.annotatedTranscripts(transcriptContainer.getAnnotatedDomainItemCount());
+        Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
+        LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
+        isopretStatsBuilder.annotatedGeneCount(gene2GoMap.size());
+        IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);
 
-        }
+        transcriptContainer = isoContainerFac.transcriptContainer();
+        geneContainer = isoContainerFac.geneContainer();
+        updateProgress(0.55, 1);
+        LOGGER.info("Loaded gene container with {} annotating terms", geneContainer.getAnnotatingTermCount());
+        isopretStatsBuilder.annotatingGoTermCountGenes(geneContainer.getAnnotatingTermCount());
+        isopretStatsBuilder.annotatedGeneCount(geneContainer.getAnnotatedDomainItemCount());
+        LOGGER.info("Loaded transcript container with {} annotating terms", transcriptContainer.getAnnotatingTermCount());
+        isopretStatsBuilder.annotatingGoTermCountTranscripts(transcriptContainer.getAnnotatingTermCount());
+        isopretStatsBuilder.annotatedTranscripts(transcriptContainer.getAnnotatedDomainItemCount());
+
+
         File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
-        HgncParser hgncParser = new HgncParser(hgncFile);
-        this.hgncMap = hgncParser.ensemblMap();
+        HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
+        this.geneSymbolToModelMap = hgncParser.ensemblMap();
         updateProgress(0.65, 1); /* this will update the progress bar */
-        updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
-        LOGGER.info(String.format("Loaded Ensembl HGNC map with %d genes", hgncMap.size()));
-        isopretStatsBuilder.hgncCount(hgncMap.size());
+        updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", geneSymbolToModelMap.size()));
+        LOGGER.info(String.format("Loaded Ensembl HGNC map with %d genes", geneSymbolToModelMap.size()));
+        isopretStatsBuilder.hgncCount(geneSymbolToModelMap.size());
 
         File interproDescriptionFile = new File(downloadDirectory + File.separator + "interpro_domain_desc.txt");
         File interproDomainsFile = new File(downloadDirectory + File.separator + "interpro_domains.txt");
@@ -187,8 +179,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateProgress(0.80, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
-        HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), hgncMap);
-        Map<String, HbaDealsResult> hbaDealsResults = hbaParser.getHbaDealsResultMap();
+        HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), geneSymbolToModelMap);
+        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         updateProgress(0.90, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
         this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
@@ -245,11 +237,11 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         return dasResults;
     }
 
-    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<AccessionNumber, List<Transcript>> gene2transcript) {
+    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<GeneSymbolAccession, List<Transcript>> gene2transcript) {
         Map<TermId, TermId> accessionNumberMap = new HashMap<>();
         for (var entry : gene2transcript.entrySet()) {
             var geneAcc = entry.getKey();
-            var geneTermId = geneAcc.toTermId();
+            var geneTermId = geneAcc.accession().toTermId();
             var transcriptList = entry.getValue();
             for (var transcript: transcriptList) {
                 var transcriptAcc = transcript.accessionId();
@@ -264,20 +256,12 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         return geneOntology;
     }
 
-    public Map<AccessionNumber, List<Transcript>> getGeneIdToTranscriptMap() {
-        return geneIdToTranscriptMap;
-    }
-
     public InterproMapper getInterproMapper() {
         return interproMapper;
     }
 
     public List<String> getErrors() {
         return errors;
-    }
-
-    public Map<String, List<Transcript>> getGeneSymbolToTranscriptMap() {
-        return geneSymbolToTranscriptMap;
     }
 
     public IsopretAssociationContainer getTranscriptContainer() {
@@ -296,5 +280,9 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     public MtcMethod getMultipleTestingMethod() {
         return multipleTestingMethod;
+    }
+
+    public Map<AccessionNumber, GeneModel> getGeneSymbolToModelMap() {
+        return geneSymbolToModelMap;
     }
 }
