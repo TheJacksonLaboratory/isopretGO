@@ -256,13 +256,14 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public int getGoTableWidth() {
-        return  400 + 30 * getTotalTranscriptCount();
+        return  400 + 30 * getExpressedTranscriptCount();
     }
 
 
     @Override
     public String getGoHtml() {
-        HtmlGoAnnotationMatrixVisualizer htmlMatrix = new HtmlGoAnnotationMatrixVisualizer(this.annotationMatrix);
+        HtmlGoAnnotationMatrixVisualizer htmlMatrix =
+                new HtmlGoAnnotationMatrixVisualizer(this.annotationMatrix, this.expressedTranscripts);
         return htmlMatrix.getHtml();
     }
 

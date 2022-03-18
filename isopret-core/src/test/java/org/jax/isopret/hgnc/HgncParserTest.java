@@ -2,7 +2,6 @@ package org.jax.isopret.hgnc;
 
 import org.jax.isopret.core.model.GeneModel;
 import org.jax.isopret.TestBase;
-import java.util.Map;
 
 import org.jax.isopret.core.model.AccessionNumber;
 import org.junit.jupiter.api.Test;

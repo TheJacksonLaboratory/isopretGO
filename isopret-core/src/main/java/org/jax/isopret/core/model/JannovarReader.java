@@ -1,6 +1,5 @@
 package org.jax.isopret.core.model;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import de.charite.compbio.jannovar.data.JannovarData;
 import de.charite.compbio.jannovar.data.JannovarDataSerializer;
@@ -56,22 +55,6 @@ public class JannovarReader {
                     }
                 }
             });
-//            for (String symbol : transcriptByGeneSymbolMap.keys()) {
-//
-//                ImmutableCollection<TranscriptModel> transcriptModelList = transcriptByGeneSymbolMap.get(symbol);
-//                for (TranscriptModel tmod : transcriptModelList) {
-//                    Optional<Transcript> opt = jmapper.remap(tmod);
-//                    if (opt.isPresent()) {
-//                        Transcript transcript = opt.get();
-//                        AccessionNumber geneId = AccessionNumber.ensemblGene(tmod.getGeneID());
-//                        GeneSymbolAccession gsa = new GeneSymbolAccession(symbol, geneId);
-//                        geneToTranscriptListMap.putIfAbsent(gsa, new ArrayList<>());
-//                        geneToTranscriptListMap.get(gsa).add(transcript);
-//                    } else {
-//                        LOGGER.warn("Could not find Jannovar transcript model for {}.", symbol);
-//                    }
-//                }
-//            }
             LOGGER.info("Parsed geneToTranscriptListMap with {} entries", geneToTranscriptListMap.size());
         } catch (SerializationException e) {
             throw new IsopretRuntimeException(e.getMessage());

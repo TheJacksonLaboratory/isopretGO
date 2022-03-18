@@ -1,7 +1,6 @@
 package org.jax.isopret;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.*;

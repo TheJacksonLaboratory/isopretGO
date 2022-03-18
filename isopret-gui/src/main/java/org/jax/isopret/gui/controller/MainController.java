@@ -176,9 +176,8 @@ public class MainController implements Initializable {
         });
         task.setOnCancelled(c -> LOGGER.info("download canceled"));
         Thread t = new Thread(task);
-        Thread.UncaughtExceptionHandler h = (thread, throwable) -> Platform.runLater(() -> {
-            displayIsopretThrown(throwable);
-        });
+        Thread.UncaughtExceptionHandler h = (thread, throwable) ->
+                Platform.runLater(() -> displayIsopretThrown(throwable));
         t.setUncaughtExceptionHandler(h);
         t.start();
     }
@@ -338,9 +337,8 @@ public class MainController implements Initializable {
             this.analysisLabel.textProperty().setValue("Analysis failed: " + exc.getMessage());
         });
         Thread t = new Thread(task);
-        Thread.UncaughtExceptionHandler h = (thread, throwable) -> Platform.runLater(() -> {
-            displayIsopretThrown(throwable);
-        });
+        Thread.UncaughtExceptionHandler h = (thread, throwable) ->
+                Platform.runLater(() -> displayIsopretThrown(throwable));
         t.setUncaughtExceptionHandler(h);
         t.start();
     }

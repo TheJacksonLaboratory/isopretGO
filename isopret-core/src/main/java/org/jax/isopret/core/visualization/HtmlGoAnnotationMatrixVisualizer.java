@@ -1,5 +1,7 @@
 package org.jax.isopret.core.visualization;
 
+import org.jax.isopret.core.model.Transcript;
+
 import java.util.List;
 
 /**
@@ -16,13 +18,13 @@ public class HtmlGoAnnotationMatrixVisualizer {
      *
      * Build a table with go annotations without HTML header or foter
      */
-    public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix) {
+    public HtmlGoAnnotationMatrixVisualizer(GoAnnotationMatrix matrix, List<Transcript> expressedTranscripts) {
         if (matrix.getAllGoIds().isEmpty()) {
             this.html = "<p>No Gene Ontology annotations found.</p>";
         } else {
             StringBuilder sb = new StringBuilder();
-            sb.append(htmlTableHeader(matrix.getTranscripts()));
-            for (GoAnnotationRow row : matrix.getAnnotationRows()) {
+            sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
+            for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
                 sb.append(getRow(row));
             }
             sb.append("</table>\n");

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class records information about the Gene Ontology annotations for a gene
- * and all of its isoforms.
+ * and all of its isoforms that are expressed in the current experiment.
  */
 public class GoAnnotationMatrix {
     private final Logger LOGGER = LoggerFactory.getLogger(GoAnnotationMatrix.class);
@@ -22,8 +22,7 @@ public class GoAnnotationMatrix {
     private final List<TermId> transcriptIds;
 
     private final List<TermId> expressedTranscriptIds;
-    /** GO annotation patterns for all transcripts */
-    private final List<GoAnnotationRow> annotationRows;
+
     /** GO annotation patterns for transcripts expressed incurrent HBADEALS dataset. */
     private final List<GoAnnotationRow> expressedAnnotationRows;
 
@@ -57,17 +56,19 @@ public class GoAnnotationMatrix {
                     .collect(Collectors.toList());
             LOGGER.trace("Got {} transcript Ids for {}", transcriptIds.size(), accessionNumber.getAccessionString());
             LOGGER.trace("Gene: {}", accessionNumber.getAccessionString());
-            List<GoAnnotationRow> rows = allAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
+           // List<GoAnnotationRow> rows = allAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
+            List<GoAnnotationRow> rows = expressedAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
+
             Collections.sort(rows);
-            annotationRows = List.copyOf(rows);
-            rows = expressedAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
-            Collections.sort(rows);
+           // annotationRows = List.copyOf(rows);
+            //rows = expressedAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
+            //Collections.sort(rows);
             expressedAnnotationRows = List.copyOf(rows);
         } else {
             LOGGER.info("Could not get GO data for {}", accessionNumber.getAccessionString());
             transcriptIds = List.of();
             expressedTranscriptIds = List.of();
-            annotationRows = List.of();
+            //annotationRows = List.of();
             expressedAnnotationRows = List.of();
         }
     }
@@ -152,9 +153,9 @@ public class GoAnnotationMatrix {
     public String getAccession() {
         return accession;
     }
-    public List<GoAnnotationRow> getAnnotationRows() {
-        return annotationRows;
-    }
+//    public List<GoAnnotationRow> getAnnotationRows() {
+//        return annotationRows;
+//    }
 
     public List<GoAnnotationRow> getExpressedAnnotationRows() { return expressedAnnotationRows; }
 
@@ -166,8 +167,12 @@ public class GoAnnotationMatrix {
         return  this.expressedTranscriptIds.stream().map(TermId::getValue).collect(Collectors.toList());
     }
 
+    /**
+     *
+     * @return All GO ids that are associated with one or more expressed transcript.
+     */
     public Set<TermId> getAllGoIds() {
-        return annotationRows.stream()
+        return expressedAnnotationRows.stream()
                 .map(GoAnnotationRow::getGoId)
                 .collect(Collectors.toSet());
     }
