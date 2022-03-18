@@ -2,6 +2,7 @@ package org.jax.isopret.core.hbadeals;
 
 import org.jax.isopret.core.model.AccessionNumber;
 import org.jax.isopret.core.model.GeneModel;
+import org.jax.isopret.core.model.GeneSymbolAccession;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,6 +48,10 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
 
     public GeneModel getGeneModel() {
         return geneModel;
+    }
+
+    public GeneSymbolAccession getGeneSymbolAccession() {
+        return new GeneSymbolAccession(geneModel.geneSymbol(), geneAccession);
     }
 
     public double getExpressionFoldChange() {

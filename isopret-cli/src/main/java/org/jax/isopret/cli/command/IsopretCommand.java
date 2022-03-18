@@ -39,11 +39,11 @@ public abstract class IsopretCommand {
 
     private JannovarReader jannovarReader = null;
 
-    private  Map<AccessionNumber, GeneModel> hgncMap = null;
+    protected   Map<AccessionNumber, GeneModel> hgncMap = null;
     /** Key ensembl transcript id; values: annotating go terms .*/
-    private Map<TermId, Set<TermId>> transcriptToGoMap = null;
+    protected Map<TermId, Set<TermId>> transcriptToGoMap = null;
 
-    private Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap = null;
+    protected Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap = null;
 
     @CommandLine.Option(names={"-d","--download"},
             scope = CommandLine.ScopeType.INHERIT,
@@ -102,18 +102,6 @@ public abstract class IsopretCommand {
         return geneSymbolAccessionListMap;
     }
 
-    /**
-     * @return map with key: Ensembl Gene ID and value: the corresponding {@link GeneModel} object
-     */
-    protected Map<AccessionNumber, GeneModel> loadHgncMap() {
-        if (hgncMap == null) {
-            File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
-            HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
-            hgncMap = hgncParser.ensemblMap();
-            LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
-        }
-        return hgncMap;
-    }
 
     protected InterproMapper loadInterproMapper() {
         File interproDescriptionFile = new File(downloadDirectory + File.separator + "interpro_domain_desc.txt");

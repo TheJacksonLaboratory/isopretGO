@@ -7,6 +7,7 @@ import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.model.GeneModel;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.model.AccessionNumber;
@@ -65,7 +66,11 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         Ontology geneOntology = loadGeneOntology();
         int n_go_terms = geneOntology.countNonObsoleteTerms();
         LOGGER.info("Loaded Gene Ontology with {} terms", n_go_terms);
-        Map<AccessionNumber, GeneModel> hgncMap = loadHgncMap();
+
+        File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
+        HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
+        Map<AccessionNumber, GeneModel> hgncMap  = hgncParser.ensemblMap();
+        LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
         LOGGER.info("Loaded HGNC map with {} genes", hgncMap.size());
         Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionToTranscriptMap = loadJannovarSymbolToTranscriptMap();
         LOGGER.info("Loaded geneId-to-transcript map with {} genes", geneSymbolAccessionToTranscriptMap.size());
