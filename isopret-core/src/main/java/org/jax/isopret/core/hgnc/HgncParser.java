@@ -88,7 +88,7 @@ public class HgncParser {
     /**
      * Parse the HGNC file
      * @param hgncFile path to the hgnc_complete_set.txt file
-     * @param geneSymbolAccessionListMap
+     * @param geneSymbolAccessionListMap map with key - gene identifiers, value -- list of transcripts.
      */
     public HgncParser(File hgncFile, Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionListMap) {
         ensemblMap = initHgncItems(hgncFile, geneSymbolAccessionListMap);

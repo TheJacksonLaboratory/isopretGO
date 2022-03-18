@@ -6,7 +6,6 @@ import org.jax.isopret.core.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.core.model.GeneModel;
-import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.InterproMapper;
 import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.core.model.AccessionNumber;

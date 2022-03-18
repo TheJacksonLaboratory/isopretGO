@@ -91,7 +91,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     /**
      * This function counts each interpro domain only once (this is important because
      * some proteins have multiple of the same domain).
-     * @return
+     * @return map with key accession number of a transcript, value -- set of interpro's associated with the transcript
      */
     public Map<AccessionNumber, Set<InterproEntry>> getTranscriptToUniqueInterproMap() {
         Map<AccessionNumber, Set<InterproEntry>> uniqCountMap = new HashMap<>();
