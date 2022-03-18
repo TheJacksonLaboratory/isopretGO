@@ -41,7 +41,6 @@ public class GoAnnotationMatrix {
                               AccessionNumber accessionNumber,
                               Set<TermId> expressedTranscriptSet){
         // The termId (key) of transcriptToGoMap corresponds to an accession number
-       // TermId accessionId = accessionNumber.toTermId();
         this.accession = accessionNumber.getAccessionString();
         if (geneIdToTranscriptMap.containsKey(accessionNumber) && transcript2GoMap != null) {
             // if this is the case then we have isoforms all is Good
@@ -54,21 +53,15 @@ public class GoAnnotationMatrix {
             this.expressedTranscriptIds = transcriptIds.stream()
                     .filter(expressedTranscriptSet::contains)
                     .collect(Collectors.toList());
-            LOGGER.trace("Got {} transcript Ids for {}", transcriptIds.size(), accessionNumber.getAccessionString());
-            LOGGER.trace("Gene: {}", accessionNumber.getAccessionString());
-           // List<GoAnnotationRow> rows = allAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
+            LOGGER.trace("Got {} expressed transcript Ids for {}", expressedTranscriptIds.size(), accessionNumber.getAccessionString());
             List<GoAnnotationRow> rows = expressedAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
 
             Collections.sort(rows);
-           // annotationRows = List.copyOf(rows);
-            //rows = expressedAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
-            //Collections.sort(rows);
             expressedAnnotationRows = List.copyOf(rows);
         } else {
             LOGGER.info("Could not get GO data for {}", accessionNumber.getAccessionString());
             transcriptIds = List.of();
             expressedTranscriptIds = List.of();
-            //annotationRows = List.of();
             expressedAnnotationRows = List.of();
         }
     }

@@ -13,7 +13,7 @@
 <?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.web.WebView?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
     <VBox prefHeight="887.0" prefWidth="1203.0">
         <padding><Insets bottom="5" left="10" right="5" top="10" /></padding>
         <spacing>10</spacing>
@@ -75,7 +75,9 @@
                     <WebView fx:id="hbaProteinWebView" prefHeight="861.0" prefWidth="1203.0" />
                     <VBox>
                          <TextFlow fx:id="goAnnotationsTextFlow" minWidth="1100.0">
-                                </TextFlow>
+                     <VBox.margin>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </VBox.margin></TextFlow>
                     </VBox>
                     <WebView fx:id="hbaGoWebView" prefHeight="861.0" prefWidth="1203.0" />
 
