@@ -133,8 +133,6 @@ public class GoCompWidget {
         newWindow.setX(primaryStage.getX() + 200);
         newWindow.setY(primaryStage.getY() + 100);
 
-
-
         newWindow.show();
     }
 

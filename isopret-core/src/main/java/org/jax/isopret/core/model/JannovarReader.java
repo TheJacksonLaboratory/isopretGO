@@ -41,7 +41,6 @@ public class JannovarReader {
             JannovarData jannovarData = new JannovarDataSerializer(jannovarSerFile.toString()).load();
             ImmutableMultimap<String, TranscriptModel> transcriptByGeneSymbolMap = jannovarData.getTmByGeneSymbol();
             transcriptByGeneSymbolMap.asMap().forEach((symbol, transcriptModelList) -> {
-                LOGGER.info("Jannovar map key={}", symbol);
                 for (TranscriptModel tmod : transcriptModelList) {
                     Optional<Transcript> opt = jmapper.remap(tmod);
                     if (opt.isPresent()) {

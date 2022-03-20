@@ -42,8 +42,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     private Ontology geneOntology;
 
     private Map<AccessionNumber, GeneModel> geneSymbolToModelMap = Map.of();
-    /** Key ensembl transcript id; values: annotating go terms .*/
-    private Map<TermId, Set<TermId>> transcriptToGoMap = Map.of();
 
     /** Key: transcript id; value: set of Annotating GO Terms. */
     private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
@@ -174,11 +172,11 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.interproAnnotationCount(interproMapper.getInterproAnnotationCount());
         LOGGER.info(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
 
-        TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
-        transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
+        //TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
+        //Map<TermId, Set<TermId>> transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
         updateProgress(0.80, 1); /* this will update the progress bar */
-        updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
-        LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
+      //  updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
+        //LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), geneSymbolToModelMap);
         Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         updateProgress(0.90, 1); /* this will update the progress bar */
@@ -188,8 +186,8 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                 geneContainer,
                 transcriptContainer);
         updateProgress(0.95, 1);
-        updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
-        LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
+     //   updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
+       // LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         updateMessage("Finished loading data for isopret analysis.");
         LOGGER.info("Beginning DGE GO analysis");
         isopretStatsBuilder.dasIsoformCount(isoformSpecificThresholder.getDasIsoformCount());

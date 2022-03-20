@@ -91,12 +91,19 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
 
     private String getGoTable() {
         StringBuilder sb = new StringBuilder();
-        sb.append(htmlTableHeader());
+
         //Map<GoTermIdPlusLabel, Integer> countsMap
         List<Map.Entry<GoTermIdPlusLabel, Integer>> list = new ArrayList<>(countsMap.entrySet());
+        int THRESHOLD = 3;
+        int aboveThreshold = (int) list.stream().filter(e -> e.getValue() >= THRESHOLD).count();
         list.sort(Map.Entry.<GoTermIdPlusLabel, Integer>comparingByValue().reversed());
+        sb.append("<p>Total of ").append(list.size()).append(" GO terms annotated to the transcripts. Of these, ");
+        sb.append(aboveThreshold).append(" were above the threshold of ").append(THRESHOLD).append( " annotations")
+                  .append(" and are shown here.</p>");
+        sb.append(htmlTableHeader());
         for (var entry : list) {
-            sb.append(getRow(entry.getKey(), entry.getValue()));
+            if (entry.getValue() >= THRESHOLD)
+                sb.append(getRow(entry.getKey(), entry.getValue()));
         }
         sb.append("</table>\n");
         return sb.toString();

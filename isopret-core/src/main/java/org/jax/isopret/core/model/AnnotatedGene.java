@@ -166,6 +166,8 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         return this.splicingThreshold;
     }
 
+    public double getExpressionThreshold() { return this.expressionThreshold; }
+
     public Map<Transcript, Double> getUpregulatedExpressedTranscripts() {
         return this.expressedTranscriptMap
                 .entrySet()

@@ -328,7 +328,6 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public List<AnnotatedGene> getAnnotatedGeneList() {
-        int notfound = 0;
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();
         // sort the raw results according to minimum p-values
         List<HbaDealsResult> results = thresholder.getRawResults().values()
@@ -347,9 +346,6 @@ public class IsopretServiceImpl implements IsopretService  {
                     expressionThreshold,
                     splicingThreshold);
             annotatedGenes.add(agene);
-        }
-        if (notfound > 0) {
-            LOGGER.warn("Could not find transcript map for {} genes", notfound);
         }
         return annotatedGenes;
     }

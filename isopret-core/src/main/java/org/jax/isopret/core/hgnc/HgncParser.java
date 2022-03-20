@@ -100,6 +100,7 @@ public class HgncParser {
         int less_than_24_fields = 0;
         int well_formed_lines = 0;
         String line = null;
+        int not_found_in_jannovar = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(hgncFile))) {
             line = br.readLine();
             if (! line.startsWith("hgnc_id")) {
@@ -131,13 +132,15 @@ public class HgncParser {
                             transcriptList);
                     ensemblMap.put(gsa.accession(), item);
                 } else {
-                    LOGGER.error("Could not find Jannovar transcript data for {}", gsa);
+                    // not an error, we do not expect to find all of the transcripts in HGNC in the Jannovar file
+                    not_found_in_jannovar++;
                 }
             }
         } catch (IOException e) {
             String msg = String.format("Could not parse the HGNC file (%s). Error for line (%s)", e.getMessage(), line);
             throw new IsopretRuntimeException("Could not parse the HGNC file: " + e.getMessage());
         }
+        LOGGER.trace("Unable to find {} HGNC transcripts in the Jannovar data ", not_found_in_jannovar);
         LOGGER.trace("{} HGNC lines with less than 24 fields skipped.", less_than_24_fields);
         LOGGER.trace("{} valid HGNC lines successsfully parsed.", well_formed_lines);
         return Map.copyOf(ensemblMap); // immutable copy
