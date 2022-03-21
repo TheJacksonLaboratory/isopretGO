@@ -1,4 +1,4 @@
-package org.jax.isopret.core.transcript;
+package org.jax.isopret.core.model;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.TermId;

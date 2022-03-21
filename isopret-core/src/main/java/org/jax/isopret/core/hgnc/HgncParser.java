@@ -1,7 +1,10 @@
 package org.jax.isopret.core.hgnc;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.GeneSymbolAccession;
+import org.jax.isopret.core.model.GeneModel;
+import org.jax.isopret.core.model.Transcript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +70,8 @@ import java.util.Map;
  * [49] agr
  *
  * The logic of this class is that the user may give us ids from one of several different sources. It would be
- * wasteful to create a Map for each of the sources. Therefore, we parse all of this information into a List of
- * {@link HgncItem} objects. There are then accessor functions for each of the sources that create a map on the fly.
+ * wasteful to create a Map for each of the sources. Therefore, we parse all of this information into a map of
+ * {@link GeneModel} objects. There are then accessor functions for each of the sources that create a map on the fly.
  * @author Peter N Robinson
  */
 public class HgncParser {
@@ -78,26 +80,29 @@ public class HgncParser {
     private final static int GENE_NAME = 2;
     private final static int ENTREZ_ID = 18;
     private final static int ENSEMBL_GENE_ID = 19;
-    private final static int USCS_ID = 21;
     private final static int REFSEQ_ACCESSION = 23;
 
-    private final List<HgncItem> itemList;
 
 
+    private final Map<AccessionNumber, GeneModel> ensemblMap;
     /**
      * Parse the HGNC file
      * @param hgncFile path to the hgnc_complete_set.txt file
+     * @param geneSymbolAccessionListMap map with key - gene identifiers, value -- list of transcripts.
      */
-    public HgncParser(File hgncFile) {
-        itemList = initHgncItems(hgncFile);
+    public HgncParser(File hgncFile, Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionListMap) {
+        ensemblMap = initHgncItems(hgncFile, geneSymbolAccessionListMap);
     }
 
-    private List<HgncItem> initHgncItems(File hgncFile) {
-        List<HgncItem> items = new ArrayList<>();
+    private Map<AccessionNumber, GeneModel>  initHgncItems(File hgncFile,
+                                          Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap) {
+        Map<AccessionNumber, GeneModel> ensemblMap = new HashMap<>();
         int less_than_24_fields = 0;
         int well_formed_lines = 0;
+        String line = null;
+        int not_found_in_jannovar = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(hgncFile))) {
-            String line = br.readLine();
+            line = br.readLine();
             if (! line.startsWith("hgnc_id")) {
                 throw new IsopretRuntimeException("Malformed HGNC header line: " + line);
             }
@@ -109,73 +114,45 @@ public class HgncParser {
                 } else {
                     well_formed_lines++;
                 }
-                HgncItem item = new HgncItem(fields[GENE_SYMBOL], fields[GENE_NAME], fields[ENTREZ_ID], fields[ENSEMBL_GENE_ID], fields[USCS_ID], fields[REFSEQ_ACCESSION]);
-                items.add(item);
+                // some lines do not have an ENSEMBL id -- about 20 or so, and they can be ignored.
+                //ENSG00000160710
+                if (fields[ENSEMBL_GENE_ID].length() < 15) {
+                    LOGGER.trace("Malformed HGNC line ({}) with no Ensembl id\n", line);
+                    continue;
+                }
+                AccessionNumber ensemblGeneAcc = AccessionNumber.ensemblGene(fields[ENSEMBL_GENE_ID]);
+                GeneSymbolAccession gsa = new GeneSymbolAccession(fields[GENE_SYMBOL], ensemblGeneAcc);
+                if (geneSymbolAccessionListMap.containsKey(gsa)) {
+                    List<Transcript> transcriptList = geneSymbolAccessionListMap.get(gsa);
+                    GeneModel item = new GeneModel(fields[GENE_SYMBOL],
+                            fields[GENE_NAME],
+                            fields[ENTREZ_ID],
+                            gsa.accession(),
+                            fields[REFSEQ_ACCESSION],
+                            transcriptList);
+                    ensemblMap.put(gsa.accession(), item);
+                } else {
+                    // not an error, we do not expect to find all of the transcripts in HGNC in the Jannovar file
+                    not_found_in_jannovar++;
+                }
             }
         } catch (IOException e) {
+            String msg = String.format("Could not parse the HGNC file (%s). Error for line (%s)", e.getMessage(), line);
             throw new IsopretRuntimeException("Could not parse the HGNC file: " + e.getMessage());
         }
+        LOGGER.trace("Unable to find {} HGNC transcripts in the Jannovar data ", not_found_in_jannovar);
         LOGGER.trace("{} HGNC lines with less than 24 fields skipped.", less_than_24_fields);
         LOGGER.trace("{} valid HGNC lines successsfully parsed.", well_formed_lines);
-        return items;
+        return Map.copyOf(ensemblMap); // immutable copy
     }
 
     public int itemCount() {
-        return this.itemList.size();
+        return this.ensemblMap.size();
     }
 
-    public Map<AccessionNumber, HgncItem> ensemblMap() {
-        Map<AccessionNumber, HgncItem> ensmap = new HashMap<>();
-        int notMapped = 0;
-        for (HgncItem item : itemList) {
-            String ens = item.getEnsemblGeneId();
-            if (ens != null && ens.startsWith("ENSG")) {
-                ensmap.put(AccessionNumber.ensemblGene(ens), item);
-            } else {
-                notMapped++;
-            }
-        }
-        if (notMapped > 0) {
-            LOGGER.trace("Retrieving {} ENSG mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
-        }
-        return ensmap;
+    public Map<AccessionNumber, GeneModel> ensemblMap() {
+        return this.ensemblMap;
     }
-
-    public Map<String, HgncItem> ucscMap() {
-        Map<String, HgncItem> ensmap = new HashMap<>();
-        int notMapped = 0;
-        for (HgncItem item : itemList) {
-            String ucsc = item.getUcscId();
-            if (ucsc != null && ucsc.startsWith("uc")) {
-                ensmap.put(ucsc, item);
-            } else {
-                notMapped++;
-            }
-        }
-        if (notMapped > 0) {
-            LOGGER.trace("Retrieving {} UCSC mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
-        }
-        return ensmap;
-    }
-
-    public Map<String, HgncItem> refseqMap() {
-        Map<String, HgncItem> ensmap = new HashMap<>();
-        int notMapped = 0;
-        for (HgncItem item : itemList) {
-            String refseq = item.getRefseqAccecssion();
-            if (refseq != null && refseq.startsWith("NM_")) {
-                ensmap.put(refseq, item);
-            } else {
-                notMapped++;
-            }
-        }
-        if (notMapped > 0) {
-            LOGGER.trace("Retrieving {} RefSeq mappings; could not map {} HGNS entries.\n", ensmap.size(), notMapped);
-        }
-        return ensmap;
-    }
-
-
 
 
 }

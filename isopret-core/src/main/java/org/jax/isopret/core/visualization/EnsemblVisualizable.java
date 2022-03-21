@@ -4,9 +4,9 @@ import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.AnnotatedGene;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.AnnotatedGene;
+import org.jax.isopret.core.model.Transcript;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.Contig;
 import org.slf4j.Logger;
@@ -84,7 +84,7 @@ public class EnsemblVisualizable implements Visualizable {
         svggen = ProteinSvgGenerator.factory(agene);
 
         if (!agene.hasInterproAnnotations()) {
-            this.proteinSvg = ProteinSvgGenerator.empty(agene.getHbaDealsResult().getSymbol());
+            this.proteinSvg = ProteinSvgGenerator.empty(agene.getSymbol());
             this.proteinSvgHeight = 50;
         } else {
             AbstractSvgGenerator psvggen = ProteinSvgGenerator.factory(agene);
@@ -113,7 +113,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getGeneSymbol() {
-        return hbaDealsResult.getSymbol();
+        return hbaDealsResult.getGeneModel().geneSymbol();
     }
 
     @Override
@@ -256,13 +256,14 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public int getGoTableWidth() {
-        return  400 + 30 * getTotalTranscriptCount();
+        return  400 + 30 * getExpressedTranscriptCount();
     }
 
 
     @Override
     public String getGoHtml() {
-        HtmlGoAnnotationMatrixVisualizer htmlMatrix = new HtmlGoAnnotationMatrixVisualizer(this.annotationMatrix);
+        HtmlGoAnnotationMatrixVisualizer htmlMatrix =
+                new HtmlGoAnnotationMatrixVisualizer(this.annotationMatrix, this.expressedTranscripts);
         return htmlMatrix.getHtml();
     }
 

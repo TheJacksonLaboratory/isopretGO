@@ -9,23 +9,11 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
  * {@link #das} is the same for the differential alternative splicing dataset.
  * @author Peter Robinson
  */
-public class GoCompTerm implements Comparable<GoCompTerm> {
+public record GoCompTerm(TermId tid, String label, double dge, double das) implements Comparable<GoCompTerm> {
 
-    private final TermId tid;
-    private final String label;
-
-    private final double dge;
-    private final double das;
 
     private static final double THRESH = -1 * Math.log10(0.05);
 
-
-    GoCompTerm(TermId tid, String label, double dge, double das) {
-        this.tid = tid;
-        this.label = label;
-        this.dge = dge;
-        this.das = das;
-    }
 
     @Override
     public int compareTo(GoCompTerm that) {

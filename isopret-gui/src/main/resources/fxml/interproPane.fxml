@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
+
 <ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.InterproController">
     <StackPane alignment="TOP_CENTER">
         <VBox alignment="TOP_CENTER" maxWidth="1200.0" minHeight="600.0" minWidth="1105.0" prefWidth="1200.0">
             <VBox alignment="TOP_CENTER">
-               <TextFlow fx:id="interproTextFlow" prefHeight="200.0" prefWidth="1200.0" />
+               <TextFlow fx:id="interproTextFlow" prefHeight="100.0" prefWidth="1200.0">
+               <VBox.margin>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </VBox.margin></TextFlow>
             </VBox>
 
             <TableView fx:id="interproResultTableView" stylesheets="@../css/isopretstyle.css" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="interproIdColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" resizable="false" text="id" />
-                    <TableColumn fx:id="interproDescriptionColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumntarget" text="description" />
-                    <TableColumn fx:id="studyCountsColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Study" />
-                    <TableColumn fx:id="studyPercentageColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Study (%)" />
-                    <TableColumn fx:id="populationCountsColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population" />
-                    <TableColumn fx:id="populationPercentageColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population (%)" />
-                    <TableColumn fx:id="rawPColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="p-value" />
-                    <TableColumn fx:id="adjPColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="adj. p-value" />
-
+                    <TableColumn fx:id="interproIdColumn" editable="false" maxWidth="-1.0" minWidth="100.0" prefWidth="-1.0" resizable="false" text="id" />
+                    <TableColumn fx:id="interproDescriptionColumn" editable="false" maxWidth="-1.0" minWidth="200.0" prefWidth="-1.0" styleClass="mycolumntarget" text="description" />
+                    <TableColumn fx:id="studyCountsColumn" editable="false" maxWidth="-1.0" minWidth="200.0" prefWidth="-1.0" styleClass="mycolumn" text="Study" />
+                    <TableColumn fx:id="populationCountsColumn" maxWidth="-1.0" minWidth="200.0" prefWidth="-1.0" styleClass="mycolumn" text="Population" />
+                    <TableColumn fx:id="rawPColumn" maxWidth="-1.0" minWidth="120.0" prefWidth="-1.0" text="p-value" />
+                    <TableColumn fx:id="adjPColumn" maxWidth="-1.0" minWidth="120.0" prefWidth="-1.0" text="adj. p-value" />
+                    <TableColumn fx:id="exportColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="Export" />
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

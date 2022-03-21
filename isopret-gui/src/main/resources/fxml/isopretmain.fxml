@@ -47,7 +47,7 @@
     </top>
     <center>
         <TabPane fx:id="tabPane" tabMaxHeight="30.0" tabMaxWidth="200.0">
-            <Tab closable="false" text="Setup">
+            <Tab id="setupTab" closable="false" text="Setup">
                 <AnchorPane>
                     <VBox alignment="TOP_CENTER" maxHeight="714.0" maxWidth="900.0" minHeight="600.0" minWidth="900.0" prefWidth="900.0" styleClass="vboxWithBorder" stylesheets="@../css/isopretstyle.css" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="100.0">
                         <effect>

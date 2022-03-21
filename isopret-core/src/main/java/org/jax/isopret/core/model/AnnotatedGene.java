@@ -1,8 +1,9 @@
-package org.jax.isopret.core.transcript;
+package org.jax.isopret.core.model;
 
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.interpro.InterproEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +30,9 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
     private final Boolean differentiallySpliced;
 
-    private final Double expressionThreshold;
+    private final double expressionThreshold;
 
-    private final Double splicingThreshold;
+    private final double splicingThreshold;
 
 
 
@@ -40,38 +41,9 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      * @param transcripts transcripts encoded by this gene
      * @param transcriptToInterproHitMap Interpro hits for the transcripts
      * @param result result of HBA-DEALS analysis for this gene.
+     * @param expressionThreshold posterior error probability (differential gene expression)
+     * @param splicingThreshold  posterior error probability (differential splicing)
      */
-    public AnnotatedGene(List<Transcript> transcripts,
-                         Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
-                         HbaDealsResult result) {
-        this.transcripts = transcripts;
-        // restrict the transcript/interpro map to transcripts that are actually expressed.
-        this.transcriptToInterproHitMap = transcriptToInterproHitMap
-                .entrySet()
-                .stream()
-                .filter(e -> result.transcriptExpressed(e.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        this.hbaDealsResult = result;
-        // use HBA Deals results to filter for transcripts that are actually expressed
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
-        expressedTranscripts = transcripts
-                    .stream()
-                    .filter(t -> transcriptMap.containsKey(t.accessionId()))
-                    .collect(Collectors.toList());
-        expressedTranscriptMap = new HashMap<>();
-        for (Transcript t: transcripts) {
-            AccessionNumber accession = t.accessionId();
-            if (transcriptMap.containsKey(accession)) {
-                double logFC = transcriptMap.get(accession).getLog2FoldChange();
-                expressedTranscriptMap.put(t, logFC);
-            }
-        }
-        this.differentiallySpliced = null;
-        this.differentiallyExpressed = null;
-        this.expressionThreshold = null;
-        this.splicingThreshold = null;
-    }
-
     public AnnotatedGene(List<Transcript> transcripts,
                          Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
                          HbaDealsResult result,
@@ -116,11 +88,37 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         return transcriptToInterproHitMap;
     }
 
+    /**
+     * This function counts each interpro domain only once (this is important because
+     * some proteins have multiple of the same domain).
+     * @return map with key accession number of a transcript, value -- set of interpro's associated with the transcript
+     */
+    public Map<AccessionNumber, Set<InterproEntry>> getTranscriptToUniqueInterproMap() {
+        Map<AccessionNumber, Set<InterproEntry>> uniqCountMap = new HashMap<>();
+        Set<Integer> alreadySeen = new HashSet<>();
+        for (Map.Entry<AccessionNumber, List<DisplayInterproAnnotation>> entry : transcriptToInterproHitMap.entrySet()) {
+            AccessionNumber acc = entry.getKey();
+            // Note that DisplayInterproAnnotation can be unique because of different positions
+            // for this function, we only want to count any one Interpro Entry once
+            Set<InterproEntry> interproSet = entry.getValue()
+                            .stream()
+                                    .map(DisplayInterproAnnotation::getInterproEntry)
+                                            .collect(Collectors.toSet());
+            uniqCountMap.put(acc, interproSet);
+        }
+        return uniqCountMap;
+
+    }
+
     public int getTranscriptCount() {
         return expressedTranscripts.size();
     }
 
-    public String getSymbol() { return this.hbaDealsResult.getSymbol(); }
+    public String getSymbol() { return this.hbaDealsResult.getGeneModel().geneSymbol(); }
+
+    public AccessionNumber getGeneAccessionNumber() {
+        return hbaDealsResult.getGeneAccession();
+    }
 
     public int getCodingTranscriptCount() {
         return (int) this.expressedTranscripts
@@ -165,8 +163,10 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     }
 
     public double getSplicingThreshold() {
-        return this.splicingThreshold == null ? 1.0 : this.splicingThreshold;
+        return this.splicingThreshold;
     }
+
+    public double getExpressionThreshold() { return this.expressionThreshold; }
 
     public Map<Transcript, Double> getUpregulatedExpressedTranscripts() {
         return this.expressedTranscriptMap
@@ -182,6 +182,15 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
                 .stream()
                 .filter(e -> e.getValue() < 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public boolean hasInterproAnnotations() {
+        for (AccessionNumber transcriptId : this.transcriptToInterproHitMap.keySet()) {
+            if (this.hbaDealsResult.getTranscriptMap().containsKey(transcriptId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -201,17 +210,10 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         } else if (that.passesSplicingThreshold() && (!this.passesSplicingThreshold())) {
             return 1;
         } else {
-            return this.getHbaDealsResult().getSymbol().compareTo(that.getHbaDealsResult().getSymbol());
+            return this.getSymbol().compareTo(that.getSymbol());
         }
     }
 
-    public boolean hasInterproAnnotations() {
-        for (AccessionNumber transcriptId : this.transcriptToInterproHitMap.keySet()) {
-            if (this.hbaDealsResult.getTranscriptMap().containsKey(transcriptId)) {
-                return true;
-            }
-        }
-       return false;
-    }
+
 
 }

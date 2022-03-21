@@ -1,6 +1,6 @@
 package org.jax.isopret.core.hbadeals;
 
-import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.model.AccessionNumber;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -34,12 +34,12 @@ public class HbaDealsIsoformSpecificThresholder {
     private final StudySet dasStudy;
     private final StudySet dasPopulation;
 
-    private final Map<String, HbaDealsResult> rawResults;
+    private final Map<AccessionNumber, HbaDealsResult> rawResults;
 
     private final double fdrThreshold;
 
 
-    public Map<String, HbaDealsResult> getRawResults() {
+    public Map<AccessionNumber, HbaDealsResult> getRawResults() {
         return rawResults;
     }
 
@@ -55,7 +55,7 @@ public class HbaDealsIsoformSpecificThresholder {
      * Find the FDR thresholds for splicing and expression
      * @param results Map of HBA-DEALS analysis results (key: gene symbol)
      */
-    public HbaDealsIsoformSpecificThresholder(Map<String, HbaDealsResult> results,
+    public HbaDealsIsoformSpecificThresholder(Map<AccessionNumber, HbaDealsResult> results,
                                               double fdrThreshold,
                                               AssociationContainer<TermId> geneContainer,
                                               AssociationContainer<TermId> transcriptContainer) {

@@ -1,8 +1,8 @@
 package org.jax.isopret.core.hbadeals;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.hgnc.HgncItem;
-import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.model.GeneModel;
+import org.jax.isopret.core.model.AccessionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +28,8 @@ public class HbaDealsParser {
      */
     private final String hbadealsFile;
 
-    /** Key -- a gene symbol, value -- an {@link HbaDealsResult} object with results for gene expression and splicing.*/
-    private final Map<String, HbaDealsResult> hbaDealsResultMap;
+    /** Key -- an ENSG {@link AccessionNumber}, value -- an {@link HbaDealsResult} object with results for gene expression and splicing.*/
+    private final Map<AccessionNumber, HbaDealsResult> ensgAcc2hbaDealsMap;
 
 
     /**
@@ -56,9 +56,9 @@ public class HbaDealsParser {
      * @param fname Path to an HBA-DEALS output file
      * @param hgncMap Map from
      */
-    public HbaDealsParser(String fname, Map<AccessionNumber, HgncItem> hgncMap) {
+    public HbaDealsParser(String fname, Map<AccessionNumber, GeneModel> hgncMap) {
         hbadealsFile = fname;
-        this.hbaDealsResultMap = new HashMap<>();
+        this.ensgAcc2hbaDealsMap = new HashMap<>();
         int n_lines = 0;
         List<HbaLine> lines = new ArrayList<>();
         Set<String> unfound = new HashSet<>();
@@ -66,7 +66,7 @@ public class HbaDealsParser {
             String line;
             checkHeader(br.readLine()); // skip header
             while ((line = br.readLine()) != null) {
-                //TODO -- allow parsing with other accessions
+                //Note -- for now we only support Ensembl accession numbers!
                 HbaLine hline = HbaLine.fromEnsembl(line);
                 lines.add(hline);
                 n_lines++;
@@ -76,20 +76,21 @@ public class HbaDealsParser {
         }
         int found_symbol = 0;
         for (HbaLine hline : lines) {
-            String symbol = hline.geneAccession.getAccessionString(); // if we cannot find symbol, just show the accession
-            if (hgncMap.containsKey(hline.geneAccession)) {
-                symbol = hgncMap.get(hline.geneAccession).getGeneSymbol();
+            AccessionNumber ensgAccession = hline.geneAccession; // if we cannot find symbol, just show the accession
+            if (hgncMap.containsKey(ensgAccession)) {
+                GeneModel model = hgncMap.get(ensgAccession);
+                this.ensgAcc2hbaDealsMap.putIfAbsent(ensgAccession, new HbaDealsResult(hline.geneAccession, model));
+                HbaDealsResult hbaresult = this.ensgAcc2hbaDealsMap.get(ensgAccession);
+                if (hline.isIsoform) {
+                    hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p);
+                } else {
+                    hbaresult.addExpressionResult(hline.expFC, hline.raw_p);
+                }
                 found_symbol++;
             } else {
                 unfound.add(hline.geneAccession.getAccessionString());
             }
-            this.hbaDealsResultMap.putIfAbsent(symbol, new HbaDealsResult(hline.geneAccession, symbol));
-            HbaDealsResult hbaresult = this.hbaDealsResultMap.get(symbol);
-            if (hline.isIsoform) {
-                hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p);
-            } else {
-                hbaresult.addExpressionResult(hline.expFC, hline.raw_p);
-            }
+
         }
         if (unfound.size() > found_symbol) {
             LOGGER.error("We could not map {} accession numbers and could map {} accession numbers", unfound.size(), found_symbol);
@@ -97,14 +98,14 @@ public class HbaDealsParser {
         }
         LOGGER.trace("We found gene symbols {} times and missed it {} times.\n", found_symbol, unfound.size());
         LOGGER.trace("We parsed {} lines from {}.\n", n_lines, this.hbadealsFile);
-        LOGGER.trace("We got {} genes with HBA DEALS results\n", hbaDealsResultMap.size());
+        LOGGER.trace("We got {} genes with HBA DEALS results\n", ensgAcc2hbaDealsMap.size());
         if (! unfound.isEmpty()) {
             LOGGER.info("Could not find symbols for {} accessions.", unfound.size());
         }
     }
 
-    public Map<String, HbaDealsResult> getHbaDealsResultMap() {
-        return hbaDealsResultMap;
+    public Map<AccessionNumber, HbaDealsResult> getEnsgAcc2hbaDealsMap() {
+        return ensgAcc2hbaDealsMap;
     }
 
     /**

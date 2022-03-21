@@ -1,21 +1,19 @@
 package org.jax.isopret.gui.service.impl;
 
-import com.google.common.collect.Streams;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.IsopretAssociationContainer;
-import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.go.*;
 import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.transcript.AccessionNumber;
-import org.jax.isopret.core.transcript.AnnotatedGene;
-import org.jax.isopret.core.transcript.Transcript;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.AnnotatedGene;
+import org.jax.isopret.core.model.GeneModel;
+import org.jax.isopret.core.model.Transcript;
 import org.jax.isopret.core.visualization.DasDgeGoVisualizer;
 import org.jax.isopret.core.visualization.EnsemblVisualizable;
 import org.jax.isopret.core.visualization.GoAnnotationMatrix;
@@ -26,6 +24,7 @@ import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
+import org.monarchinitiative.phenol.ontology.data.TermAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.slf4j.Logger;
@@ -38,6 +37,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class IsopretServiceImpl implements IsopretService  {
@@ -56,12 +56,12 @@ public class IsopretServiceImpl implements IsopretService  {
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
     private HbaDealsIsoformSpecificThresholder thresholder = null;
-    private Map<String, List<Transcript>> geneSymbolToTranscriptMap = Map.of();
+    private Map<AccessionNumber, GeneModel> geneAccessionToModelMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
     private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();
     private IsopretAssociationContainer transcriptContainer = null;
     private IsopretAssociationContainer geneContainer = null;
-    private Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap;
+    //private Map<AccessionNumber, List<Transcript>> geneIdToTranscriptMap;
     /** Key: transcript id; value: set of Annotating GO Terms. */
     private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
     private IsopretStats isopretStats = null;
@@ -199,13 +199,12 @@ public class IsopretServiceImpl implements IsopretService  {
     public void setData(IsopretDataLoadTask task) {
         this.geneOntology = task.getGeneOntology();
         this.interproMapper = task.getInterproMapper();
-        this.geneSymbolToTranscriptMap = task.getGeneSymbolToTranscriptMap();
         this.geneContainer = task.getGeneContainer();
         this.transcriptContainer = task.getTranscriptContainer();
         this.dgeGoTerms = task.getDgeResults();
         this.dasGoTerms = task.getDasResults();
         this.thresholder = task.getIsoformSpecificThresholder();
-        this.geneIdToTranscriptMap = task.getGeneIdToTranscriptMap();
+        this.geneAccessionToModelMap = task.getGeneSymbolToModelMap();
         this.transcript2GoMap = task.getTranscript2GoMap();
         this.isopretStats = task.getIsopretStats();
         this.goMethod = task.getOverrepMethod();
@@ -246,13 +245,14 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public Visualizable getVisualizableForGene(String symbol) {
-        if (! this.thresholder.getRawResults().containsKey(symbol)) {
-            LOGGER.error("Could not find HBADEALS results for {}.", symbol);
+    public Visualizable getVisualizableForGene(AccessionNumber ensgAccession) {
+        if (! this.thresholder.getRawResults().containsKey(ensgAccession)) {
+            LOGGER.error("Could not find HBADEALS results for {}.", ensgAccession);
             return null;
         }
-        List<Transcript> transcripts = this.geneSymbolToTranscriptMap.getOrDefault(symbol, List.of());
-        HbaDealsResult result = thresholder.getRawResults().get(symbol);
+        GeneModel geneModel = this.geneAccessionToModelMap.get(ensgAccession);
+        List<Transcript> transcripts = geneModel == null ? List.of() : geneModel.transcriptList();
+        HbaDealsResult result = thresholder.getRawResults().get(ensgAccession);
         double splicingThreshold = thresholder.getSplicingPepThreshold();
         double expressionThreshold = thresholder.getExpressionPepThreshold();
         Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
@@ -266,9 +266,10 @@ public class IsopretServiceImpl implements IsopretService  {
         return new EnsemblVisualizable(agene, annotationMatrix);
     }
 
+
+
     @Override
-    public List<Visualizable> getGeneVisualizables() {
-        int notfound = 0;
+    public List<Visualizable> getGeneVisualizables(Set<AccessionNumber> includedEnsgAccessionSet) {
         List<Visualizable> visualizables = new ArrayList<>();
         // sort the raw results according to minimum p-values
         List<HbaDealsResult> results = thresholder.getRawResults().values()
@@ -276,11 +277,39 @@ public class IsopretServiceImpl implements IsopretService  {
                 .sorted()
                 .toList();
         for (HbaDealsResult result : results) {
-            if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
-                notfound++;
-                continue;
+            AccessionNumber ensgAccession = result.getGeneAccession();
+            // if this gene is in our included set.. (it should always be in geneAccessionToModelMap, but check here to avoid NPE
+            if ( includedEnsgAccessionSet.contains(ensgAccession) &&
+                    this.geneAccessionToModelMap.containsKey(ensgAccession)) {
+                GeneModel model = this.geneAccessionToModelMap.get(ensgAccession);
+                List<Transcript> transcripts = model == null ? List.of() : model.transcriptList();
+                double splicingThreshold = thresholder.getSplicingPepThreshold();
+                double expressionThreshold = thresholder.getExpressionPepThreshold();
+                Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
+                        interproMapper.transcriptToInterproHitMap(result.getGeneAccession());
+                AnnotatedGene agene = new AnnotatedGene(transcripts,
+                        transcriptToInterproHitMap,
+                        result,
+                        expressionThreshold,
+                        splicingThreshold);
+                GoAnnotationMatrix annotationMatrix = getGoAnnotationMatrixForGene(result);
+                EnsemblVisualizable viz = new EnsemblVisualizable(agene, annotationMatrix);
+                visualizables.add(viz);
             }
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
+        }
+        return visualizables;
+    }
+
+    @Override
+    public List<Visualizable> getGeneVisualizables() {
+        List<Visualizable> visualizables = new ArrayList<>();
+        // sort the raw results according to minimum p-values
+        List<HbaDealsResult> results = thresholder.getRawResults().values()
+                .stream()
+                .sorted()
+                .toList();
+        for (HbaDealsResult result : results) {
+            List<Transcript> transcripts = result.getGeneModel().transcriptList();
             double splicingThreshold = thresholder.getSplicingPepThreshold();
             double expressionThreshold = thresholder.getExpressionPepThreshold();
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
@@ -294,15 +323,11 @@ public class IsopretServiceImpl implements IsopretService  {
             EnsemblVisualizable viz = new EnsemblVisualizable(agene, annotationMatrix);
             visualizables.add(viz);
         }
-        if (notfound > 0) {
-            LOGGER.warn("Could not find transcript map for {} genes", notfound);
-        }
-       return visualizables;
+        return visualizables;
     }
 
     @Override
     public List<AnnotatedGene> getAnnotatedGeneList() {
-        int notfound = 0;
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();
         // sort the raw results according to minimum p-values
         List<HbaDealsResult> results = thresholder.getRawResults().values()
@@ -310,11 +335,7 @@ public class IsopretServiceImpl implements IsopretService  {
                 .sorted()
                 .toList();
         for (HbaDealsResult result : results) {
-            if (! this.geneSymbolToTranscriptMap.containsKey(result.getSymbol())) {
-                notfound++;
-                continue;
-            }
-            List<Transcript> transcripts = this.geneSymbolToTranscriptMap.get(result.getSymbol());
+            List<Transcript> transcripts = result.getGeneModel().transcriptList();
             double splicingThreshold = thresholder.getSplicingPepThreshold();
             double expressionThreshold = thresholder.getExpressionPepThreshold();
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
@@ -325,9 +346,6 @@ public class IsopretServiceImpl implements IsopretService  {
                     expressionThreshold,
                     splicingThreshold);
             annotatedGenes.add(agene);
-        }
-        if (notfound > 0) {
-            LOGGER.warn("Could not find transcript map for {} genes", notfound);
         }
         return annotatedGenes;
     }
@@ -390,7 +408,7 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public int totalSignificantGoTermsAnnotatingGene(Set<TermId> goIds) {
         // total significant terms in DGE/DAS
-        return Streams.concat(dgeGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
+        return Stream.concat(dgeGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
                         filter(goIds::contains),
                         dasGoTerms.stream().map(GoTerm2PValAndCounts::getGoTermId).
                                 filter(goIds::contains))
@@ -417,7 +435,7 @@ public class IsopretServiceImpl implements IsopretService  {
                 .map(GoTerm2PValAndCounts::getGoTermId)
                 .collect(Collectors.toSet());
         return new GoAnnotationMatrix(this.geneOntology,
-                this.geneIdToTranscriptMap,
+                this.geneAccessionToModelMap,
                 this.transcript2GoMap,
                 significantGoSet,
                 accession,
@@ -459,13 +477,14 @@ public class IsopretServiceImpl implements IsopretService  {
                 .toList();
         // now figure out which of these genes are annotated to goId
         Set<TermId> domainIdSet = this.geneContainer.getDomainItemsAnnotatedByGoTerm(goId);
-        List<String> symbols = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
-                .map(HbaDealsResult::getSymbol)
+        List<AccessionNumber> ensgAccessionList = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
+                .map(HbaDealsResult::getGeneModel)
+                .map(GeneModel::ensemblGeneId)
                 .toList();
         // transform to visualizable
         List<Visualizable> visualizables = new ArrayList<>();
-        for (String sym : symbols) {
-            visualizables.add(getVisualizableForGene(sym));
+        for (AccessionNumber ensg : ensgAccessionList) {
+            visualizables.add(getVisualizableForGene(ensg));
         }
         return visualizables;
     }
@@ -483,20 +502,20 @@ public class IsopretServiceImpl implements IsopretService  {
         Set<TermId> domainIdSet  = this.transcriptContainer.getDomainItemsAnnotatedByGoTerm(goId);
         // when we get here, the domain ids are transcript ids.
         LOGGER.info("getDasForGoTerm, domainIdSet.size={} for go={}", domainIdSet.size(), goId.getValue());
-        Set<String> symbols = new HashSet<>();
+        Set<AccessionNumber> ensgAccessionSet = new HashSet<>();
         for (HbaDealsResult result : das) {
             for (AccessionNumber transcriptAccession : result.getTranscriptMap().keySet()) {
                 if (domainIdSet.contains(transcriptAccession.toTermId())) {
-                    symbols.add(result.getSymbol());
+                    ensgAccessionSet.add(result.getGeneModel().ensemblGeneId());
                     break; // done with this gene
                 }
             }
         }
-        LOGGER.info("getDasForGoTerm, symbols.size={} ", symbols.size());
+        LOGGER.info("getDasForGoTerm, symbols.size={} ", ensgAccessionSet.size());
         // transform to visualizable
         List<Visualizable> visualizables = new ArrayList<>();
-        for (String sym : symbols) {
-            visualizables.add(getVisualizableForGene(sym));
+        for (AccessionNumber ensg : ensgAccessionSet) {
+            visualizables.add(getVisualizableForGene(ensg));
         }
         return visualizables;
     }
@@ -504,6 +523,24 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public double getSplicingPepThreshold() {
         return thresholder.getSplicingPepThreshold();
+    }
+    @Override
+    public Map<GoTermIdPlusLabel, Integer> getGoAnnotationsForTranscript(Set<TermId> annotatedItemTermIds) {
+        Map<GoTermIdPlusLabel, Integer> countMap = new HashMap<>();
+        Map<TermId, IsopretAnnotations> annotMap =   transcriptContainer.getAssociationMap();
+
+        for (IsopretAnnotations annots : annotMap.values()) {
+            for (TermAnnotation a : annots.getAnnotations()) {
+                IsopretTermAnnotation itanot = (IsopretTermAnnotation) a;
+                if (annotatedItemTermIds.contains(itanot.getItemId())) {
+                    TermId goId = itanot.getTermId();
+                    String label = geneOntology.getTermLabel(goId).orElse("n/a");
+                    GoTermIdPlusLabel gtlab = new GoTermIdPlusLabel(goId, label);
+                    countMap.merge(gtlab, 1, Integer::sum);
+                }
+            }
+        }
+        return countMap;
     }
 
 }

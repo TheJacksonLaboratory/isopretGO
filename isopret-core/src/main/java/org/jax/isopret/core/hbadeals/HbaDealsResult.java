@@ -1,6 +1,8 @@
 package org.jax.isopret.core.hbadeals;
 
-import org.jax.isopret.core.transcript.AccessionNumber;
+import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.core.model.GeneModel;
+import org.jax.isopret.core.model.GeneSymbolAccession;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,16 +13,16 @@ import java.util.stream.Collectors;
 public class HbaDealsResult implements Comparable<HbaDealsResult> {
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final AccessionNumber geneAccession;
-    private final String symbol;
+    private final GeneModel geneModel;
     private double expressionFoldChange;
     private double expressionP;
     private final Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap;
 
 
 
-    public HbaDealsResult(AccessionNumber geneAccession, String sym) {
+    public HbaDealsResult(AccessionNumber geneAccession, GeneModel sym) {
         this.geneAccession = geneAccession;
-        this.symbol = sym;
+        this.geneModel = sym;
         transcriptMap = new HashMap<>();
     }
 
@@ -44,8 +46,12 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
         return this.geneAccession.getAccessionNumber();
     }
 
-    public String getSymbol() {
-        return symbol;
+    public GeneModel getGeneModel() {
+        return geneModel;
+    }
+
+    public GeneSymbolAccession getGeneSymbolAccession() {
+        return new GeneSymbolAccession(geneModel.geneSymbol(), geneAccession);
     }
 
     public double getExpressionFoldChange() {
