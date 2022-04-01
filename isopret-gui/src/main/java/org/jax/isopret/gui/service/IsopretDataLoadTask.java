@@ -171,9 +171,6 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.interproDescriptionCount(interproMapper.getInterproDescriptionCount());
         isopretStatsBuilder.interproAnnotationCount(interproMapper.getInterproAnnotationCount());
         LOGGER.info(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
-
-        //TranscriptFunctionFileParser parser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
-        //Map<TermId, Set<TermId>> transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
         updateProgress(0.80, 1); /* this will update the progress bar */
       //  updateMessage(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));
         //LOGGER.info(String.format("Loaded transcriptToGoMap with %d elements", transcriptToGoMap.size()));

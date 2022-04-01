@@ -137,18 +137,9 @@ public class GoAnnotationMatrix {
         return rows;
     }
 
-
-
-
-
-
-
     public String getAccession() {
         return accession;
     }
-//    public List<GoAnnotationRow> getAnnotationRows() {
-//        return annotationRows;
-//    }
 
     public List<GoAnnotationRow> getExpressedAnnotationRows() { return expressedAnnotationRows; }
 

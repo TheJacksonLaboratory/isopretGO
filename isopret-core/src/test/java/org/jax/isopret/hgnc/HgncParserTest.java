@@ -14,28 +14,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class HgncParserTest extends TestBase {
 
-
-
+    private final AccessionNumber adarEnsembl = AccessionNumber.ensemblGene("ENSG00000160710");
+    /**
+     * Note that isopret only retains gene models for which we have both HGNC and Jannovar data.
+     * In our case, this means that we only retain data for ADAR.
+     */
     @Test
     public void testEnsemblMap() {
-        assertEquals(6, ensemblMap.size());
+        assertEquals(1, ensemblMap.size());
         for (AccessionNumber ens : ensemblMap.keySet()) {
             assertTrue(ens.getAccessionString().startsWith("ENSG"));
         }
-        assertTrue(ensemblMap.containsKey(AccessionNumber.ensemblGene("ENSG00000121410")));
-        assertTrue(ensemblMap.containsKey(AccessionNumber.ensemblGene("ENSG00000268895")));
-        assertTrue(ensemblMap.containsKey(AccessionNumber.ensemblGene("ENSG00000166147")));
-        assertTrue(ensemblMap.containsKey(AccessionNumber.ensemblGene("ENSG00000177519")));
-        assertTrue(ensemblMap.containsKey(AccessionNumber.ensemblGene("ENSG00000124614")));
-        assertTrue(ensemblMap.containsKey(AccessionNumber.ensemblGene("ENSG00000160710")));
+        assertTrue(ensemblMap.containsKey(adarEnsembl));
         // test ENSG00000121410
-        GeneModel item = ensemblMap.get(AccessionNumber.ensemblGene("ENSG00000121410"));
-        assertEquals("A1BG", item.geneSymbol());
-        assertEquals("alpha-1-B glycoprotein", item.geneName());
-        assertEquals("1", item.entrezId());
-        assertEquals("NM_130786", item.refseqAccecssion());
-        AccessionNumber a1bgAcc = AccessionNumber.ensemblGene("ENSG00000121410");
-        assertEquals(a1bgAcc, item.ensemblGeneId());
+        GeneModel item = ensemblMap.get(adarEnsembl);
+        assertEquals("ADAR", item.geneSymbol());
+        assertEquals("adenosine deaminase RNA specific", item.geneName());
+        assertEquals("103", item.entrezId());
+        assertEquals("NM_001111", item.refseqAccecssion());
     }
 
 

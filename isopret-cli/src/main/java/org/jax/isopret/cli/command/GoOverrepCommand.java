@@ -66,7 +66,7 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         Ontology geneOntology = loadGeneOntology();
         int n_go_terms = geneOntology.countNonObsoleteTerms();
         LOGGER.info("Loaded Gene Ontology with {} terms", n_go_terms);
-
+        geneSymbolAccessionListMap = loadJannovarSymbolToTranscriptMap();
         File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
         HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
         Map<AccessionNumber, GeneModel> hgncMap  = hgncParser.ensemblMap();
