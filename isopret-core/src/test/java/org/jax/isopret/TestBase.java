@@ -50,22 +50,9 @@ public class TestBase {
     protected static final Path INTERPRO_ADAR_PATH = Paths.get("src/test/resources/interpro/ADAR_interpro.txt");
     private static final Map<Integer, InterproEntry> interproDomainMap = InterproDomainDescParser.getInterproDescriptionMap(new File(INTERPRO_ADAR_DOMAIN_DESC));
     private static final Map<AccessionNumber, List<InterproAnnotation>> annotationMap = InterproDomainParser.getInterproAnnotationMap(INTERPRO_ADAR_PATH.toFile());
-    private static Map<String, List<Transcript>> symbolToTranscriptMap = null;
-
-
-
     private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
     private static Map<String, HbaDealsResult> hbaDealsResultMap = null;
 
-
-
-//    public static Map<String, HbaDealsResult> getADARHbaDealsResultMap () {
-//        if (hbaDealsResultMap == null) {
-//            final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString(), hgncParser.ensemblMap());
-//            hbaDealsResultMap = parser.getHbaDealsResultMap();
-//        }
-//        return hbaDealsResultMap;
-//    }
 
 
     public static GenomicAssembly getHg38() {
