@@ -96,6 +96,12 @@ public class HgncParser {
 
     private Map<AccessionNumber, GeneModel>  initHgncItems(File hgncFile,
                                           Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap) {
+        if (geneSymbolAccessionListMap == null) {
+            throw new IsopretRuntimeException("Cannot initialize HgncParser because geneSymbolAccessionListMap argument was null");
+        }
+        if (geneSymbolAccessionListMap.isEmpty()) {
+            throw new IsopretRuntimeException("Cannot initialize HgncParser because geneSymbolAccessionListMap argument was empty");
+        }
         Map<AccessionNumber, GeneModel> ensemblMap = new HashMap<>();
         int less_than_24_fields = 0;
         int well_formed_lines = 0;
