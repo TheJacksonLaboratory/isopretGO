@@ -50,17 +50,18 @@ public class IsopretDownloader {
     private static final String HGNC_URL = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt";
     private static final String HGNC_FILENAME = "hgnc_complete_set.txt";
 
-    private static final String INTERPRO_DOMAIN_DESC_URL ="https://zenodo.org/record/6011912/files/interpro_domain_desc.txt?download=1";
+    private static final String ZENODO_BASE_URL = "https://zenodo.org/record/6453313/";
+
+    private static final String INTERPRO_DOMAIN_DESC_URL = ZENODO_BASE_URL + "files/interpro_domain_desc.txt?download=1";
     private static final String INTERPRO_DOMAIN_DESC_FILENAME = "interpro_domain_desc.txt";
 
-    private static final String INTERPRO_DOMAINS_URL = "https://zenodo.org/record/6011912/files/interpro_domains.txt?download=1";
+    private static final String INTERPRO_DOMAINS_URL = ZENODO_BASE_URL + "files/interpro_domains.txt?download=1";
     private static final String INTERPRO_DOMAINS_FILENAME = "interpro_domains.txt";
 
-
-    private static final String ISOFORM_FUNCTION_MF_URL = "https://zenodo.org/record/6011912/files/isoform_function_list_mf.txt?download=1";
+    private static final String ISOFORM_FUNCTION_MF_URL = ZENODO_BASE_URL + "files/isoform_function_list_mf.txt?download=1";
     private static final String ISOFORM_FUNCTION_MF_FILENAME = "isoform_function_list_mf.txt";
 
-    private static final String ISOFORM_FUNCTION_BP_URL = "https://zenodo.org/record/6011912/files/isoform_function_list_bp.txt?download=1";
+    private static final String ISOFORM_FUNCTION_BP_URL = ZENODO_BASE_URL + "files/isoform_function_list_bp.txt?download=1";
     private static final String ISOFORM_FUNCTION_BP_FILENAME = "isoform_function_list_bp.txt";
 
     public IsopretDownloader(String path){
