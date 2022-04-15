@@ -25,14 +25,11 @@ public class IsopretFxDownloadTask extends Task<Void> {
 
     @Override
     protected Void call() {
-        long totalDownloads = 8;
+        long totalDownloads = 7;
         long i = 0;
         this.updateProgress(i, totalDownloads);
         updateMessage("Starting go.json download...");
         downloader.downloadGoJson();
-        this.updateProgress(++i, totalDownloads);
-        updateMessage("Starting goa_human.gaf download...");
-        downloader.downloadGoAnnotationFile();
         this.updateProgress(++i, totalDownloads);
         updateMessage("Starting Jannovar transcript file download...");
         downloader.downloadJannovar();

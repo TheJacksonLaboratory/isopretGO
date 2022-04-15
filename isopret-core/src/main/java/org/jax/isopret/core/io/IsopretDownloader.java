@@ -40,9 +40,9 @@ public class IsopretDownloader {
 
     private final static String GO_JSON = "go.json";
     private final static String GO_JSON_URL = "http://purl.obolibrary.org/obo/go.json";
-    private final static String GO_ANNOT = "goa_human.gaf";
-    private final static String GO_ANNOT_GZ = "goa_human.gaf.gz";
-    private final static String GO_ANNOT_URL = "http://geneontology.org/gene-associations/goa_human.gaf.gz";
+//    private final static String GO_ANNOT = "goa_human.gaf";
+//    private final static String GO_ANNOT_GZ = "goa_human.gaf.gz";
+//    private final static String GO_ANNOT_URL = "http://geneontology.org/gene-associations/goa_human.gaf.gz";
 
     private static final String JannovarZenodoUrl = "https://zenodo.org/record/4311513/files/hg38_ensembl.ser?download=1";
     private static final String JannovarFilename = "hg38_ensembl.ser";
@@ -78,7 +78,7 @@ public class IsopretDownloader {
      */
     public void download() {
         downloadGoJson();
-        downloadGoAnnotationFile();
+//        downloadGoAnnotationFile();
         downloadJannovar();
         downloadHgnc();
         downloadInterproDomainDesc();
@@ -94,9 +94,9 @@ public class IsopretDownloader {
         downloadFileIfNeeded(GO_JSON, GO_JSON_URL);
     }
 
-    public void downloadGoAnnotationFile() {
-        downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
-    }
+//    public void downloadGoAnnotationFile() {
+//        downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
+//    }
 
     public void downloadJannovar() {
         downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
