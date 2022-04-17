@@ -18,14 +18,19 @@ import java.util.stream.Collectors;
  * Display HTML file with genes and isoforms annotated to a given Interpro entry.
  * We show all genes with one or more isoforms that (1) are annotated to the interpro entry in question and (2) are
  * significantly differentially spliced.
+ *
  * @author Peter Robinson
  */
 public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproAnnotatedGenesVisualizer.class);
     private final InterproOverrepResult interproResult;
-    /** Genes we will include in the HTML display. */
-    private final  List<AnnotatedGene> includedGenes;
-    /** GO annotations for differential isoforms. */
+    /**
+     * Genes we will include in the HTML display.
+     */
+    private final List<AnnotatedGene> includedGenes;
+    /**
+     * GO annotations for differential isoforms.
+     */
     private final Map<GoTermIdPlusLabel, Integer> countsMap;
 
     public InterproAnnotatedGenesVisualizer(InterproOverrepResult interpro, IsopretService isopretService) {
@@ -39,19 +44,20 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         for (AnnotatedGene gene : annotatedGeneList) {
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptMap = gene.getTranscriptToInterproHitMap();
             boolean includeThisGene = false;
-            if (gene.passesSplicingThreshold())
-            for (HbaDealsTranscriptResult tresult: gene.getHbaDealsResult().getTranscriptResults()) {
-                if (tresult.isSignificant(splicingPepThreshold)) {
-                    AccessionNumber acc = tresult.getTranscriptId();
-                    List<DisplayInterproAnnotation> dialist = transcriptMap.get(acc);
-                    if (dialist == null) {
-                        // no annotations for this transcript, which is expected for some
-                        continue;
-                    }
-                    for (var dia : dialist) {
-                        if (dia.getInterproEntry().getId() == targetInterproId) {
-                            includeThisGene = true;
-                            transcriptAccessions.add(acc.toTermId());
+            if (gene.passesSplicingThreshold()) {
+                for (HbaDealsTranscriptResult tresult : gene.getHbaDealsResult().getTranscriptResults()) {
+                    if (tresult.isSignificant(splicingPepThreshold)) {
+                        AccessionNumber acc = tresult.getTranscriptId();
+                        List<DisplayInterproAnnotation> dialist = transcriptMap.get(acc);
+                        if (dialist == null) {
+                            // no annotations for this transcript, which is expected for some
+                            continue;
+                        }
+                        for (var dia : dialist) {
+                            if (dia.getInterproEntry().getId() == targetInterproId) {
+                                includeThisGene = true;
+                                transcriptAccessions.add(acc.toTermId());
+                            }
                         }
                     }
                 }
@@ -98,8 +104,8 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
         int aboveThreshold = (int) list.stream().filter(e -> e.getValue() >= THRESHOLD).count();
         list.sort(Map.Entry.<GoTermIdPlusLabel, Integer>comparingByValue().reversed());
         sb.append("<p>Total of ").append(list.size()).append(" GO terms annotated to the transcripts. Of these, ");
-        sb.append(aboveThreshold).append(" were above the threshold of ").append(THRESHOLD).append( " annotations")
-                  .append(" and are shown here.</p>");
+        sb.append(aboveThreshold).append(" were above the threshold of ").append(THRESHOLD).append(" annotations")
+                .append(" and are shown here.</p>");
         sb.append(htmlTableHeader());
         for (var entry : list) {
             if (entry.getValue() >= THRESHOLD)
@@ -171,33 +177,31 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
             """;
 
 
-
     String header() {
         return String.format(
                 """
-                <!doctype html>
-                <html class="no-js" lang="">
-                <head>
-                <meta charset="utf-8">
-                <meta http-equiv="x-ua-compatible" content="ie=edge">
-                <title>Isopret: Differentially spliced genes annotated to %s (%s)</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                %s
-                </head>
-                """,
+                        <!doctype html>
+                        <html class="no-js" lang="">
+                        <head>
+                        <meta charset="utf-8">
+                        <meta http-equiv="x-ua-compatible" content="ie=edge">
+                        <title>Isopret: Differentially spliced genes annotated to %s (%s)</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                        %s
+                        </head>
+                        """,
                 this.termLabel, this.interproId, HtmlUtil.css);
     }
 
     protected static final String bottom = """
-           <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
-           </main>
-           <footer>
-               <p>Isopret &copy; 2022</p>
-           </footer>
-            </body>
-            </html>
-            """;
-
+            <span id="tooltip" display="none" style="position: absolute; display: none;"></span>
+            </main>
+            <footer>
+                <p>Isopret &copy; 2022</p>
+            </footer>
+             </body>
+             </html>
+             """;
 
 
     public String getTitle() {

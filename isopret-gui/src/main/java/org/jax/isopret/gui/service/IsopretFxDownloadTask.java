@@ -31,9 +31,6 @@ public class IsopretFxDownloadTask extends Task<Void> {
         updateMessage("Starting go.json download...");
         downloader.downloadGoJson();
         this.updateProgress(++i, totalDownloads);
-        updateMessage("Starting goa_human.gaf download...");
-        downloader.downloadGoAnnotationFile();
-        this.updateProgress(++i, totalDownloads);
         updateMessage("Starting Jannovar transcript file download...");
         downloader.downloadJannovar();
         this.updateProgress(++i, totalDownloads);
@@ -51,6 +48,9 @@ public class IsopretFxDownloadTask extends Task<Void> {
         updateProgress(++i, totalDownloads);
         updateMessage("Starting isoform function (BP) download");
         downloader.downloadIsoformFunctionBpList();
+        updateProgress(++i, totalDownloads);
+        updateMessage("Starting isoform function (CC) download");
+        downloader.downloadIsoformFunctionCcList();
         updateProgress(++i, totalDownloads);
         updateMessage("Finished download to " + downloadDir);
         return null;

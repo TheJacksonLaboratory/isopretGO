@@ -87,7 +87,16 @@ public class TranscriptFunctionFileParser {
                     predictionFileBp.getAbsolutePath());
         }
         Map<TermId, Set<TermId>> annotMapBp = parseFunctionFile(predictionFileBp, ontology);
+        File predictionFileCc = new File(downloadDirectory + File.separator + "isoform_function_list_cc.txt");
+        if (!predictionFileCc.isFile()) {
+            throw new IsopretFileNotFoundException("isoform_function_list_cc.txt", predictionFileCc.getAbsolutePath());
+        }
+        Map<TermId, Set<TermId>> annotMapCc = parseFunctionFile(predictionFileCc, ontology);
         for (var entry : annotMapBp.entrySet()) {
+            annotMapMf.putIfAbsent(entry.getKey(), new HashSet<>());
+            annotMapMf.get(entry.getKey()).addAll(entry.getValue());
+        }
+        for (var entry : annotMapCc.entrySet()) {
             annotMapMf.putIfAbsent(entry.getKey(), new HashSet<>());
             annotMapMf.get(entry.getKey()).addAll(entry.getValue());
         }

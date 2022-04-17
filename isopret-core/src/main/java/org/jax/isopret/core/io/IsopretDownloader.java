@@ -37,31 +37,24 @@ public class IsopretDownloader {
             ="ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz";
     /** Basename of the file with cDNA sequences for ensembl genes. */
     private final static String ENSEMBL_CDNA ="Homo_sapiens.GRCh38.cdna.all.fa.gz";
-
     private final static String GO_JSON = "go.json";
     private final static String GO_JSON_URL = "http://purl.obolibrary.org/obo/go.json";
-    private final static String GO_ANNOT = "goa_human.gaf";
-    private final static String GO_ANNOT_GZ = "goa_human.gaf.gz";
-    private final static String GO_ANNOT_URL = "http://geneontology.org/gene-associations/goa_human.gaf.gz";
-
     private static final String JannovarZenodoUrl = "https://zenodo.org/record/4311513/files/hg38_ensembl.ser?download=1";
     private static final String JannovarFilename = "hg38_ensembl.ser";
-
     private static final String HGNC_URL = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt";
     private static final String HGNC_FILENAME = "hgnc_complete_set.txt";
-
-    private static final String INTERPRO_DOMAIN_DESC_URL ="https://zenodo.org/record/6011912/files/interpro_domain_desc.txt?download=1";
+    /** The Base URL of the zenodo repository where we store various input files for Isopret. */
+    private static final String ZENODO_BASE_URL = "https://zenodo.org/record/6466530/";
+    private static final String INTERPRO_DOMAIN_DESC_URL = ZENODO_BASE_URL + "files/interpro_domain_desc.txt?download=1";
     private static final String INTERPRO_DOMAIN_DESC_FILENAME = "interpro_domain_desc.txt";
-
-    private static final String INTERPRO_DOMAINS_URL = "https://zenodo.org/record/6011912/files/interpro_domains.txt?download=1";
+    private static final String INTERPRO_DOMAINS_URL = ZENODO_BASE_URL + "files/interpro_domains.txt?download=1";
     private static final String INTERPRO_DOMAINS_FILENAME = "interpro_domains.txt";
-
-
-    private static final String ISOFORM_FUNCTION_MF_URL = "https://zenodo.org/record/6011912/files/isoform_function_list_mf.txt?download=1";
+    private static final String ISOFORM_FUNCTION_MF_URL = ZENODO_BASE_URL + "files/isoform_function_list_mf.txt?download=1";
     private static final String ISOFORM_FUNCTION_MF_FILENAME = "isoform_function_list_mf.txt";
-
-    private static final String ISOFORM_FUNCTION_BP_URL = "https://zenodo.org/record/6011912/files/isoform_function_list_bp.txt?download=1";
+    private static final String ISOFORM_FUNCTION_BP_URL = ZENODO_BASE_URL + "files/isoform_function_list_bp.txt?download=1";
     private static final String ISOFORM_FUNCTION_BP_FILENAME = "isoform_function_list_bp.txt";
+    private static final String ISOFORM_FUNCTION_CC_URL = ZENODO_BASE_URL + "files/isoform_function_list_cc.txt?download=1";
+    private static final String ISOFORM_FUNCTION_CC_FILENAME = "isoform_function_list_cc.txt";
 
     public IsopretDownloader(String path){
         this(path,false);
@@ -77,13 +70,13 @@ public class IsopretDownloader {
      */
     public void download() {
         downloadGoJson();
-        downloadGoAnnotationFile();
         downloadJannovar();
         downloadHgnc();
         downloadInterproDomainDesc();
         downloadInterproDomains();
         downloadIsoformFunctionMfList();
         downloadIsoformFunctionBpList();
+        downloadIsoformFunctionCcList();
     }
 
     /**
@@ -91,10 +84,6 @@ public class IsopretDownloader {
      */
     public void downloadGoJson() {
         downloadFileIfNeeded(GO_JSON, GO_JSON_URL);
-    }
-
-    public void downloadGoAnnotationFile() {
-        downloadGzipFileIfNeeded(GO_ANNOT,GO_ANNOT_GZ, GO_ANNOT_URL);
     }
 
     public void downloadJannovar() {
@@ -119,6 +108,10 @@ public class IsopretDownloader {
 
     public void downloadIsoformFunctionBpList() {
         downloadFileIfNeeded(ISOFORM_FUNCTION_BP_FILENAME, ISOFORM_FUNCTION_BP_URL);
+    }
+
+    public void downloadIsoformFunctionCcList() {
+        downloadFileIfNeeded(ISOFORM_FUNCTION_CC_FILENAME, ISOFORM_FUNCTION_CC_URL);
     }
 
 
