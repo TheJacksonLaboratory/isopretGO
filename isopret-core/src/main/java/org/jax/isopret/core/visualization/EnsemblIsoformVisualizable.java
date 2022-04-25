@@ -15,13 +15,13 @@ public class EnsemblIsoformVisualizable implements IsoformVisualizable {
 
     private final boolean isSignificant;
 
-    public EnsemblIsoformVisualizable(HbaDealsTranscriptResult transcriptResult){
+    public EnsemblIsoformVisualizable(HbaDealsTranscriptResult transcriptResult, double splicingPepThreshold){
         this.transcriptAccession = transcriptResult.getTranscript();
         String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
         this.isoformUrlAnchor =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());
         this.log2FoldChange = transcriptResult.getLog2FoldChange();
         this.isoformP = transcriptResult.getP();
-        this.isSignificant = transcriptResult.isSignificant();
+        this.isSignificant = transcriptResult.isSignificant(splicingPepThreshold);
     }
 
     private String getEnsemblTranscriptUrl(String accession) {

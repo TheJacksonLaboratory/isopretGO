@@ -191,7 +191,7 @@ public class InterproController implements Initializable {
 
     /**
      * Allow column name to be wrapped into multiple lines. Based on
-     * <a href="https://stackoverflow.com/questions/10952111/javafx-2-0-table-with-multiline-table-header">this
+     * <a href="<a href="https://stackoverflow.com/questions/10952111/javafx-2-0-table-with-multiline-table-header">https://stackoverflow.com/questions/10952111/javafx-2-0-table-with-multiline-table-header</a>">this
      * post</a>.
      *
      * @param col {@link TableColumn} with a name that will be wrapped
