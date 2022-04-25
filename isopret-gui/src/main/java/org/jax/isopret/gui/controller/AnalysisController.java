@@ -4,6 +4,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -39,6 +40,9 @@ public class AnalysisController implements Initializable {
      * reference to a Tab that has been opened for it.
      */
     private final Map<Visualizable, Tab> openTabs = new ConcurrentHashMap<>();
+    /** The search box for finding a given gene symbol in the rows of the table. */
+    @FXML
+    private TextField geneSymbolSearchBox;
 
     @FXML
     private ScrollPane VpAnalysisPane;
@@ -237,6 +241,10 @@ public class AnalysisController implements Initializable {
             hbaGeneResultTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             AnchorPane.setTopAnchor(hbaGeneResultTableView, listviewHbox.getLayoutY() + listviewHbox.getHeight());
             hbaGeneResultTableView.sort();
+            // set up the search bar
+            geneSymbolSearchBox.textProperty().addListener((observable, oldValue, newValue) ->
+                    hbaGeneResultTableView.setItems(filterVisualizableList(vpl, newValue))
+            );
         });
     }
 
@@ -320,7 +328,7 @@ public class AnalysisController implements Initializable {
 
     /**
      * Allow column name to be wrapped into multiple lines. Based on
-     * <a href="https://stackoverflow.com/questions/10952111/javafx-2-0-table-with-multiline-table-header">this
+     * <a href="<a href="https://stackoverflow.com/questions/10952111/javafx-2-0-table-with-multiline-table-header">https://stackoverflow.com/questions/10952111/javafx-2-0-table-with-multiline-table-header</a>">this
      * post</a>.
      *
      * @param col {@link TableColumn} with a name that will be wrapped
@@ -338,5 +346,31 @@ public class AnalysisController implements Initializable {
         col.setGraphic(stack);
     }
 
+    /**
+     * Used to search the rows of hte analysis table by matching on the gene symbol
+     * @param visualizable A {@link Visualizable} object in our Table row
+     * @param searchText text representing part or all of a gene symbol
+     * @return true if the gene symbol in the visualizable matches the search text
+     */
+    private boolean searchGeneSymbol(Visualizable visualizable, String searchText){
+        return visualizable.getGeneSymbol().toLowerCase().contains(searchText.toLowerCase());
+    }
+
+    private ObservableList<Visualizable> filterVisualizableList(List<Visualizable> list, String searchText){
+        List<Visualizable> filteredList = new ArrayList<>();
+        for (Visualizable visualizable : list){
+            if(searchGeneSymbol(visualizable, searchText)) filteredList.add(visualizable);
+        }
+        return FXCollections.observableList(filteredList);
+    }
+
+    /**
+     * This method is called when the user clicks the "delete" button (X) to the right of the
+     * gene symbol search field.
+     */
+    public void handleClearSearchText(ActionEvent e) {
+        geneSymbolSearchBox.setText("");
+        e.consume();
+    }
 
 }
