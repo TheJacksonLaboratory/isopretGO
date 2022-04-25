@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public class AccessionNumber implements Comparable<AccessionNumber> {
 
-
     enum Database {ENSEMBL, REFSEQ, NCBIGENE}
 
     enum Category { GENE, TRANSCRIPT }
@@ -58,6 +57,8 @@ public class AccessionNumber implements Comparable<AccessionNumber> {
     public boolean isGene() {
         return this.category == Category.GENE;
     }
+
+    public boolean isTranscript() { return this.category == Category.TRANSCRIPT;   }
 
     @Override
     public int hashCode() {

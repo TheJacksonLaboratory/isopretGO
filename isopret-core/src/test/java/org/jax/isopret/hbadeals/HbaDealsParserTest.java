@@ -58,6 +58,7 @@ public class HbaDealsParserTest extends TestBase {
     @Test
     public void if_adar_has_significant_das_then_ok() {
         final double EPSILON = 0.0001;
+        final double PEP_THRESHOLD = 0.05;
         HbaDealsResult adar = hbaDealsResultMap.get(adarAccession);
         assertTrue(adar.hasDifferentialSplicingResult(THRESHOLD));
         double pva = adar.getSmallestSplicingP();
@@ -66,7 +67,7 @@ public class HbaDealsParserTest extends TestBase {
         assertEquals(5, transcriptMap.size());
         AccessionNumber ENST00000368471 = AccessionNumber.ensemblTranscript("ENST00000368471");
         HbaDealsTranscriptResult ENST00000368471result = transcriptMap.get(ENST00000368471);
-        assertTrue(ENST00000368471result.isSignificant());
+        assertTrue(ENST00000368471result.isSignificant(PEP_THRESHOLD));
         assertEquals(1e-05, ENST00000368471result.getP(), EPSILON);
         var ENST00000368474 = AccessionNumber.ensemblTranscript("ENST00000368474");
         HbaDealsTranscriptResult ENST00000368474result = transcriptMap.get(ENST00000368474);
