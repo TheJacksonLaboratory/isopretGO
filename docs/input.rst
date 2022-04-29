@@ -17,6 +17,15 @@ simultaneously characterizes differential expression and splicing in cohorts.
 The HBA-DEALS algorithm is explained in `Karlebach et al, 2020, Genome Biology 21:171 <https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6>`_.
 Source code is available at the `HBA-DEALS GitHub repository <https://github.com/TheJacksonLaboratory/HBA-DEALS>`_.
 
+
+Important
+=========
+
+For use with isopret, HBA-DEALS *must8 be run with the ``isoform.level`` option set to true. See the `HBADEALS documentation <https://hba-deals.readthedocs.io/en/latest/>`_
+for details.
+
+
+
 HBA-DEALS output format
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -54,5 +63,4 @@ only `Ensembl <http://ensembl.org/>`_ gene/transcript models.
 Example input files
 ^^^^^^^^^^^^^^^^^^^
 
-Example input files can be found at the
-`Isopret input file zenodo repository <https://zenodo.org/record/5880976>`_.
+Example input files are described in :ref:`rstexample`.
