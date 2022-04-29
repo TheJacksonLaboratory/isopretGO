@@ -21,6 +21,7 @@ the `Ontologizer <https://pubmed.ncbi.nlm.nih.gov/18511468/>`_.
 
    setup
    input
+   examples
    running
    output
 
