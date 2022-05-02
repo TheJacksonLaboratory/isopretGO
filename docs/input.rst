@@ -63,4 +63,4 @@ only `Ensembl <http://ensembl.org/>`_ gene/transcript models.
 Example input files
 ^^^^^^^^^^^^^^^^^^^
 
-Example input files are described in :ref:`rstexample`.
+Example input files are described in :ref:`rstexamples`.
