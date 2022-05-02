@@ -95,6 +95,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         double xstart = this.proteinMinSvgPos;
         double width = xend - xstart;
         List<Integer> codingExonLengths = transcript.codingExonLengths();
+        if (transcript.strand().isNegative()) {
+            Collections.reverse(codingExonLengths);
+        }
         int cdnalen = codingExonLengths.stream().mapToInt(Integer::intValue).sum();
         double widthPerBp = width/cdnalen;
         int exonNumber = 0;
