@@ -2,7 +2,11 @@
 Isopret: Isoform interpretation
 ===============================
 
-Isopret is a Java application for investigating overrepresentation of
+Isopret (Isoform Interpretation) is  an expectation-maximization algorithm able
+to infer isoform specific functions using a global optimization approach.
+
+
+Isopret-gui is a Java application for investigating and visualizing overrepresentation of
 `Gene Ontology (GO) <http://geneontology.org/>`_ annotations in differentially spliced or
 differentially expressed genes.
 
