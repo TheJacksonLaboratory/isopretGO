@@ -118,11 +118,6 @@ public abstract class AnnotatedGenesVisualizer {
                 String.format("%.3f", expressionFC) + ", corresponding to a log<sub>2</sub> fold change of " +
                 String.format("%.3f", expressionLogFc) + ". The posterior error probability (PEP) according the the " + HBADEALS_A +
                 " analysis was " + String.format("%e", expressionP) + ".</p>" +
-                "<p>The gene has a total of " +
-                totalTranscriptCount + " annotated transcripts in Ensembl, of which " +
-                expressedTranscriptCount + " were expressed in the current experiment (" + experiment + "). " +
-                "Of these, " + signDiffIsoCount + " were found to be differentially spliced." +
-                "</p>\n" +
                 "<p>" + symbol + " has a total of " +
                 totalTranscriptCount + " transcripts annotated in Ensembl, of which " +
                 expressedTranscriptCount + " were expressed in the current experiment (" + experiment + ")." +

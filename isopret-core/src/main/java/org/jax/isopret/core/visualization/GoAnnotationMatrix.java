@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -19,12 +20,18 @@ public class GoAnnotationMatrix {
     private final Logger LOGGER = LoggerFactory.getLogger(GoAnnotationMatrix.class);
 
     private final String accession;
+
+    private final String geneSymbol;
     private final List<TermId> transcriptIds;
 
-    private final List<TermId> expressedTranscriptIds;
+    private final List<TermId> expressedCodingTranscriptIds;
+    
+    private final List<TermId> expressedNoncodingTranscriptIds;
+    
+    
 
     /** GO annotation patterns for transcripts expressed incurrent HBADEALS dataset. */
-    private final List<GoAnnotationRow> expressedAnnotationRows;
+    private final List<GoAnnotationRow> expressedCodingAnnotationRows;
 
     /**
      *  @param ontology reference to Gene Ontology
@@ -44,37 +51,51 @@ public class GoAnnotationMatrix {
         this.accession = accessionNumber.getAccessionString();
         if (geneIdToTranscriptMap.containsKey(accessionNumber) && transcript2GoMap != null) {
             // if this is the case then we have isoforms all is Good
-            this. transcriptIds =
+            this.transcriptIds =
                     geneIdToTranscriptMap.get(accessionNumber).transcriptList()
                             .stream()
                             .map(Transcript::accessionId)
                             .map(AccessionNumber::toTermId)
                             .collect(Collectors.toList());
-            this.expressedTranscriptIds = transcriptIds.stream()
+            this.expressedCodingTranscriptIds = geneIdToTranscriptMap.get(accessionNumber).transcriptList()
+                    .stream()
+                    .filter(Transcript::isCoding)
+                    .map(Transcript::accessionId)
+                    .map(AccessionNumber::toTermId)
                     .filter(expressedTranscriptSet::contains)
                     .collect(Collectors.toList());
-            LOGGER.trace("Got {} expressed transcript Ids for {}", expressedTranscriptIds.size(), accessionNumber.getAccessionString());
-            List<GoAnnotationRow> rows = expressedAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
+            this.expressedNoncodingTranscriptIds = geneIdToTranscriptMap.get(accessionNumber).transcriptList()
+                    .stream()
+                    .filter(Predicate.not(Transcript::isCoding))
+                    .map(Transcript::accessionId)
+                    .map(AccessionNumber::toTermId)
+                    .filter(expressedTranscriptSet::contains)
+                    .collect(Collectors.toList());
+            this.geneSymbol = geneIdToTranscriptMap.get(accessionNumber).geneSymbol();
+            LOGGER.trace("Got {} expressed transcript Ids for {}", expressedCodingTranscriptIds.size(), accessionNumber.getAccessionString());
+            List<GoAnnotationRow> rows = expressedCodingAnnotationRows(ontology, geneIdToTranscriptMap, transcript2GoMap, significantGoSet);
 
             Collections.sort(rows);
-            expressedAnnotationRows = List.copyOf(rows);
+            expressedCodingAnnotationRows = List.copyOf(rows);
         } else {
             LOGGER.info("Could not get GO data for {}", accessionNumber.getAccessionString());
+            this.geneSymbol = "n/a";
             transcriptIds = List.of();
-            expressedTranscriptIds = List.of();
-            expressedAnnotationRows = List.of();
+            expressedNoncodingTranscriptIds = List.of();
+            expressedCodingTranscriptIds = List.of();
+            expressedCodingAnnotationRows = List.of();
         }
     }
 
 
-    List<GoAnnotationRow> expressedAnnotationRows(Ontology ontology,
-                                                  Map<AccessionNumber, GeneModel> geneIdToTranscriptMap,
-                                                  Map<TermId, Set<TermId>> transcript2GoMap,
-                                                  Set<TermId> significantGoSet) {
+    List<GoAnnotationRow> expressedCodingAnnotationRows(Ontology ontology,
+                                                        Map<AccessionNumber, GeneModel> geneIdToTranscriptMap,
+                                                        Map<TermId, Set<TermId>> transcript2GoMap,
+                                                        Set<TermId> significantGoSet) {
         // collect all GO terms that annotate at least one transcript
         Set<TermId> goIdSet = new HashSet<>();
         List<GoAnnotationRow> rows = new ArrayList<>();
-        for (TermId transcriptId : expressedTranscriptIds) {
+        for (TermId transcriptId : expressedCodingTranscriptIds) {
             if (transcript2GoMap.containsKey(transcriptId)) {
                 goIdSet.addAll(transcript2GoMap.get(transcriptId));
             }
@@ -89,7 +110,7 @@ public class GoAnnotationMatrix {
             String label = opt.get();
             boolean significant = significantGoSet.contains(goId);
             List<Boolean> transcriptAnnotated = new ArrayList<>();
-            for (TermId transcriptId : expressedTranscriptIds) {
+            for (TermId transcriptId : expressedCodingTranscriptIds) {
                 if (transcript2GoMap.containsKey(transcriptId)) {
                     transcriptAnnotated.add(transcript2GoMap.get(transcriptId).contains(goId));
                 } else {
@@ -100,6 +121,10 @@ public class GoAnnotationMatrix {
             rows.add(row);
         }
         return rows;
+    }
+
+    public String getGeneSymbol() {
+        return geneSymbol;
     }
 
     List<GoAnnotationRow> allAnnotationRows(Ontology ontology,
@@ -141,14 +166,17 @@ public class GoAnnotationMatrix {
         return accession;
     }
 
-    public List<GoAnnotationRow> getExpressedAnnotationRows() { return expressedAnnotationRows; }
+    public List<GoAnnotationRow> getExpressedCodingAnnotationRows() { return expressedCodingAnnotationRows; }
+
+    public List<TermId> getExpressedNoncodingTranscriptIds() { return this.expressedNoncodingTranscriptIds;}
+
 
     public List<String> getTranscripts() {
         return  this.transcriptIds.stream().map(TermId::getValue).collect(Collectors.toList());
     }
 
-    public List<String> getExpressedTranscripts() {
-        return  this.expressedTranscriptIds.stream().map(TermId::getValue).collect(Collectors.toList());
+    public List<String> getExpressedCodingTranscripts() {
+        return  this.expressedCodingTranscriptIds.stream().map(TermId::getValue).collect(Collectors.toList());
     }
 
     /**
@@ -156,7 +184,7 @@ public class GoAnnotationMatrix {
      * @return All GO ids that are associated with one or more expressed transcript.
      */
     public Set<TermId> getAllGoIds() {
-        return expressedAnnotationRows.stream()
+        return expressedCodingAnnotationRows.stream()
                 .map(GoAnnotationRow::getGoId)
                 .collect(Collectors.toSet());
     }

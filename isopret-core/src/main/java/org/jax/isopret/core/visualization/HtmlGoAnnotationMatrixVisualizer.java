@@ -1,8 +1,10 @@
 package org.jax.isopret.core.visualization;
 
 import org.jax.isopret.core.model.Transcript;
+import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class creates an HTML table with the GO annotations of
@@ -23,8 +25,8 @@ public class HtmlGoAnnotationMatrixVisualizer {
             this.html = "<p>No Gene Ontology annotations found.</p>";
         } else {
             StringBuilder sb = new StringBuilder();
-            sb.append(htmlTableHeader(matrix.getExpressedTranscripts()));
-            for (GoAnnotationRow row : matrix.getExpressedAnnotationRows()) {
+            sb.append(htmlTableHeader(matrix));
+            for (GoAnnotationRow row : matrix.getExpressedCodingAnnotationRows()) {
                 sb.append(getRow(row));
             }
             sb.append("</table>\n");
@@ -52,12 +54,23 @@ public class HtmlGoAnnotationMatrixVisualizer {
         return sb.toString();
     }
 
-    private String htmlTableHeader(List<String> transcripts) {
+    private String htmlTableHeader(GoAnnotationMatrix matrix) {
         StringBuilder sb = new StringBuilder();
+        List<String> expressedCoding = matrix.getExpressedCodingTranscripts();
+        List<TermId> expressedNonCoding = matrix.getExpressedNoncodingTranscriptIds();
+        if (expressedNonCoding.size() > 0) {
+            sb.append("<p>").append(matrix.getGeneSymbol()).append(" displayed ").append(expressedNonCoding.size())
+                    .append(" non-coding expressed transcripts (");
+            String idlist = expressedNonCoding.stream().map(TermId::getValue).collect(Collectors.joining("; "));
+            sb.append(idlist);
+            sb.append("). The isopret algorithm does not assign any GO annotation to non-coding transcripts.</p>\n");
+            sb.append("<br/>\n");
+        }
+
         sb.append("<table class=\"go\">");
         sb.append("<tr>");
         sb.append("<th width=\"375px\";>GO term</th>");
-        for (String transcript : transcripts) {
+        for (String transcript : expressedCoding) {
             sb.append("<th width=\"28px\";><span>").append(transcript).append("</span></th>");
         }
         sb.append("</tr>");
