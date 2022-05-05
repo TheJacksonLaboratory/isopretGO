@@ -26,10 +26,27 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private static final int HEIGHT_FOR_SV_DISPLAY = 160;
     private static final int HEIGHT_PER_DISPLAY_ITEM = 90;
     private static final int ISOFORM_HEIGHT = 20;
-    private static final String[] colors = {"#F08080", "#CCE5FF", "#ABEBC6", "#FFA07A", "#C39BD3", "#FEA6FF", "#F7DC6F",
-            "#CFFF98", "#A1D6E2", "#EC96A4", "#E6DF44", "#F76FDA", "#FFCCE5", "#E4EA8C", "#F1F76F", "vFDD2D6", "#F76F7F",
-            "#DAF7A6", "#FFC300", "#F76FF5", "#FFFF99", "#FF99FF", "#99FFFF", "#CCFF99", "#FFE5CC", "#FFD700", "#9ACD32",
-            "#7FFFD4", "#FFB6C1", "#FFFACD", "#FFE4E1", "#F0FFF0", "#F0FFFF"};
+    /** 7 colors from the star trek palette from the R ggsci library. */
+    private static final String [] starTrekColors = {"#CC0C00", "#5C88DA", "#84BD00", "#FFCD00", "#7C878E", "#00B5E2", "#00AF66"};
+    /** 8 colors from the NEJM palette from the R ggsci library. */
+    private static final String [] nejmColors = {"#BC3C29", "#0072B5", "#E18727", "#20854E", "#7876B1", "#6F99AD", "#FFDC91", "#EE4C97"};
+    /** 9 colors from the chicago palette from the R ggsci library. */
+    private static final String [] uchicagoColors = {"#800000", "#767676", "#FFA319", "#8A9045", "#155F83", "#C16622", "#8F3931", "#58593F", "#350E20"};
+    /** 10 colors from the NPG palette from the R ggsci library. */
+    private static final String [] npgColors = {"#E64B35", "#4DBBD5", "#00A087", "#3C5488", "#F39B7F" ,"#8491B4", "#91D1C2", "#DC0000", "#7E6148", "#B09C85" };
+    /** 10 colors from the AAAS palette from the R ggsci library. */
+    private static final String [] aaasColors = { "#3B4992", "#EE0000", "#008B45", "#631879", "#008280", "#BB0021", "#5F559B", "#A20056", "#808180", "#1B1919"};
+    /** 10 colors from the d3 palette from the R ggsci library. */
+    private static final String [] d3colors = {"#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD", "#8C564B", "#E377C2", "#7F7F7F", "#BCBD22", "#17BECF"};
+    /** 26 colors from the UCSC palette from the R ggsci library. */
+    private static final String [] ucscColors =
+    {"#FF0000", "#FF9900", "#FFCC00", "#00FF00", "#6699FF", "#CC33FF",
+             "#99991E", "#999999", "#FF00CC", "#CC0000", "#FFCCCC", "#FFFF00",
+             "#CCFF00", "#358000", "#0000CC", "#99CCFF", "#00FFFF", "#CCFFFF",
+            "#9900CC", "#CC99FF", "#996600", "#666600", "#666666", "#CCCCCC",
+            "#79CC3D", "#CCCC99"};
+
+
 
     private final SortedMap<InterproEntry, String> interproEntryColorMap;
 
@@ -44,6 +61,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private final static String JAMA_BLUE = "#00b2e2";
 
     private final static int HEIGHT_PER_INTERPRO_ROW = 30;
+    private final static int HEIGHT_PER_INTERPRO_LABELROW = 20;
+
+    private final Set<InterproEntry> siteSet;
 
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, SortedMap<InterproEntry, String> colorMap) {
         super(SVG_WIDTH, height);
@@ -58,6 +78,14 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         this.proteinMinSvgPos = 50;
         this.proteinMaxSvgPos = 1000;
         this.keyMinSvgPos = 1050;
+        siteSet = new HashSet<>();
+        for (var hitlist : annotatedGene.getTranscriptToInterproHitMap().values()) {
+            for (var hit : hitlist) {
+                if (hit.isSite()) {
+                    siteSet.add(hit.getInterproEntry());
+                }
+            }
+        }
     }
 
 
@@ -243,22 +271,68 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         }
     }
 
-
     private void writeInterproLabelsWithColorBoxes(Writer writer, double Y) throws IOException {
-        for (var entry : interproEntryColorMap.entrySet()) {
-            InterproEntry accession = entry.getKey();
-            String label = String.format("%s (%s)", accession.getDescription(), entry.getKey().getIntroproAccession());
-            String color = entry.getValue();
-            int boxDimension = 20;
-            double startx = 50;
-            writer.write(SvgUtil.square(startx, Y, boxDimension, color));
-            double x = startx + 2 * boxDimension;
-            double textY = Y + 0.9*boxDimension;
-            writer.write(SvgUtil.text(x, textY, BLACK, 24, label));
-            Y += HEIGHT_PER_INTERPRO_ROW;
+        double startx = 50;
+        int boxDimension = 12;
+        for (var colorMapEntry : interproEntryColorMap.entrySet()) {
+            InterproEntry interproEntry = colorMapEntry.getKey();
+            String label = String.format("%s (%s)", interproEntry.getDescription(), colorMapEntry.getKey().getIntroproAccession());
+            String color = colorMapEntry.getValue();
+            if (siteSet.contains(interproEntry)) {
+                double Y2 = Y+4;
+                double Ytop = Y2-0.25*ISOFORM_HEIGHT;
+                double Xmiddle = startx + 0.5 * boxDimension;
+                double Xend = startx + boxDimension;
+                String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
+                        "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, startx, Ytop, Xend, Ytop, color);
+                writer.write(triangle);
+                double x = startx + 2 * boxDimension;
+                double textY = Y + 0.9 * boxDimension;
+                writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+            } else {
+                writer.write(SvgUtil.square(startx, Y, boxDimension, color));
+                double x = startx + 2 * boxDimension;
+                double textY = Y + 0.9 * boxDimension;
+                writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+            }
+            Y += HEIGHT_PER_INTERPRO_LABELROW;
         }
     }
 
+    /**
+     * Choose a color palette according to the number of items to display
+     *  so we have 7:starTrekColors,8:nejmColors,9:uchicagoColors,10:npgColors,10:aaasColors,10:d3colors,26 colors:ucscColors
+     * @param n
+     * @return
+     */
+    private static String [] getColors(int n) {
+        long currentTime = System.currentTimeMillis();
+        Random r1 = new Random(currentTime);
+        if (n>10) return ucscColors;
+        else if (n>9) {
+            // choose one of three tens
+            double r = r1.nextDouble();
+            if (r<0.33) return npgColors;
+            else if (r<0.67) return aaasColors;
+            else return d3colors;
+        } else if (n>7) {
+            // choose one of the five
+            double r = r1.nextDouble();
+            if (r<0.2) return npgColors;
+            else if (r<0.4) return aaasColors;
+            else if (r<0.6) return ucscColors;
+            else if (r<0.8) return nejmColors;
+            else return d3colors;
+        } else {
+            double r = r1.nextDouble();
+            if (r<0.15) return npgColors;
+            else if (r<0.3) return aaasColors;
+            else if (r<0.45) return ucscColors;
+            else if (r<0.6) return nejmColors;
+            else if (r<0.8) return starTrekColors;
+            else return d3colors;
+        }
+    }
 
     public static AbstractSvgGenerator factory(AnnotatedGene annotatedGene) {
         int height = HEIGHT_PER_DISPLAY_ITEM * annotatedGene.getCodingTranscriptCount() + HEIGHT_FOR_SV_DISPLAY;
@@ -273,6 +347,8 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
                 .distinct()
                 .sorted()
                 .toList();
+        int n_items = entryList.size();
+        String [] colors = getColors(n_items);
         Random random = new Random();
         int i = random.nextInt(colors.length);
         for (var entry : entryList) {
