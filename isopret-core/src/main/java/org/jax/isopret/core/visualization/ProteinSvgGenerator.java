@@ -61,6 +61,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private final static String JAMA_BLUE = "#00b2e2";
 
     private final static int HEIGHT_PER_INTERPRO_ROW = 30;
+    private final static int HEIGHT_PER_INTERPRO_LABELROW = 20;
+
+    private final Set<InterproEntry> siteSet;
 
     private ProteinSvgGenerator(int height, AnnotatedGene annotatedGene, SortedMap<InterproEntry, String> colorMap) {
         super(SVG_WIDTH, height);
@@ -75,6 +78,14 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         this.proteinMinSvgPos = 50;
         this.proteinMaxSvgPos = 1000;
         this.keyMinSvgPos = 1050;
+        siteSet = new HashSet<>();
+        for (var hitlist : annotatedGene.getTranscriptToInterproHitMap().values()) {
+            for (var hit : hitlist) {
+                if (hit.isSite()) {
+                    siteSet.add(hit.getInterproEntry());
+                }
+            }
+        }
     }
 
 
@@ -260,19 +271,31 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
         }
     }
 
-
     private void writeInterproLabelsWithColorBoxes(Writer writer, double Y) throws IOException {
-        for (var entry : interproEntryColorMap.entrySet()) {
-            InterproEntry accession = entry.getKey();
-            String label = String.format("%s (%s)", accession.getDescription(), entry.getKey().getIntroproAccession());
-            String color = entry.getValue();
-            int boxDimension = 20;
-            double startx = 50;
-            writer.write(SvgUtil.square(startx, Y, boxDimension, color));
-            double x = startx + 2 * boxDimension;
-            double textY = Y + 0.9*boxDimension;
-            writer.write(SvgUtil.text(x, textY, BLACK, 24, label));
-            Y += HEIGHT_PER_INTERPRO_ROW;
+        double startx = 50;
+        int boxDimension = 12;
+        for (var colorMapEntry : interproEntryColorMap.entrySet()) {
+            InterproEntry interproEntry = colorMapEntry.getKey();
+            String label = String.format("%s (%s)", interproEntry.getDescription(), colorMapEntry.getKey().getIntroproAccession());
+            String color = colorMapEntry.getValue();
+            if (siteSet.contains(interproEntry)) {
+                double Y2 = Y+4;
+                double Ytop = Y2-0.25*ISOFORM_HEIGHT;
+                double Xmiddle = startx + 0.5 * boxDimension;
+                double Xend = startx + boxDimension;
+                String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
+                        "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, startx, Ytop, Xend, Ytop, color);
+                writer.write(triangle);
+                double x = startx + 2 * boxDimension;
+                double textY = Y + 0.9 * boxDimension;
+                writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+            } else {
+                writer.write(SvgUtil.square(startx, Y, boxDimension, color));
+                double x = startx + 2 * boxDimension;
+                double textY = Y + 0.9 * boxDimension;
+                writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+            }
+            Y += HEIGHT_PER_INTERPRO_LABELROW;
         }
     }
 
