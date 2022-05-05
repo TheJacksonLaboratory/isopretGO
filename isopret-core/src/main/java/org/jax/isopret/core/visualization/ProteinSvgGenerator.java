@@ -154,14 +154,55 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
 
+    private static final Comparator<DisplayInterproAnnotation> COMPARATOR =
+            Comparator.comparingInt(DisplayInterproAnnotation::getStart)
+                    .thenComparingInt(DisplayInterproAnnotation::getEnd);
+    /** check if two adjacent intervals overlap by at least 95% */
+
+
+
     private void writeDomains(Transcript transcript, int ypos, Writer writer) throws IOException {
         List<DisplayInterproAnnotation> hits = this.annotatedGene
                 .getTranscriptToInterproHitMap()
                 .getOrDefault(transcript.accessionId(), new ArrayList<>());
+        // search for overlapping/redundant hits and keep only one hit
+        // this is needed because in some cases we get multiple predictions that differ by only a few amino acids
+        Map<String, List<DisplayInterproAnnotation>> hitMap = new HashMap<>();
         for (DisplayInterproAnnotation hit : hits) {
             if (hit.isFamily() || hit.isSuperFamily()) {
                 continue; // do not show families
             }
+            String accession = hit.getInterproEntry().getIntroproAccession();
+            hitMap.putIfAbsent(accession, new ArrayList<>());
+            hitMap.get(accession).add(hit);
+        }
+        List<DisplayInterproAnnotation> filteredHits = new ArrayList<>();
+        for (List<DisplayInterproAnnotation> diaList : hitMap.values()) {
+            if (diaList.isEmpty()) {
+                LOGGER.error("Got empty DisplayInterproAnnotation list (should never happen)");
+                continue;
+            } else if (diaList.size() == 1) {
+                filteredHits.add(diaList.get(0));
+            }
+            Collections.sort(diaList, COMPARATOR); // sort by position
+            DisplayInterproAnnotation currentDia = diaList.get(0); // if we get here, we know there are at least two elems
+            for (int i=1; i< diaList.size(); i++) {
+                DisplayInterproAnnotation nextDia = diaList.get(i);
+                if (currentDia.overlapsBy(nextDia)) {
+                    currentDia = currentDia.merge(nextDia);
+                } else {
+                    filteredHits.add(currentDia);
+                    currentDia = nextDia;
+                }
+            }
+            filteredHits.add(currentDia);
+        }
+
+
+        for (DisplayInterproAnnotation hit : filteredHits) {
+//            if (hit.isFamily() || hit.isSuperFamily()) {
+//                continue; // do not show families
+//            }
             double xstart = translateProteinToSvgCoordinate(hit.getStart());
             double xend = translateProteinToSvgCoordinate(hit.getEnd());
             double width = xend - xstart;
