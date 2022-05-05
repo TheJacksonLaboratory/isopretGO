@@ -302,8 +302,8 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     /**
      * Choose a color palette according to the number of items to display
      *  so we have 7:starTrekColors,8:nejmColors,9:uchicagoColors,10:npgColors,10:aaasColors,10:d3colors,26 colors:ucscColors
-     * @param n
-     * @return
+     * @param n number of elements to be displayed
+     * @return list of colors to display
      */
     private static String [] getColors(int n) {
         long currentTime = System.currentTimeMillis();

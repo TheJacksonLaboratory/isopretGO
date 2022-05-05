@@ -27,10 +27,10 @@ is the recommended input file.
 
 ## Note to Macintosh users
 
-Isopret requires Java 17 and makes use of `JavaFX <https://openjfx.io/>`_ to implement the
+Isopret requires Java 17 and makes use of [JavaFX](https://openjfx.io/) to implement the
 graphical user interface (GUI). We have noticed that JavaFX GUI apps including isopret have crashed on
-Macintosh laptops with the new ARM M1 chip when using Oracles SDK (version 17.0.2). We
-have used `Azul Zulu <https://www.azul.com/downloads/?package=jdk>`_ JDKs on M1 Macintoshes and
+Macintosh laptops with the new ARM M1 chip when using Oracle's SDK (version 17.0.2). We
+have used [Azul Zulu](https://www.azul.com/downloads/?package=jdk) JDKs on M1 Macintoshes and
 could run Isopret and other JavaFX apps without problems.
 
 
