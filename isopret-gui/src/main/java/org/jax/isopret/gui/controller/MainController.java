@@ -67,7 +67,7 @@ public class MainController implements Initializable {
     @FXML
     private Label downloadDataSourceLabel;
     @FXML
-    private ProgressIndicator transcriptDownloadPI;
+    private ProgressIndicator datasourcesDownloadProgressIndicator;
     private final ObservableList<String> goMethodList = FXCollections.observableArrayList("Term for Term",
             "Parent-Child Union", "Parent-Child Intersect");
     @FXML
@@ -84,8 +84,6 @@ public class MainController implements Initializable {
 
     @FXML
     private ChoiceBox<String> mtcChoiceBox;
-
-
 
     @Autowired
     private IsopretService service;
@@ -109,9 +107,8 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
-        this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
+        this.datasourcesDownloadProgressIndicator.progressProperty().bind(service.downloadCompletenessProperty());
         this.hbaDealsFileLabel.textProperty().bind(service.hbaDealsFileProperty());
-        this.transcriptDownloadPI.progressProperty().bind(service.downloadCompletenessProperty());
         goChoiceBox.setItems(goMethodList);
         goChoiceBox.getSelectionModel().selectFirst();
         goChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> service.setGoMethod(newValue));
@@ -143,7 +140,7 @@ public class MainController implements Initializable {
     @FXML
     private void downloadSources(ActionEvent e) {
         e.consume();
-        if (service.sourcesDownloaded()) {
+        if (service.sourcesDownloaded() > 0.9999999) { // don't worry about rounding errors
             LOGGER.info("Sources previously downloaded");
         }
         DirectoryChooser dirChooser = new DirectoryChooser();
@@ -158,8 +155,8 @@ public class MainController implements Initializable {
         LOGGER.info("Downloading files for isopret to {}", file.getAbsolutePath());
 
         IsopretFxDownloadTask task = new IsopretFxDownloadTask(file.getAbsolutePath());
-        this.transcriptDownloadPI.progressProperty().unbind();
-        this.transcriptDownloadPI.progressProperty().bind(task.progressProperty());
+        this.datasourcesDownloadProgressIndicator.progressProperty().unbind();
+        this.datasourcesDownloadProgressIndicator.progressProperty().bind(task.progressProperty());
         this.downloadDataSourceLabel.textProperty().unbind();
         this.downloadDataSourceLabel.textProperty().bind(task.messageProperty());
 

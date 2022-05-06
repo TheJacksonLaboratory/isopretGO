@@ -118,10 +118,12 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
             }
         }
         if (domain_termId_not_found > 0) {
-            LOGGER.warn("Could not find {} domain item term ids.", domain_termId_not_found);
+            // expected behavior
+            LOGGER.trace("Could not find {} domain item term ids.", domain_termId_not_found);
         }
         if (ontology_term_not_found > 0) {
-            LOGGER.warn("Could not find {} ontology term ids (are go.json/versions in synch?).", ontology_term_not_found);
+            // expected behavior
+            LOGGER.trace("Could not find {} ontology term ids (are go.json/versions in synch?).", ontology_term_not_found);
         }
         Map<TermId, DirectAndIndirectTermAnnotations> annotationMap = new HashMap<>();
         for (Map.Entry<TermId, Set<TermId>> entry : directAnnotationMap.entrySet()) {

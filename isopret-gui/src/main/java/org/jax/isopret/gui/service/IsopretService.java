@@ -30,7 +30,7 @@ public interface IsopretService {
     /**
      * Source files.
      */
-    boolean sourcesDownloaded();
+    double sourcesDownloaded();
 
     void setDownloadDir(File file);
 

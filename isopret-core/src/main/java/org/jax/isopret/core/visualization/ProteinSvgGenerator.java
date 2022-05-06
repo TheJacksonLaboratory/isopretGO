@@ -198,11 +198,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             filteredHits.add(currentDia);
         }
 
-
         for (DisplayInterproAnnotation hit : filteredHits) {
-//            if (hit.isFamily() || hit.isSuperFamily()) {
-//                continue; // do not show families
-//            }
             double xstart = translateProteinToSvgCoordinate(hit.getStart());
             double xend = translateProteinToSvgCoordinate(hit.getEnd());
             double width = xend - xstart;
@@ -315,27 +311,36 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private void writeInterproLabelsWithColorBoxes(Writer writer, double Y) throws IOException {
         double startx = 50;
         int boxDimension = 12;
+        // we want to show the sites at the bottom of the list, so we store them in this map and then output them
+        Map<InterproEntry, String> siteMap = new HashMap<>();
         for (var colorMapEntry : interproEntryColorMap.entrySet()) {
             InterproEntry interproEntry = colorMapEntry.getKey();
             String label = String.format("%s (%s)", interproEntry.getDescription(), colorMapEntry.getKey().getIntroproAccession());
             String color = colorMapEntry.getValue();
             if (siteSet.contains(interproEntry)) {
-                double Y2 = Y+4;
-                double Ytop = Y2-0.25*ISOFORM_HEIGHT;
-                double Xmiddle = startx + 0.5 * boxDimension;
-                double Xend = startx + boxDimension;
-                String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
-                        "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, startx, Ytop, Xend, Ytop, color);
-                writer.write(triangle);
-                double x = startx + 2 * boxDimension;
-                double textY = Y + 0.9 * boxDimension;
-                writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+                siteMap.put(interproEntry, color);
             } else {
                 writer.write(SvgUtil.square(startx, Y, boxDimension, color));
                 double x = startx + 2 * boxDimension;
                 double textY = Y + 0.9 * boxDimension;
                 writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+                Y += HEIGHT_PER_INTERPRO_LABELROW;
             }
+        }
+        for (var colorMapEntry : siteMap.entrySet()) {
+            InterproEntry interproEntry = colorMapEntry.getKey();
+            String label = String.format("%s (%s)", interproEntry.getDescription(), colorMapEntry.getKey().getIntroproAccession());
+            String color = colorMapEntry.getValue();
+            double Y2 = Y + 4;
+            double Ytop = Y2 - 0.25 * ISOFORM_HEIGHT;
+            double Xmiddle = startx + 0.5 * boxDimension;
+            double Xend = startx + boxDimension;
+            String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
+                    "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, startx, Ytop, Xend, Ytop, color);
+            writer.write(triangle);
+            double x = startx + 2 * boxDimension;
+            double textY = Y + 0.9 * boxDimension;
+            writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
             Y += HEIGHT_PER_INTERPRO_LABELROW;
         }
     }
