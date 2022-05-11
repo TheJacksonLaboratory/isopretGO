@@ -41,8 +41,8 @@ public class InterproOverrepCommand extends IsopretCommand implements Callable<I
     @CommandLine.Option(names={"-b","--hbadeals"},
             description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
-    @CommandLine.Option(names={"--outfile"}, description = "Name of output file to write stats")
-    private String outfile = null;
+    @CommandLine.Option(names={"--outfile"}, description = "Name of output file to write stats (default: ${DEFAULT-VALUE})")
+    private String outfile = "isopret-interpro-overrep.txt";
 
     private Ontology geneOntology = null;
     private IsopretAssociationContainer transcriptContainer = null;

@@ -155,7 +155,7 @@ public class HbaGeneController implements Initializable {
         isoformPColumn.setEditable(false);
         isoformPColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().isoformP()));
         isoformTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
-        LOGGER.error("Adding isoform vis n={} items", visualizable.getIsoformVisualizable().size());
+        LOGGER.trace("Adding isoform vis n={} items", visualizable.getIsoformVisualizable().size());
         WebEngine webEngine = hbaGeneWebView.getEngine();
         webEngine.loadContent(this.visualizable.getIsoformHtml());
         // interpro table

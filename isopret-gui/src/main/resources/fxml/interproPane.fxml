@@ -21,12 +21,12 @@
             <TableView fx:id="interproResultTableView" stylesheets="@../css/isopretstyle.css" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="interproIdColumn" editable="false" maxWidth="-1.0" minWidth="100.0" prefWidth="-1.0" resizable="false" text="id" />
-                    <TableColumn fx:id="interproDescriptionColumn" editable="false" maxWidth="-1.0" minWidth="200.0" prefWidth="-1.0" styleClass="mycolumntarget" text="description" />
-                    <TableColumn fx:id="studyCountsColumn" editable="false" maxWidth="-1.0" minWidth="200.0" prefWidth="-1.0" styleClass="mycolumn" text="Study" />
-                    <TableColumn fx:id="populationCountsColumn" maxWidth="-1.0" minWidth="200.0" prefWidth="-1.0" styleClass="mycolumn" text="Population" />
+                    <TableColumn fx:id="interproDescriptionColumn" editable="false" maxWidth="-1.0" minWidth="400.0" prefWidth="-1.0" styleClass="mycolumntarget" text="description" />
+                    <TableColumn fx:id="studyCountsColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Study" />
+                    <TableColumn fx:id="populationCountsColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" styleClass="mycolumn" text="Population" />
                     <TableColumn fx:id="rawPColumn" maxWidth="-1.0" minWidth="120.0" prefWidth="-1.0" text="p-value" />
                     <TableColumn fx:id="adjPColumn" maxWidth="-1.0" minWidth="120.0" prefWidth="-1.0" text="adj. p-value" />
-                    <TableColumn fx:id="exportColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="-1.0" text="Export" />
+                    <TableColumn fx:id="exportColumn" maxWidth="-1.0" minWidth="70.0" prefWidth="-1.0" text="Export" />
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

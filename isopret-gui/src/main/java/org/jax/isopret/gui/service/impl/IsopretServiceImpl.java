@@ -78,38 +78,39 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     private double calculateDownloadCompleteness() {
-        if (sourcesDownloaded()) return 1.0d;
-        else return 0.0;
+        return sourcesDownloaded();
     }
 
 
     @Override
-    public boolean sourcesDownloaded() {
+    public double sourcesDownloaded() {
         if (! pgProperties.containsKey("downloaddir")) {
             LOGGER.warn("Download directory not initialized");
-            return false;
+            return 0d;
         }
         String downloadPath = pgProperties.getProperty("downloaddir");
         File downloadDir = new File(downloadPath);
         if (! downloadDir.isDirectory()) {
             LOGGER.warn("Download directory not initialized");
-            return false;
+            return 0d;
         }
         Set<String> expectedDownloadedFiles = getExpectedDownloadedFiles();
+        int expected = expectedDownloadedFiles.size();
         File [] downloadedFiles = downloadDir.listFiles();
         if (downloadedFiles == null) {
             LOGGER.warn("No downloaded files");
-            return false;
+            return 0d;
         }
         Set<String> basenames = Arrays.stream(downloadedFiles).map(File::getName).collect(Collectors.toSet());
-        int notfound = 0;
+        int found = 0;
         for (String name : expectedDownloadedFiles) {
-            if (! basenames.contains(name)) {
+            if (basenames.contains(name)) {
+                found++;
+            } else {
                 LOGGER.error("Did not find {} in download directory at {}.", name, downloadDir);
-                notfound++;
             }
         }
-        return notfound == 0; // We are OK if we find all required files.
+        return (double) found/expected;
     }
 
     /**
@@ -127,7 +128,8 @@ public class IsopretServiceImpl implements IsopretService  {
     // TODO Add the other files to the download
     @Override
     public Set<String> getExpectedDownloadedFiles() {
-        return Set.of("go.json", "goa_human.gaf", "hg38_ensembl.ser", "hgnc_complete_set.txt");
+        return Set.of("interpro_domain_desc.txt", "isoform_function_list_cc.txt", "hg38_ensembl.ser",
+                "interpro_domains.txt", "isoform_function_list_mf.txt", "hgnc_complete_set.txt", "isoform_function_list_bp.txt");
     }
 
     @Override

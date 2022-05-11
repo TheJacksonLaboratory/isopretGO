@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(name = "download",
         mixinStandardHelpOptions = true,
-        description = "Download files for prositometry")
+        description = "Download files for isopret analysis")
 public class DownloadCommand implements Callable<Integer> {
     @CommandLine.Option(names={"-d","--data"}, description ="directory to download data (default: ${DEFAULT-VALUE})" )
     private String datadir="data";

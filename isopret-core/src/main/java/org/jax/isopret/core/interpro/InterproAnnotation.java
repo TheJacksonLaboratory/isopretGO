@@ -54,6 +54,8 @@ public class InterproAnnotation {
         return end;
     }
 
+    public int getLength() { return end - start + 1; }
+
     @Override
     public int hashCode() {
         return Objects.hash(this.enst, this.ensg, this.interpro, this.start, this.end);

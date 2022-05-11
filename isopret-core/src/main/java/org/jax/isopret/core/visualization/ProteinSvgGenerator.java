@@ -154,14 +154,51 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
 
+    private static final Comparator<DisplayInterproAnnotation> COMPARATOR =
+            Comparator.comparingInt(DisplayInterproAnnotation::getStart)
+                    .thenComparingInt(DisplayInterproAnnotation::getEnd);
+    /** check if two adjacent intervals overlap by at least 95% */
+
+
+
     private void writeDomains(Transcript transcript, int ypos, Writer writer) throws IOException {
         List<DisplayInterproAnnotation> hits = this.annotatedGene
                 .getTranscriptToInterproHitMap()
                 .getOrDefault(transcript.accessionId(), new ArrayList<>());
+        // search for overlapping/redundant hits and keep only one hit
+        // this is needed because in some cases we get multiple predictions that differ by only a few amino acids
+        Map<String, List<DisplayInterproAnnotation>> hitMap = new HashMap<>();
         for (DisplayInterproAnnotation hit : hits) {
             if (hit.isFamily() || hit.isSuperFamily()) {
                 continue; // do not show families
             }
+            String accession = hit.getInterproEntry().getIntroproAccession();
+            hitMap.putIfAbsent(accession, new ArrayList<>());
+            hitMap.get(accession).add(hit);
+        }
+        List<DisplayInterproAnnotation> filteredHits = new ArrayList<>();
+        for (List<DisplayInterproAnnotation> diaList : hitMap.values()) {
+            if (diaList.isEmpty()) {
+                LOGGER.error("Got empty DisplayInterproAnnotation list (should never happen)");
+                continue;
+            } else if (diaList.size() == 1) {
+                filteredHits.add(diaList.get(0));
+            }
+            diaList.sort(COMPARATOR);
+            DisplayInterproAnnotation currentDia = diaList.get(0); // if we get here, we know there are at least two elems
+            for (int i=1; i< diaList.size(); i++) {
+                DisplayInterproAnnotation nextDia = diaList.get(i);
+                if (currentDia.overlapsBy(nextDia)) {
+                    currentDia = currentDia.merge(nextDia);
+                } else {
+                    filteredHits.add(currentDia);
+                    currentDia = nextDia;
+                }
+            }
+            filteredHits.add(currentDia);
+        }
+
+        for (DisplayInterproAnnotation hit : filteredHits) {
             double xstart = translateProteinToSvgCoordinate(hit.getStart());
             double xend = translateProteinToSvgCoordinate(hit.getEnd());
             double width = xend - xstart;
@@ -274,27 +311,36 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     private void writeInterproLabelsWithColorBoxes(Writer writer, double Y) throws IOException {
         double startx = 50;
         int boxDimension = 12;
+        // we want to show the sites at the bottom of the list, so we store them in this map and then output them
+        Map<InterproEntry, String> siteMap = new HashMap<>();
         for (var colorMapEntry : interproEntryColorMap.entrySet()) {
             InterproEntry interproEntry = colorMapEntry.getKey();
             String label = String.format("%s (%s)", interproEntry.getDescription(), colorMapEntry.getKey().getIntroproAccession());
             String color = colorMapEntry.getValue();
             if (siteSet.contains(interproEntry)) {
-                double Y2 = Y+4;
-                double Ytop = Y2-0.25*ISOFORM_HEIGHT;
-                double Xmiddle = startx + 0.5 * boxDimension;
-                double Xend = startx + boxDimension;
-                String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
-                        "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, startx, Ytop, Xend, Ytop, color);
-                writer.write(triangle);
-                double x = startx + 2 * boxDimension;
-                double textY = Y + 0.9 * boxDimension;
-                writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+                siteMap.put(interproEntry, color);
             } else {
                 writer.write(SvgUtil.square(startx, Y, boxDimension, color));
                 double x = startx + 2 * boxDimension;
                 double textY = Y + 0.9 * boxDimension;
                 writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
+                Y += HEIGHT_PER_INTERPRO_LABELROW;
             }
+        }
+        for (var colorMapEntry : siteMap.entrySet()) {
+            InterproEntry interproEntry = colorMapEntry.getKey();
+            String label = String.format("%s (%s)", interproEntry.getDescription(), colorMapEntry.getKey().getIntroproAccession());
+            String color = colorMapEntry.getValue();
+            double Y2 = Y + 4;
+            double Ytop = Y2 - 0.25 * ISOFORM_HEIGHT;
+            double Xmiddle = startx + 0.5 * boxDimension;
+            double Xend = startx + boxDimension;
+            String triangle = String.format("<polygon points=\"%f,%f %f,%f %f,%f\"\n" +
+                    "style=\"fill:%s;stroke:black;stroke-width:1\"/>", Xmiddle, Y2, startx, Ytop, Xend, Ytop, color);
+            writer.write(triangle);
+            double x = startx + 2 * boxDimension;
+            double textY = Y + 0.9 * boxDimension;
+            writer.write(SvgUtil.text(x, textY, BLACK, 18, label));
             Y += HEIGHT_PER_INTERPRO_LABELROW;
         }
     }
@@ -302,8 +348,8 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     /**
      * Choose a color palette according to the number of items to display
      *  so we have 7:starTrekColors,8:nejmColors,9:uchicagoColors,10:npgColors,10:aaasColors,10:d3colors,26 colors:ucscColors
-     * @param n
-     * @return
+     * @param n number of elements to be displayed
+     * @return list of colors to display
      */
     private static String [] getColors(int n) {
         long currentTime = System.currentTimeMillis();

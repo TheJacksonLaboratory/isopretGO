@@ -70,7 +70,7 @@
                                         <Insets left="40.0" />
                                     </HBox.margin>
                                 </Button>
-                                <ProgressIndicator fx:id="transcriptDownloadPI" progress="0.0">
+                                <ProgressIndicator fx:id="datasourcesDownloadProgressIndicator" progress="0.0">
                                     <padding>
                                         <Insets left="50.0" />
                                     </padding>
