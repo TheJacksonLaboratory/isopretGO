@@ -184,7 +184,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             } else if (diaList.size() == 1) {
                 filteredHits.add(diaList.get(0));
             }
-            Collections.sort(diaList, COMPARATOR); // sort by position
+            diaList.sort(COMPARATOR);
             DisplayInterproAnnotation currentDia = diaList.get(0); // if we get here, we know there are at least two elems
             for (int i=1; i< diaList.size(); i++) {
                 DisplayInterproAnnotation nextDia = diaList.get(i);

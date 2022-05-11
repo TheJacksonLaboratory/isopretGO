@@ -1,12 +1,8 @@
 package org.jax.isopret.interpro;
 
-import org.jax.isopret.core.interpro.InterproAnnotation;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InterproAnnotationTest extends InterproTestBase{
 

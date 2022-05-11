@@ -18,7 +18,7 @@ import java.util.zip.GZIPInputStream;
 /**
  * Command to download the {@code hp.obo} and {@code phenotype.hpoa} files that
  * we will need to run Isopret. Note that this class is also used by
- * the IsopretFxDonloader (a Task) so several of the methods are made public that
+ * the IsopretFxDownloader (a Task) so several of the methods are made public that
  * do not need to be public for the CLI download.
  * @author Peter N Robinson
  */
@@ -28,15 +28,6 @@ public class IsopretDownloader {
     private final String downloadDirectory;
     /** If true, download new version whether or not the file is already present. */
     private final boolean overwrite;
-
-    private final static String PROSITE_DAT = "prosite.dat";
-
-    private final static String PROSITE_DAT_URL ="ftp://ftp.expasy.org/databases/prosite/prosite.dat";
-
-    private final static String ENSEMBL_CDNA_URL
-            ="ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz";
-    /** Basename of the file with cDNA sequences for ensembl genes. */
-    private final static String ENSEMBL_CDNA ="Homo_sapiens.GRCh38.cdna.all.fa.gz";
     private final static String GO_JSON = "go.json";
     private final static String GO_JSON_URL = "http://purl.obolibrary.org/obo/go.json";
     private static final String JannovarZenodoUrl = "https://zenodo.org/record/4311513/files/hg38_ensembl.ser?download=1";

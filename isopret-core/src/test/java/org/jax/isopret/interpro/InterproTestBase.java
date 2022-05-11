@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import static org.jax.isopret.core.interpro.InterproEntryType.ACTIVE_SITE;
 import static org.jax.isopret.core.interpro.InterproEntryType.FAMILY;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InterproTestBase {
 

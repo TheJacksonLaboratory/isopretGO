@@ -67,7 +67,7 @@ public class FileDownloader {
         }
 
         if (!dest.getParentFile().exists()) {
-            System.out.println("Creating directory {}"+ dest.getParentFile().getAbsolutePath());
+            System.out.println("Creating directory"+ dest.getParentFile().getAbsolutePath());
             dest.getParentFile().mkdirs();
         }
 

@@ -34,3 +34,6 @@ hs_err_pid*
 /isopret-cli/target/
 /isopret-core/target/
 /isopret-gui/target/
+/isopret-go-overrep.txt
+!/isopret-interpro-overrep.txt
+/isopret-interpro-overrep.txt

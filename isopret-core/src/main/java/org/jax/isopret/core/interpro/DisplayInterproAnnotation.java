@@ -74,7 +74,7 @@ public class DisplayInterproAnnotation extends InterproAnnotation implements Com
      * The expected use case is that other will start at a position that is equal to or more than
      * the start position of this, because we will be checking a sorted list.
      * If this is not the case, then check whether there is at least 90% overlap.
-     * @param other
+     * @param other another DisplayInterproAnnotation object that might overlap with this one
      * @return true if there is at least 75% reciprocal overlap.
      */
     public boolean overlapsBy(DisplayInterproAnnotation other) {

@@ -49,15 +49,19 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
             description ="HBA-DEALS output file" , required = true)
     private String hbadealsFile;
     @CommandLine.Option(names={"-c","--calculation"},
-            description ="Ontologizer calculation (Term-for-Term, PC-Union, PC-Intersection)" )
+            description ="Ontologizer calculation (Term-for-Term [default], PC-Union, PC-Intersection)" )
     private String ontologizerCalculation = "Term-for-Term";
     @CommandLine.Option(names={"--mtc"},
-            description="Multiple-Testing-Correction for GO analysis")
+            description="Multiple-Testing-Correction for GO analysis (${DEFAULT-VALUE} [default], Benjamini-Hochberg, " +
+                    " Benjamini-Yekutieli," +
+                    " Bonferroni-Holm," +
+                    " Sidak," +
+                    " None)")
     private String mtc = "Bonferroni";
     @CommandLine.Option(names={"-v", "--verbose"}, description = "Show stats on commandline")
     private boolean verbose = true;
-    @CommandLine.Option(names={"--outfile"}, description = "Name of output file to write stats")
-    private String outfile = null;
+    @CommandLine.Option(names={"--outfile"}, description = "Name of output file to write stats (default: ${DEFAULT-VALUE})")
+    private String outfile = "isopret-go-overrep.txt";
 
 
 
@@ -99,7 +103,6 @@ public class GoOverrepCommand extends IsopretCommand implements Callable<Integer
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbadealsFile, hgncMap);
         Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
-       // HbaDealsThresholder thresholder = initializeHbaDealsThresholder(hgncMap, this.hbadealsFile);
         MtcMethod mtcMethod = MtcMethod.fromString(mtc);
         HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
                 0.05,
