@@ -9,6 +9,7 @@ import org.jax.isopret.core.model.AnnotatedGene;
 import org.jax.isopret.core.model.Transcript;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.Contig;
+import org.monarchinitiative.svart.Strand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,6 +123,13 @@ public class EnsemblVisualizable implements Visualizable {
     @Override
     public String getGeneAccession() {
         return this.hbaDealsResult.getGeneAccession().getAccessionString();
+    }
+
+    @Override
+    public String getStrand() {
+        if (this.expressedTranscripts.isEmpty()) return "";
+        Transcript t = this.expressedTranscripts.get(0);
+        return t.strand() == Strand.POSITIVE ? "+ strand" : "- strand";
     }
 
     private String getEnsemblUrl(String accession) {
