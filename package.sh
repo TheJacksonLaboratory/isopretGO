@@ -7,13 +7,14 @@
 
 ##
 # Static variables
-SRC_DIR=hpo-case-annotator-app
+SRC_DIR=isopret-gui
 APP_NAME="isopret-gui"
 CMD_NAME="isopret-gui"
-VERSION=0.9.22
+VERSION=1.0.0
 
 BUILD_DIR=${SRC_DIR}/target
-JAR_NAME="isopret-gui-${VERSION}.jar"
+#JAR_NAME="isopret-gui-${VERSION}.jar"
+JAR_NAME="isopret-gui.jar"
 VENDOR="The Jackson Laboratory"
 DESCRIPTION="Isopret-gui is a Java application for investigating and visualizing overrepresentation of Gene Ontology (GO) annotations in differentially spliced or differentially expressed genes."
 COPYRIGHT="Copyright 2022, All rights reserved"
@@ -40,7 +41,7 @@ function build_for_module_path() {
       # Setup Linux CLI using module path
       MPATH="${PACKAGE_DIR}/lib:${PACKAGE_DIR}/${JAR_NAME}"
       printf "Module path: %s\n" "${MPATH}"
-      MODULE="org.monarchinitiative.hca.app/org.monarchinitiative.hpo_case_annotator.App"
+      MODULE="org.jax.isopret.app/org.jax.isopret_gui.App"
       printf "Module %s\n" "${MODULE}"
 
       DETECTED_MODULES=$(jdeps --multi-release 17 --ignore-missing-deps --print-module-deps --module-path "${MPATH}" ${PACKAGE_DIR}/${JAR_NAME})
