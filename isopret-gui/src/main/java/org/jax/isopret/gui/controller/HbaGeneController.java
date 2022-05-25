@@ -98,7 +98,8 @@ public class HbaGeneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.hbaGeneLabel.setText(visualizable.getGeneSymbol());
+        String geneAndStrand = String.format("%s (%s)", visualizable.getGeneSymbol(), visualizable.getStrand());
+        this.hbaGeneLabel.setText(geneAndStrand);
         Text geneSymbolText = new Text(String.format("Gene Ontology annotations for %s (%s)\n",
                 visualizable.getGeneSymbol(),
                 visualizable.getGeneAccession()));

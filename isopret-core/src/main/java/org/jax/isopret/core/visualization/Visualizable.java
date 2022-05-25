@@ -76,4 +76,6 @@ public interface Visualizable {
 
     int getGoTableWidth();
 
+    default String getStrand() { return ""; }
+
 }
