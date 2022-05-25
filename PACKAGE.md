@@ -16,7 +16,7 @@ Run the following to create a deb installer (for Debian, Ubuntu, and related sys
 bash package.sh
 ```
 
-This will create a deb file called ``isopret-gui_1.0.0-1_amd64.deb``. On some 
+This will create a deb file called ``isopret-gui_1.0.0-1_amd64.deb``. On some
 systems, the file can be installed with a right-click. From the command line,
 the following installs the package
 
@@ -36,13 +36,13 @@ to remove the app, enter the following command
 sudo dpkg remove isopret-gui_1.0.0-1_amd64.deb
 ```
 
-## Mac 
+## Mac
 
 The command
 ```aidl
 bash package.sh
 ```
-will generate a file called ``isopret-gui-1.0.0.dmg``. This file can 
+will generate a file called ``isopret-gui-1.0.0.dmg``. This file can
 be used to install the package as usual (start with a double-click)
 
 Note that the JAR files and the dmg installation files for M1 and intel macs are not
@@ -53,4 +53,4 @@ changed the file names by hand.
 
 ## Windows
 
-At present, we do not offer a Windows installation file, please use the JAR file instead.
+At present, we do not offer a Windows installation file, please use the JAR file as described in the README.

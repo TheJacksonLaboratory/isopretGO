@@ -33,6 +33,18 @@ Macintosh laptops with the new ARM M1 chip when using Oracle's SDK (version 17.0
 have used [Azul Zulu](https://www.azul.com/downloads/?package=jdk) JDKs on M1 Macintoshes and
 could run Isopret and other JavaFX apps without problems.
 
+We offer pre-built installation files for MacIntosh (M1 and Intel) in the Release section. 
+
+## Note to Linux users
+
+The easiest way to run isopret-gui on a linux system is to run the downloadable JAR file from the releases page.
+
+```aidl
+java -jar isopret-gui.jar
+```
+
+Additionally, an installation file is provided as explained in [PACKAGE](PACKAGE.md).
+
 
 ### Further information
 
