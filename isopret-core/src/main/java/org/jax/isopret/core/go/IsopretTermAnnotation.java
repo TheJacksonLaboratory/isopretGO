@@ -14,7 +14,7 @@ import java.util.Optional;
  */
 public class IsopretTermAnnotation implements TermAnnotation {
     private final TermId goTermId;
-    private final TermId accessionNumber;
+private final TermId accessionNumber;
 
     public IsopretTermAnnotation(TermId accession, TermId goTermId) {
         this.accessionNumber = accession;
