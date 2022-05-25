@@ -56,6 +56,7 @@
                     <include>**/*.properties</include>
                     <include>**/*.fxml</include>
                     <include>**/*.css</include>
+                    <include>**/*.ico</include>
                 </includes>
             </resource>
         </resources>
