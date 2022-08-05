@@ -1,6 +1,6 @@
 package org.jax.isopret.core.hbadeals;
 
-import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.model.AccessionNumber;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.TermId;

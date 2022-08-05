@@ -1,7 +1,7 @@
 package org.jax.isopret.core.interpro;
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.model.AccessionNumber;
 
 import java.util.Objects;
 import java.util.Optional;

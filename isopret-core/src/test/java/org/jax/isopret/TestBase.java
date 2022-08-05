@@ -5,6 +5,7 @@ import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hgnc.HgncParser;
 import org.jax.isopret.core.interpro.*;
 import org.jax.isopret.core.model.*;
+import org.jax.isopret.model.*;
 import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 

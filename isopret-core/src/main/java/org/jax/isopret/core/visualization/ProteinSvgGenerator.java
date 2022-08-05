@@ -3,9 +3,9 @@ package org.jax.isopret.core.visualization;
 
 import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.interpro.InterproEntry;
-import org.jax.isopret.core.model.AccessionNumber;
-import org.jax.isopret.core.model.AnnotatedGene;
-import org.jax.isopret.core.model.Transcript;
+import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.model.AnnotatedGene;
+import org.jax.isopret.model.Transcript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

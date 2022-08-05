@@ -1,7 +1,7 @@
 package org.jax.isopret.core.hbadeals;
 
-import org.jax.isopret.core.model.AccessionNumber;
-import org.jax.isopret.core.model.GeneModel;
+import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.model.GeneModel;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

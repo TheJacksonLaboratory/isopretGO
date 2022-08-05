@@ -1,4 +1,4 @@
-package org.jax.isopret.core.model;
+package org.jax.isopret.model;
 
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;

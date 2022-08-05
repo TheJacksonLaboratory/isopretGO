@@ -1,8 +1,8 @@
 package org.jax.isopret.core.hbadeals;
 
-import org.jax.isopret.core.model.AccessionNumber;
-import org.jax.isopret.core.model.GeneModel;
-import org.jax.isopret.core.model.GeneSymbolAccession;
+import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.model.GeneModel;
+import org.jax.isopret.model.GeneSymbolAccession;
 
 import java.util.*;
 import java.util.stream.Collectors;

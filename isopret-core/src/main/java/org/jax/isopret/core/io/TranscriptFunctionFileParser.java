@@ -3,7 +3,7 @@ package org.jax.isopret.core.io;
 import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretFileNotFoundException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.model.AccessionNumber;
+import org.jax.isopret.model.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;

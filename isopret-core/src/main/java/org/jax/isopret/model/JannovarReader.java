@@ -1,4 +1,4 @@
-package org.jax.isopret.core.model;
+package org.jax.isopret.model;
 
 import com.google.common.collect.ImmutableMultimap;
 import de.charite.compbio.jannovar.data.JannovarData;

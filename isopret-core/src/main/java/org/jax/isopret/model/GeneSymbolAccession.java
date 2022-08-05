@@ -1,4 +1,4 @@
-package org.jax.isopret.core.model;
+package org.jax.isopret.model;
 /**
  * A convenience class to record both the symbol and the accession number of a gene.
  */

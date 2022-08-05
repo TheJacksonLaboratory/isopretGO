@@ -4,9 +4,9 @@ package org.jax.isopret.core.visualization;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
-import org.jax.isopret.core.model.AccessionNumber;
-import org.jax.isopret.core.model.AnnotatedGene;
-import org.jax.isopret.core.model.Transcript;
+import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.model.AnnotatedGene;
+import org.jax.isopret.model.Transcript;
 import org.monarchinitiative.svart.*;
 
 import java.io.IOException;
