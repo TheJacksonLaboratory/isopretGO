@@ -36,7 +36,7 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(name = "interpro",
         mixinStandardHelpOptions = true,
         description = "Interpro Overrepresentation")
-public class InterproOverrepCommand extends IsopretCommand implements Callable<Integer> {
+public class InterproOverrepCommand extends AbstractIsopretCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproOverrepCommand.class);
     @CommandLine.Option(names={"-b","--hbadeals"},
             description ="HBA-DEALS output file" , required = true)

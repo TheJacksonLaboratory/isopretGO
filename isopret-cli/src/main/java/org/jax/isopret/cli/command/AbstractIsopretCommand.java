@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class IsopretCommand {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IsopretCommand.class);
+public abstract class AbstractIsopretCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIsopretCommand.class);
     /** isopret only supports hg38. */
     private final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
 

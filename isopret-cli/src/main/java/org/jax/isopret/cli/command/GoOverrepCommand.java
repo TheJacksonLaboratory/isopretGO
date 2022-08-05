@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @CommandLine.Command(name = "GO",
         mixinStandardHelpOptions = true,
         description = "Gene Ontology Overrepresentation")
-public class GoOverrepCommand extends IsopretCommand implements Callable<Integer> {
+public class GoOverrepCommand extends AbstractIsopretCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoOverrepCommand.class);
     @CommandLine.Option(names={"-b","--hbadeals"},
             description ="HBA-DEALS output file" , required = true)
