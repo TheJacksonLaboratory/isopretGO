@@ -1,4 +1,4 @@
-package org.jax.isopret.model;
+package org.jax.isopret.core.impl.jannovar;
 
 import com.google.common.collect.ImmutableMultimap;
 import de.charite.compbio.jannovar.data.JannovarData;
@@ -7,6 +7,9 @@ import de.charite.compbio.jannovar.data.SerializationException;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
+import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.model.GeneSymbolAccession;
+import org.jax.isopret.model.Transcript;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,7 +6,6 @@ import org.jax.isopret.core.impl.hbadeals.HbaDealsThresholder;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
-import org.jax.isopret.model.JannovarReader;
 import org.jax.isopret.model.Transcript;
 import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -26,16 +25,6 @@ public abstract class AbstractIsopretCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIsopretCommand.class);
     /** isopret only supports hg38. */
     private final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
-
-    private Ontology geneOntology = null;
-
-    private GoAssociationContainer associationContainer = null;
-
-    private JannovarReader jannovarReader = null;
-
-    protected   Map<AccessionNumber, GeneModel> hgncMap = null;
-    /** Key ensembl transcript id; values: annotating go terms .*/
-    protected Map<TermId, Set<TermId>> transcriptToGoMap = null;
 
     protected Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap = null;
 

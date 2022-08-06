@@ -1,7 +1,6 @@
 package org.jax.isopret.core;
 
 import org.jax.isopret.core.impl.DefaultIsopretProvider;
-import org.jax.isopret.core.impl.interpro.InterproMapper;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.GeneSymbolAccession;

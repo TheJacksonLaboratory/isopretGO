@@ -13,7 +13,6 @@ module org.jax.isopret.core {
     exports org.jax.isopret.model;
     exports org.jax.isopret.core.except;
     exports org.jax.isopret.core.impl.hbadeals;
-    exports org.jax.isopret.core.impl.interpro;
     exports org.jax.isopret.visualization;
     exports org.jax.isopret.core;
 

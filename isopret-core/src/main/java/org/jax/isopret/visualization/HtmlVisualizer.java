@@ -1,7 +1,7 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.core.impl.interpro.InterproEntry;
+import org.jax.isopret.model.DisplayInterproAnnotation;
+import org.jax.isopret.model.InterproEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

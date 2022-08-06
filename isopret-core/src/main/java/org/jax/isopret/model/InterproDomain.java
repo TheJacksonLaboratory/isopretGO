@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.interpro;
+package org.jax.isopret.model;
 
 /**
  * POJO representing an Interpro domain annotation.

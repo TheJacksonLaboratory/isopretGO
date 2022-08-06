@@ -1,9 +1,9 @@
 package org.jax.isopret.interpro;
 
-import org.jax.isopret.core.impl.interpro.InterproEntry;
+import org.jax.isopret.model.InterproEntry;
 import org.junit.jupiter.api.Test;
 
-import static org.jax.isopret.core.impl.interpro.InterproEntryType.ACTIVE_SITE;
+import static org.jax.isopret.model.InterproEntryType.ACTIVE_SITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

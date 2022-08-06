@@ -2,8 +2,6 @@ package org.jax.isopret.model;
 
 import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
-import org.jax.isopret.core.impl.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.core.impl.interpro.InterproEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

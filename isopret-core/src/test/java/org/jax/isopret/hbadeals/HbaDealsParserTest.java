@@ -5,6 +5,7 @@ import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.TestBase;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
+import org.jax.isopret.core.impl.jannovar.JannovarReader;
 import org.jax.isopret.model.*;
 import org.junit.jupiter.api.Test;
 

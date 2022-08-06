@@ -2,8 +2,8 @@ package org.jax.isopret.visualization;
 
 import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
-import org.jax.isopret.core.impl.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.core.impl.interpro.InterproEntry;
+import org.jax.isopret.model.DisplayInterproAnnotation;
+import org.jax.isopret.model.InterproEntry;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.model.Transcript;

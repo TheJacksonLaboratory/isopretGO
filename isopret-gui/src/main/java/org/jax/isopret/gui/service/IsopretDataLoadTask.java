@@ -11,7 +11,7 @@ import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
 import org.jax.isopret.model.*;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
-import org.jax.isopret.core.impl.interpro.InterproMapper;
+import org.jax.isopret.core.InterproMapper;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;

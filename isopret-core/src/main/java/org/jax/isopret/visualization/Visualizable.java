@@ -1,6 +1,6 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.model.DisplayInterproAnnotation;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 import java.util.List;

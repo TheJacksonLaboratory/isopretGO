@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.interpro;
+package org.jax.isopret.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
