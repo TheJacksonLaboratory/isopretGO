@@ -4,7 +4,8 @@ import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.configuration.IsopretDataResolver;
 import org.jax.isopret.core.impl.go.IsopretContainerFactory;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
-import org.jax.isopret.core.io.TranscriptFunctionFileParser;
+import org.jax.isopret.core.impl.go.TranscriptFunctionFileParser;
+import org.jax.isopret.core.impl.interpro.InterproMapper;
 import org.jax.isopret.model.*;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
@@ -41,7 +42,9 @@ public class DefaultIsopretProvider implements IsopretProvider {
 
     private  AssociationContainer<TermId> transcriptContainer = null;
 
-    AssociationContainer<TermId> geneContainer = null;
+    private AssociationContainer<TermId> geneContainer = null;
+
+    private InterproMapper interproMapper = null;
 
 
     public DefaultIsopretProvider(Path dataDirectory) {
@@ -158,8 +161,15 @@ public class DefaultIsopretProvider implements IsopretProvider {
         transcriptToGoMap = parser.getTranscriptIdToGoTermsMap();
         geneIdToGoTermsMap = parser.getGeneIdToGoTermsMap(transcriptToGeneIdMap());
     }
-
-
+    @Override
+    public InterproMapper interproMapper() {
+        if (interproMapper == null) {
+            File interproDescriptionFile = dataResolver.interproDomainDesc().toFile();
+            File interproDomainsFile = dataResolver.interproDomains().toFile();
+            this.interproMapper = new InterproMapper(interproDescriptionFile, interproDomainsFile);
+        }
+        return this.interproMapper;
+    }
 
 
 }

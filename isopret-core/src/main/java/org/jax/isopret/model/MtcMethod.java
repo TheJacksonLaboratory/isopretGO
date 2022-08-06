@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.go;
+package org.jax.isopret.model;
 
 public enum MtcMethod {
     BENJAMINI_HOCHBERG("Benjamini-Hochberg"),

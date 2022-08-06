@@ -1,4 +1,4 @@
-package org.jax.isopret.core.io;
+package org.jax.isopret.core.impl.go;
 
 import org.jax.isopret.model.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;

@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.go;
+package org.jax.isopret.model;
 
 public enum GoMethod {
     TFT("Term-for-Term"), PCunion("Parent-Child-Union"), PCintersect("Parent-Child-Intersection"), MGSA("MGSA");

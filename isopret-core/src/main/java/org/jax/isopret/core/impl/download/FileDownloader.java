@@ -1,4 +1,4 @@
-package org.jax.isopret.core.io;
+package org.jax.isopret.core.impl.download;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -45,7 +45,7 @@ public class FileDownloader {
     }
 
     /** Downloader with default options */
-    FileDownloader() {
+    public FileDownloader() {
         options=new Options();
     }
 
@@ -61,7 +61,7 @@ public class FileDownloader {
      * @throws FileDownloadException
      *             on problems with downloading
      */
-    boolean copyURLToFile(URL src, File dest) throws FileDownloadException {
+    public boolean copyURLToFile(URL src, File dest) throws FileDownloadException {
         if (dest.exists()) {
             System.out.println("Overwriting file at "+dest);
         }

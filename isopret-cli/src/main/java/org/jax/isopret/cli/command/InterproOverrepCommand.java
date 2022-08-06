@@ -10,10 +10,9 @@ import org.jax.isopret.core.impl.go.IsopretContainerFactory;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.impl.hgnc.HgncParser;
-import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.core.impl.interpro.DisplayInterproAnnotation;
 import org.jax.isopret.core.impl.interpro.InterproMapper;
+import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.model.GeneSymbolAccession;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -60,7 +58,7 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
     @Override
     public Integer call() throws IsopretException {
         provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
-        interproMapper = getInterproMapper();
+        interproMapper = provider.interproMapper();
         LOGGER.info("Got interpro mapper");
         List<AnnotatedGene> annotatedGeneList = getAnnotatedGeneList();
         LOGGER.info("Got {} Annotated genes.", annotatedGeneList.size());
@@ -108,22 +106,6 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
         return thresholder;
     }
 
-
-    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<GeneSymbolAccession, List<Transcript>> gene2transcript) {
-        Map<TermId, TermId> accessionNumberMap = new HashMap<>();
-        for (var entry : gene2transcript.entrySet()) {
-            var geneAcc = entry.getKey();
-            var geneTermId = geneAcc.accession().toTermId();
-            var transcriptList = entry.getValue();
-            for (var transcript: transcriptList) {
-                var transcriptAcc = transcript.accessionId();
-                var transcriptTermId = transcriptAcc.toTermId();
-                accessionNumberMap.put(transcriptTermId, geneTermId);
-            }
-        }
-        return Map.copyOf(accessionNumberMap); // immutable copy
-    }
-
     public List<AnnotatedGene> getAnnotatedGeneList() throws IsopretException{
         int notfound = 0;
         HbaDealsIsoformSpecificThresholder thresholder = getThresholder(hbadealsFile);
@@ -139,7 +121,7 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
         int c = 0;
         double splicingThreshold = thresholder.getSplicingPepThreshold();
         double expressionThreshold = thresholder.getExpressionPepThreshold();
-        InterproMapper interproMapper = getInterproMapper();
+        InterproMapper interproMapper = provider.interproMapper();
         for (HbaDealsResult result : results) {
             c++;
             if (c % 100==0) {
@@ -165,20 +147,6 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
         return annotatedGenes;
     }
 
-
-    private InterproMapper getInterproMapper() {
-        File interproDescriptionFile = new File(downloadDirectory + File.separator + "interpro_domain_desc.txt");
-        File interproDomainsFile = new File(downloadDirectory + File.separator + "interpro_domains.txt");
-        if (! interproDomainsFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find interpro_domains.txt at " +
-                    interproDomainsFile.getAbsolutePath());
-        }
-        if (! interproDescriptionFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find interpro_domain_desc.txt at " +
-                    interproDescriptionFile.getAbsolutePath());
-        }
-        return new InterproMapper(interproDescriptionFile, interproDomainsFile);
-    }
 
 
 }

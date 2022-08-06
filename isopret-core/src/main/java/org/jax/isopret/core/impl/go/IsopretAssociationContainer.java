@@ -72,6 +72,8 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
      * @param goTermId GO term of interest
      * @return all domain items that are annotated to this GO term
      */
+    // TODO use new  Set<T> getDomainItemsAnnotatedByOntologyTerm(TermId tid)
+    //  in interface AssociationContainer<T> after PR merged to only use Interface in client code
     public Set<TermId> getDomainItemsAnnotatedByGoTerm(TermId goTermId) {
         Set<TermId> domainItemSet = new HashSet<>();
         Set<TermId> descendentSet = OntologyAlgorithm.getDescendents(this.ontology, goTermId);

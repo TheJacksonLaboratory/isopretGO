@@ -1,7 +1,9 @@
-package org.jax.isopret.core.io;
+package org.jax.isopret.core;
 
 
 import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.core.impl.download.FileDownloadException;
+import org.jax.isopret.core.impl.download.FileDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,7 +149,7 @@ public class IsopretDownloader {
                     f.getAbsolutePath());
             return;
         }
-        FileDownloader downloader=new FileDownloader();
+        FileDownloader downloader = new FileDownloader();
         try {
             URL url = new URL(webAddress);
             downloader.copyURLToFile(url, new File(f.getAbsolutePath()));

@@ -1,6 +1,8 @@
 package org.jax.isopret.core.impl.go;
 
 
+import org.jax.isopret.model.GoMethod;
+import org.jax.isopret.model.MtcMethod;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.StudySet;

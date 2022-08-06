@@ -1,4 +1,4 @@
-package org.jax.isopret.core.io;
+package org.jax.isopret.core.impl.download;
 
 public class FileDownloadException extends Exception {
 
