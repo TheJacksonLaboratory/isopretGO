@@ -1,15 +1,15 @@
 package org.jax.isopret.cli.command;
 
+import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.go.*;
-import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hgnc.HgncParser;
+import org.jax.isopret.core.impl.go.GoMethod;
+import org.jax.isopret.core.impl.go.MtcMethod;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
 import org.jax.isopret.model.GeneModel;
-import org.jax.isopret.core.io.TranscriptFunctionFileParser;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
 import org.jax.isopret.model.Transcript;
@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -67,36 +67,19 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
 
     @Override
     public Integer call() throws IsopretException {
-        Ontology geneOntology = loadGeneOntology();
-        int n_go_terms = geneOntology.countNonObsoleteTerms();
-        LOGGER.info("Loaded Gene Ontology with {} terms", n_go_terms);
-        geneSymbolAccessionListMap = loadJannovarSymbolToTranscriptMap();
-        File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
-        HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
-        Map<AccessionNumber, GeneModel> hgncMap  = hgncParser.ensemblMap();
-        LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
-        LOGGER.info("Loaded HGNC map with {} genes", hgncMap.size());
-        Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionToTranscriptMap = loadJannovarSymbolToTranscriptMap();
-        LOGGER.info("Loaded geneId-to-transcript map with {} genes", geneSymbolAccessionToTranscriptMap.size());
-        Map<TermId, Set<TermId>> transcriptIdToGoTermsMap = loadTranscriptIdToGoTermsMap();
-        LOGGER.info("Loaded transcriptIdToGoTermsMap with {} entries", transcriptIdToGoTermsMap.size());
-        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneSymbolAccessionToTranscriptMap);
-        LOGGER.info("Loaded transcriptToGeneIdMap with {} entries", transcriptIdToGoTermsMap.size());
+        IsopretProvider provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
+        Ontology geneOntology = provider.geneOntology();
+        geneSymbolAccessionListMap = provider.geneSymbolToTranscriptListMap();
+        Map<AccessionNumber, GeneModel> hgncMap  = provider.ensemblGeneModelMap();
+        Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
+        Map<TermId, Set<TermId>> transcriptIdToGoTermsMap = provider.transcriptIdToGoTermsMap();
+        Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
         // create and check the annotation containers for the inferred data
         LOGGER.info("Loading TranscriptFunctionFileParser");
-        TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(downloadDirectory), geneOntology);
-        Map<TermId, Set<TermId>> transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
-        LOGGER.info("Loaded transcript2GoMap with {} entries", transcript2GoMap.size());
-        Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
-        LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
-        LOGGER.info("About to create transcript container");
-        IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology,transcriptIdToGoTermsMap, gene2GoMap);
-        AssociationContainer<TermId> transcriptContainer = isoContainerFac.transcriptContainer();
-        LOGGER.info("transcriptContainer terms n={}", transcriptContainer.getAnnotatingTermCount());
-        LOGGER.info("transcriptContainer items n={}", transcriptContainer.getAnnotatedDomainItemCount());
-        AssociationContainer<TermId> geneContainer = isoContainerFac.geneContainer();
-        LOGGER.info("geneContainer terms n={}", geneContainer.getAnnotatingTermCount());
-        LOGGER.info("geneContainer items n={}", geneContainer.getAnnotatedDomainItemCount());
+        Map<TermId, Set<TermId>> transcript2GoMap = provider.transcriptIdToGoTermsMap();
+        Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
+        AssociationContainer<TermId> transcriptContainer = provider.transcriptContainer();
+        AssociationContainer<TermId> geneContainer = provider.geneContainer();
 
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");

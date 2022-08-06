@@ -1,11 +1,10 @@
 package org.jax.isopret.hbadeals;
 
-import org.jax.isopret.core.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
 import org.jax.isopret.TestBase;
-import org.jax.isopret.core.hgnc.HgncParser;
-import org.jax.isopret.core.model.*;
+import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.model.*;
 import org.junit.jupiter.api.Test;
 

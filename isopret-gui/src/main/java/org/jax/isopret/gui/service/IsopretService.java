@@ -3,10 +3,10 @@ package org.jax.isopret.gui.service;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.core.go.GoTermIdPlusLabel;
+import org.jax.isopret.core.impl.go.GoTermIdPlusLabel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
-import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.visualization.Visualizable;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -67,11 +67,11 @@ public interface IsopretService {
     String getGoSummary();
 
 
-    /** Get {@link org.jax.isopret.core.visualization.Visualizable} objects for all genes. */
+    /** Get {@link Visualizable} objects for all genes. */
     List<Visualizable> getGeneVisualizables();
-    /** Get {@link org.jax.isopret.core.visualization.Visualizable} objects for a subset of genes. */
+    /** Get {@link Visualizable} objects for a subset of genes. */
     List<Visualizable> getGeneVisualizables(Set<AccessionNumber> includedEnsgAccessionSet);
-    /** Get {@link org.jax.isopret.core.visualization.Visualizable} objects for a specific genes. */
+    /** Get {@link Visualizable} objects for a specific genes. */
     Visualizable getVisualizableForGene(AccessionNumber ensgAccesion);
     GoComparison getGoComparison();
 

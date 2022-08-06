@@ -1,10 +1,10 @@
 package org.jax.isopret.gui.service;
 
 import org.jax.isopret.core.analysis.InterproOverrepResult;
-import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.core.interpro.InterproEntry;
-import org.jax.isopret.core.visualization.IsoformVisualizable;
-import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.core.impl.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.impl.interpro.InterproEntry;
+import org.jax.isopret.visualization.IsoformVisualizable;
+import org.jax.isopret.visualization.Visualizable;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 

@@ -52,9 +52,7 @@ public class IsopretDataResolver {
     public Path isoformFunctionListMf() {
         return dataDirectory.resolve("isoform_function_list_mf.txt");
     }
-    public Path  hg38Ensembl() {
-        return dataDirectory.resolve(" hg38_ensembl.ser");
-    }
+    public Path  hg38Ensembl() { return dataDirectory.resolve("hg38_ensembl.ser"); }
     public Path hgncCompleteSet() {
         return dataDirectory.resolve("hgnc_complete_set.txt");
     }

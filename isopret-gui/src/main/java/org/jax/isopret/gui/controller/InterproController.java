@@ -15,7 +15,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.visualization.Visualizable;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.gui.service.InterproAnnotatedGenesVisualizer;

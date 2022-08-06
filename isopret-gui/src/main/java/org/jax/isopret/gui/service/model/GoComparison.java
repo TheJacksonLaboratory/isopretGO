@@ -1,7 +1,7 @@
 package org.jax.isopret.gui.service.model;
 
-import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.MtcMethod;
+import org.jax.isopret.core.impl.go.GoMethod;
+import org.jax.isopret.core.impl.go.MtcMethod;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;

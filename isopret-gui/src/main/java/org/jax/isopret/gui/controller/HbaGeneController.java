@@ -17,7 +17,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.IOUtils;
-import org.jax.isopret.core.visualization.*;
+import org.jax.isopret.visualization.*;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.widgets.PopupFactory;

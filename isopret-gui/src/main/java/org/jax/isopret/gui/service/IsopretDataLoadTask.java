@@ -1,22 +1,20 @@
 package org.jax.isopret.gui.service;
 
 import javafx.concurrent.Task;
+import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.go.*;
-import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.impl.go.*;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
 import org.jax.isopret.model.GeneModel;
-import org.jax.isopret.core.hgnc.HgncParser;
-import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.io.TranscriptFunctionFileParser;
+import org.jax.isopret.core.impl.hgnc.HgncParser;
+import org.jax.isopret.core.impl.interpro.InterproMapper;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
-import org.jax.isopret.model.JannovarReader;
 import org.jax.isopret.model.Transcript;
-import org.monarchinitiative.phenol.io.OntologyLoader;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
@@ -69,9 +67,12 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private final IsopretStats.Builder isopretStatsBuilder;
 
+    private final IsopretProvider provider;
+
     public IsopretDataLoadTask(File downloadDirectory, File hbaDealsFile, GoMethod goMethod, MtcMethod mtcMethod) {
         errors = new ArrayList<>();
         this.downloadDirectory = downloadDirectory;
+        this.provider = IsopretProvider.provider(downloadDirectory.toPath());
         this.hbaDealsFile = hbaDealsFile;
         this.overrepMethod = goMethod;
         this.multipleTestingMethod = mtcMethod;
@@ -92,24 +93,13 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateMessage("Reading Gene Ontology file");
         updateProgress(0.05, 1);
 
-        File goJsonFile = new File(downloadDirectory + File.separator + "go.json");
-        if (!goJsonFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find Gene Ontology JSON file at " + goJsonFile.getAbsolutePath());
-        }
-        isopretStatsBuilder.info("GO file", goJsonFile.getAbsolutePath());
-        this.geneOntology = OntologyLoader.loadOntology(goJsonFile);
+        this.geneOntology = provider.geneOntology();
         updateMessage("Loaded Gene Ontology file");
         updateProgress(0.15, 1);
-        File jannovarFile = new File(downloadDirectory + File.separator + "hg38_ensembl.ser");
-        if (! jannovarFile.isFile()) {
-            String errorMsg = String.format("Could not find hg38_ensembl.ser (Jannovar file) at \"%s\"",
-                    jannovarFile.getAbsolutePath());
-            throw new IsopretRuntimeException(errorMsg);
-        }
-        isopretStatsBuilder.info("Jannovar file", jannovarFile.getAbsolutePath());
-        JannovarReader jannovarReader = new JannovarReader(jannovarFile, assembly);
         updateProgress(0.20, 1);
-        Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionListMap = jannovarReader.getGeneToTranscriptListMap();
+        Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionListMap = provider.geneSymbolToTranscriptListMap();
+
+
         updateMessage(String.format("Loaded JannovarReader with %d genes.", geneSymbolAccessionListMap.size()));
         updateProgress(0.25, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded geneSymbolAccessionListMap with %d gene symbols.", geneSymbolAccessionListMap.size()));
@@ -123,13 +113,13 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list_mf.txt");
 
         isopretStatsBuilder.info("isoform function file", isoformFunctionFile.getAbsolutePath());
-        TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
-        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneSymbolAccessionListMap);
-        this.transcript2GoMap = fxnparser.getTranscriptIdToGoTermsMap();
+       // TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
+        Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
+                createTranscriptToGeneIdMap(geneSymbolAccessionListMap);
+        this.transcript2GoMap = provider.transcriptIdToGoTermsMap();
         updateProgress(0.40, 1);
         updateMessage(String.format("Loaded isoformFunctionFile (%d transcripts).", transcript2GoMap.size()));
-
-        Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
+        Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
         LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
         isopretStatsBuilder.annotatedGeneCount(gene2GoMap.size());
         IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);

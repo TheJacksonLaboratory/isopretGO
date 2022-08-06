@@ -1,12 +1,13 @@
 package org.jax.isopret.interpro;
 
+import org.jax.isopret.core.impl.interpro.InterproEntry;
 import org.junit.jupiter.api.Test;
 
-import static org.jax.isopret.core.interpro.InterproEntryType.ACTIVE_SITE;
+import static org.jax.isopret.core.impl.interpro.InterproEntryType.ACTIVE_SITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * This simple test class tests the construction of the {@link org.jax.isopret.core.interpro.InterproEntry}
+ * This simple test class tests the construction of the {@link InterproEntry}
  * that is constructed in {@link InterproTestBase}.
  */
 public class InterproEntryTest extends InterproTestBase {

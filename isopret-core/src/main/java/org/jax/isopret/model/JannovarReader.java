@@ -6,6 +6,7 @@ import de.charite.compbio.jannovar.data.JannovarDataSerializer;
 import de.charite.compbio.jannovar.data.SerializationException;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import java.util.*;
 /**
  * Ingest jannovar transcripts and transform them to variant-api-compliant objects. We intend to
  * use the resultant {@link #geneToTranscriptListMap} to transmit the information to the HGNC
- * parsed gene information object that is parsed by {@link org.jax.isopret.core.hgnc.HgncParser}.
+ * parsed gene information object that is parsed by {@link HgncParser}.
  * @author Peter Robinson
  */
 public class JannovarReader {

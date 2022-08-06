@@ -1,25 +1,24 @@
 package org.jax.isopret.cli.command;
 
+import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.go.IsopretAssociationContainer;
-import org.jax.isopret.core.go.IsopretContainerFactory;
-import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.hgnc.HgncParser;
+import org.jax.isopret.core.impl.go.IsopretAssociationContainer;
+import org.jax.isopret.core.impl.go.IsopretContainerFactory;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.model.GeneModel;
-import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.io.TranscriptFunctionFileParser;
+import org.jax.isopret.core.impl.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.core.impl.interpro.InterproMapper;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.model.GeneSymbolAccession;
 import org.jax.isopret.model.Transcript;
-import org.jax.isopret.core.visualization.InterproOverrepVisualizer;
-import org.monarchinitiative.phenol.io.OntologyLoader;
+import org.jax.isopret.visualization.InterproOverrepVisualizer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -44,7 +44,6 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
     @CommandLine.Option(names={"--outfile"}, description = "Name of output file to write stats (default: ${DEFAULT-VALUE})")
     private String outfile = "isopret-interpro-overrep.txt";
 
-    private Ontology geneOntology = null;
     private IsopretAssociationContainer transcriptContainer = null;
     private IsopretAssociationContainer geneContainer = null;
     /** Key ensembl transcript id; values: annotating go terms .*/
@@ -56,8 +55,11 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
 
     private InterproMapper interproMapper = null;
 
+    private IsopretProvider provider = null;
+
     @Override
     public Integer call() throws IsopretException {
+        provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
         interproMapper = getInterproMapper();
         LOGGER.info("Got interpro mapper");
         List<AnnotatedGene> annotatedGeneList = getAnnotatedGeneList();
@@ -80,32 +82,19 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
         return null;
     }
 
-    private Ontology getGeneOntology() {
-        if (this.geneOntology == null) {
-            File goJsonFile = new File(downloadDirectory + File.separator + "go.json");
-            if (!goJsonFile.isFile()) {
-                throw new IsopretRuntimeException("Could not find Gene Ontology JSON file at " + goJsonFile.getAbsolutePath());
-            }
-            this.geneOntology = OntologyLoader.loadOntology(goJsonFile);
-        }
-        return this.geneOntology;
-    }
+
 
 
     private HbaDealsIsoformSpecificThresholder getThresholder(String hbaDealsFilePath) throws IsopretException {
-        File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
-        geneSymbolAccessionToTranscriptMap = loadJannovarSymbolToTranscriptMap();
-        HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
-        Map<AccessionNumber, GeneModel> hgncMap  = hgncParser.ensemblMap();
-        LOGGER.info("Loaded Ensembl HGNC map with {} genes", hgncMap.size());
+        geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
+        Map<AccessionNumber, GeneModel> hgncMap  = provider.ensemblGeneModelMap();
+        Ontology ontology = provider.geneOntology();
         HbaDealsParser hbaParser = new HbaDealsParser(hbaDealsFilePath, hgncMap);
         Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
-        Ontology ontology = getGeneOntology();
-        TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(new File(downloadDirectory), ontology);
-        this.transcriptToGoMap = fxnparser.getTranscriptIdToGoTermsMap();
-        Map<TermId, TermId> transcriptToGeneIdMap = createTranscriptToGeneIdMap(geneSymbolAccessionToTranscriptMap);
-        Map<TermId, Set<TermId>> gene2GoMap = fxnparser.getGeneIdToGoTermsMap(transcriptToGeneIdMap);
-        IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcriptToGoMap, gene2GoMap);
+        this.transcriptToGoMap = provider.transcriptIdToGoTermsMap();
+        Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
+        Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
+        IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(ontology, transcriptToGoMap, gene2GoMap);
         LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
         transcriptContainer = isoContainerFac.transcriptContainer();
         LOGGER.info("Got transcriptContainer with {} domain items", transcriptContainer.getAnnotatedDomainItemCount());
@@ -139,7 +128,7 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
         int notfound = 0;
         HbaDealsIsoformSpecificThresholder thresholder = getThresholder(hbadealsFile);
         this.splicingPepThreshold = thresholder.getSplicingPepThreshold();
-        this.geneSymbolAccessionToTranscriptMap = loadJannovarSymbolToTranscriptMap();
+        this.geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();
         // sort the raw results according to minimum p-values
         List<HbaDealsResult> results = thresholder.getRawResults().values()

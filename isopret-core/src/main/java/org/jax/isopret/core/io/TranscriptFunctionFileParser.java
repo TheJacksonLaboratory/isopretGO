@@ -1,8 +1,5 @@
 package org.jax.isopret.core.io;
 
-import org.jax.isopret.core.except.IsopretException;
-import org.jax.isopret.core.except.IsopretFileNotFoundException;
-import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.model.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -75,22 +72,12 @@ public class TranscriptFunctionFileParser {
     }
 
 
-    public TranscriptFunctionFileParser(File downloadDirectory, Ontology ontology) throws IsopretException {
-        File predictionFileMf = new File(downloadDirectory + File.separator + "isoform_function_list_mf.txt");
-        if (!predictionFileMf.isFile()) {
-            throw new IsopretFileNotFoundException("isoform_function_list_mf.txt", predictionFileMf.getAbsolutePath());
-        }
+    public TranscriptFunctionFileParser(File predictionFileMf,
+                                        File predictionFileBp,
+                                        File predictionFileCc,
+                                        Ontology ontology)  {
         Map<TermId, Set<TermId>> annotMapMf = parseFunctionFile(predictionFileMf, ontology);
-        File predictionFileBp = new File(downloadDirectory + File.separator + "isoform_function_list_bp.txt");
-        if (!predictionFileBp.isFile()) {
-            throw new IsopretRuntimeException("Could not find isoform_function_list_bp.txt at " +
-                    predictionFileBp.getAbsolutePath());
-        }
         Map<TermId, Set<TermId>> annotMapBp = parseFunctionFile(predictionFileBp, ontology);
-        File predictionFileCc = new File(downloadDirectory + File.separator + "isoform_function_list_cc.txt");
-        if (!predictionFileCc.isFile()) {
-            throw new IsopretFileNotFoundException("isoform_function_list_cc.txt", predictionFileCc.getAbsolutePath());
-        }
         Map<TermId, Set<TermId>> annotMapCc = parseFunctionFile(predictionFileCc, ontology);
         for (var entry : annotMapBp.entrySet()) {
             annotMapMf.putIfAbsent(entry.getKey(), new HashSet<>());
