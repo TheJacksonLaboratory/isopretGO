@@ -16,9 +16,9 @@ public interface IsopretInterpoAnalysisRunner {
     /**
      * This will run the analysis starting from a list of {@link  AnnotatedGene} objects, which is the case from
      * the GUI
-     * @param annotatedGeneList
+     * @param annotatedGeneList List of genes from experiment
      * @param splicingPep Splicing PEP threshold
-     * @return
+     * @return object to run analysis for Interpro domain overrepresentation
      */
     static IsopretInterpoAnalysisRunner hbadeals(List<AnnotatedGene> annotatedGeneList, double splicingPep) {
         return IsopretInterpoAnalysisRunnerImpl.of(annotatedGeneList, splicingPep);

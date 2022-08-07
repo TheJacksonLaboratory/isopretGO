@@ -3,7 +3,6 @@ package org.jax.isopret.core.impl.interpro;
 import org.jax.isopret.core.InterproAnalysisResults;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 

@@ -4,8 +4,6 @@ import org.jax.isopret.core.InterproAnalysisResults;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.List;
 
 public class InterproOverrepVisualizer {
 

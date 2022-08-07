@@ -85,7 +85,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
     }
 
     @Override
-    protected Integer call() throws IsopretException {
+    protected Integer call() {
         updateProgress(0, 1); /* this will update the progress bar */
         updateMessage("Reading Gene Ontology file");
         updateProgress(0.05, 1);
