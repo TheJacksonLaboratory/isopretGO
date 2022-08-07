@@ -68,10 +68,11 @@ import java.util.Map;
  * [47] lncipedia
  * [48] gtrnadb
  * [49] agr
- *
+ * <p>
  * The logic of this class is that the user may give us ids from one of several different sources. It would be
  * wasteful to create a Map for each of the sources. Therefore, we parse all of this information into a map of
  * {@link GeneModel} objects. There are then accessor functions for each of the sources that create a map on the fly.
+ * </p>
  * @author Peter N Robinson
  */
 public class HgncParser {
@@ -144,16 +145,12 @@ public class HgncParser {
             }
         } catch (IOException e) {
             String msg = String.format("Could not parse the HGNC file (%s). Error for line (%s)", e.getMessage(), line);
-            throw new IsopretRuntimeException("Could not parse the HGNC file: " + e.getMessage());
+            throw new IsopretRuntimeException(msg);
         }
         LOGGER.trace("Unable to find {} HGNC transcripts in the Jannovar data ", not_found_in_jannovar);
         LOGGER.trace("{} HGNC lines with less than 24 fields skipped.", less_than_24_fields);
         LOGGER.trace("{} valid HGNC lines successsfully parsed.", well_formed_lines);
         return Map.copyOf(ensemblMap); // immutable copy
-    }
-
-    public int itemCount() {
-        return this.ensemblMap.size();
     }
 
     public Map<AccessionNumber, GeneModel> ensemblMap() {

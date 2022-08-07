@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 public class HbaDealsIsoformSpecificThresholder {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsIsoformSpecificThresholder.class);
 
-    private static final double DEFAULT_THRESHOLD = 0.05;
-
     /** Probability threshold for expression results that attains fdrThreshold FDR for expression. */
     private final double expressionPepThreshold;
     /** Probability threshold for splicing results that attains fdrThreshold FDR for splicing. */
@@ -102,7 +100,7 @@ public class HbaDealsIsoformSpecificThresholder {
                 .values()
                 .stream()
                 .flatMap(r -> r.getTranscriptResults().stream())
-                .filter(tr -> tr.getP() <= splicingPepThreshold)
+                .filter(tr -> tr.getPvalue() <= splicingPepThreshold)
                 .map(HbaDealsTranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());

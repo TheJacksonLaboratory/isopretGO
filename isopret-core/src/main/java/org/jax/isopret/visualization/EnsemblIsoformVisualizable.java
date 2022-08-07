@@ -20,7 +20,7 @@ public class EnsemblIsoformVisualizable implements IsoformVisualizable {
         String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
         this.isoformUrlAnchor =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());
         this.log2FoldChange = transcriptResult.getLog2FoldChange();
-        this.isoformP = transcriptResult.getP();
+        this.isoformP = transcriptResult.getPvalue();
         this.isSignificant = transcriptResult.isSignificant(splicingPepThreshold);
     }
 

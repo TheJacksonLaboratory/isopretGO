@@ -7,9 +7,6 @@ import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
 import org.jax.isopret.model.Transcript;
-import org.monarchinitiative.phenol.analysis.GoAssociationContainer;
-import org.monarchinitiative.phenol.ontology.data.Ontology;
-import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.assembly.GenomicAssemblies;
 import org.monarchinitiative.svart.assembly.GenomicAssembly;
 import org.slf4j.Logger;
@@ -19,7 +16,6 @@ import picocli.CommandLine;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class AbstractIsopretCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIsopretCommand.class);

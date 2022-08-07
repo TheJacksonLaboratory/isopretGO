@@ -17,13 +17,12 @@ import java.util.stream.Collectors;
  * expected number of false discoveries. If we thus rank the observations by PEP (from smallest to largest)
  * and choose the rank just before the rank where the cumulative mean of the FDR (called qvalue after John Storey),
  * this is where we set the threshold.
+ * @author Peter N Robinson
  */
 public class HbaDealsThresholder {
     private static final Logger LOGGER = LoggerFactory.getLogger(HbaDealsThresholder.class);
 
     private static final double DEFAULT_THRESHOLD = 0.05;
-    /** We will choose no gene with a higher probability of non-differentiality than this while calculating FDR. */
-    private final double MAX_PROB = 0.25;
     /** Threshold for total probability to calculate Bayesian FDR (Usually, we will use 0.05). */
     private final double fdrThreshold;
     /** HBA-DEALS results for all genes in the experiment. */
@@ -49,11 +48,13 @@ public class HbaDealsThresholder {
      * Find the FDR thresholds for splicing and expression
      * @param results Map of HBA-DEALS analysis results (key: gene symbol)
      */
-    public HbaDealsThresholder(Map<AccessionNumber, HbaDealsResult> results, double probThres) {
+    public HbaDealsThresholder(Map<AccessionNumber, HbaDealsResult> results, double fdrThres) {
         rawResults = results;
-        fdrThreshold = probThres;
+        fdrThreshold = fdrThres;
         this.expressionThreshold = calculateExpressionThreshold();
         this.splicingThreshold = calculateSplicingThreshold();
+        LOGGER.info("Calculated expression PEP threshold as {}, and splicing PEP threshold as {}.",
+                expressionThreshold, splicingThreshold);
         this.dgeGeneSymbols = this.rawResults
                 .values()
                 .stream()
@@ -68,64 +69,17 @@ public class HbaDealsThresholder {
                 .map(HbaDealsResult::getGeneModel)
                 .map(GeneModel::geneSymbol)
                 .collect(Collectors.toSet());
+        LOGGER.info("Found {} passing genes and {} passing isoforms.",
+                dgeGeneSymbols.size(), dasGeneSymbols.size());
     }
 
-
-
-
     /**
-     * Calculate a false discovery rate,
-     * where the FDR is simply the sum of probabilities of not being differential of all items below threshold.
-     * @param p probability threshold
-     * @param probs probabilities of not being differential
-     * @return estimated FDR at this probability threshold
-     */
-    private double getFdr(double p, List<Double> probs) {
-        int i = 0;
-        double fdr = 0.0;
-        for (double prob : probs) {
-            if (prob > p) {
-                break;
-            } else {
-                fdr += prob;
-                i++;
-            }
-        }
-        if (i==0) return 0.0;
-        return fdr/(double) i;
-    }
-
-
-    /**
-     * Implements the following R
-     * s <- seq(0.01,0.25,0.01) # 0.01, 0.02, ..., 0.25
-     * # The following gets the sum of all P values not more than s[i] divided by the count of such instances
-     * h0.de <- unlist(lapply(s,function(p)sum(res$P[res$Isoform=='Expression'& res$P<=p])/sum(res$Isoform=='Expression'& res$P<=p)))
-     * exp.thresh <- s[max(which(h0.de<=fdr))] highest prob threshold below threshold.
-     * Calculates the q-value threshold needed to attain a desired FDR
-     * @param probs List of probabilities from HBA-DEALS
      * @return the probability threshold associated with the q-value threshold to reach the desired FDR
      */
     private double getThreshold(List<Double> probs) {
-        double FDR_THRESHOLD = 0.05;
-        Collections.sort(probs);
-        double p_threshold = 0.0;
-        double min_p = 0.0;
-        double max_p = 0.25;
-        double delta = max_p - min_p;
-        double TOL = 0.001;
-        while (delta > TOL) {
-            double mid_p = min_p + (max_p - min_p)/2.0;
-            double fdr = getFdr(mid_p, probs);
-            if (fdr <= FDR_THRESHOLD) {
-                min_p = mid_p;
-                p_threshold = mid_p;
-            } else {
-                max_p = mid_p;
-            }
-            delta = max_p - min_p;
-        }
-        return p_threshold;
+       PosteriorErrorProbThreshold pthresh = new PosteriorErrorProbThreshold(probs, this.fdrThreshold);
+       double pepThresh = pthresh.getPepThreshold();
+       return pepThresh;
     }
 
 
@@ -134,7 +88,7 @@ public class HbaDealsThresholder {
                 .values()
                 .stream()
                 .map(HbaDealsResult::getExpressionP)
-                .collect(Collectors.toList());
+                .toList();
        return getThreshold(expressionProbs);
     }
 

@@ -11,11 +11,12 @@ import java.util.*;
 
 /**
  * This is a conveniece class that adds gene symbols to the GO results.
- * The challenge is that we want to show those GO terms that are significantly enriched togehter with the
+ * The challenge is that we want to show those GO terms that are significantly enriched together with the
  * genes they annotate. Typically, this will be a small subset of all of the GO terms that annotate a gene.
  * Therefore, this class takes a set of genes that show either DGE or DAS as well as a set of overrepresented
  * GO terms, and returns a Map with key (gene) and value (set of associated overrepresented GO terms).
  */
+@Deprecated(forRemoval = true)
 public class HbaGene2Go {
     final Logger LOGGER = LoggerFactory.getLogger(HbaGene2Go.class);
 

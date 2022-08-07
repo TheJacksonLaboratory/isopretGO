@@ -2,6 +2,7 @@ package org.jax.isopret.core.impl.hbadeals;
 
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneModel;
+import org.jax.isopret.model.GeneResult;
 import org.jax.isopret.model.GeneSymbolAccession;
 
 import java.util.*;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * This class encapsulates the results of HBADEALS for one gene and all of the isoforms of that gene that were
  */
-public class HbaDealsResult implements Comparable<HbaDealsResult> {
+public class HbaDealsResult implements GeneResult, Comparable<HbaDealsResult> {
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final AccessionNumber geneAccession;
     private final GeneModel geneModel;
@@ -35,42 +36,43 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
         HbaDealsTranscriptResult tresult = new HbaDealsTranscriptResult(isoform, expFC, P);
         transcriptMap.putIfAbsent(isoform, tresult);
     }
-
+    @Override
     public AccessionNumber getGeneAccession() {
         return geneAccession;
     }
 
     /**
      * @return an int representing Accession number of the gene, e.g., 1167 for ENSG00000001167. */
+    @Override
     public int getEnsgId() {
         return this.geneAccession.getAccessionNumber();
     }
-
+    @Override
     public GeneModel getGeneModel() {
         return geneModel;
     }
-
+    @Override
     public GeneSymbolAccession getGeneSymbolAccession() {
         return new GeneSymbolAccession(geneModel.geneSymbol(), geneAccession);
     }
-
+    @Override
     public double getExpressionFoldChange() {
         return expressionFoldChange;
     }
-
+    @Override
     public double getExpressionP() {
         return expressionP;
     }
-
+    @Override
     public List<Double> getSplicingPlist() {
         return this.transcriptMap
                 .values()
                 .stream()
-                .map(HbaDealsTranscriptResult::getP)
+                .map(HbaDealsTranscriptResult::getPvalue)
                 .collect(Collectors.toList());
     }
 
-
+    @Override
     public Map<AccessionNumber, HbaDealsTranscriptResult> getTranscriptMap() {
         return Collections.unmodifiableMap(transcriptMap);
     }
@@ -79,19 +81,20 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
      * Only expressed transcripts are added to the HBA-DEALS results file.
      * @return Number of expressed transcripts observed for this gene.
      */
+    @Override
     public int getExpressedTranscriptCount() {
         return transcriptMap.size();
     }
-
+    @Override
     public int getSignificantTranscriptCount(double pepThreshold) {
-        return (int) this.transcriptMap.values().stream().filter(r -> r.getP() <= pepThreshold).count();
+        return (int) this.transcriptMap.values().stream().filter(r -> r.getPvalue() <= pepThreshold).count();
     }
-
+    @Override
     public boolean hasDifferentialExpressionResult(double threshold) { return this.expressionP < threshold; }
 
-
+    @Override
     public boolean hasDifferentialSplicingResult(double threshold) {
-        return this.transcriptMap.values().stream().anyMatch(r -> r.getP() <= threshold);
+        return this.transcriptMap.values().stream().anyMatch(r -> r.getPvalue() <= threshold);
     }
 
     /**
@@ -100,20 +103,21 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
      * @param expression adjusted probability threshold
      * @return true if this gene has a differential expression OR splicing result
      */
+    @Override
     public boolean hasDifferentialSplicingOrExpressionResult(double splicing, double expression) {
         return hasDifferentialSplicingResult(splicing) || hasDifferentialExpressionResult(expression);
     }
-
+    @Override
     public boolean transcriptExpressed(AccessionNumber acc) {
         return this.transcriptMap.containsKey(acc);
     }
 
-
+    @Override
     public double getSmallestSplicingP() {
         return this.transcriptMap
                 .values()
                 .stream()
-                .map(HbaDealsTranscriptResult::getP)
+                .map(HbaDealsTranscriptResult::getPvalue)
                 .min(Double::compareTo)
                 .orElse(1.0);
     }
@@ -121,7 +125,7 @@ public class HbaDealsResult implements Comparable<HbaDealsResult> {
     private double minp() {
         return Math.min(getExpressionP(), getSmallestSplicingP());
     }
-
+    @Override
     public Set<HbaDealsTranscriptResult> getTranscriptResults() {
         return new HashSet<>(this.transcriptMap.values());
     }

@@ -3,7 +3,7 @@ package org.jax.isopret.gui.service;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.core.impl.go.GoTermIdPlusLabel;
+import org.jax.isopret.model.GoTermIdPlusLabel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.visualization.Visualizable;

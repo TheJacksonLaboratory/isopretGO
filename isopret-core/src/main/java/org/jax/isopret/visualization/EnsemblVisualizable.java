@@ -75,7 +75,7 @@ public class EnsemblVisualizable implements Visualizable {
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
         this.differentiallyExpressed = agene.passesExpressionThreshold();
         this.differentiallySpliced = agene.passesSplicingThreshold();
-        Predicate<HbaDealsTranscriptResult> passesExpressionThreshold = result -> result.getP() < agene.getExpressionThreshold();
+        Predicate<HbaDealsTranscriptResult> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
         this.significantIsoforms = (int) hbaDealsResult.getTranscriptMap().values().stream().filter(passesExpressionThreshold).count();
         double SPLICING_THRESHOLD = agene.getSplicingThreshold();
         this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().

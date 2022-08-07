@@ -2,7 +2,6 @@ package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.core.except.IsopretException;
 import org.jax.isopret.core.except.IsopretRuntimeException;
 import org.jax.isopret.model.GoMethod;
 import org.jax.isopret.model.MtcMethod;
@@ -66,18 +65,13 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
 
 
     @Override
-    public Integer call() throws IsopretException {
+    public Integer call() {
         IsopretProvider provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
         Ontology geneOntology = provider.geneOntology();
         geneSymbolAccessionListMap = provider.geneSymbolToTranscriptListMap();
         Map<AccessionNumber, GeneModel> hgncMap  = provider.ensemblGeneModelMap();
         Map<GeneSymbolAccession, List<Transcript>> geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         Map<TermId, Set<TermId>> transcriptIdToGoTermsMap = provider.transcriptIdToGoTermsMap();
-        Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
-        // create and check the annotation containers for the inferred data
-        LOGGER.info("Loading TranscriptFunctionFileParser");
-        Map<TermId, Set<TermId>> transcript2GoMap = provider.transcriptIdToGoTermsMap();
-        Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
         AssociationContainer<TermId> transcriptContainer = provider.transcriptContainer();
         AssociationContainer<TermId> geneContainer = provider.geneContainer();
 

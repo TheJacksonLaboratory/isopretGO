@@ -270,7 +270,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         Map<AccessionNumber, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         double logFC = getLogFoldChage(id);
         if (!transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
-        double p = transcriptResultMap.get(id).getP();
+        double p = transcriptResultMap.get(id).getPvalue();
         boolean differential = p < this.splicingThreshold;
         return getFormatedPvalue(logFC, p, differential);
     }
