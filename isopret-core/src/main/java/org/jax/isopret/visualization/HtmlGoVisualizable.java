@@ -1,6 +1,6 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;

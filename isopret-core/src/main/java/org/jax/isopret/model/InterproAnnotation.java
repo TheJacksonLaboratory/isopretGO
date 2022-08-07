@@ -1,6 +1,6 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 
 import java.util.Objects;
 import java.util.Optional;

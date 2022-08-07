@@ -1,7 +1,7 @@
 package org.jax.isopret.core.impl.interpro;
 
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.InterproEntry;
 import org.jax.isopret.model.InterproEntryType;
 import org.slf4j.Logger;

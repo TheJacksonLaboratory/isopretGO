@@ -5,7 +5,7 @@ import de.charite.compbio.jannovar.data.JannovarData;
 import de.charite.compbio.jannovar.data.JannovarDataSerializer;
 import de.charite.compbio.jannovar.data.SerializationException;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;

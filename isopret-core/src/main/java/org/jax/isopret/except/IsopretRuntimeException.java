@@ -1,4 +1,4 @@
-package org.jax.isopret.core.except;
+package org.jax.isopret.except;
 
 public class IsopretRuntimeException extends RuntimeException {
 

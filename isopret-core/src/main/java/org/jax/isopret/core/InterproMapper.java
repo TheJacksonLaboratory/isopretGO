@@ -1,6 +1,6 @@
 package org.jax.isopret.core;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.interpro.InterproDomainDescParser;
 import org.jax.isopret.core.impl.interpro.InterproDomainParser;
 import org.jax.isopret.model.AccessionNumber;

@@ -2,7 +2,7 @@ package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.GoMethod;
 import org.jax.isopret.model.MtcMethod;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;

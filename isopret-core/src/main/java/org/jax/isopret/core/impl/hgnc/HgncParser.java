@@ -1,6 +1,6 @@
 package org.jax.isopret.core.impl.hgnc;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
 import org.jax.isopret.model.GeneModel;

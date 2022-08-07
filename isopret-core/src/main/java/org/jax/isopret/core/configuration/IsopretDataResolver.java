@@ -1,6 +1,6 @@
 package org.jax.isopret.core.configuration;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

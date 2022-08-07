@@ -12,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.jax.isopret.core.InterproAnalysisResults;
+import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
 import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.model.GoMethod;
@@ -392,9 +394,13 @@ public class MainController implements Initializable {
     }
 
     public void exportInterproReport(ActionEvent actionEvent) {
+//
+//        InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
+//        List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
         double splicingPepThreshold = service.getSplicingPepThreshold();
-        InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
-        List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+        IsopretInterpoAnalysisRunner runner = IsopretInterpoAnalysisRunner.hbadeals(service.getAnnotatedGeneList(), splicingPepThreshold);
+        InterproAnalysisResults results = runner.run();
+
         FileChooser chooser = new FileChooser();
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         chooser.setTitle("Save Isopret domain Overrepresentation results");

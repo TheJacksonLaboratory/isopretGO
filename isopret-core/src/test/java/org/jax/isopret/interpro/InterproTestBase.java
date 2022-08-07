@@ -1,6 +1,6 @@
 package org.jax.isopret.interpro;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.InterproAnnotation;
 import org.jax.isopret.model.InterproEntry;
 

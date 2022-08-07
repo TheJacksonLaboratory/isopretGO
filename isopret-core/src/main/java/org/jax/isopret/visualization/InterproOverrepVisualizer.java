@@ -1,5 +1,6 @@
 package org.jax.isopret.visualization;
 
+import org.jax.isopret.core.InterproAnalysisResults;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 
 import java.io.StringWriter;
@@ -8,12 +9,11 @@ import java.util.List;
 
 public class InterproOverrepVisualizer {
 
-    private final List<InterproOverrepResult> results;
+    private final InterproAnalysisResults results;
 
 
-    public InterproOverrepVisualizer(List<InterproOverrepResult> results) {
-        Collections.sort(results);
-        this.results = results;
+    public InterproOverrepVisualizer(InterproAnalysisResults overrepresults) {
+        this.results = overrepresults;
     }
 
 
@@ -28,7 +28,7 @@ public class InterproOverrepVisualizer {
         int N = results.size();
         StringWriter writer = new StringWriter();
         writer.write(header() + "\n");
-        for (InterproOverrepResult res: results) {
+        for (InterproOverrepResult res: results.results()) {
             double raw_p = res.rawPval();
             double corrected_p = Math.min(1.0, N*raw_p);
             writer.write(String.format("%s\t%s\t%d\t%d\t%d\t%d\t%e\t%e\n",

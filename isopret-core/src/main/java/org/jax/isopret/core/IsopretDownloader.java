@@ -1,7 +1,7 @@
 package org.jax.isopret.core;
 
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.download.FileDownloadException;
 import org.jax.isopret.core.impl.download.FileDownloader;
 import org.slf4j.Logger;

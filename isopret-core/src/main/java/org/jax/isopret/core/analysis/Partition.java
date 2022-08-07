@@ -19,6 +19,7 @@ import java.util.List;
  * @author Peter Robinson
  * @param <T>
  */
+@Deprecated(forRemoval = true)
 public final class Partition<T> extends AbstractList<List<T>> {
 
     private final List<T> list;
