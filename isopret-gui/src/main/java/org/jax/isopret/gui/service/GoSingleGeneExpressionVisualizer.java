@@ -1,6 +1,6 @@
 package org.jax.isopret.gui.service;
 
-import org.jax.isopret.core.visualization.HtmlUtil;
+import org.jax.isopret.visualization.HtmlUtil;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 public class GoSingleGeneExpressionVisualizer extends AnnotatedGenesVisualizer {

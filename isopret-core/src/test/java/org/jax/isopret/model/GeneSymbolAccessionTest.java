@@ -1,7 +1,5 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.model.AccessionNumber;
-import org.jax.isopret.core.model.GeneSymbolAccession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

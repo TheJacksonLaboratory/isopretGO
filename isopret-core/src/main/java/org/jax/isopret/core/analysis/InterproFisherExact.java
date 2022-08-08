@@ -1,9 +1,9 @@
 package org.jax.isopret.core.analysis;
 
-import org.jax.isopret.core.hbadeals.HbaDealsTranscriptResult;
-import org.jax.isopret.core.interpro.InterproEntry;
-import org.jax.isopret.core.model.AccessionNumber;
-import org.jax.isopret.core.model.AnnotatedGene;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.model.InterproEntry;
+import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.model.AnnotatedGene;
 import org.monarchinitiative.phenol.analysis.stats.Hypergeometric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
 package org.jax.isopret.gui.service;
 
-import org.jax.isopret.core.visualization.HtmlUtil;
-import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.visualization.HtmlUtil;
+import org.jax.isopret.visualization.Visualizable;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 
 

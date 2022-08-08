@@ -12,11 +12,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.jax.isopret.core.InterproAnalysisResults;
+import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
 import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
-import org.jax.isopret.core.go.GoMethod;
-import org.jax.isopret.core.go.MtcMethod;
-import org.jax.isopret.core.visualization.InterproOverrepVisualizer;
+import org.jax.isopret.model.GoMethod;
+import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.visualization.InterproOverrepVisualizer;
 import org.jax.isopret.gui.configuration.ApplicationProperties;
 import org.jax.isopret.gui.service.*;
 import org.jax.isopret.gui.widgets.IsopretStatsWidget;
@@ -46,7 +48,7 @@ import static org.jax.isopret.gui.widgets.PopupFactory.displayIsopretThrown;
 /**
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
- * @version 0.0.1 (2021-11-27)
+ * @version 1.0.3 (2022-08-07)
  */
 @Component
 public class MainController implements Initializable {
@@ -182,7 +184,7 @@ public class MainController implements Initializable {
     /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "1.0.0-RC1";
+        String version = "1.0.3";
         if (applicationProperties.getApplicationVersion() != null) {
             version = applicationProperties.getApplicationVersion();
         }
@@ -392,9 +394,13 @@ public class MainController implements Initializable {
     }
 
     public void exportInterproReport(ActionEvent actionEvent) {
+//
+//        InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
+//        List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
         double splicingPepThreshold = service.getSplicingPepThreshold();
-        InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
-        List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+        IsopretInterpoAnalysisRunner runner = IsopretInterpoAnalysisRunner.hbadeals(service.getAnnotatedGeneList(), splicingPepThreshold);
+        InterproAnalysisResults results = runner.run();
+
         FileChooser chooser = new FileChooser();
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         chooser.setTitle("Save Isopret domain Overrepresentation results");

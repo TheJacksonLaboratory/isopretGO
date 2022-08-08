@@ -1,6 +1,6 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.io.IsopretDownloader;
+import org.jax.isopret.core.IsopretDownloader;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;

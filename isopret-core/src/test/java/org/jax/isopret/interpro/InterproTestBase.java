@@ -1,13 +1,13 @@
 package org.jax.isopret.interpro;
 
-import org.jax.isopret.core.except.IsopretRuntimeException;
-import org.jax.isopret.core.interpro.InterproAnnotation;
-import org.jax.isopret.core.interpro.InterproEntry;
+import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.model.InterproAnnotation;
+import org.jax.isopret.model.InterproEntry;
 
 import java.util.Optional;
 
-import static org.jax.isopret.core.interpro.InterproEntryType.ACTIVE_SITE;
-import static org.jax.isopret.core.interpro.InterproEntryType.FAMILY;
+import static org.jax.isopret.model.InterproEntryType.ACTIVE_SITE;
+import static org.jax.isopret.model.InterproEntryType.FAMILY;
 
 public class InterproTestBase {
 

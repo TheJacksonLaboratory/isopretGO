@@ -5,19 +5,15 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.core.go.*;
-import org.jax.isopret.core.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
-import org.jax.isopret.core.interpro.InterproMapper;
-import org.jax.isopret.core.model.AccessionNumber;
-import org.jax.isopret.core.model.AnnotatedGene;
-import org.jax.isopret.core.model.GeneModel;
-import org.jax.isopret.core.model.Transcript;
-import org.jax.isopret.core.visualization.DasDgeGoVisualizer;
-import org.jax.isopret.core.visualization.EnsemblVisualizable;
-import org.jax.isopret.core.visualization.GoAnnotationMatrix;
-import org.jax.isopret.core.visualization.Visualizable;
+import org.jax.isopret.core.impl.go.*;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.InterproMapper;
+import org.jax.isopret.model.*;
+import org.jax.isopret.visualization.DasDgeGoVisualizer;
+import org.jax.isopret.visualization.EnsemblVisualizable;
+import org.jax.isopret.visualization.GoAnnotationMatrix;
+import org.jax.isopret.visualization.Visualizable;
 import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
@@ -125,7 +121,7 @@ public class IsopretServiceImpl implements IsopretService  {
             e.printStackTrace();
         }
     }
-    // TODO Add the other files to the download
+
     @Override
     public Set<String> getExpectedDownloadedFiles() {
         return Set.of("interpro_domain_desc.txt", "isoform_function_list_cc.txt", "hg38_ensembl.ser",
