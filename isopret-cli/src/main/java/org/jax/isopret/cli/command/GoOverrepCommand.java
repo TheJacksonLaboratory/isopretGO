@@ -1,5 +1,7 @@
 package org.jax.isopret.cli.command;
 
+import org.jax.isopret.core.GoAnalysisResults;
+import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.except.IsopretRuntimeException;
@@ -92,38 +94,13 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
         LOGGER.info("Using Gene Ontology approach {}", goMethod.name());
         LOGGER.info("About to create HbaDealsGoContainer");
-        List<GoTerm2PValAndCounts> dgeGoTerms = doGoAnalysis(goMethod,
-                mtcMethod,
-                geneOntology,
-                isoThresholder.getDgeStudy(),
-                isoThresholder.getDgePopulation());
-        System.out.println("Go enrichments, DGE");
-        for (var cts : dgeGoTerms) {
-            if (cts.passesThreshold(0.05))
-                try {
-                    System.out.println(cts.getRow(geneOntology));
-                } catch (Exception e) {
-                    // some issue with getting terms, probably ontology is not in sync
-                    LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
-                }
-        }
 
-        List<GoTerm2PValAndCounts> dasGoTerms = doGoAnalysis(goMethod,
-                mtcMethod,
-                geneOntology,
-                isoThresholder.getDasStudy(),
-                isoThresholder.getDasPopulation());
-        System.out.println("Go enrichments, DAS");
-        for (var cts : dasGoTerms) {
-            if (cts.passesThreshold(0.05))
-                try {
-                    System.out.println(cts.getRow(geneOntology));
-                } catch (Exception e) {
-                    // some issue with getting terms, probably ontology is not in sync
-                    LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
-                }
-        }
-        writeGoResultsToFile(dasGoTerms, dgeGoTerms, geneOntology);
+        IsopretGoAnalysisRunner runner = IsopretGoAnalysisRunner.hbadeals(provider, hbadealsFile, mtcMethod, goMethod);
+
+        GoAnalysisResults results = runner.run();
+
+
+        writeGoResultsToFile(results, geneOntology);
 
         if (verbose) {
             IsopretStats.Builder builder = new IsopretStats.Builder();
@@ -143,53 +120,12 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         return 0;
     }
 
-    private List<GoTerm2PValAndCounts> doGoAnalysis(GoMethod goMethod, MtcMethod mtcMethod, Ontology geneOntology, StudySet dgeStudy, StudySet dgePopulation) {
-        final double ALPHA = 0.05;
-        PValueCalculation pvalcal;
-        MultipleTestingCorrection mtc;
-        switch (mtcMethod) {
-            case BONFERRONI -> mtc = new Bonferroni();
-            case BONFERRONI_HOLM -> mtc = new BonferroniHolm();
-            case BENJAMINI_HOCHBERG -> mtc = new BenjaminiHochberg();
-            case BENJAMINI_YEKUTIELI -> mtc = new BenjaminiYekutieli();
-            case SIDAK -> mtc = new Sidak();
-            case NONE -> mtc = new NoMultipleTestingCorrection();
-            default -> {
-                // should never happen
-                System.err.println("[WARNING] Did not recognize MTC");
-                mtc = new Bonferroni();
-            }
-        }
-        if (goMethod.equals(GoMethod.TFT)) {
-            pvalcal = new TermForTermPValueCalculation(geneOntology,
-                    dgePopulation,
-                    dgeStudy,
-                    mtc);
-        } else if (goMethod.equals(GoMethod.PCunion)) {
-            pvalcal = new ParentChildUnionPValueCalculation(geneOntology,
-                    dgePopulation,
-                    dgeStudy,
-                    mtc);
-        } else if (goMethod.equals(GoMethod.PCintersect)) {
-            pvalcal = new ParentChildIntersectionPValueCalculation(geneOntology,
-                    dgePopulation,
-                    dgeStudy,
-                    mtc);
-        } else {
-            throw new IsopretRuntimeException("Did not recognise GO Method");
-        }
-        return pvalcal.calculatePVals()
-                .stream()
-                .filter(item -> item.passesThreshold(ALPHA))
-                .sorted()
-                .collect(Collectors.toList());
-
-    }
-
-    private void writeGoResultsToFile(List<GoTerm2PValAndCounts> dasGoTerms,
-                                      List<GoTerm2PValAndCounts> dgeGoTerms,
+    private void writeGoResultsToFile(GoAnalysisResults results,
                                       Ontology geneOntology) {
 
+
+        List<GoTerm2PValAndCounts> dasGoTerms = results.dasGoTerms();
+        List<GoTerm2PValAndCounts> dgeGoTerms = results.dgeGoTerms();
         if (outfile == null) {
             outfile = getDefaultOutfileName("gene-ontology", hbadealsFile);
         }
@@ -219,22 +155,4 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
 
     }
 
-
-
-
-    Map<TermId, TermId> createTranscriptToGeneIdMap(Map<GeneSymbolAccession, List<Transcript>> gene2transcript) {
-        Map<TermId, TermId> accessionNumberMap = new HashMap<>();
-        for (var entry : gene2transcript.entrySet()) {
-            var geneAcc = entry.getKey();
-            var geneTermId = geneAcc.accession().toTermId();
-            var transcriptList = entry.getValue();
-            for (var transcript: transcriptList) {
-                var transcriptAcc = transcript.accessionId();
-                var transcriptTermId = transcriptAcc.toTermId();
-                //System.out.println(transcriptAcc.getAccessionString() +": " + geneAcc.getAccessionString());
-                accessionNumberMap.put(transcriptTermId, geneTermId);
-            }
-        }
-        return Map.copyOf(accessionNumberMap); // immutable copy
-    }
 }
