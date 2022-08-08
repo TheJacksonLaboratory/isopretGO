@@ -48,7 +48,7 @@ import static org.jax.isopret.gui.widgets.PopupFactory.displayIsopretThrown;
 /**
  * A Java app to help design probes for Capture Hi-C
  * @author Peter Robinson
- * @version 0.0.1 (2021-11-27)
+ * @version 1.0.3 (2022-08-07)
  */
 @Component
 public class MainController implements Initializable {
@@ -184,7 +184,7 @@ public class MainController implements Initializable {
     /** Show version and last build time. */
     @FXML
     private void about(ActionEvent e) {
-        String version = "1.0.0-RC1";
+        String version = "1.0.3";
         if (applicationProperties.getApplicationVersion() != null) {
             version = applicationProperties.getApplicationVersion();
         }

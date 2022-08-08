@@ -1,9 +1,10 @@
 package org.jax.isopret.gui.service;
 
 import javafx.concurrent.Task;
+import org.jax.isopret.core.GoAnalysisResults;
+import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.except.IsopretException;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.go.*;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
@@ -152,7 +153,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         }
         isopretStatsBuilder.info("Interpro domains file", interproDomainsFile.getAbsolutePath());
         isopretStatsBuilder.info("Interpro description file", interproDescriptionFile.getAbsolutePath());
-        this.interproMapper = new InterproMapper(interproDescriptionFile, interproDomainsFile);
+        this.interproMapper = provider.interproMapper();
         updateProgress(0.70, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
         isopretStatsBuilder.interproDescriptionCount(interproMapper.getInterproDescriptionCount());
@@ -161,13 +162,13 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         updateProgress(0.80, 1); /* this will update the progress bar */
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), geneSymbolToModelMap);
         Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
-        updateProgress(0.90, 1); /* this will update the progress bar */
+        updateProgress(0.85, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
         this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);
-        updateProgress(0.95, 1);
+        updateProgress(0.90, 1);
         updateMessage("Finished loading data for isopret analysis.");
         LOGGER.info("Beginning DGE GO analysis");
         isopretStatsBuilder.dasIsoformCount(isoformSpecificThresholder.getDasIsoformCount());
@@ -180,28 +181,18 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.expressionPthreshold(isoformSpecificThresholder.getExpressionPepThreshold());
         isopretStatsBuilder.splicingPthreshold(isoformSpecificThresholder.getSplicingPepThreshold());
 
-        HbaDealsGoAnalysis dgeGoAnalysis = new HbaDealsGoAnalysis(geneOntology,
-                isoformSpecificThresholder.getDgeStudy(),
-                isoformSpecificThresholder.getDgePopulation(),
-                this.overrepMethod,
-                this.multipleTestingMethod);
-        this.dgeResults = dgeGoAnalysis.overrepresetationAnalysis();
-
-        updateProgress(0.97, 1);
-        updateMessage(String.format("Finished DGE overrepresentation analysis. %d overrepresented GO Terms",
-               dgeResults.size()));
-        LOGGER.info("Finished DGE GO analysis, n = {}", this.dgeResults.size());
-        LOGGER.info("Beginning DAS GO analysis");
-        HbaDealsGoAnalysis dasGoAnalysis = new HbaDealsGoAnalysis(geneOntology,
-                isoformSpecificThresholder.getDasStudy(),
-                isoformSpecificThresholder.getDasPopulation(),
-                this.overrepMethod,
-                this.multipleTestingMethod);
-        this.dasResults = dasGoAnalysis.overrepresetationAnalysis();
-        LOGGER.info("Finished DAS GO analysis, n = {}", this.dasResults.size());
+        IsopretGoAnalysisRunner runner = IsopretGoAnalysisRunner.hbadeals(provider,
+                this.hbaDealsFile.getAbsolutePath(),
+                multipleTestingMethod,
+                overrepMethod);
+        updateMessage("Running overrepresentation analysis");
         updateProgress(0.95, 1);
-        updateMessage(String.format("Finished DAS overrepresentation analysis. %d overrepresented GO Terms",
-                dasResults.size()));
+        GoAnalysisResults goResults = runner.run();
+        this.dgeResults = goResults.dgeGoTerms();
+        this.dasResults = goResults.dasGoTerms();
+        updateProgress(0.97, 1);
+        updateMessage(String.format("Finished DAS/DGE overrepresentation analysis. %d/%d overrepresented GO Terms",
+                this.dasResults.size(),dgeResults.size()));
         updateProgress(1.0, 1);
         updateMessage("Done");
         return 0;

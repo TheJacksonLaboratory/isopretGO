@@ -121,7 +121,7 @@ public class IsopretServiceImpl implements IsopretService  {
             e.printStackTrace();
         }
     }
-    // TODO Add the other files to the download
+
     @Override
     public Set<String> getExpectedDownloadedFiles() {
         return Set.of("interpro_domain_desc.txt", "isoform_function_list_cc.txt", "hg38_ensembl.ser",

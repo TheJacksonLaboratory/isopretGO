@@ -67,7 +67,10 @@ public class FileDownloader {
 
         if (!dest.getParentFile().exists()) {
             System.out.println("Creating directory"+ dest.getParentFile().getAbsolutePath());
-            dest.getParentFile().mkdirs();
+            if (! dest.getParentFile().mkdirs()) {
+                System.err.printf("[ERROR] Could not create directory at %s.\n",dest.getParentFile());
+                return false;
+            }
         }
 
         if (src.getProtocol().equals("ftp") && options.ftp.host != null)
@@ -148,7 +151,10 @@ public class FileDownloader {
                 pb.print(fileSize);
 
         } catch (FileNotFoundException e) {
-            dest.delete();
+            if (! dest.delete() ) {
+                System.err.printf("[ERROR] Could not delete file at %s\n", dest.getAbsoluteFile());
+                return false;
+            }
             try {
                 ftp.logout();
             } catch (IOException e1) {
@@ -161,7 +167,10 @@ public class FileDownloader {
             }
             throw new FileDownloadException("ERROR: problem downloading file.", e);
         } catch (IOException e) {
-            dest.delete();
+            if (! dest.delete() ) {
+                System.err.printf("[ERROR] Could not delete file at %s\n", dest.getAbsoluteFile());
+                return false;
+            }
             try {
                 ftp.logout();
                 ftp.disconnect();

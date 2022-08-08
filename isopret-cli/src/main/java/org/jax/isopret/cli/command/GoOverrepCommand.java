@@ -4,7 +4,6 @@ import org.jax.isopret.core.GoAnalysisResults;
 import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.GoMethod;
 import org.jax.isopret.model.MtcMethod;
 import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
@@ -15,11 +14,9 @@ import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
 import org.jax.isopret.model.Transcript;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
-import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.*;
-import org.monarchinitiative.phenol.analysis.stats.mtc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -30,7 +27,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 /**
  * Our inference procedure generates a file called {@code isoform_function_list.txt} that
