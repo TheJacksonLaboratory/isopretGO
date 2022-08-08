@@ -26,6 +26,8 @@ function detect_platform() {
       echo "Linux"
     elif [[ "$OSTYPE" =~ darwin.* ]]; then
       echo "Osx";
+    elif [[ "$OSTYPE" =~ "win64" ]]; then
+          echo "Windows";
     else
       # More people use OSX
       echo "Osx"
@@ -93,6 +95,19 @@ function build_for_class_path() {
     --license-file LICENSE \
     --copyright "${COPYRIGHT}"
 #    --icon "${ICON}.icns" \
+  elif [[ "$PLATFORM" == "Windows" ]]; then
+     # setup OSX CLI
+        jpackage --name "${APP_NAME}" \
+        --input "${PACKAGE_DIR}" \
+        --main-jar "${JAR_NAME}" \
+        --app-version "${VERSION}" \
+        --description "${DESCRIPTION}" \
+        --windows-package-name "${CMD_NAME}" \
+        --vendor "${VENDOR}" \
+        --license-file LICENSE \
+        --copyright "${COPYRIGHT}" \
+        --win-console
+    #    --icon "${ICON}.icns" \
   else
     printf "Unknown platform %s\n. Abort." "${PLATFORM}"
     exit

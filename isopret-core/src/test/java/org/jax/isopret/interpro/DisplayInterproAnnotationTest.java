@@ -1,6 +1,6 @@
 package org.jax.isopret.interpro;
 
-import org.jax.isopret.core.interpro.DisplayInterproAnnotation;
+import org.jax.isopret.model.DisplayInterproAnnotation;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
