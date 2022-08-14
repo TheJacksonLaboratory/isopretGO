@@ -2,7 +2,6 @@ package org.jax.isopret.visualization;
 
 
 import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;

@@ -1,8 +1,5 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsThresholder;
 import org.jax.isopret.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +21,12 @@ public abstract class AbstractIsopretCommand {
 
 
 
-    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, GeneModel> hgncMap, String hbadealsPath) {
-        Map<AccessionNumber, GeneResult> hbaDealsResults =
-                RnaSeqResultsParser.fromHbaDeals(hbadealsPath, hgncMap);
-        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
-        return new HbaDealsThresholder(hbaDealsResults);
-    }
+//    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, GeneModel> hgncMap, String hbadealsPath) {
+//        Map<AccessionNumber, GeneResult> hbaDealsResults =
+//                RnaSeqResultsParser.fromHbaDeals(hbadealsPath, hgncMap);
+//        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
+//        return new HbaDealsThresholder(hbaDealsResults);
+//    }
 
 
     /**

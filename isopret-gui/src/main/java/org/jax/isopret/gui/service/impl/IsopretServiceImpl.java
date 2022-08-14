@@ -7,7 +7,6 @@ import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.impl.go.*;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.model.*;
 import org.jax.isopret.visualization.DasDgeGoVisualizer;

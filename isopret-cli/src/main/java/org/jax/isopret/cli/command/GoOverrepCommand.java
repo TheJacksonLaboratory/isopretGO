@@ -4,10 +4,10 @@ import org.jax.isopret.core.GoAnalysisResults;
 import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
+import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -37,9 +38,19 @@ import java.util.concurrent.Callable;
         description = "Gene Ontology Overrepresentation")
 public class GoOverrepCommand extends AbstractIsopretCommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoOverrepCommand.class);
-    @CommandLine.Option(names={"-b","--hbadeals"},
-            description ="HBA-DEALS output file" , required = true)
-    private String hbadealsFile;
+
+    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+    ExclusiveInputFile exclusive;
+
+    static class ExclusiveInputFile {
+        @CommandLine.Option(names={"-b","--hbadeals"},
+                description ="HBA-DEALS file" , required = true)
+        private String hbadealsFile = null;
+        @CommandLine.Option(names={"-e","--edger"},
+                description ="edgeR file" , required = true)
+        private String edgeRFile = null;
+    }
+
     @CommandLine.Option(names={"-c","--calculation"},
             description ="Ontologizer calculation (Term-for-Term [default], PC-Union, PC-Intersection)" )
     private String ontologizerCalculation = "Term-for-Term";
@@ -54,11 +65,27 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
     private boolean verbose = true;
     @CommandLine.Option(names={"--outfile"}, description = "Name of output file to write stats (default: ${DEFAULT-VALUE})")
     private String outfile = "isopret-go-overrep.txt";
+    /** Set to true if we are using HbaDeals, otherwise set to false (indicates edgeR). */
+    private boolean isHbaDeals;
+    private File rnaseqDataFile;
 
 
 
     @Override
     public Integer call() {
+        // validate input file and determine if it is HBA-DEALS or edgeR
+        if (exclusive.edgeRFile == null && exclusive.hbadealsFile != null) {
+            isHbaDeals = true;
+            rnaseqDataFile = new File(exclusive.hbadealsFile);
+        } else if (exclusive.edgeRFile != null && exclusive.hbadealsFile == null) {
+            isHbaDeals = false;
+            rnaseqDataFile = new File(exclusive.edgeRFile);
+        }
+        if (! rnaseqDataFile.isFile()) {
+            throw new IsopretRuntimeException("Could not find RNA-seq data file at " + rnaseqDataFile.getAbsoluteFile());
+        }
+
+
         IsopretProvider provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
         Ontology geneOntology = provider.geneOntology();
         geneSymbolAccessionListMap = provider.geneSymbolToTranscriptListMap();
@@ -70,8 +97,12 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
 
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
-        Map<AccessionNumber, GeneResult> hbaDealsResults =
-                RnaSeqResultsParser.fromHbaDeals(this.hbadealsFile, hgncMap);
+        Map<AccessionNumber, GeneResult> hbaDealsResults;
+        if (isHbaDeals) {
+            hbaDealsResults = RnaSeqResultsParser.fromHbaDeals(rnaseqDataFile, hgncMap);
+        } else {
+            hbaDealsResults = RnaSeqResultsParser.fromEdgeR(rnaseqDataFile, hgncMap);
+        }
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         MtcMethod mtcMethod = MtcMethod.fromString(mtc);
         HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
@@ -86,7 +117,7 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         LOGGER.info("Using Gene Ontology approach {}", goMethod.name());
         LOGGER.info("About to create HbaDealsGoContainer");
 
-        IsopretGoAnalysisRunner runner = IsopretGoAnalysisRunner.hbadeals(provider, hbadealsFile, mtcMethod, goMethod);
+        IsopretGoAnalysisRunner runner = IsopretGoAnalysisRunner.hbadeals(provider, exclusive.hbadealsFile, mtcMethod, goMethod);
 
         GoAnalysisResults results = runner.run();
 
@@ -118,7 +149,7 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         List<GoTerm2PValAndCounts> dasGoTerms = results.dasGoTerms();
         List<GoTerm2PValAndCounts> dgeGoTerms = results.dgeGoTerms();
         if (outfile == null) {
-            outfile = getDefaultOutfileName("gene-ontology", hbadealsFile);
+            outfile = getDefaultOutfileName("gene-ontology", exclusive.hbadealsFile);
         }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outfile))) {

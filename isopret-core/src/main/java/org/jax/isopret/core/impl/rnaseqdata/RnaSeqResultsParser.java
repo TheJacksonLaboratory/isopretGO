@@ -120,25 +120,17 @@ public class RnaSeqResultsParser {
 
     /**
      * This parser expects ENSG and ENST nomenclature
-     * @param fname Path to an HBA-DEALS output file
+     * @param file HBA-DEALS output file
      * @param hgncMap Map from
      */
 
-    public static Map<AccessionNumber, GeneResult> fromHbaDeals(String fname, Map<AccessionNumber, GeneModel> hgncMap) {
-        File f = new File(fname);
-        if (! f.isFile()) {
-            throw new IsopretRuntimeException("Could not find HBA-DEALS file at " + fname);
-        }
-        RnaSeqResultsParser parser = new RnaSeqResultsParser(f, hgncMap, true);
+    public static Map<AccessionNumber, GeneResult> fromHbaDeals(File file, Map<AccessionNumber, GeneModel> hgncMap) {
+        RnaSeqResultsParser parser = new RnaSeqResultsParser(file, hgncMap, true);
         return parser.ensgAcc2geneResultMap;
     }
 
-    public static Map<AccessionNumber, GeneResult> fromEdgeR(String fname, Map<AccessionNumber, GeneModel> hgncMap) {
-        File f = new File(fname);
-        if (! f.isFile()) {
-            throw new IsopretRuntimeException("Could not find edgeR file at " + fname);
-        }
-        RnaSeqResultsParser parser = new RnaSeqResultsParser(f, hgncMap, false);
+    public static Map<AccessionNumber, GeneResult> fromEdgeR(File file, Map<AccessionNumber, GeneModel> hgncMap) {
+        RnaSeqResultsParser parser = new RnaSeqResultsParser(file, hgncMap, false);
         return parser.ensgAcc2geneResultMap;
     }
 

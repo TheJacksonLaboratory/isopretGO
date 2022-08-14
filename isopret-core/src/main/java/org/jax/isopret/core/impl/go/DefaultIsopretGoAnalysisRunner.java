@@ -5,7 +5,6 @@ import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
@@ -17,6 +16,7 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,14 +26,17 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultIsopretGoAnalysisRunner.class);
 
-    private final String hbaDealsFile;
+    private final File hbaDealsFile;
     private final MtcMethod mtcMethod;
     private final GoMethod goMethod;
     private final IsopretProvider provider;
 
-    public DefaultIsopretGoAnalysisRunner(IsopretProvider provider , String hbaDealsFile, MtcMethod mtcMethod, GoMethod goMethod) {
+    public DefaultIsopretGoAnalysisRunner(IsopretProvider provider , String hbaDealsFilePath, MtcMethod mtcMethod, GoMethod goMethod) {
         this.provider = provider;
-        this.hbaDealsFile = hbaDealsFile;
+        this.hbaDealsFile = new File(hbaDealsFilePath);
+        if (! hbaDealsFile.isFile()) {
+            throw new IsopretRuntimeException("Could not find HBA-DEALS file at " + hbaDealsFilePath);
+        }
         this.mtcMethod = mtcMethod;
         this.goMethod = goMethod;
     }

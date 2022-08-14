@@ -1,6 +1,5 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

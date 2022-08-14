@@ -4,5 +4,6 @@ module isopret.cli {
     requires org.slf4j;
     requires org.jax.isopret.core;
     requires org.monarchinitiative.phenol.analysis;
-    requires org.monarchitiative.svart;
+
+    opens org.jax.isopret.cli.command to info.picocli;
 }

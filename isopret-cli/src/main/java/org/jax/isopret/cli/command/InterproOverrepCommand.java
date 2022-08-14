@@ -5,7 +5,6 @@ import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.model.*;
 import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.visualization.InterproOverrepVisualizer;
@@ -16,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -42,7 +42,7 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
     public Integer call() {
         provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
         Map<AccessionNumber, GeneResult> hbaDealsResults =
-                RnaSeqResultsParser.fromHbaDeals(this.hbadealsFile, provider.ensemblGeneModelMap());
+                RnaSeqResultsParser.fromHbaDeals(new File(this.hbadealsFile), provider.ensemblGeneModelMap());
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         AssociationContainer<TermId> transcriptContainer = provider.transcriptContainer();
         AssociationContainer<TermId> geneContainer = provider.geneContainer();

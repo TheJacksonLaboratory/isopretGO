@@ -1,7 +1,6 @@
 package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.TestBase;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
@@ -26,7 +25,7 @@ public class HbaDealsParserTest extends TestBase {
    private static final HgncParser hgncParser = new HgncParser(new File(hgncPath), transcriptListMap);
     private static final  Map<AccessionNumber, GeneModel> ensemblMap = hgncParser.ensemblMap();
     private static final Map<AccessionNumber, GeneResult> hbaDealsResultMap =
-            RnaSeqResultsParser.fromHbaDeals(HBADEALS_ADAR_PATH.toString(), ensemblMap);
+            RnaSeqResultsParser.fromHbaDeals(HBADEALS_ADAR_PATH.toFile(), ensemblMap);
     private final double THRESHOLD = 0.05;
     @Test
     public void if_hbadeals_adar_results_retrieved_then_ok() {

@@ -10,7 +10,6 @@ import org.jax.isopret.core.impl.go.IsopretAssociationContainer;
 import org.jax.isopret.core.impl.go.IsopretContainerFactory;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -18,6 +17,7 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 
 public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisRunner {
@@ -75,7 +75,11 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
         geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         Map<AccessionNumber, GeneModel> hgncMap  = provider.ensemblGeneModelMap();
         Ontology ontology = provider.geneOntology();
-        Map<AccessionNumber, GeneResult> hbaDealsResults = RnaSeqResultsParser.fromHbaDeals(hbadealsFile, hgncMap);
+        File file = new File(hbadealsFile);
+        if (! file.isFile()) {
+            throw new IsopretRuntimeException("Could not fine HBA-DEAL file at " + file.getAbsoluteFile());
+        }
+        Map<AccessionNumber, GeneResult> hbaDealsResults = RnaSeqResultsParser.fromHbaDeals(file, hgncMap);
         this.transcriptToGoMap = provider.transcriptIdToGoTermsMap();
         Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
         Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
