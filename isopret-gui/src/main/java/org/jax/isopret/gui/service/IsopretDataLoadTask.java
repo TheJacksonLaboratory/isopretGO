@@ -181,7 +181,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.splicingPthreshold(isoformSpecificThresholder.getSplicingPepThreshold());
 
         IsopretGoAnalysisRunner runner = IsopretGoAnalysisRunner.hbadeals(provider,
-                this.hbaDealsFile.getAbsolutePath(),
+                this.hbaDealsFile,
                 multipleTestingMethod,
                 overrepMethod);
         updateMessage("Running overrepresentation analysis");

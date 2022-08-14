@@ -4,6 +4,7 @@ import org.jax.isopret.core.GoAnalysisResults;
 import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
@@ -26,20 +27,29 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultIsopretGoAnalysisRunner.class);
 
-    private final File hbaDealsFile;
+    private final File rnaSeqResultsFile;
     private final MtcMethod mtcMethod;
     private final GoMethod goMethod;
     private final IsopretProvider provider;
 
-    public DefaultIsopretGoAnalysisRunner(IsopretProvider provider , String hbaDealsFilePath, MtcMethod mtcMethod, GoMethod goMethod) {
+    private final RnaSeqAnalysisMethod rnaSeqAnalysisMethod;
+
+    public DefaultIsopretGoAnalysisRunner(IsopretProvider provider,
+                                          File rnaSeqDataFile,
+                                          MtcMethod mtcMethod,
+                                          GoMethod goMethod,
+                                          RnaSeqAnalysisMethod rnaSeqMethod) {
         this.provider = provider;
-        this.hbaDealsFile = new File(hbaDealsFilePath);
-        if (! hbaDealsFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find HBA-DEALS file at " + hbaDealsFilePath);
+        this.rnaSeqResultsFile = rnaSeqDataFile;
+        if (! rnaSeqResultsFile.isFile()) {
+            throw new IsopretRuntimeException("Could not find HBA-DEALS file at " + rnaSeqDataFile);
         }
         this.mtcMethod = mtcMethod;
         this.goMethod = goMethod;
+        this.rnaSeqAnalysisMethod = rnaSeqMethod;
     }
+
+
     @Override
     public GoAnalysisResults run() {
         Ontology geneOntology = provider.geneOntology();
@@ -51,13 +61,26 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
         AssociationContainer<TermId> geneContainer = provider.geneContainer();
 
         // ----------  6. HBA-DEALS input file  ----------------
-        LOGGER.info("About to create thresholder");
-        Map<AccessionNumber, GeneResult> hbaDealsResults = RnaSeqResultsParser.fromHbaDeals(this.hbaDealsFile, hgncMap);
-        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
-        IsoformSpecificThresholder isoThresholder =  IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
-                0.05,
-                geneContainer,
-                transcriptContainer);
+        LOGGER.info("About to create thresholder for RNA-seq method {}", rnaSeqAnalysisMethod);
+        Map<AccessionNumber, GeneResult> geneResults;
+        if (rnaSeqAnalysisMethod == RnaSeqAnalysisMethod.HBADEALS) {
+            geneResults = RnaSeqResultsParser.fromHbaDeals(this.rnaSeqResultsFile, hgncMap);
+        } else {
+            geneResults = RnaSeqResultsParser.fromEdgeR(this.rnaSeqResultsFile, hgncMap);
+        }
+        LOGGER.trace("Analyzing {} genes.", geneResults.size());
+        IsoformSpecificThresholder isoThresholder;
+        if (rnaSeqAnalysisMethod == RnaSeqAnalysisMethod.HBADEALS) {
+            isoThresholder = IsoformSpecificThresholder.fromHbaDeals(geneResults,
+                    0.05,
+                    geneContainer,
+                    transcriptContainer);
+        } else {
+            isoThresholder = IsoformSpecificThresholder.fromEdgeR(geneResults,
+                    0.05,
+                    geneContainer,
+                    transcriptContainer);
+        }
         LOGGER.info("Initialized HBADealsThresholder");
         LOGGER.info("isoThresholder.getDgePopulation().getAnnotatedItemCount()={}"
                 ,isoThresholder.getDgePopulation().getAnnotatedItemCount());
@@ -95,7 +118,7 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
                     LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
                 }
         }
-        return new DefaultGoAnalysisResults(hbaDealsFile, mtcMethod, goMethod, dasGoTerms, dgeGoTerms);
+        return new DefaultGoAnalysisResults(rnaSeqResultsFile, mtcMethod, goMethod, dasGoTerms, dgeGoTerms);
     }
 
 

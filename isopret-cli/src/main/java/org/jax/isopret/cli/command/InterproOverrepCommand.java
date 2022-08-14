@@ -1,12 +1,9 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.InterproAnalysisResults;
-import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
-import org.jax.isopret.core.IsopretProvider;
+import org.jax.isopret.core.*;
 import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.model.*;
-import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.visualization.InterproOverrepVisualizer;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -25,7 +22,8 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(name = "interpro",
         mixinStandardHelpOptions = true,
         description = "Interpro Overrepresentation")
-public class InterproOverrepCommand extends AbstractIsopretCommand implements Callable<Integer> {
+public class InterproOverrepCommand extends AbstractRnaseqAnalysisCommand
+        implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproOverrepCommand.class);
     @CommandLine.Option(names={"-b","--hbadeals"},
             description ="HBA-DEALS output file" , required = true)
@@ -37,6 +35,8 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
     private InterproMapper interproMapper = null;
 
     private IsopretProvider provider = null;
+
+
 
     @Override
     public Integer call() {

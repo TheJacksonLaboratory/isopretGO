@@ -6,7 +6,6 @@ import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
-import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -25,19 +24,20 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
- * Our inference procedure generates a file called {@code isoform_function_list.txt} that
- * contains a list of isoforms with their inferred functions,
- * ENST00000380173	GO:2001303
- * ENST00000251535	GO:2001304
- * ENST00000609196	GO:2001311
- * (...)
- * This command compares the function with the original GO genewise annotations
+ * This command creates a list of significantly overrepresented GO terms for differential expression and splicing.
+ * @author Peter N Robinson
  */
 @CommandLine.Command(name = "GO",
         mixinStandardHelpOptions = true,
         description = "Gene Ontology Overrepresentation")
-public class GoOverrepCommand extends AbstractIsopretCommand implements Callable<Integer> {
+public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
+        implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoOverrepCommand.class);
+    /**
+     * The desired significance threshold for GO results. Note that this is different from the
+     * FDR threshold for differential genes/isoforms in RNA-seq
+     */
+    private static final double GO_PVAL_THRESHOLD = 0.05;
 
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     ExclusiveInputFile exclusive;
@@ -85,7 +85,6 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
             throw new IsopretRuntimeException("Could not find RNA-seq data file at " + rnaseqDataFile.getAbsoluteFile());
         }
 
-
         IsopretProvider provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
         Ontology geneOntology = provider.geneOntology();
         geneSymbolAccessionListMap = provider.geneSymbolToTranscriptListMap();
@@ -95,7 +94,7 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         AssociationContainer<TermId> transcriptContainer = provider.transcriptContainer();
         AssociationContainer<TermId> geneContainer = provider.geneContainer();
 
-        // ----------  6. HBA-DEALS input file  ----------------
+        // ----------  HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
         Map<AccessionNumber, GeneResult> hbaDealsResults;
         if (isHbaDeals) {
@@ -105,19 +104,16 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         }
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         MtcMethod mtcMethod = MtcMethod.fromString(mtc);
-        IsoformSpecificThresholder isoThresholder = IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
-                0.05,
-                geneContainer,
-                transcriptContainer);
-        LOGGER.info("Initialized HBADealsThresholder");
-        LOGGER.info("isoThresholder.getDgePopulation().getAnnotatedItemCount()={}"
-                ,isoThresholder.getDgePopulation().getAnnotatedItemCount());
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
         LOGGER.info("Using Gene Ontology approach {}", goMethod.name());
         LOGGER.info("About to create HbaDealsGoContainer");
-
-        IsopretGoAnalysisRunner runner = IsopretGoAnalysisRunner.hbadeals(provider, exclusive.hbadealsFile, mtcMethod, goMethod);
+        IsopretGoAnalysisRunner runner;
+        if (isHbaDeals) {
+            runner = IsopretGoAnalysisRunner.hbadeals(provider, rnaseqDataFile, mtcMethod, goMethod);
+        } else {
+            runner = IsopretGoAnalysisRunner.edgeR(provider, rnaseqDataFile, mtcMethod, goMethod);
+        }
 
         GoAnalysisResults results = runner.run();
 
@@ -154,7 +150,7 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outfile))) {
             for (var cts : dasGoTerms) {
-                if (cts.passesThreshold(0.05))
+                if (cts.passesThreshold(GO_PVAL_THRESHOLD))
                     try {
                         bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
                     } catch (Exception e) {
@@ -163,7 +159,7 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
                     }
             }
             for (var cts : dgeGoTerms) {
-                if (cts.passesThreshold(0.05))
+                if (cts.passesThreshold(GO_PVAL_THRESHOLD))
                     try {
                         bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
                     } catch (Exception e) {
