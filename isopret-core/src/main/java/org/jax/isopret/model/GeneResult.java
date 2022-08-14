@@ -1,6 +1,6 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
 
 import java.util.*;
 

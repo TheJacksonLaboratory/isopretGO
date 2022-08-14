@@ -1,7 +1,7 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

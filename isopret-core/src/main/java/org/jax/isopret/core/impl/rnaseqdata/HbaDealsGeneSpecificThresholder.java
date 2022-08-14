@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.hbadeals;
+package org.jax.isopret.core.impl.rnaseqdata;
 
 public class HbaDealsGeneSpecificThresholder {
 }

@@ -1,7 +1,7 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
 import org.jax.isopret.model.DisplayInterproAnnotation;
 import org.jax.isopret.model.InterproEntry;
 import org.jax.isopret.model.AccessionNumber;

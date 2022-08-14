@@ -1,8 +1,8 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsThresholder;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;

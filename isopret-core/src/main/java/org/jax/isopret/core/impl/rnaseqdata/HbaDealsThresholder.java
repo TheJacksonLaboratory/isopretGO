@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.hbadeals;
+package org.jax.isopret.core.impl.rnaseqdata;
 
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneModel;

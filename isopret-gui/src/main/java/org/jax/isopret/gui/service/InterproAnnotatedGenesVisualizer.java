@@ -2,7 +2,7 @@ package org.jax.isopret.gui.service;
 
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.model.GoTermIdPlusLabel;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
 import org.jax.isopret.model.DisplayInterproAnnotation;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;

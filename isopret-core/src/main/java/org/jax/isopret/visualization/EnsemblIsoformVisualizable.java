@@ -1,6 +1,6 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
 
 public class EnsemblIsoformVisualizable implements IsoformVisualizable {
 
