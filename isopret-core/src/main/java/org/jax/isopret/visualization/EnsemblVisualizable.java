@@ -2,11 +2,7 @@ package org.jax.isopret.visualization;
 
 import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
-import org.jax.isopret.model.DisplayInterproAnnotation;
-import org.jax.isopret.model.InterproEntry;
-import org.jax.isopret.model.AccessionNumber;
-import org.jax.isopret.model.AnnotatedGene;
-import org.jax.isopret.model.Transcript;
+import org.jax.isopret.model.*;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.Contig;
 import org.monarchinitiative.svart.Strand;
@@ -42,7 +38,7 @@ public class EnsemblVisualizable implements Visualizable {
      */
     private final List<IsoformVisualizable> isoformVisualizables;
 
-    private final GeneResultImpl hbaDealsResult;
+    private final GeneResult hbaDealsResult;
 
     private final String chromosome;
 

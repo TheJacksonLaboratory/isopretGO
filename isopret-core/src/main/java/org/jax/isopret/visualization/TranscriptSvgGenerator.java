@@ -6,6 +6,7 @@ import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
+import org.jax.isopret.model.GeneResult;
 import org.jax.isopret.model.Transcript;
 import org.monarchinitiative.svart.*;
 
@@ -80,7 +81,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     private final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
 
-    private final GeneResultImpl hbaDealsResult;
+    private final GeneResult hbaDealsResult;
 
     private final boolean differentiallyExpressed;
 
@@ -97,7 +98,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     private List<Transcript> getAffectedTranscripts(AnnotatedGene annotatedGene) {
         List<Transcript> transcripts = annotatedGene.getTranscripts();
-        GeneResultImpl result = annotatedGene.getHbaDealsResult();
+        GeneResult result = annotatedGene.getHbaDealsResult();
         Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
         return transcripts
                 .stream()
@@ -534,7 +535,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
     public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript) {
         List<Transcript> transcripts = annotatedTranscript.getTranscripts();
-        GeneResultImpl result = annotatedTranscript.getHbaDealsResult();
+        GeneResult result = annotatedTranscript.getHbaDealsResult();
         Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
         List<Transcript> affectedTranscripts = transcripts
                 .stream()

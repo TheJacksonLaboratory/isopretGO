@@ -22,7 +22,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     /** Key -- accession number of a transcript; value -- corresponding Interpro annotations .*/
     private final Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap;
 
-    private final GeneResultImpl hbaDealsResult;
+    private final GeneResult hbaDealsResult;
 
     private final Boolean differentiallyExpressed;
 
@@ -44,7 +44,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      */
     public AnnotatedGene(List<Transcript> transcripts,
                          Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
-                         GeneResultImpl result,
+                         GeneResult result,
                          double expressionThreshold,
                          double splicingThreshold) {
         this.transcripts = transcripts;
@@ -136,7 +136,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         return transcripts;
     }
 
-    public GeneResultImpl getHbaDealsResult() {
+    public GeneResult getHbaDealsResult() {
         return hbaDealsResult;
     }
 

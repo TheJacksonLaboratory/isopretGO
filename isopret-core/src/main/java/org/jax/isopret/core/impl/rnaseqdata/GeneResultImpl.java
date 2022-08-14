@@ -32,17 +32,17 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
         this.geneModel = sym;
         transcriptMap = new HashMap<>();
     }
-
+    @Override
     public void addExpressionResult(double fc, double p) {
         this.expressionFoldChange = fc;
         this.expressionP = p;
     }
-
+    @Override
     public void addTranscriptResult(AccessionNumber isoform, double expFC, double P) {
         TranscriptResultImpl tresult = new TranscriptResultImpl(isoform, expFC, P);
         transcriptMap.putIfAbsent(isoform, tresult);
     }
-    @Override
+
     public AccessionNumber getGeneAccession() {
         return geneAccession;
     }

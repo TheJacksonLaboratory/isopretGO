@@ -1,6 +1,6 @@
 package org.jax.isopret.hbadeals;
 
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.TestBase;
@@ -25,9 +25,8 @@ public class HbaDealsParserTest extends TestBase {
     private static final Map<GeneSymbolAccession, List<Transcript>> transcriptListMap = reader.getGeneToTranscriptListMap();
    private static final HgncParser hgncParser = new HgncParser(new File(hgncPath), transcriptListMap);
     private static final  Map<AccessionNumber, GeneModel> ensemblMap = hgncParser.ensemblMap();
-    private static final HbaDealsParser parser = new HbaDealsParser(HBADEALS_ADAR_PATH.toString(), ensemblMap);
-
-    private static final Map<AccessionNumber, GeneResultImpl> hbaDealsResultMap = parser.getEnsgAcc2hbaDealsMap();
+    private static final Map<AccessionNumber, GeneResult> hbaDealsResultMap =
+            RnaSeqResultsParser.fromHbaDeals(HBADEALS_ADAR_PATH.toString(), ensemblMap);
     private final double THRESHOLD = 0.05;
     @Test
     public void if_hbadeals_adar_results_retrieved_then_ok() {
@@ -39,13 +38,13 @@ public class HbaDealsParserTest extends TestBase {
      */
     @Test
     public void if_five_hbadeals_adar_transcript_results_retrieved_then_ok() {
-        GeneResultImpl adar = hbaDealsResultMap.get(adarAccession);
+        GeneResult adar = hbaDealsResultMap.get(adarAccession);
         assertEquals(5, adar.getTranscriptMap().size());
     }
 
     @Test
     public void if_adar_has_significant_dge_then_ok() {
-        GeneResultImpl adar = hbaDealsResultMap.get(adarAccession);
+        GeneResult adar = hbaDealsResultMap.get(adarAccession);
         assertTrue(adar.hasDifferentialExpressionResult(THRESHOLD));
         double p = adar.getExpressionP();
         assertTrue(p<0.0000001); // represented as p=0 in our test file
@@ -60,7 +59,7 @@ public class HbaDealsParserTest extends TestBase {
     public void if_adar_has_significant_das_then_ok() {
         final double EPSILON = 0.0001;
         final double PEP_THRESHOLD = 0.05;
-        GeneResultImpl adar = hbaDealsResultMap.get(adarAccession);
+        GeneResult adar = hbaDealsResultMap.get(adarAccession);
         assertTrue(adar.hasDifferentialSplicingResult(THRESHOLD));
         double pva = adar.getSmallestSplicingP();
         assertEquals(1e-05, pva, EPSILON);

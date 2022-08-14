@@ -4,15 +4,10 @@ import org.jax.isopret.core.GoAnalysisResults;
 import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.model.GoMethod;
-import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.model.*;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
-import org.jax.isopret.model.GeneModel;
-import org.jax.isopret.model.AccessionNumber;
-import org.jax.isopret.model.GeneSymbolAccession;
-import org.jax.isopret.model.Transcript;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -75,8 +70,8 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
 
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
-        HbaDealsParser hbaParser = new HbaDealsParser(this.hbadealsFile, hgncMap);
-        Map<AccessionNumber, GeneResultImpl> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResult> hbaDealsResults =
+                RnaSeqResultsParser.fromHbaDeals(this.hbadealsFile, hgncMap);
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         MtcMethod mtcMethod = MtcMethod.fromString(mtc);
         HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,

@@ -9,7 +9,7 @@ import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.core.impl.go.IsopretAssociationContainer;
 import org.jax.isopret.core.impl.go.IsopretContainerFactory;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
@@ -75,8 +75,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
         geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         Map<AccessionNumber, GeneModel> hgncMap  = provider.ensemblGeneModelMap();
         Ontology ontology = provider.geneOntology();
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
-        Map<AccessionNumber, GeneResultImpl> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResult> hbaDealsResults = RnaSeqResultsParser.fromHbaDeals(hbadealsFile, hgncMap);
         this.transcriptToGoMap = provider.transcriptIdToGoTermsMap();
         Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
         Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
@@ -102,7 +101,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
         this.geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();
         // sort the raw results according to minimum p-values
-        List<GeneResultImpl> results = thresholder.getRawResults().values()
+        List<GeneResult> results = thresholder.getRawResults().values()
                 .stream()
                 .sorted()
                 .toList();
@@ -111,7 +110,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
         double splicingThreshold = thresholder.getSplicingPepThreshold();
         double expressionThreshold = thresholder.getExpressionPepThreshold();
         InterproMapper interproMapper = provider.interproMapper();
-        for (GeneResultImpl result : results) {
+        for (GeneResult result : results) {
             c++;
             if (c % 100==0) {
                 LOGGER.info("results {} not found {}", c, notfound);

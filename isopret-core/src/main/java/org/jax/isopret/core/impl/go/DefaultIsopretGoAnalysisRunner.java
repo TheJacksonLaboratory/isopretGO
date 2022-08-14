@@ -4,7 +4,7 @@ import org.jax.isopret.core.GoAnalysisResults;
 import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
@@ -49,8 +49,7 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
 
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
-        HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile, hgncMap);
-        Map<AccessionNumber, GeneResultImpl> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResult> hbaDealsResults = RnaSeqResultsParser.fromHbaDeals(this.hbaDealsFile, hgncMap);
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
                 0.05,

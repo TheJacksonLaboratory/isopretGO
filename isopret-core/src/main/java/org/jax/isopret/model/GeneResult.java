@@ -22,6 +22,9 @@ public interface GeneResult {
 
     List<Double> getSplicingPlist() ;
 
+    void addExpressionResult(double fc, double p);
+    void addTranscriptResult(AccessionNumber isoform, double expFC, double P);
+
 
     Map<AccessionNumber, TranscriptResultImpl> getTranscriptMap();
 
