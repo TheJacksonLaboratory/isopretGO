@@ -32,12 +32,12 @@ public class HbaDealsIsoformSpecificThresholder {
     private final StudySet dasStudy;
     private final StudySet dasPopulation;
 
-    private final Map<AccessionNumber, HbaDealsResult> rawResults;
+    private final Map<AccessionNumber, GeneResultImpl> rawResults;
 
     private final double fdrThreshold;
 
 
-    public Map<AccessionNumber, HbaDealsResult> getRawResults() {
+    public Map<AccessionNumber, GeneResultImpl> getRawResults() {
         return rawResults;
     }
 
@@ -53,7 +53,7 @@ public class HbaDealsIsoformSpecificThresholder {
      * Find the FDR thresholds for splicing and expression
      * @param results Map of HBA-DEALS analysis results (key: gene symbol)
      */
-    public HbaDealsIsoformSpecificThresholder(Map<AccessionNumber, HbaDealsResult> results,
+    public HbaDealsIsoformSpecificThresholder(Map<AccessionNumber, GeneResultImpl> results,
                                               double fdrThreshold,
                                               AssociationContainer<TermId> geneContainer,
                                               AssociationContainer<TermId> transcriptContainer) {
@@ -63,7 +63,7 @@ public class HbaDealsIsoformSpecificThresholder {
         List<Double> expressionProbs = results
                 .values()
                 .stream()
-                .map(HbaDealsResult::getExpressionP)
+                .map(GeneResultImpl::getExpressionP)
                 .collect(Collectors.toList());
         PosteriorErrorProbThreshold probThresholdExpression = new PosteriorErrorProbThreshold(expressionProbs, fdrThreshold);
         this.expressionPepThreshold = probThresholdExpression.getPepThreshold();
@@ -71,7 +71,7 @@ public class HbaDealsIsoformSpecificThresholder {
         List<Double> splicingProbs = results
                 .values()
                 .stream()
-                .map(HbaDealsResult::getSplicingPlist)
+                .map(GeneResultImpl::getSplicingPlist)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         PosteriorErrorProbThreshold probThresholdSplicing = new PosteriorErrorProbThreshold(splicingProbs, fdrThreshold);
@@ -81,13 +81,13 @@ public class HbaDealsIsoformSpecificThresholder {
                 .values()
                 .stream()
                 .filter(r -> r.getExpressionP() <= this.expressionPepThreshold)
-                .map(HbaDealsResult::getGeneAccession)
+                .map(GeneResultImpl::getGeneAccession)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         Set<TermId> dgePopulation = results
                 .values()
                 .stream()
-                .map(HbaDealsResult::getGeneAccession)
+                .map(GeneResultImpl::getGeneAccession)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         LOGGER.info("DGE: {} study set and {} population genes", dgeSignificant.size(), dgePopulation.size());
@@ -101,14 +101,14 @@ public class HbaDealsIsoformSpecificThresholder {
                 .stream()
                 .flatMap(r -> r.getTranscriptResults().stream())
                 .filter(tr -> tr.getPvalue() <= splicingPepThreshold)
-                .map(HbaDealsTranscriptResult::getTranscriptId)
+                .map(TranscriptResultImpl::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         Set<TermId> dasIsoformPopulation = results
                 .values()
                 .stream()
                 .flatMap(r -> r.getTranscriptResults().stream())
-                .map(HbaDealsTranscriptResult::getTranscriptId)
+                .map(TranscriptResultImpl::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         LOGGER.info("DAS: {} study set and {} population genes", dasIsoformStudy.size(), dasIsoformPopulation.size());

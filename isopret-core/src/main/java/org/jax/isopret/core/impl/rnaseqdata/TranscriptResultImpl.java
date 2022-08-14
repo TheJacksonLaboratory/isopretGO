@@ -3,13 +3,21 @@ package org.jax.isopret.core.impl.rnaseqdata;
 import org.jax.isopret.model.TranscriptResult;
 import org.jax.isopret.model.AccessionNumber;
 
-public class HbaDealsTranscriptResult implements TranscriptResult {
+
+/**
+ * This class stores the results of analysis of differential splicing of
+ * a specific transcript (isoform) of a gene. It is expected that instances of
+ * this class will be contained in a member list of the {@link GeneResultImpl} object
+ * that represents the gene to which this isoform belongs.
+ * @author Peter N Robinson
+ */
+public class TranscriptResultImpl implements TranscriptResult {
     private final AccessionNumber transcript;
     private final double foldChange;
     private final double P;
 
 
-    public HbaDealsTranscriptResult(AccessionNumber transcript, double fc, double p) {
+    public TranscriptResultImpl(AccessionNumber transcript, double fc, double p) {
         this.transcript = transcript;
         this.foldChange = fc;
         this.P = p;

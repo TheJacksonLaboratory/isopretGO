@@ -9,7 +9,7 @@ import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.go.*;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.model.*;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.core.InterproMapper;
@@ -161,7 +161,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         LOGGER.info(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
         updateProgress(0.80, 1); /* this will update the progress bar */
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), geneSymbolToModelMap);
-        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResultImpl> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         updateProgress(0.85, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
         this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,

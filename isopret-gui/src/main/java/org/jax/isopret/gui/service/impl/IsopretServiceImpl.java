@@ -7,7 +7,7 @@ import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.impl.go.*;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.model.*;
 import org.jax.isopret.visualization.DasDgeGoVisualizer;
@@ -250,7 +250,7 @@ public class IsopretServiceImpl implements IsopretService  {
         }
         GeneModel geneModel = this.geneAccessionToModelMap.get(ensgAccession);
         List<Transcript> transcripts = geneModel == null ? List.of() : geneModel.transcriptList();
-        HbaDealsResult result = thresholder.getRawResults().get(ensgAccession);
+        GeneResultImpl result = thresholder.getRawResults().get(ensgAccession);
         double splicingThreshold = thresholder.getSplicingPepThreshold();
         double expressionThreshold = thresholder.getExpressionPepThreshold();
         Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap =
@@ -270,11 +270,11 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<Visualizable> getGeneVisualizables(Set<AccessionNumber> includedEnsgAccessionSet) {
         List<Visualizable> visualizables = new ArrayList<>();
         // sort the raw results according to minimum p-values
-        List<HbaDealsResult> results = thresholder.getRawResults().values()
+        List<GeneResultImpl> results = thresholder.getRawResults().values()
                 .stream()
                 .sorted()
                 .toList();
-        for (HbaDealsResult result : results) {
+        for (GeneResultImpl result : results) {
             AccessionNumber ensgAccession = result.getGeneAccession();
             // if this gene is in our included set.. (it should always be in geneAccessionToModelMap, but check here to avoid NPE
             if ( includedEnsgAccessionSet.contains(ensgAccession) &&
@@ -302,11 +302,11 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<Visualizable> getGeneVisualizables() {
         List<Visualizable> visualizables = new ArrayList<>();
         // sort the raw results according to minimum p-values
-        List<HbaDealsResult> results = thresholder.getRawResults().values()
+        List<GeneResultImpl> results = thresholder.getRawResults().values()
                 .stream()
                 .sorted()
                 .toList();
-        for (HbaDealsResult result : results) {
+        for (GeneResultImpl result : results) {
             List<Transcript> transcripts = result.getGeneModel().transcriptList();
             double splicingThreshold = thresholder.getSplicingPepThreshold();
             double expressionThreshold = thresholder.getExpressionPepThreshold();
@@ -328,11 +328,11 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<AnnotatedGene> getAnnotatedGeneList() {
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();
         // sort the raw results according to minimum p-values
-        List<HbaDealsResult> results = thresholder.getRawResults().values()
+        List<GeneResultImpl> results = thresholder.getRawResults().values()
                 .stream()
                 .sorted()
                 .toList();
-        for (HbaDealsResult result : results) {
+        for (GeneResultImpl result : results) {
             List<Transcript> transcripts = result.getGeneModel().transcriptList();
             double splicingThreshold = thresholder.getSplicingPepThreshold();
             double expressionThreshold = thresholder.getExpressionPepThreshold();
@@ -424,7 +424,7 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
 
-    public GoAnnotationMatrix getGoAnnotationMatrixForGene(HbaDealsResult result) {
+    public GoAnnotationMatrix getGoAnnotationMatrixForGene(GeneResultImpl result) {
         AccessionNumber accession = result.getGeneAccession();
         Set<TermId> expressedTranscriptSet = result.getTranscriptMap().keySet().stream()
                 .map(AccessionNumber::toTermId)
@@ -469,14 +469,14 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public List<Visualizable> getDgeForGoTerm(TermId goId) {
         double expThres = this.thresholder.getExpressionPepThreshold();
-        List<HbaDealsResult> dge = this.thresholder.getRawResults().values()
+        List<GeneResultImpl> dge = this.thresholder.getRawResults().values()
                 .stream()
                 .filter(h -> h.hasDifferentialExpressionResult(expThres))
                 .toList();
         // now figure out which of these genes are annotated to goId
         Set<TermId> domainIdSet = this.geneContainer.getDomainItemsAnnotatedByGoTerm(goId);
         List<AccessionNumber> ensgAccessionList = dge.stream().filter(d -> domainIdSet.contains(d.getGeneAccession().toTermId()))
-                .map(HbaDealsResult::getGeneModel)
+                .map(GeneResultImpl::getGeneModel)
                 .map(GeneModel::ensemblGeneId)
                 .toList();
         // transform to visualizable
@@ -491,7 +491,7 @@ public class IsopretServiceImpl implements IsopretService  {
     public List<Visualizable> getDasForGoTerm(TermId goId) {
         double splicingPepThreshold = this.thresholder.getSplicingPepThreshold();
         LOGGER.info("getDasForGoTerm, splicingPepThreshold={}", splicingPepThreshold);
-        List<HbaDealsResult> das = this.thresholder.getRawResults().values()
+        List<GeneResultImpl> das = this.thresholder.getRawResults().values()
                 .stream()
                 .filter(h -> h.hasDifferentialSplicingResult(splicingPepThreshold))
                 .toList();
@@ -501,7 +501,7 @@ public class IsopretServiceImpl implements IsopretService  {
         // when we get here, the domain ids are transcript ids.
         LOGGER.info("getDasForGoTerm, domainIdSet.size={} for go={}", domainIdSet.size(), goId.getValue());
         Set<AccessionNumber> ensgAccessionSet = new HashSet<>();
-        for (HbaDealsResult result : das) {
+        for (GeneResultImpl result : das) {
             for (AccessionNumber transcriptAccession : result.getTranscriptMap().keySet()) {
                 if (domainIdSet.contains(transcriptAccession.toTermId())) {
                     ensgAccessionSet.add(result.getGeneModel().ensemblGeneId());

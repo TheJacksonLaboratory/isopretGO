@@ -1,7 +1,7 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
+import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.DisplayInterproAnnotation;
 import org.jax.isopret.model.InterproEntry;
 import org.jax.isopret.model.AccessionNumber;
@@ -42,7 +42,7 @@ public class EnsemblVisualizable implements Visualizable {
      */
     private final List<IsoformVisualizable> isoformVisualizables;
 
-    private final HbaDealsResult hbaDealsResult;
+    private final GeneResultImpl hbaDealsResult;
 
     private final String chromosome;
 
@@ -75,7 +75,7 @@ public class EnsemblVisualizable implements Visualizable {
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
         this.differentiallyExpressed = agene.passesExpressionThreshold();
         this.differentiallySpliced = agene.passesSplicingThreshold();
-        Predicate<HbaDealsTranscriptResult> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
+        Predicate<TranscriptResultImpl> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
         this.significantIsoforms = (int) hbaDealsResult.getTranscriptMap().values().stream().filter(passesExpressionThreshold).count();
         double SPLICING_THRESHOLD = agene.getSplicingThreshold();
         this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().

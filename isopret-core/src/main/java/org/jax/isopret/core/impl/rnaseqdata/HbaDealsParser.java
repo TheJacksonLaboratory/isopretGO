@@ -28,8 +28,8 @@ public class HbaDealsParser {
      */
     private final String hbadealsFile;
 
-    /** Key -- an ENSG {@link AccessionNumber}, value -- an {@link HbaDealsResult} object with results for gene expression and splicing.*/
-    private final Map<AccessionNumber, HbaDealsResult> ensgAcc2hbaDealsMap;
+    /** Key -- an ENSG {@link AccessionNumber}, value -- an {@link GeneResultImpl} object with results for gene expression and splicing.*/
+    private final Map<AccessionNumber, GeneResultImpl> ensgAcc2hbaDealsMap;
 
 
     /**
@@ -79,8 +79,8 @@ public class HbaDealsParser {
             AccessionNumber ensgAccession = hline.geneAccession; // if we cannot find symbol, just show the accession
             if (hgncMap.containsKey(ensgAccession)) {
                 GeneModel model = hgncMap.get(ensgAccession);
-                this.ensgAcc2hbaDealsMap.putIfAbsent(ensgAccession, new HbaDealsResult(hline.geneAccession, model));
-                HbaDealsResult hbaresult = this.ensgAcc2hbaDealsMap.get(ensgAccession);
+                this.ensgAcc2hbaDealsMap.putIfAbsent(ensgAccession, new GeneResultImpl(hline.geneAccession, model));
+                GeneResultImpl hbaresult = this.ensgAcc2hbaDealsMap.get(ensgAccession);
                 if (hline.isIsoform) {
                     hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p);
                 } else {
@@ -104,7 +104,7 @@ public class HbaDealsParser {
         }
     }
 
-    public Map<AccessionNumber, HbaDealsResult> getEnsgAcc2hbaDealsMap() {
+    public Map<AccessionNumber, GeneResultImpl> getEnsgAcc2hbaDealsMap() {
         return ensgAcc2hbaDealsMap;
     }
 

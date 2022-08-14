@@ -1,7 +1,7 @@
 package org.jax.isopret.cli.command;
 
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsThresholder;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.AccessionNumber;
@@ -19,8 +19,6 @@ import java.util.Map;
 
 public abstract class AbstractIsopretCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIsopretCommand.class);
-    /** isopret only supports hg38. */
-    private final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
 
     protected Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap = null;
 
@@ -33,7 +31,7 @@ public abstract class AbstractIsopretCommand {
 
     protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, GeneModel> hgncMap, String hbadealsPath) {
         HbaDealsParser hbaParser = new HbaDealsParser(hbadealsPath, hgncMap);
-        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResultImpl> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         return new HbaDealsThresholder(hbaDealsResults);
     }

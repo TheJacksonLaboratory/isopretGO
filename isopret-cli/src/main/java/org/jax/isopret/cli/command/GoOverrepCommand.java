@@ -8,7 +8,7 @@ import org.jax.isopret.model.GoMethod;
 import org.jax.isopret.model.MtcMethod;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.HbaDealsParser;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
@@ -76,7 +76,7 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         // ----------  6. HBA-DEALS input file  ----------------
         LOGGER.info("About to create thresholder");
         HbaDealsParser hbaParser = new HbaDealsParser(this.hbadealsFile, hgncMap);
-        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResultImpl> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         MtcMethod mtcMethod = MtcMethod.fromString(mtc);
         HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,

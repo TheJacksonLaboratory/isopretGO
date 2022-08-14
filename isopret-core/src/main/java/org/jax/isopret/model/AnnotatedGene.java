@@ -1,7 +1,7 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsResult;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
+import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
     /** Key -- accession number of a transcript; value -- corresponding Interpro annotations .*/
     private final Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap;
 
-    private final HbaDealsResult hbaDealsResult;
+    private final GeneResultImpl hbaDealsResult;
 
     private final Boolean differentiallyExpressed;
 
@@ -44,14 +44,14 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      */
     public AnnotatedGene(List<Transcript> transcripts,
                          Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptToInterproHitMap,
-                         HbaDealsResult result,
+                         GeneResultImpl result,
                          double expressionThreshold,
                          double splicingThreshold) {
         this.transcripts = transcripts;
 
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
         expressedTranscripts = transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))
@@ -93,7 +93,6 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
      */
     public Map<AccessionNumber, Set<InterproEntry>> getTranscriptToUniqueInterproMap() {
         Map<AccessionNumber, Set<InterproEntry>> uniqCountMap = new HashMap<>();
-        Set<Integer> alreadySeen = new HashSet<>();
         for (Map.Entry<AccessionNumber, List<DisplayInterproAnnotation>> entry : transcriptToInterproHitMap.entrySet()) {
             AccessionNumber acc = entry.getKey();
             // Note that DisplayInterproAnnotation can be unique because of different positions
@@ -137,7 +136,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
         return transcripts;
     }
 
-    public HbaDealsResult getHbaDealsResult() {
+    public GeneResultImpl getHbaDealsResult() {
         return hbaDealsResult;
     }
 

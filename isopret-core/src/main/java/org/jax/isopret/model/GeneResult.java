@@ -1,6 +1,6 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 
 import java.util.*;
 
@@ -23,7 +23,7 @@ public interface GeneResult {
     List<Double> getSplicingPlist() ;
 
 
-    Map<AccessionNumber, HbaDealsTranscriptResult> getTranscriptMap();
+    Map<AccessionNumber, TranscriptResultImpl> getTranscriptMap();
 
     /**
      * Only expressed transcripts are added to the HBA-DEALS results file.
@@ -52,5 +52,5 @@ public interface GeneResult {
     double getSmallestSplicingP();
 
 
-    Set<HbaDealsTranscriptResult> getTranscriptResults();
+    Set<TranscriptResultImpl> getTranscriptResults();
 }
