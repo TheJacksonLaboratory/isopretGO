@@ -6,7 +6,7 @@ import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -105,7 +105,7 @@ public class GoOverrepCommand extends AbstractIsopretCommand implements Callable
         }
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         MtcMethod mtcMethod = MtcMethod.fromString(mtc);
-        HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+        IsoformSpecificThresholder isoThresholder = IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);

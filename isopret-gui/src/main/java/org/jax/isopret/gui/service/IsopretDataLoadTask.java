@@ -7,7 +7,7 @@ import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.go.*;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.model.*;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
@@ -43,7 +43,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private InterproMapper interproMapper = null;
 
-    private HbaDealsIsoformSpecificThresholder isoformSpecificThresholder = null;
+    private IsoformSpecificThresholder isoformSpecificThresholder = null;
 
     private final File downloadDirectory;
 
@@ -76,7 +76,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder = new IsopretStats.Builder();
     }
 
-    public HbaDealsIsoformSpecificThresholder getIsoformSpecificThresholder() {
+    public IsoformSpecificThresholder getIsoformSpecificThresholder() {
         return isoformSpecificThresholder;
     }
 
@@ -163,7 +163,7 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                 RnaSeqResultsParser.fromHbaDeals(this.hbaDealsFile, geneSymbolToModelMap);
         updateProgress(0.85, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
-        this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+        this.isoformSpecificThresholder = IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);

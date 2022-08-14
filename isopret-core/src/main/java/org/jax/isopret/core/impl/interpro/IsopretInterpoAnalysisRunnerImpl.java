@@ -8,7 +8,7 @@ import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.core.impl.go.IsopretAssociationContainer;
 import org.jax.isopret.core.impl.go.IsopretContainerFactory;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
@@ -71,7 +71,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
     }
 
 
-    private HbaDealsIsoformSpecificThresholder getThresholder(String hbadealsFile, IsopretProvider provider)  {
+    private IsoformSpecificThresholder getThresholder(String hbadealsFile, IsopretProvider provider)  {
         geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         Map<AccessionNumber, GeneModel> hgncMap  = provider.ensemblGeneModelMap();
         Ontology ontology = provider.geneOntology();
@@ -89,7 +89,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
         LOGGER.info("Got transcriptContainer with {} domain items", transcriptContainer.getAnnotatedDomainItemCount());
         geneContainer = isoContainerFac.geneContainer();
         LOGGER.info("Got geneContainer with {} domain items", geneContainer.getAnnotatedDomainItemCount());
-        HbaDealsIsoformSpecificThresholder thresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+        IsoformSpecificThresholder thresholder =  IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);
@@ -100,7 +100,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
 
     private List<AnnotatedGene> getAnnotatedGeneList(String hbadealsFile, IsopretProvider provider) {
         int notfound = 0;
-        HbaDealsIsoformSpecificThresholder thresholder = getThresholder(hbadealsFile , provider);
+        IsoformSpecificThresholder thresholder = getThresholder(hbadealsFile , provider);
         this.splicingPepThreshold = thresholder.getSplicingPepThreshold();
         this.geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();

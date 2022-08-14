@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.impl.go.*;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.model.*;
 import org.jax.isopret.visualization.DasDgeGoVisualizer;
@@ -50,7 +50,7 @@ public class IsopretServiceImpl implements IsopretService  {
     private MtcMethod mtcMethod = MtcMethod.NONE;
     private Ontology geneOntology = null;
     private InterproMapper interproMapper = null;
-    private HbaDealsIsoformSpecificThresholder thresholder = null;
+    private IsoformSpecificThresholder thresholder = null;
     private Map<AccessionNumber, GeneModel> geneAccessionToModelMap = Map.of();
     private List<GoTerm2PValAndCounts> dasGoTerms = List.of();
     private List<GoTerm2PValAndCounts> dgeGoTerms = List.of();

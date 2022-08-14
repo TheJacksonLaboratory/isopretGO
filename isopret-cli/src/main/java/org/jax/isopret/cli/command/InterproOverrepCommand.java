@@ -3,7 +3,7 @@ package org.jax.isopret.cli.command;
 import org.jax.isopret.core.InterproAnalysisResults;
 import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
-import org.jax.isopret.core.impl.rnaseqdata.HbaDealsIsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.model.*;
 import org.jax.isopret.core.InterproMapper;
@@ -46,7 +46,7 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         AssociationContainer<TermId> transcriptContainer = provider.transcriptContainer();
         AssociationContainer<TermId> geneContainer = provider.geneContainer();
-        HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+        IsoformSpecificThresholder isoThresholder =  IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);
