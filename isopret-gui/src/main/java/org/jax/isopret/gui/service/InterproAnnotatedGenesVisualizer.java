@@ -2,7 +2,7 @@ package org.jax.isopret.gui.service;
 
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.model.GoTermIdPlusLabel;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.DisplayInterproAnnotation;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
@@ -45,7 +45,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
             Map<AccessionNumber, List<DisplayInterproAnnotation>> transcriptMap = gene.getTranscriptToInterproHitMap();
             boolean includeThisGene = false;
             if (gene.passesSplicingThreshold()) {
-                for (HbaDealsTranscriptResult tresult : gene.getHbaDealsResult().getTranscriptResults()) {
+                for (TranscriptResultImpl tresult : gene.getHbaDealsResult().getTranscriptResults()) {
                     if (tresult.isSignificant(splicingPepThreshold)) {
                         AccessionNumber acc = tresult.getTranscriptId();
                         List<DisplayInterproAnnotation> dialist = transcriptMap.get(acc);

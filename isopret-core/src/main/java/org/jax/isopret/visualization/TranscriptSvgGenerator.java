@@ -2,10 +2,10 @@ package org.jax.isopret.visualization;
 
 
 import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
+import org.jax.isopret.model.GeneResult;
 import org.jax.isopret.model.Transcript;
 import org.monarchinitiative.svart.*;
 
@@ -80,7 +80,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     private final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
 
-    private final HbaDealsResult hbaDealsResult;
+    private final GeneResult hbaDealsResult;
 
     private final boolean differentiallyExpressed;
 
@@ -97,8 +97,8 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     private List<Transcript> getAffectedTranscripts(AnnotatedGene annotatedGene) {
         List<Transcript> transcripts = annotatedGene.getTranscripts();
-        HbaDealsResult result = annotatedGene.getHbaDealsResult();
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        GeneResult result = annotatedGene.getHbaDealsResult();
+        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
         return transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))
@@ -260,14 +260,14 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
 
     private double getLogFoldChage(AccessionNumber id) {
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResultImpl> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         if (!transcriptResultMap.containsKey(id)) return 0.0;
         double fc = transcriptResultMap.get(id).getFoldChange();
         return Math.log(fc) / Math.log(2);
     }
 
     private String getFormatedPvalue(AccessionNumber id) {
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResultImpl> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         double logFC = getLogFoldChage(id);
         if (!transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
         double p = transcriptResultMap.get(id).getPvalue();
@@ -534,8 +534,8 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
     public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript) {
         List<Transcript> transcripts = annotatedTranscript.getTranscripts();
-        HbaDealsResult result = annotatedTranscript.getHbaDealsResult();
-        Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap = result.getTranscriptMap();
+        GeneResult result = annotatedTranscript.getHbaDealsResult();
+        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
         List<Transcript> affectedTranscripts = transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))

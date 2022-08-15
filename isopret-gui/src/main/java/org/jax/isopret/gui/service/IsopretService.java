@@ -3,6 +3,7 @@ package org.jax.isopret.gui.service;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
 import org.jax.isopret.model.GoTermIdPlusLabel;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
@@ -36,19 +37,27 @@ public interface IsopretService {
 
     StringProperty downloadDirProperty();
 
-    StringProperty hbaDealsFileProperty();
+    StringProperty rnaSeqResultsFileProperty();
+
 
     DoubleProperty downloadCompletenessProperty();
 
-    void setHbaDealsFile(File file);
+    /**
+     * Set the RNA-Seq results file (with assessment of differential expression and splicing)
+     * @param file The RNA-seq file (e.g., output of HBA-DEALS)
+     * @param method One of {@link RnaSeqAnalysisMethod}
+     */
+    void setRnaSeqFile(File file, RnaSeqAnalysisMethod method);
 
     void setGoMethod(String method);
 
     void setMtcMethod(String method);
 
+    RnaSeqAnalysisMethod getRnaSeqMethod();
+
     Optional<File> getDownloadDir();
 
-    Optional<File> getHbaDealsFileOpt();
+    Optional<File> getRnaSeqResultsFileOpt();
 
     void setData(IsopretDataLoadTask task);
 
@@ -90,4 +99,6 @@ public interface IsopretService {
     List<AnnotatedGene> getAnnotatedGeneList();
     double getSplicingPepThreshold();
     Map<GoTermIdPlusLabel, Integer> getGoAnnotationsForTranscript(Set<TermId> annotatedItemTermIds);
+
+
 }

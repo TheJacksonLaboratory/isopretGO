@@ -5,11 +5,10 @@ import org.jax.isopret.core.GoAnalysisResults;
 import org.jax.isopret.core.IsopretGoAnalysisRunner;
 import org.jax.isopret.core.IsopretProvider;
 import org.jax.isopret.core.analysis.IsopretStats;
-import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
 import org.jax.isopret.core.impl.go.*;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.model.*;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.core.InterproMapper;
@@ -44,11 +43,13 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private InterproMapper interproMapper = null;
 
-    private HbaDealsIsoformSpecificThresholder isoformSpecificThresholder = null;
+    private IsoformSpecificThresholder isoformSpecificThresholder = null;
 
-    private final File downloadDirectory;
-
-    private final File hbaDealsFile;
+    //private final File downloadDirectory;
+    /**
+     * The HBA-DEALS or edgeR analysis file.
+     */
+    private final File rnaSeqResultsFile;
 
     private final GoMethod overrepMethod;
     private final MtcMethod multipleTestingMethod;
@@ -67,17 +68,23 @@ public class IsopretDataLoadTask extends Task<Integer>  {
 
     private final IsopretProvider provider;
 
-    public IsopretDataLoadTask(File downloadDirectory, File hbaDealsFile, GoMethod goMethod, MtcMethod mtcMethod) {
+    private final RnaSeqAnalysisMethod rnaSeqAnalysisMethod;
+
+    public IsopretDataLoadTask(File downloadDirectory,
+                               File hbaDealsFile,
+                               GoMethod goMethod,
+                               MtcMethod mtcMethod,
+                               RnaSeqAnalysisMethod rnaSeqMethod) {
         errors = new ArrayList<>();
-        this.downloadDirectory = downloadDirectory;
         this.provider = IsopretProvider.provider(downloadDirectory.toPath());
-        this.hbaDealsFile = hbaDealsFile;
+        this.rnaSeqResultsFile = hbaDealsFile;
         this.overrepMethod = goMethod;
         this.multipleTestingMethod = mtcMethod;
+        this.rnaSeqAnalysisMethod = rnaSeqMethod;
         isopretStatsBuilder = new IsopretStats.Builder();
     }
 
-    public HbaDealsIsoformSpecificThresholder getIsoformSpecificThresholder() {
+    public IsoformSpecificThresholder getIsoformSpecificThresholder() {
         return isoformSpecificThresholder;
     }
 
@@ -107,21 +114,17 @@ public class IsopretDataLoadTask extends Task<Integer>  {
                 .map(List::size)
                 .reduce(0, Integer::sum);
         isopretStatsBuilder.transcriptsCount(n_transcripts);
+        isopretStatsBuilder.rnaSeqMethod(rnaSeqAnalysisMethod);
 
-        File isoformFunctionFile = new File(downloadDirectory + File.separator + "isoform_function_list_mf.txt");
-
-        isopretStatsBuilder.info("isoform function file", isoformFunctionFile.getAbsolutePath());
-       // TranscriptFunctionFileParser fxnparser = new TranscriptFunctionFileParser(downloadDirectory, geneOntology);
-        Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
-                createTranscriptToGeneIdMap(geneSymbolAccessionListMap);
+        File isoformFunctionFileMf = provider.isoformFunctionListMf().toFile();
+        isopretStatsBuilder.info("isoform function file", isoformFunctionFileMf.getAbsolutePath());
         this.transcript2GoMap = provider.transcriptIdToGoTermsMap();
         updateProgress(0.40, 1);
-        updateMessage(String.format("Loaded isoformFunctionFile (%d transcripts).", transcript2GoMap.size()));
+        updateMessage(String.format("Loaded isoformFunctionFileMf (%d transcripts).", transcript2GoMap.size()));
         Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
         LOGGER.info("Loaded gene2GoMap with {} entries", gene2GoMap.size());
         isopretStatsBuilder.annotatedGeneCount(gene2GoMap.size());
         IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology, transcript2GoMap, gene2GoMap);
-
         transcriptContainer = isoContainerFac.transcriptContainer();
         geneContainer = isoContainerFac.geneContainer();
         updateProgress(0.55, 1);
@@ -133,24 +136,15 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.annotatedTranscripts(transcriptContainer.getAnnotatedDomainItemCount());
 
 
-        File hgncFile = new File(downloadDirectory + File.separator + "hgnc_complete_set.txt");
+        File hgncFile = provider.hgncCompleteSet().toFile();
         HgncParser hgncParser = new HgncParser(hgncFile, geneSymbolAccessionListMap);
         this.geneSymbolToModelMap = hgncParser.ensemblMap();
         updateProgress(0.65, 1); /* this will update the progress bar */
         updateMessage(String.format("Loaded Ensembl HGNC map with %d genes", geneSymbolToModelMap.size()));
         LOGGER.info(String.format("Loaded Ensembl HGNC map with %d genes", geneSymbolToModelMap.size()));
         isopretStatsBuilder.hgncCount(geneSymbolToModelMap.size());
-
-        File interproDescriptionFile = new File(downloadDirectory + File.separator + "interpro_domain_desc.txt");
-        File interproDomainsFile = new File(downloadDirectory + File.separator + "interpro_domains.txt");
-        if (! interproDomainsFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find interpro_domains.txt at " +
-                    interproDomainsFile.getAbsolutePath());
-        }
-        if (! interproDescriptionFile.isFile()) {
-            throw new IsopretRuntimeException("Could not find interpro_domain_desc.txt at " +
-                    interproDescriptionFile.getAbsolutePath());
-        }
+        File interproDescriptionFile = provider.interproDomainDesc().toFile();
+        File interproDomainsFile = provider.interproDomains().toFile();
         isopretStatsBuilder.info("Interpro domains file", interproDomainsFile.getAbsolutePath());
         isopretStatsBuilder.info("Interpro description file", interproDescriptionFile.getAbsolutePath());
         this.interproMapper = provider.interproMapper();
@@ -160,14 +154,21 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.interproAnnotationCount(interproMapper.getInterproAnnotationCount());
         LOGGER.info(String.format("Loaded InterproMapper with %d descriptions", interproMapper.getInterproDescriptionCount()));
         updateProgress(0.80, 1); /* this will update the progress bar */
-        HbaDealsParser hbaParser = new HbaDealsParser(this.hbaDealsFile.getAbsolutePath(), geneSymbolToModelMap);
-        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResult> geneResultsMap =
+                RnaSeqResultsParser.parse(this.rnaSeqResultsFile, geneSymbolToModelMap, rnaSeqAnalysisMethod);
         updateProgress(0.85, 1); /* this will update the progress bar */
-        updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", hbaDealsResults.size()));
-        this.isoformSpecificThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
-                0.05,
-                geneContainer,
-                transcriptContainer);
+        updateMessage(String.format("Loaded HBA-DEALS results with %d observed genes.", geneResultsMap.size()));
+        if (this.rnaSeqAnalysisMethod == RnaSeqAnalysisMethod.HBADEALS) {
+            this.isoformSpecificThresholder = IsoformSpecificThresholder.fromHbaDeals(geneResultsMap,
+                    0.05,
+                    geneContainer,
+                    transcriptContainer);
+        } else {
+            this.isoformSpecificThresholder = IsoformSpecificThresholder.fromEdgeR(geneResultsMap,
+                    0.05,
+                    geneContainer,
+                    transcriptContainer);
+        }
         updateProgress(0.90, 1);
         updateMessage("Finished loading data for isopret analysis.");
         LOGGER.info("Beginning DGE GO analysis");
@@ -180,11 +181,18 @@ public class IsopretDataLoadTask extends Task<Integer>  {
         isopretStatsBuilder.fdrThreshold(isoformSpecificThresholder.getFdrThreshold());
         isopretStatsBuilder.expressionPthreshold(isoformSpecificThresholder.getExpressionPepThreshold());
         isopretStatsBuilder.splicingPthreshold(isoformSpecificThresholder.getSplicingPepThreshold());
-
-        IsopretGoAnalysisRunner runner = IsopretGoAnalysisRunner.hbadeals(provider,
-                this.hbaDealsFile.getAbsolutePath(),
-                multipleTestingMethod,
-                overrepMethod);
+        IsopretGoAnalysisRunner runner;
+        if (this.rnaSeqAnalysisMethod == RnaSeqAnalysisMethod.HBADEALS) {
+            runner = IsopretGoAnalysisRunner.hbadeals(provider,
+                    this.rnaSeqResultsFile,
+                    multipleTestingMethod,
+                    overrepMethod);
+        } else {
+            runner = IsopretGoAnalysisRunner.edgeR(provider,
+                    this.rnaSeqResultsFile,
+                    multipleTestingMethod,
+                    overrepMethod);
+        }
         updateMessage("Running overrepresentation analysis");
         updateProgress(0.95, 1);
         GoAnalysisResults goResults = runner.run();

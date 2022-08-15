@@ -244,7 +244,7 @@ public class GeneOntologyController implements Initializable {
     }
 
     Optional<File> getDefaultFname(String type, String goId) {
-        Optional<File> hba = isopretService.getHbaDealsFileOpt();
+        Optional<File> hba = isopretService.getRnaSeqResultsFileOpt();
         String hbaName = hba.map(File::getName).orElse("hbadeals");
         String fname = "isopret-" + type + "-" + goId + "-" + hbaName + ".html";
         fname = fname.replaceAll(":", "_");

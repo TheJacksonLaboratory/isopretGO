@@ -91,7 +91,7 @@
                                     <Insets bottom="10.0" left="20.0" />
                                 </VBox.margin>
                             </Label>
-                            <Label styleClass="infolabel" stylesheets="@../css/isopretstyle.css" text="Select HBA-DEALS results file for RNA-seq cohort analysis">
+                            <Label styleClass="infolabel" stylesheets="@../css/isopretstyle.css" text="Select HBA-DEALS/edgeR results file for RNA-seq cohort analysis">
                                 <VBox.margin>
                                     <Insets bottom="20.0" left="40.0" />
                                 </VBox.margin>
@@ -102,9 +102,19 @@
                                         <Insets left="40.0" />
                                     </HBox.margin>
                                 </Button>
-                                <Label fx:id="hbaDealsFileLabel" text="n/a">
+                        <Button mnemonicParsing="false" onAction="#chooseEdgeRFile" prefHeight="30.0" prefWidth="200.0" styleClass="Button" stylesheets="@../css/isopretstyle.css" text="edgeR file">
+                           <HBox.margin>
+                              <Insets left="40.0" />
+                           </HBox.margin>
+                        </Button>
+                            </HBox>
+                            <HBox prefHeight="100.0" prefWidth="200.0">
+                                <VBox.margin>
+                                    <Insets top="20.0"/>
+                                </VBox.margin>
+                                <Label fx:id="rnaSeqFileLabel" text="...">
                                     <HBox.margin>
-                                        <Insets left="30.0" top="5.0" />
+                                        <Insets left="50.0"/>
                                     </HBox.margin>
                                 </Label>
                             </HBox>
@@ -147,6 +157,9 @@
                                     </GridPane.margin>
                                 </ChoiceBox>
                             </GridPane>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
                         </VBox>
                         <VBox prefHeight="100.0" prefWidth="100.0">
                             <Label styleClass="bluelabel" stylesheets="@../css/isopretstyle.css" text="Isopret analysis">

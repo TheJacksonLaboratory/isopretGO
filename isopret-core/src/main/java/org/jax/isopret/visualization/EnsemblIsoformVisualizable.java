@@ -1,6 +1,6 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 
 public class EnsemblIsoformVisualizable implements IsoformVisualizable {
 
@@ -15,7 +15,7 @@ public class EnsemblIsoformVisualizable implements IsoformVisualizable {
 
     private final boolean isSignificant;
 
-    public EnsemblIsoformVisualizable(HbaDealsTranscriptResult transcriptResult, double splicingPepThreshold){
+    public EnsemblIsoformVisualizable(TranscriptResultImpl transcriptResult, double splicingPepThreshold){
         this.transcriptAccession = transcriptResult.getTranscript();
         String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
         this.isoformUrlAnchor =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());

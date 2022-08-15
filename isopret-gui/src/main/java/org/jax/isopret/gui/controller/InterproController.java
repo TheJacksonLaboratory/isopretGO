@@ -166,7 +166,7 @@ public class InterproController implements Initializable {
         }
 
     Optional<File> getDefaultFname(String type, String interproId) {
-        Optional<File> hba = isopretService.getHbaDealsFileOpt();
+        Optional<File> hba = isopretService.getRnaSeqResultsFileOpt();
         String hbaName = hba.map(File::getName).orElse("hbadeals");
         String fname = "isopret-" + type + "-" + interproId + "-" + hbaName + ".html";
         fname = fname.replaceAll(":", "_");

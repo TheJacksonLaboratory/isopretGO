@@ -8,9 +8,8 @@ import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.core.impl.go.IsopretAssociationContainer;
 import org.jax.isopret.core.impl.go.IsopretContainerFactory;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.model.*;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
@@ -18,6 +17,7 @@ import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 
 public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisRunner {
@@ -71,12 +71,15 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
     }
 
 
-    private HbaDealsIsoformSpecificThresholder getThresholder(String hbadealsFile, IsopretProvider provider)  {
+    private IsoformSpecificThresholder getThresholder(String hbadealsFile, IsopretProvider provider)  {
         geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         Map<AccessionNumber, GeneModel> hgncMap  = provider.ensemblGeneModelMap();
         Ontology ontology = provider.geneOntology();
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsFile, hgncMap);
-        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        File file = new File(hbadealsFile);
+        if (! file.isFile()) {
+            throw new IsopretRuntimeException("Could not fine HBA-DEAL file at " + file.getAbsoluteFile());
+        }
+        Map<AccessionNumber, GeneResult> hbaDealsResults = RnaSeqResultsParser.fromHbaDeals(file, hgncMap);
         this.transcriptToGoMap = provider.transcriptIdToGoTermsMap();
         Map<TermId, TermId> transcriptToGeneIdMap = provider.transcriptToGeneIdMap();
         Map<TermId, Set<TermId>> gene2GoMap = provider.gene2GoMap();
@@ -86,7 +89,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
         LOGGER.info("Got transcriptContainer with {} domain items", transcriptContainer.getAnnotatedDomainItemCount());
         geneContainer = isoContainerFac.geneContainer();
         LOGGER.info("Got geneContainer with {} domain items", geneContainer.getAnnotatedDomainItemCount());
-        HbaDealsIsoformSpecificThresholder thresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+        IsoformSpecificThresholder thresholder =  IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);
@@ -97,12 +100,12 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
 
     private List<AnnotatedGene> getAnnotatedGeneList(String hbadealsFile, IsopretProvider provider) {
         int notfound = 0;
-        HbaDealsIsoformSpecificThresholder thresholder = getThresholder(hbadealsFile , provider);
+        IsoformSpecificThresholder thresholder = getThresholder(hbadealsFile , provider);
         this.splicingPepThreshold = thresholder.getSplicingPepThreshold();
         this.geneSymbolAccessionToTranscriptMap = provider.geneSymbolToTranscriptListMap();
         List<AnnotatedGene> annotatedGenes = new ArrayList<>();
         // sort the raw results according to minimum p-values
-        List<HbaDealsResult> results = thresholder.getRawResults().values()
+        List<GeneResult> results = thresholder.getRawResults().values()
                 .stream()
                 .sorted()
                 .toList();
@@ -111,7 +114,7 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
         double splicingThreshold = thresholder.getSplicingPepThreshold();
         double expressionThreshold = thresholder.getExpressionPepThreshold();
         InterproMapper interproMapper = provider.interproMapper();
-        for (HbaDealsResult result : results) {
+        for (GeneResult result : results) {
             c++;
             if (c % 100==0) {
                 LOGGER.info("results {} not found {}", c, notfound);

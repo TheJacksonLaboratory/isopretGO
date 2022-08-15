@@ -211,7 +211,7 @@ public class HbaGeneController implements Initializable {
 
     @FXML private void htmlSummaryExport(ActionEvent e) {
 
-        Optional<File> opt =  service.getHbaDealsFileOpt();
+        Optional<File> opt =  service.getRnaSeqResultsFileOpt();
         if (opt.isEmpty()) {
             PopupFactory.displayError("Error", "Could not get HBA-DEAL file name");
             return;
@@ -242,7 +242,7 @@ public class HbaGeneController implements Initializable {
 
     @FXML private void geneSVGexport(ActionEvent e) {
         String svg = this.visualizable.getIsoformSvg();
-        Optional<File> opt = service.getHbaDealsFileOpt();
+        Optional<File> opt = service.getRnaSeqResultsFileOpt();
         if (opt.isEmpty()) {
             PopupFactory.displayError("Error", "Cannot export isoform SVG because HBA-DEALS file name not found");
             return;
@@ -255,7 +255,7 @@ public class HbaGeneController implements Initializable {
     }
 
     @FXML private void genePDFexport(ActionEvent e) {
-        Optional<File> opt = service.getHbaDealsFileOpt();
+        Optional<File> opt = service.getRnaSeqResultsFileOpt();
         if (opt.isEmpty()) {
             PopupFactory.displayError("Error", "Cannot export SVG because HBA-DEALS file name not found");
             return;
@@ -274,7 +274,7 @@ public class HbaGeneController implements Initializable {
 
     @FXML private void proteinSVGexport(ActionEvent e) {
         String svg = this.visualizable.getProteinSvg();
-        Optional<File> opt = service.getHbaDealsFileOpt();
+        Optional<File> opt = service.getRnaSeqResultsFileOpt();
         if (opt.isEmpty()) {
             PopupFactory.displayError("Error", "Cannot export SVG because HBA-DEALS file name not found");
             return;
@@ -288,7 +288,7 @@ public class HbaGeneController implements Initializable {
     }
 
     @FXML private void proteinPDFexport(ActionEvent e) {
-        Optional<File> opt = service.getHbaDealsFileOpt();
+        Optional<File> opt = service.getRnaSeqResultsFileOpt();
         if (opt.isEmpty()) {
             PopupFactory.displayError("Error", "Cannot export SVG because HBA-DEALS file name not found");
             return;

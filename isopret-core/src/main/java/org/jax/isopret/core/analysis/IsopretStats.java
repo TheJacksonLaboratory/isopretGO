@@ -1,5 +1,7 @@
 package org.jax.isopret.core.analysis;
 
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
+
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -130,6 +132,11 @@ public class IsopretStats {
 
         public Builder geneOntologyVersion(String v) {
             map.put("Gene Ontology version", v);
+            return this;
+        }
+
+        public Builder rnaSeqMethod(RnaSeqAnalysisMethod method) {
+            map.put("RNA-Seq analysis method", method.name());
             return this;
         }
 

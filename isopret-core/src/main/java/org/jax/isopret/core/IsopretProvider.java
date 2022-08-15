@@ -42,4 +42,13 @@ public interface IsopretProvider {
 
 
     InterproMapper interproMapper();
+
+    Path goJson();
+    Path isoformFunctionListBp();
+    Path isoformFunctionListCc();
+    Path isoformFunctionListMf();
+    Path  hg38Ensembl();
+    Path hgncCompleteSet();
+    Path interproDomainDesc();
+    Path interproDomains();
 }
