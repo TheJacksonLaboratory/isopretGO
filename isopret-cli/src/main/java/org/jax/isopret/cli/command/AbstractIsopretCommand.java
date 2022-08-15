@@ -1,14 +1,6 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsThresholder;
-import org.jax.isopret.model.GeneModel;
-import org.jax.isopret.model.AccessionNumber;
-import org.jax.isopret.model.GeneSymbolAccession;
-import org.jax.isopret.model.Transcript;
-import org.monarchinitiative.svart.assembly.GenomicAssemblies;
-import org.monarchinitiative.svart.assembly.GenomicAssembly;
+import org.jax.isopret.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -19,8 +11,6 @@ import java.util.Map;
 
 public abstract class AbstractIsopretCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractIsopretCommand.class);
-    /** isopret only supports hg38. */
-    private final GenomicAssembly assembly = GenomicAssemblies.GRCh38p13();
 
     protected Map<GeneSymbolAccession, List<Transcript>>  geneSymbolAccessionListMap = null;
 
@@ -31,12 +21,12 @@ public abstract class AbstractIsopretCommand {
 
 
 
-    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, GeneModel> hgncMap, String hbadealsPath) {
-        HbaDealsParser hbaParser = new HbaDealsParser(hbadealsPath, hgncMap);
-        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
-        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
-        return new HbaDealsThresholder(hbaDealsResults);
-    }
+//    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, GeneModel> hgncMap, String hbadealsPath) {
+//        Map<AccessionNumber, GeneResult> hbaDealsResults =
+//                RnaSeqResultsParser.fromHbaDeals(hbadealsPath, hgncMap);
+//        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
+//        return new HbaDealsThresholder(hbaDealsResults);
+//    }
 
 
     /**

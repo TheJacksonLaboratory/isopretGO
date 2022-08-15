@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.hbadeals;
+package org.jax.isopret.core.impl.rnaseqdata;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +19,7 @@ import java.util.stream.IntStream;
  * Our goal is to set the FDR to a given threshold (by default, 0.01) and to define the PEP threshold that calls
  * as many tests as possible signficant while still maintaining this threshold. We apply the additional criterion that
  * if the PEP is larger than 0.25 the test is not called significant, regardless of the FDR.
+ * @author Peter N Robinson
  */
 public class PosteriorErrorProbThreshold {
 

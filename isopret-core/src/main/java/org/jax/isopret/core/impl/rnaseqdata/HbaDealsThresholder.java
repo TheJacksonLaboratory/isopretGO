@@ -1,7 +1,8 @@
-package org.jax.isopret.core.impl.hbadeals;
+package org.jax.isopret.core.impl.rnaseqdata;
 
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneModel;
+import org.jax.isopret.model.GeneResult;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class HbaDealsThresholder {
     /** Threshold for total probability to calculate Bayesian FDR (Usually, we will use 0.05). */
     private final double fdrThreshold;
     /** HBA-DEALS results for all genes in the experiment. */
-    private final Map<AccessionNumber, HbaDealsResult> rawResults;
+    private final Map<AccessionNumber, GeneResult> rawResults;
     /** Probability threshold for expression results that attains {@link #fdrThreshold} FDR for expression. */
     private final double expressionThreshold;
     /** Probability threshold for splicing results that attains {@link #fdrThreshold} FDR for splicing. */
@@ -40,7 +41,7 @@ public class HbaDealsThresholder {
      * Find the FDR thresholds for splicing and expression
      * @param results Map of HBA-DEALS analysis results (key: gene symbol)
      */
-    public HbaDealsThresholder(Map<AccessionNumber, HbaDealsResult> results) {
+    public HbaDealsThresholder(Map<AccessionNumber, GeneResult> results) {
        this(results, DEFAULT_THRESHOLD);
     }
 
@@ -48,7 +49,7 @@ public class HbaDealsThresholder {
      * Find the FDR thresholds for splicing and expression
      * @param results Map of HBA-DEALS analysis results (key: gene symbol)
      */
-    public HbaDealsThresholder(Map<AccessionNumber, HbaDealsResult> results, double fdrThres) {
+    public HbaDealsThresholder(Map<AccessionNumber, GeneResult> results, double fdrThres) {
         rawResults = results;
         fdrThreshold = fdrThres;
         this.expressionThreshold = calculateExpressionThreshold();
@@ -59,14 +60,14 @@ public class HbaDealsThresholder {
                 .values()
                 .stream()
                 .filter(r -> r.getExpressionP() <= this.expressionThreshold)
-                .map(HbaDealsResult::getGeneModel)
+                .map(GeneResult::getGeneModel)
                 .map(GeneModel::geneSymbol)
                 .collect(Collectors.toSet());
         this.dasGeneSymbols = this.rawResults
                 .values()
                 .stream()
                 .filter(r -> r.getSmallestSplicingP() <= this.splicingThreshold)
-                .map(HbaDealsResult::getGeneModel)
+                .map(GeneResult::getGeneModel)
                 .map(GeneModel::geneSymbol)
                 .collect(Collectors.toSet());
         LOGGER.info("Found {} passing genes and {} passing isoforms.",
@@ -87,7 +88,7 @@ public class HbaDealsThresholder {
         List<Double> expressionProbs = rawResults
                 .values()
                 .stream()
-                .map(HbaDealsResult::getExpressionP)
+                .map(GeneResult::getExpressionP)
                 .toList();
        return getThreshold(expressionProbs);
     }
@@ -96,7 +97,7 @@ public class HbaDealsThresholder {
         List<Double> splicingProbs = rawResults
                 .values()
                 .stream()
-                .map(HbaDealsResult::getSplicingPlist)
+                .map(GeneResult::getSplicingPlist)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         return getThreshold(splicingProbs);
@@ -140,7 +141,7 @@ public class HbaDealsThresholder {
         return splicingThreshold;
     }
 
-    public Map<AccessionNumber, HbaDealsResult> getRawResults() {
+    public Map<AccessionNumber, GeneResult> getRawResults() {
         return rawResults;
     }
 
@@ -149,7 +150,7 @@ public class HbaDealsThresholder {
      */
     public Set<TermId> getAllGeneTermIds() {
         return rawResults.values().stream()
-                .map(HbaDealsResult::getEnsgId)
+                .map(GeneResult::getEnsgId)
                 .map(AccessionNumber::ensgFromInt)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
@@ -160,10 +161,10 @@ public class HbaDealsThresholder {
      */
     public Set<TermId> getAllTranscriptTermIds() {
         return rawResults.values().stream()
-                .map(HbaDealsResult::getTranscriptMap)
+                .map(GeneResult::getTranscriptMap)
                 .map(Map::values)
                 .flatMap(Collection::stream)
-                .map(HbaDealsTranscriptResult::getTranscriptId)
+                .map(TranscriptResultImpl::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
     }
@@ -173,18 +174,18 @@ public class HbaDealsThresholder {
                 .values()
                 .stream()
                 .filter(r -> r.getExpressionP() <= this.expressionThreshold)
-                .map(HbaDealsResult::getGeneAccession)
+                .map(GeneResult::getGeneAccession)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
     }
 
     public Set<TermId> dasIsoformTermIds() {
         return rawResults.values().stream()
-                .map(HbaDealsResult::getTranscriptMap)
+                .map(GeneResult::getTranscriptMap)
                 .map(Map::values)
                 .flatMap(Collection::stream)
                 .filter(r -> r.isSignificant(this.splicingThreshold ))
-               .map(HbaDealsTranscriptResult::getTranscriptId)
+               .map(TranscriptResultImpl::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
     }

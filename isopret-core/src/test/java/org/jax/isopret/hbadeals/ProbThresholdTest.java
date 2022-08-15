@@ -1,6 +1,6 @@
 package org.jax.isopret.hbadeals;
 
-import org.jax.isopret.core.impl.hbadeals.PosteriorErrorProbThreshold;
+import org.jax.isopret.core.impl.rnaseqdata.PosteriorErrorProbThreshold;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

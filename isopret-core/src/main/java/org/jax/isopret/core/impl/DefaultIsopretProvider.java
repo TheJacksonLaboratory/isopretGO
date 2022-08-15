@@ -172,5 +172,45 @@ public class DefaultIsopretProvider implements IsopretProvider {
         return this.interproMapper;
     }
 
+    @Override
+    public Path goJson() {
+        return dataResolver.goJson();
+    }
+
+    @Override
+    public Path isoformFunctionListBp() {
+        return dataResolver.isoformFunctionListBp();
+    }
+
+    @Override
+    public Path isoformFunctionListCc() {
+        return dataResolver.isoformFunctionListCc();
+    }
+
+    @Override
+    public Path isoformFunctionListMf() {
+        return dataResolver.isoformFunctionListMf();
+    }
+
+    @Override
+    public Path hg38Ensembl() {
+        return dataResolver.hg38Ensembl();
+    }
+
+    @Override
+    public Path hgncCompleteSet() {
+        return dataResolver.hgncCompleteSet();
+    }
+
+    @Override
+    public Path interproDomainDesc() {
+        return dataResolver.interproDomainDesc();
+    }
+
+    @Override
+    public Path interproDomains() {
+        return dataResolver.interproDomains();
+    }
+
 
 }

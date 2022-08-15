@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.hbadeals;
+package org.jax.isopret.core.impl.rnaseqdata;
 
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.GeneModel;
@@ -9,34 +9,40 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class encapsulates the results of HBADEALS for one gene and all of the isoforms of that gene that were
+ * This class encapsulates the results of RNA-seq analysis for a gene and the isoforms
+ * that correspond to the gene. It is designed to be used for both HBA-DEALS and edgeR
+ * results. {@link #hasDifferentialExpressionResult(double)} can be used to determine
+ * if the gene is differential (not that for HBA-DEALS the PEP is used and for edgeR the
+ * BH-adjusted p-value). Similarly, {@link #hasDifferentialSplicingResult(double)} is
+ * used to determine if there are one or more differential isoforms.
+ * @author Peter N Robinson
  */
-public class HbaDealsResult implements GeneResult, Comparable<HbaDealsResult> {
+public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final AccessionNumber geneAccession;
     private final GeneModel geneModel;
     private double expressionFoldChange;
     private double expressionP;
-    private final Map<AccessionNumber, HbaDealsTranscriptResult> transcriptMap;
+    private final Map<AccessionNumber, TranscriptResultImpl> transcriptMap;
 
 
 
-    public HbaDealsResult(AccessionNumber geneAccession, GeneModel sym) {
+    public GeneResultImpl(AccessionNumber geneAccession, GeneModel sym) {
         this.geneAccession = geneAccession;
         this.geneModel = sym;
         transcriptMap = new HashMap<>();
     }
-
+    @Override
     public void addExpressionResult(double fc, double p) {
         this.expressionFoldChange = fc;
         this.expressionP = p;
     }
-
+    @Override
     public void addTranscriptResult(AccessionNumber isoform, double expFC, double P) {
-        HbaDealsTranscriptResult tresult = new HbaDealsTranscriptResult(isoform, expFC, P);
+        TranscriptResultImpl tresult = new TranscriptResultImpl(isoform, expFC, P);
         transcriptMap.putIfAbsent(isoform, tresult);
     }
-    @Override
+
     public AccessionNumber getGeneAccession() {
         return geneAccession;
     }
@@ -68,12 +74,12 @@ public class HbaDealsResult implements GeneResult, Comparable<HbaDealsResult> {
         return this.transcriptMap
                 .values()
                 .stream()
-                .map(HbaDealsTranscriptResult::getPvalue)
+                .map(TranscriptResultImpl::getPvalue)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Map<AccessionNumber, HbaDealsTranscriptResult> getTranscriptMap() {
+    public Map<AccessionNumber, TranscriptResultImpl> getTranscriptMap() {
         return Collections.unmodifiableMap(transcriptMap);
     }
 
@@ -117,7 +123,7 @@ public class HbaDealsResult implements GeneResult, Comparable<HbaDealsResult> {
         return this.transcriptMap
                 .values()
                 .stream()
-                .map(HbaDealsTranscriptResult::getPvalue)
+                .map(TranscriptResultImpl::getPvalue)
                 .min(Double::compareTo)
                 .orElse(1.0);
     }
@@ -126,7 +132,7 @@ public class HbaDealsResult implements GeneResult, Comparable<HbaDealsResult> {
         return Math.min(getExpressionP(), getSmallestSplicingP());
     }
     @Override
-    public Set<HbaDealsTranscriptResult> getTranscriptResults() {
+    public Set<TranscriptResultImpl> getTranscriptResults() {
         return new HashSet<>(this.transcriptMap.values());
     }
 
@@ -134,7 +140,7 @@ public class HbaDealsResult implements GeneResult, Comparable<HbaDealsResult> {
      * Sort according to the smallest ('most significant') p value for expression or splicing.
      */
     @Override
-    public int compareTo(HbaDealsResult that) {
+    public int compareTo(GeneResultImpl that) {
         return Double.compare(this.minp(), that.minp());
     }
 }

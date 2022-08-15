@@ -16,6 +16,7 @@ import org.jax.isopret.core.InterproAnalysisResults;
 import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
 import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
 import org.jax.isopret.model.GoMethod;
 import org.jax.isopret.model.MtcMethod;
 import org.jax.isopret.visualization.InterproOverrepVisualizer;
@@ -58,7 +59,7 @@ public class MainController implements Initializable {
     public Tab interproTab;
 
     @FXML
-    private Label hbaDealsFileLabel;
+    private Label rnaSeqFileLabel;
     @FXML
     private ProgressBar analysisPB;
     @FXML
@@ -110,7 +111,7 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
         this.datasourcesDownloadProgressIndicator.progressProperty().bind(service.downloadCompletenessProperty());
-        this.hbaDealsFileLabel.textProperty().bind(service.hbaDealsFileProperty());
+        this.rnaSeqFileLabel.textProperty().bind(service.rnaSeqResultsFileProperty());
         goChoiceBox.setItems(goMethodList);
         goChoiceBox.getSelectionModel().selectFirst();
         goChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> service.setGoMethod(newValue));
@@ -121,23 +122,7 @@ public class MainController implements Initializable {
     }
 
 
-    /**
-     * Show the user a file chooser to select an output (results) file from HBA-DEALS.
-     */
-    @FXML
-    private void chooseHbaDealsOutputFile(ActionEvent e) {
-        e.consume();
-        FileChooser chooser = new FileChooser();
-        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        chooser.setTitle("Choose HBA-DEALS File");
-        File file = chooser.showOpenDialog(rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().equals("")) {
-            LOGGER.error("Could not get HBA-DEALS file");
-            PopupFactory.displayError("Error","Could not get HBA-DEALS file.");
-            return;
-        }
-        service.setHbaDealsFile(file);
-    }
+
 
     @FXML
     private void downloadSources(ActionEvent e) {
@@ -227,19 +212,21 @@ public class MainController implements Initializable {
             PopupFactory.displayError("ERROR", "Could not find download directory");
             return;
         }
-        Optional<File> hbadealsOpt = service.getHbaDealsFileOpt();
-        if (hbadealsOpt.isEmpty()) {
-            PopupFactory.displayError("ERROR", "HBA-DEALS file not found");
+        Optional<File> rnaSeqFileOpt = service.getRnaSeqResultsFileOpt();
+        if (rnaSeqFileOpt.isEmpty()) {
+            PopupFactory.displayError("ERROR", "RNA-Seq results file not found");
             return;
         }
         String goString = this.goChoiceBox.getValue();
         GoMethod goMethod = GoMethod.fromString(goString);
         String mtcString = this.mtcChoiceBox.getValue();
         MtcMethod mtcMethod = MtcMethod.fromString(mtcString);
+        RnaSeqAnalysisMethod rnaSeqAnalysisMethod = service.getRnaSeqMethod();
         IsopretDataLoadTask task = new IsopretDataLoadTask(downloadOpt.get(),
-                hbadealsOpt.get(),
+                rnaSeqFileOpt.get(),
                 goMethod,
-                mtcMethod);
+                mtcMethod,
+                rnaSeqAnalysisMethod);
 
         this.analysisLabel.textProperty().bind(task.messageProperty());
         this.analysisPB.progressProperty().unbind();
@@ -322,8 +309,6 @@ public class MainController implements Initializable {
             }catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
@@ -356,7 +341,7 @@ public class MainController implements Initializable {
     }
 
     public void showStats(ActionEvent actionEvent) {
-        Optional<File> opt = service.getHbaDealsFileOpt();
+        Optional<File> opt = service.getRnaSeqResultsFileOpt();
         if (opt.isEmpty()) {
             PopupFactory.displayError("Error", "Cannot show stats before selecting HBA-DEALS file");
             return;
@@ -393,10 +378,8 @@ public class MainController implements Initializable {
         }
     }
 
-    public void exportInterproReport(ActionEvent actionEvent) {
-//
-//        InterproFisherExact ife = new InterproFisherExact(service.getAnnotatedGeneList(), splicingPepThreshold);
-//        List<InterproOverrepResult> results = ife.calculateInterproOverrepresentation();
+    public void exportInterproReport(ActionEvent event) {
+        event.consume();
         double splicingPepThreshold = service.getSplicingPepThreshold();
         IsopretInterpoAnalysisRunner runner = IsopretInterpoAnalysisRunner.hbadeals(service.getAnnotatedGeneList(), splicingPepThreshold);
         InterproAnalysisResults results = runner.run();
@@ -424,5 +407,34 @@ public class MainController implements Initializable {
             PopupFactory.displayException("Error", "Could not write GO report", e);
         }
 
+    }
+
+    private void chooseRnaSeqFile(RnaSeqAnalysisMethod method, String methodName) {
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        chooser.setTitle("Choose "+ methodName + "File");
+        File file = chooser.showOpenDialog(rootNode.getScene().getWindow());
+        if (file==null || file.getAbsolutePath().equals("")) {
+            LOGGER.error("Could not get {} file", methodName);
+            PopupFactory.displayError("Error","Could not get " + methodName + " file.");
+            return;
+        }
+        service.setRnaSeqFile(file, method);
+    }
+
+    /**
+     * Show the user a file chooser to select an output (results) file from HBA-DEALS.
+     */
+    @FXML
+    private void chooseHbaDealsOutputFile(ActionEvent e) {
+        e.consume();
+        chooseRnaSeqFile(RnaSeqAnalysisMethod.HBADEALS, "HBA-DEALS");
+    }
+    /**
+     * Show the user a file chooser to select an output (results) file from edgeR.
+     */
+    public void chooseEdgeRFile(ActionEvent e) {
+        e.consume();
+        chooseRnaSeqFile(RnaSeqAnalysisMethod.EDGER, "edgeR");
     }
 }

@@ -1,6 +1,6 @@
 package org.jax.isopret.core.analysis;
 
-import org.jax.isopret.core.impl.hbadeals.HbaDealsTranscriptResult;
+import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.InterproEntry;
 import org.jax.isopret.model.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
@@ -39,7 +39,7 @@ public class InterproFisherExact {
         for (var agene : annotatedGeneList) {
             //Map<AccessionNumber, List<DisplayInterproAnnotation>> m = agene.getTranscriptToInterproHitMap();
             Map<AccessionNumber, Set<InterproEntry>> uniqIntproSetMap = agene.getTranscriptToUniqueInterproMap();
-            Set<HbaDealsTranscriptResult> results = agene.getHbaDealsResult().getTranscriptResults();
+            Set<TranscriptResultImpl> results = agene.getHbaDealsResult().getTranscriptResults();
             for (var res : results) {
                 AccessionNumber accession = res.getTranscriptId();
                 if (! uniqIntproSetMap.containsKey(accession)) {

@@ -1,13 +1,9 @@
 package org.jax.isopret.cli.command;
 
-import org.jax.isopret.core.InterproAnalysisResults;
-import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
-import org.jax.isopret.core.IsopretProvider;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsIsoformSpecificThresholder;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsParser;
-import org.jax.isopret.core.impl.hbadeals.HbaDealsResult;
+import org.jax.isopret.core.*;
+import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
 import org.jax.isopret.model.*;
-import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.visualization.InterproOverrepVisualizer;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -16,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -25,7 +22,8 @@ import java.util.concurrent.Callable;
 @CommandLine.Command(name = "interpro",
         mixinStandardHelpOptions = true,
         description = "Interpro Overrepresentation")
-public class InterproOverrepCommand extends AbstractIsopretCommand implements Callable<Integer> {
+public class InterproOverrepCommand extends AbstractRnaseqAnalysisCommand
+        implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterproOverrepCommand.class);
     @CommandLine.Option(names={"-b","--hbadeals"},
             description ="HBA-DEALS output file" , required = true)
@@ -38,15 +36,17 @@ public class InterproOverrepCommand extends AbstractIsopretCommand implements Ca
 
     private IsopretProvider provider = null;
 
+
+
     @Override
     public Integer call() {
         provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
-        HbaDealsParser hbaParser = new HbaDealsParser(this.hbadealsFile, provider.ensemblGeneModelMap());
-        Map<AccessionNumber, HbaDealsResult> hbaDealsResults = hbaParser.getEnsgAcc2hbaDealsMap();
+        Map<AccessionNumber, GeneResult> hbaDealsResults =
+                RnaSeqResultsParser.fromHbaDeals(new File(this.hbadealsFile), provider.ensemblGeneModelMap());
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
         AssociationContainer<TermId> transcriptContainer = provider.transcriptContainer();
         AssociationContainer<TermId> geneContainer = provider.geneContainer();
-        HbaDealsIsoformSpecificThresholder isoThresholder = new HbaDealsIsoformSpecificThresholder(hbaDealsResults,
+        IsoformSpecificThresholder isoThresholder =  IsoformSpecificThresholder.fromHbaDeals(hbaDealsResults,
                 0.05,
                 geneContainer,
                 transcriptContainer);
