@@ -8,6 +8,7 @@ import org.jax.isopret.core.analysis.IsopretStats;
 import org.jax.isopret.core.impl.go.*;
 import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.InterproMapper;
+import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
 import org.jax.isopret.model.*;
 import org.jax.isopret.visualization.DasDgeGoVisualizer;
 import org.jax.isopret.visualization.EnsemblVisualizable;
@@ -43,9 +44,11 @@ public class IsopretServiceImpl implements IsopretService  {
     File isopretSettingsFile;
     private final Properties pgProperties;
     private final StringProperty downloadDirProp;
-    private final StringProperty hbaDealsFileProperty;
+    private final StringProperty rnaSeqResultsFileProperty;
+
     private final DoubleProperty downloadCompletenessProp;
-    private File hbaDealsFile = null;
+    /** The HBA-DEALS or edgeR file. */
+    private File rnaSeqResultsFile = null;
     private GoMethod goMethod = GoMethod.TFT;
     private MtcMethod mtcMethod = MtcMethod.NONE;
     private Ontology geneOntology = null;
@@ -60,6 +63,7 @@ public class IsopretServiceImpl implements IsopretService  {
     /** Key: transcript id; value: set of Annotating GO Terms. */
     private Map<TermId, Set<TermId>> transcript2GoMap = Map.of();
     private IsopretStats isopretStats = null;
+    private RnaSeqAnalysisMethod rnaSeqAnalysisMethod;
 
     public IsopretServiceImpl(Properties pgProperties) {
         this.pgProperties = pgProperties;
@@ -68,7 +72,7 @@ public class IsopretServiceImpl implements IsopretService  {
         } else {
             this.downloadDirProp = new SimpleStringProperty("");
         }
-        this.hbaDealsFileProperty = new SimpleStringProperty("");
+        this.rnaSeqResultsFileProperty = new SimpleStringProperty("");
         this.downloadCompletenessProp = new SimpleDoubleProperty(calculateDownloadCompleteness());
     }
 
@@ -134,10 +138,11 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public void setHbaDealsFile(File file) {
-        this.hbaDealsFile = file;
-        this.hbaDealsFileProperty.setValue(file.getAbsolutePath());
-        LOGGER.info("Set HBA-DEALS file to {}", this.hbaDealsFile);
+    public void setRnaSeqFile(File file, RnaSeqAnalysisMethod method) {
+        this.rnaSeqResultsFile = file;
+        this.rnaSeqAnalysisMethod = method;
+        this.rnaSeqResultsFileProperty.setValue(file.getAbsolutePath());
+        LOGGER.info("Set HBA-DEALS file to {}", this.rnaSeqResultsFile);
     }
 
     @Override
@@ -152,9 +157,10 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public StringProperty hbaDealsFileProperty() {
-        return hbaDealsFileProperty;
+    public StringProperty rnaSeqResultsFileProperty() {
+        return rnaSeqResultsFileProperty;
     }
+
 
     @Override
     public DoubleProperty downloadCompletenessProperty() {
@@ -172,6 +178,11 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
+    public RnaSeqAnalysisMethod getRnaSeqMethod() {
+        return this.rnaSeqAnalysisMethod;
+    }
+
+    @Override
     public Optional<File> getDownloadDir() {
         String ddir = downloadDirProp.get();
         if (ddir == null) return Optional.empty();
@@ -184,11 +195,11 @@ public class IsopretServiceImpl implements IsopretService  {
     }
 
     @Override
-    public Optional<File> getHbaDealsFileOpt() {
-        if (this.hbaDealsFile == null || ! this.hbaDealsFile.isFile()) {
+    public Optional<File> getRnaSeqResultsFileOpt() {
+        if (this.rnaSeqResultsFile == null || ! this.rnaSeqResultsFile.isFile()) {
             return Optional.empty();
         } else  {
-            return Optional.of(this.hbaDealsFile);
+            return Optional.of(this.rnaSeqResultsFile);
         }
     }
 
@@ -460,8 +471,8 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public Optional<String> getGoReportDefaultFilename() {
-        if (hbaDealsFile == null) return Optional.empty();
-        String name = hbaDealsFile.getName() + "-" + mtcMethod.name() + "-" + goMethod.name() + ".tsv";
+        if (rnaSeqResultsFile == null) return Optional.empty();
+        String name = rnaSeqResultsFile.getName() + "-" + mtcMethod.name() + "-" + goMethod.name() + ".tsv";
         return Optional.of(name);
     }
 

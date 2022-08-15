@@ -16,5 +16,16 @@ package org.jax.isopret.core.impl.rnaseqdata;
  * </p>
  */
 public enum RnaSeqAnalysisMethod {
-    HBADEALS, EDGER
+    HBADEALS("HBA-DEALS"), EDGER("edgeR");
+
+    private final String name;
+
+    RnaSeqAnalysisMethod(String n) {
+        this.name = n;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

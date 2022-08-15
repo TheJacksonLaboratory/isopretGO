@@ -32,10 +32,10 @@ public abstract class AnnotatedGenesVisualizer {
         Ontology ontology = isopretService.getGeneOntology();
         this.termLabel = ontology.getTermLabel(goId).orElse("n/a");
         interproId = null;
-        Optional<File> opt = isopretService.getHbaDealsFileOpt();
+        Optional<File> opt = isopretService.getRnaSeqResultsFileOpt();
         basename = opt.map(File::getName).orElse("n/a");
         this.htmlHeader = header();
-        Optional<File> optHba =  isopretService.getHbaDealsFileOpt();
+        Optional<File> optHba =  isopretService.getRnaSeqResultsFileOpt();
         this.experiment = optHba.map(File::getName).orElse("n/a");
     }
 
@@ -43,10 +43,10 @@ public abstract class AnnotatedGenesVisualizer {
         this.geneOntologyId = null;
         this.interproId = interpro.interproEntry().getIntroproAccession();
         this.termLabel = interpro.interproEntry().getDescription();
-        Optional<File> opt = isopretService.getHbaDealsFileOpt();
+        Optional<File> opt = isopretService.getRnaSeqResultsFileOpt();
         basename = opt.map(File::getName).orElse("n/a");
         this.htmlHeader = header();
-        Optional<File> optHba =  isopretService.getHbaDealsFileOpt();
+        Optional<File> optHba =  isopretService.getRnaSeqResultsFileOpt();
         this.experiment = optHba.map(File::getName).orElse("n/a");
     }
 

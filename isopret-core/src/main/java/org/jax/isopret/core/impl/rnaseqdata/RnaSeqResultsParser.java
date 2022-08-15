@@ -134,6 +134,18 @@ public class RnaSeqResultsParser {
         return parser.ensgAcc2geneResultMap;
     }
 
+    public static Map<AccessionNumber, GeneResult> parse(File file,
+                                                         Map<AccessionNumber, GeneModel> hgncMap,
+                                                         RnaSeqAnalysisMethod method) {
+        RnaSeqResultsParser parser;
+        if (method == RnaSeqAnalysisMethod.HBADEALS) {
+            parser = new RnaSeqResultsParser(file, hgncMap, true);
+        } else {
+            parser = new RnaSeqResultsParser(file, hgncMap, false);
+        }
+        return parser.ensgAcc2geneResultMap;
+    }
+
 
     private Map<AccessionNumber, GeneResult> getEnsgAcc2geneResultMap() {
         return this.ensgAcc2geneResultMap;
