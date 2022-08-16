@@ -16,18 +16,17 @@ import javafx.stage.Stage;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
 public class DownloadPopup {
-    Logger LOGGER = LoggerFactory.getLogger(DownloadPopup.class);
+    final Logger LOGGER = LoggerFactory.getLogger(DownloadPopup.class);
 
     private final HostServicesWrapper hostServicesWrapper;
 
     private final String downloadDirectory;
 
-    private ObservableList<DownloadTableRow> rows;
+    private final ObservableList<DownloadTableRow> rows;
 
     public DownloadPopup(Map<String, String> successulDownloads,
                          Map<String, String> failedDownloads,
@@ -48,7 +47,7 @@ public class DownloadPopup {
         rows.addAll(myrows);
     }
 
-    static record DownloadTableRow(String url, String basename, boolean successful) {
+    record DownloadTableRow(String url, String basename, boolean successful) {
 
     }
 
