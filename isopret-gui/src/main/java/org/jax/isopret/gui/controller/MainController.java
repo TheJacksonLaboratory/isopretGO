@@ -12,11 +12,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.jax.isopret.core.InputFileChecker;
 import org.jax.isopret.core.InterproAnalysisResults;
 import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
 import org.jax.isopret.core.analysis.InterproFisherExact;
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
+import org.jax.isopret.gui.widgets.DownloadPopup;
 import org.jax.isopret.model.GoMethod;
 import org.jax.isopret.model.MtcMethod;
 import org.jax.isopret.visualization.InterproOverrepVisualizer;
@@ -111,6 +113,8 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
         this.datasourcesDownloadProgressIndicator.progressProperty().bind(service.downloadCompletenessProperty());
+        this.datasourcesDownloadProgressIndicator.setMinHeight(40);
+        this.datasourcesDownloadProgressIndicator.setMinWidth(40);
         this.rnaSeqFileLabel.textProperty().bind(service.rnaSeqResultsFileProperty());
         goChoiceBox.setItems(goMethodList);
         goChoiceBox.getSelectionModel().selectFirst();
@@ -436,5 +440,27 @@ public class MainController implements Initializable {
     public void chooseEdgeRFile(ActionEvent e) {
         e.consume();
         chooseRnaSeqFile(RnaSeqAnalysisMethod.EDGER, "edgeR");
+    }
+
+    public void manualDownload(ActionEvent actionEvent) {
+        Optional<File> opt = service.getDownloadDir();
+        if (opt.isEmpty()) {
+            PopupFactory.displayError("Error", "Cannot download before setting download directory");
+        }
+        File dir = opt.get();
+        if (! dir.isDirectory()) {
+            PopupFactory.displayError("Error", "Invalid download directory path (not a directory)");
+
+        }
+        if (this.hostServicesWrapper == null) {
+            PopupFactory.displayError("Error", "Cannot open download dialog because host services not found");
+
+        }
+        InputFileChecker checker = new InputFileChecker(dir.getAbsolutePath());
+        DownloadPopup pop = new DownloadPopup(checker.getSuccessulDownloads(),
+                checker.getFailedDownloads(),
+                dir.getAbsolutePath(),
+                this.hostServicesWrapper);
+        pop.showDialog();
     }
 }

@@ -127,8 +127,14 @@ public class IsopretServiceImpl implements IsopretService  {
 
     @Override
     public Set<String> getExpectedDownloadedFiles() {
-        return Set.of("interpro_domain_desc.txt", "isoform_function_list_cc.txt", "hg38_ensembl.ser",
-                "interpro_domains.txt", "isoform_function_list_mf.txt", "hgnc_complete_set.txt", "isoform_function_list_bp.txt");
+        return Set.of("go.json",
+                "interpro_domain_desc.txt",
+                "isoform_function_list_cc.txt",
+                "hg38_ensembl.ser",
+                "interpro_domains.txt",
+                "isoform_function_list_mf.txt",
+                "hgnc_complete_set.txt",
+                "isoform_function_list_bp.txt");
     }
 
     @Override

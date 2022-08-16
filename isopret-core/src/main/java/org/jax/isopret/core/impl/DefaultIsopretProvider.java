@@ -165,8 +165,8 @@ public class DefaultIsopretProvider implements IsopretProvider {
     @Override
     public InterproMapper interproMapper() {
         if (interproMapper == null) {
-            File interproDescriptionFile = dataResolver.interproDomainDesc().toFile();
-            File interproDomainsFile = dataResolver.interproDomains().toFile();
+            File interproDescriptionFile = dataResolver.interproDomainDescPath().toFile();
+            File interproDomainsFile = dataResolver.interproDomainsPath().toFile();
             this.interproMapper = new InterproMapper(interproDescriptionFile, interproDomainsFile);
         }
         return this.interproMapper;
@@ -204,12 +204,12 @@ public class DefaultIsopretProvider implements IsopretProvider {
 
     @Override
     public Path interproDomainDesc() {
-        return dataResolver.interproDomainDesc();
+        return dataResolver.interproDomainDescPath();
     }
 
     @Override
     public Path interproDomains() {
-        return dataResolver.interproDomains();
+        return dataResolver.interproDomainsPath();
     }
 
 
