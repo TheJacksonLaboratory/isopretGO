@@ -7,6 +7,8 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -135,6 +137,11 @@ public class DownloadPopup {
         if (result.isPresent() && result.get() == systemDownloadButton){
             hostServicesWrapper.showDocument(downloadTableRow.url());
             alert.close();
+        } else if (result.isPresent() && result.get() == clipboardButton) {
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(downloadTableRow.url());
+            clipboard.setContent(content);
         } else {
             alert.close();
         }
