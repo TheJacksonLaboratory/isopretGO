@@ -1,6 +1,7 @@
 package org.jax.isopret.core;
 
 
+import org.jax.isopret.core.configuration.IsopretDataResolver;
 import org.jax.isopret.except.IsopretRuntimeException;
 import org.jax.isopret.core.impl.download.FileDownloadException;
 import org.jax.isopret.core.impl.download.FileDownloader;
@@ -11,7 +12,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,24 +30,7 @@ public class IsopretDownloader {
     private final String downloadDirectory;
     /** If true, download new version whether or not the file is already present. */
     private final boolean overwrite;
-    private final static String GO_JSON = "go.json";
-    private final static String GO_JSON_URL = "http://purl.obolibrary.org/obo/go.json";
-    private static final String JannovarZenodoUrl = "https://zenodo.org/record/4311513/files/hg38_ensembl.ser?download=1";
-    private static final String JannovarFilename = "hg38_ensembl.ser";
-    private static final String HGNC_URL = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/hgnc_complete_set.txt";
-    private static final String HGNC_FILENAME = "hgnc_complete_set.txt";
-    /** The Base URL of the zenodo repository where we store various input files for Isopret. */
-    private static final String ZENODO_BASE_URL = "https://zenodo.org/record/6466530/";
-    private static final String INTERPRO_DOMAIN_DESC_URL = ZENODO_BASE_URL + "files/interpro_domain_desc.txt?download=1";
-    private static final String INTERPRO_DOMAIN_DESC_FILENAME = "interpro_domain_desc.txt";
-    private static final String INTERPRO_DOMAINS_URL = ZENODO_BASE_URL + "files/interpro_domains.txt?download=1";
-    private static final String INTERPRO_DOMAINS_FILENAME = "interpro_domains.txt";
-    private static final String ISOFORM_FUNCTION_MF_URL = ZENODO_BASE_URL + "files/isoform_function_list_mf.txt?download=1";
-    private static final String ISOFORM_FUNCTION_MF_FILENAME = "isoform_function_list_mf.txt";
-    private static final String ISOFORM_FUNCTION_BP_URL = ZENODO_BASE_URL + "files/isoform_function_list_bp.txt?download=1";
-    private static final String ISOFORM_FUNCTION_BP_FILENAME = "isoform_function_list_bp.txt";
-    private static final String ISOFORM_FUNCTION_CC_URL = ZENODO_BASE_URL + "files/isoform_function_list_cc.txt?download=1";
-    private static final String ISOFORM_FUNCTION_CC_FILENAME = "isoform_function_list_cc.txt";
+
 
     public IsopretDownloader(String path){
         this(path,false);
@@ -76,44 +59,48 @@ public class IsopretDownloader {
      * Download the go.json file
      */
     public void downloadGoJson() {
-        downloadFileIfNeeded(GO_JSON, GO_JSON_URL);
+        downloadFileIfNeeded(IsopretDataResolver.go());
     }
 
     public void downloadJannovar() {
-        downloadFileIfNeeded(JannovarFilename, JannovarZenodoUrl);
+        downloadFileIfNeeded(IsopretDataResolver.jannovarHg38());
     }
 
     public void downloadHgnc() {
-        downloadFileIfNeeded(HGNC_FILENAME, HGNC_URL);
+        downloadFileIfNeeded(IsopretDataResolver.hgnc());
     }
 
     public void downloadInterproDomainDesc() {
-        downloadFileIfNeeded(INTERPRO_DOMAIN_DESC_FILENAME, INTERPRO_DOMAIN_DESC_URL);
+        downloadFileIfNeeded(IsopretDataResolver.interproDomainDesc());
     }
 
     public void downloadInterproDomains() {
-        downloadFileIfNeeded(INTERPRO_DOMAINS_FILENAME, INTERPRO_DOMAINS_URL);
+        downloadFileIfNeeded(IsopretDataResolver.interproDomains());
     }
 
     public void downloadIsoformFunctionMfList() {
-        downloadFileIfNeeded(ISOFORM_FUNCTION_MF_FILENAME, ISOFORM_FUNCTION_MF_URL);
+        downloadFileIfNeeded(IsopretDataResolver.isoformFunctionMf());
     }
 
     public void downloadIsoformFunctionBpList() {
-        downloadFileIfNeeded(ISOFORM_FUNCTION_BP_FILENAME, ISOFORM_FUNCTION_BP_URL);
+        downloadFileIfNeeded(IsopretDataResolver.isoformFunctionBp());
     }
 
     public void downloadIsoformFunctionCcList() {
-        downloadFileIfNeeded(ISOFORM_FUNCTION_CC_FILENAME, ISOFORM_FUNCTION_CC_URL);
+        downloadFileIfNeeded(IsopretDataResolver.isoformFunctionCc());
     }
 
 
-
-    private void downloadGzipFileIfNeeded(String filename, String gzFilename, String webAddress) {
+    /**
+     * Use to download a file that is gzip'd and then needs to be unzipped (Not needed at present).
+     * @param gzipDownload a download item for a gzipped file
+     */
+    private void downloadGzipFileIfNeeded( DownloadItem gzipDownload) {
+        String filename = gzipDownload.basename().replace(".gz", "");
         File file = new File(String.format("%s%s%s",downloadDirectory,File.separator,filename));
-        File gzfile = new File(String.format("%s%s%s",downloadDirectory,File.separator,gzFilename));
+        File gzfile = new File(String.format("%s%s%s",downloadDirectory,File.separator,gzipDownload.basename()));
         if (! gzfile.exists() || overwrite ) { // download gzip file if needed or if users wants to overwrite
-            downloadFileIfNeeded(gzFilename, webAddress);
+            downloadFileIfNeeded(gzipDownload);
         }
         if (! gzfile.isFile()) {
             // when we get here, the gzFile should exist and be a File
@@ -141,7 +128,9 @@ public class IsopretDownloader {
 
 
 
-    private void downloadFileIfNeeded(String filename, String webAddress) {
+    private void downloadFileIfNeeded(DownloadItem downloadItem) {
+        String filename = downloadItem.basename();
+        URL url = downloadItem.url();
         File f = new File(String.format("%s%s%s",downloadDirectory,File.separator,filename));
         if (f.exists() && (! overwrite)) {
             LOGGER.info("Cowardly refusing to download {} since we found it at {}.\n",
@@ -151,12 +140,9 @@ public class IsopretDownloader {
         }
         FileDownloader downloader = new FileDownloader();
         try {
-            URL url = new URL(webAddress);
             downloader.copyURLToFile(url, new File(f.getAbsolutePath()));
-        } catch (MalformedURLException e) {
-            LOGGER.error("Malformed URL for {} [{}]: {}",filename, webAddress,e.getMessage());
         } catch (FileDownloadException e) {
-            LOGGER.error("Error downloading {} from {}: {}\"" ,filename, webAddress,e.getMessage());
+            LOGGER.error("Error downloading {} from {}: {}\"" ,filename, url ,e.getMessage());
         }
         LOGGER.trace("[INFO] Downloaded " + filename);
     }

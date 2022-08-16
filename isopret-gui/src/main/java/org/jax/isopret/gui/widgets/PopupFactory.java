@@ -137,7 +137,7 @@ public class PopupFactory {
 
     public static void showReportListDialog(List<String> reportlist) {
         Stage window;
-        String windowTitle = "GOPHER Report";
+        String windowTitle = "Report";
         window = new Stage();
         window.setOnCloseRequest(event -> window.close());
         window.setTitle(windowTitle);
