@@ -113,6 +113,8 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.downloadDataSourceLabel.textProperty().bind(service.downloadDirProperty());
         this.datasourcesDownloadProgressIndicator.progressProperty().bind(service.downloadCompletenessProperty());
+        this.datasourcesDownloadProgressIndicator.setMinHeight(40);
+        this.datasourcesDownloadProgressIndicator.setMinWidth(40);
         this.rnaSeqFileLabel.textProperty().bind(service.rnaSeqResultsFileProperty());
         goChoiceBox.setItems(goMethodList);
         goChoiceBox.getSelectionModel().selectFirst();
