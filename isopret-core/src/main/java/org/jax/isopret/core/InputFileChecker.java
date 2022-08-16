@@ -27,8 +27,8 @@ public class InputFileChecker {
         Set<DownloadItem> items = IsopretDataResolver.allDownloadItems();
         for (var ditem: items) {
             String basename = ditem.basename();
-            String url = ditem.url().getPath();
-            Path path = Path.of(dataDownload).resolve(url);
+            String url = ditem.url().toString();
+            Path path = Path.of(dataDownload).resolve(basename);
             if (path.toFile().isFile()) {
                 successulDownloads.put(basename, url);
             } else {
