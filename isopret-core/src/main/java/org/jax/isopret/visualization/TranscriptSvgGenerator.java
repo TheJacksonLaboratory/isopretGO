@@ -278,12 +278,9 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private String getFormatedPvalue(double logFc, double pval, boolean differential) {
         if (! differential) {
             return String.format("%.2f", logFc);
-        } else if (pval > 0.001) {
-            return String.format("%.2f; p=%.4f (*)", logFc, pval);
-        } else if (pval == 0.0) {
-            return String.format("%.2f; p=0.00 (*)", logFc);
         } else {
-            return String.format("%.2f; p=%.2E (*)", logFc, pval);
+            // i.e., differential
+            return String.format("%.2f (*)", logFc);
         }
     }
 
