@@ -446,11 +446,12 @@ public class MainController implements Initializable {
         Optional<File> opt = service.getDownloadDir();
         if (opt.isEmpty()) {
             PopupFactory.displayError("Error", "Cannot download before setting download directory");
+            return;
         }
         File dir = opt.get();
         if (! dir.isDirectory()) {
             PopupFactory.displayError("Error", "Invalid download directory path (not a directory)");
-
+            return;
         }
         if (this.hostServicesWrapper == null) {
             PopupFactory.displayError("Error", "Cannot open download dialog because host services not found");

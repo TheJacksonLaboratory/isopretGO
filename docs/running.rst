@@ -4,16 +4,16 @@
 Running isopret
 ===============
 
-Isopret offers a graphical user interface (GUI) version with full functionality
-as well as a command-line version that performs Gene Ontology overrepresentation
-analysis and is mainly intended to be used in bioinformatic pipelines.
+Isopret offers a  command-line tools that performs Gene Ontology overrepresentation
+analysis with the inferred isoform GO annotations. A GUI version with additional
+visualization tools is in preparation.
 
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
 
+   running-inferrence
    running-cmd
-   running-gui
-   running-pdf
+
 
 

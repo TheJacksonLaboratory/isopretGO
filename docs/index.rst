@@ -6,9 +6,7 @@ Isopret (Isoform Interpretation) is  an expectation-maximization algorithm able
 to infer isoform specific functions using a global optimization approach.
 
 
-Isopret-gui is a Java application for investigating and visualizing overrepresentation of
-`Gene Ontology (GO) <http://geneontology.org/>`_ annotations in differentially spliced or
-differentially expressed genes.
+
 
 Isopret uses the analysis (output) file of
 `HBA-DEALS <https://pubmed.ncbi.nlm.nih.gov/32660516/>`_. HBA-DEALS
@@ -23,9 +21,8 @@ the `Ontologizer <https://pubmed.ncbi.nlm.nih.gov/18511468/>`_.
    :maxdepth: 1
    :caption: Contents:
 
-   setup
    input
    examples
-   running
-   output
+   running-inferrence
+   running-go
 

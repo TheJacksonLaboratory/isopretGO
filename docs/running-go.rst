@@ -8,7 +8,7 @@ Isopret offers most functionality via its graphical user interface (GUI) version
 but does have a command-line tool that can be used to perform Gene Ontology (GO)
 overrepresentation analysis from the shell.
 
-The build process described in :rst:rstsetup_ creates both a GUI app (in the
+The build process described in :ref:`rstsetup_` creates both a GUI app (in the
 ``isopret-gui/target`` subdirectory) and a command-line app (in
 the ``isopret-cli/target`` subdirectory). It is fine to leave both apps in these
 directories if you like. For the following explanation, we will assume that
