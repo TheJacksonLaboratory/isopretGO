@@ -4,6 +4,13 @@
 Isopret input files
 ===================
 
+isopret can be run with `HBA-DEALS`_ or `edgeR`_ results files as input.
+
+HBA-DEALS
+=========
+.. _HBA-DEALS:
+
+
 Hierarchical Bayesian Analysis of Differential Expression and ALternative Splicing (HBA-DEALS)
 simultaneously characterizes differential expression and splicing in cohorts.
 
@@ -21,7 +28,8 @@ Source code is available at the `HBA-DEALS GitHub repository <https://github.com
 Important
 =========
 
-For use with isopret, HBA-DEALS *must* be run with the ``isoform.level`` option set to true. See the `HBADEALS documentation <https://hba-deals.readthedocs.io/en/latest/>`_
+For use with isopret, HBA-DEALS *must* be run with the ``isoform.level`` option set to true.
+See the `HBADEALS documentation <https://hba-deals.readthedocs.io/en/latest/>`_
 for details.
 
 
@@ -61,11 +69,6 @@ Isopret supports
 only `Ensembl <http://ensembl.org/>`_ gene/transcript models.
 
 
-Example input files
-^^^^^^^^^^^^^^^^^^^
-
-Example input files are described in :ref:`rstexamples`_.
-
 
 
 Running HBA-DEALS
@@ -74,3 +77,9 @@ Running HBA-DEALS
 A Snakemake pipeline for running HBA-DEALS is described in the `GitHub repository <https://github.com/TheJacksonLaboratory/covid19splicing>`_
 for the paper  `Betacoronavirus-specific alternate splicing <https://pubmed.ncbi.nlm.nih.gov/35074468/>`_. The GitHub repository
 also contains 15 HBA-DEALS output files related to that publicaton that can be used as input for Isopret-Gui.
+
+
+edgeR
+=====
+.. _edgeR:
+todo

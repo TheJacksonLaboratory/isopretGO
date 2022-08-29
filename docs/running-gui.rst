@@ -4,7 +4,9 @@
 Running isopret: GUI version
 ============================
 
-Only the graphical user interface (GUI) version of Isopret offers the full
+Isopret-gui is a Java application for investigating and visualizing overrepresentation of
+`Gene Ontology (GO) <http://geneontology.org/>`_ annotations in differentially spliced or
+differentially expressed genes. Only the graphical user interface (GUI) version of Isopret offers the full
 functionality.
 
 Starting isopret for the first time: Downloading input files
