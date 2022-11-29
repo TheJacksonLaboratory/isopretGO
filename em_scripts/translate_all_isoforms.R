@@ -4,6 +4,9 @@ library(Biostrings)
 
 library(data.table)
 
+
+#In order to use the gffread tool for translating isoforms we need to read the GTF file:
+
 gtf.file=fread('/Users/karleg/STAR/STAR/bin/MacOSX_x86_64/data/GRCh38/annotation/Homo_sapiens.GRCh38.91.gtf',sep='\t',quote = '',data.table = FALSE)
 
 gtf.file=gtf.file[gtf.file$V3=='exon',]
@@ -11,6 +14,8 @@ gtf.file=gtf.file[gtf.file$V3=='exon',]
 transcript.ids=gsub(';','',unlist(lapply(strsplit(as.character(gtf.file[,9]),split=' '),'[[',6)))
 
 transcript.ids=gsub("\"",'',transcript.ids)
+
+#The following path to the genomic sequence is passed to the gffread tool in order for it to generate the protein sequence:
 
 fasta.file='/Users/karleg/STAR/STAR/bin/MacOSX_x86_64/data/GRCh38/sequence/GRCh38_r91.all.fa'
 
