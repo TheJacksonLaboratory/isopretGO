@@ -19,16 +19,6 @@ public abstract class AbstractIsopretCommand {
             description = "directory to download HPO data")
     protected String downloadDirectory="data";
 
-
-
-//    protected HbaDealsThresholder initializeHbaDealsThresholder(Map<AccessionNumber, GeneModel> hgncMap, String hbadealsPath) {
-//        Map<AccessionNumber, GeneResult> hbaDealsResults =
-//                RnaSeqResultsParser.fromHbaDeals(hbadealsPath, hgncMap);
-//        LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());
-//        return new HbaDealsThresholder(hbaDealsResults);
-//    }
-
-
     /**
      *
      * @param category either gene-ontology or interpro

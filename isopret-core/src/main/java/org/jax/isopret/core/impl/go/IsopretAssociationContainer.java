@@ -150,6 +150,22 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
         return associationMap.keySet();
     }
 
+    /**
+     * TODO ADD TEST
+     * @param termId
+     * @return
+     */
+    @Override
+    public Set<TermId> getDomainItemsAnnotatedByOntologyTerm(TermId termId) {
+        Set<TermId> annotatedItems = new HashSet<>();
+        for (var e : associationMap.entrySet()) {
+            if (e.getValue().containsAnnotation(termId)) {
+                annotatedItems.add(e.getKey());
+            }
+        }
+        return annotatedItems;
+    }
+
     @Override
     public int getAnnotatingTermCount() {
         Set<TermId> tidset = this.associationMap.values()

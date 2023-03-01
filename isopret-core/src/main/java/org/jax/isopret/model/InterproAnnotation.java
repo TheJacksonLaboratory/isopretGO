@@ -6,13 +6,30 @@ import java.util.Objects;
 import java.util.Optional;
 
 
-
+/**
+ * This class is used to help display Interpro protein domain annotations. It is a superclass
+ * for {@link DisplayInterproAnnotation}.
+ */
 public class InterproAnnotation {
-
+    /**
+     * Accession number of the transcript that corresponds to the protein isoform being annotated.
+     */
     protected final AccessionNumber enst;
+    /**
+     * Accession number of the gene that corresponds to the protein being annotated.
+     */
     protected final AccessionNumber ensg ;
+    /**
+     * Integer representation of the Interpro annotation (e.g., IPR004939 would be represented as 4939)
+     */
     protected final int interpro;
+    /**
+     * Start residue position of the interpro domain in the protein
+     */
     protected final int start;
+    /**
+     * End residue position of the interpro domain in the protein
+     */
     protected final int end;
 
 
