@@ -10,24 +10,17 @@ import org.jax.isopret.model.AccessionNumber;
  * HBA-DEALS or edgeR. Note that the objects are only used for parsing and are not a part of the
  * analysis model. Each line will be transformed either to a {@link org.jax.isopret.model.GeneResult} or
  * a {@link org.jax.isopret.model.TranscriptResult}.
+ * @param geneAccession ENSEMBL accession number for a gene, e.g., ENSG00000139618
+ * @param isoform ENSEMBL accession number for a transcript (can be null), e.g., ENST00000560355.1
+ * @param expFC expression fold change (from HBA-DEALS)
+ * @param raw_p raw p-value (from HBA-DEALS)
  * @author Peter N Robinson
  */
-class RnaSeqResultLine {
-
-    final AccessionNumber geneAccession;
-    final boolean isIsoform;
-    final AccessionNumber isoform;
-    final double expFC;
-    final double raw_p;
-
-    RnaSeqResultLine(AccessionNumber geneAcc, AccessionNumber transcriptAcc, double expFC, double raw_p) {
-        geneAccession = geneAcc;
-        isoform = transcriptAcc;
-        isIsoform = isoform != null;
-        this.expFC = expFC;
-        this.raw_p = raw_p;
-    }
-
+record RnaSeqResultLine (AccessionNumber geneAccession,
+                         AccessionNumber isoform,
+                         double expFC,
+                         double raw_p
+                         ){
     /**
      * @param line an HBA-DEALS file with Ensem data
      * @return an {@link RnaSeqResultLine} object with Ensembl {@link AccessionNumber} object
@@ -47,6 +40,11 @@ class RnaSeqResultLine {
         double raw_p = Double.parseDouble(fields[3]);
         return new RnaSeqResultLine(geneAcc, transcriptAcc, expFC, raw_p);
     }
+
+    public boolean isIsoform() {
+        return isoform != null;
+    }
+
 
 
 }

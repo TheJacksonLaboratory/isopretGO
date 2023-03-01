@@ -88,19 +88,19 @@ public class RnaSeqResultsParser {
 
         int found_symbol = 0;
         for (RnaSeqResultLine hline : lines) {
-            AccessionNumber ensgAccession = hline.geneAccession; // if we cannot find symbol, just show the accession
+            AccessionNumber ensgAccession = hline.geneAccession(); // if we cannot find symbol, just show the accession
             if (hgncMap.containsKey(ensgAccession)) {
                 GeneModel model = hgncMap.get(ensgAccession);
-                resultsMap.putIfAbsent(ensgAccession, new GeneResultImpl(hline.geneAccession, model));
+                resultsMap.putIfAbsent(ensgAccession, new GeneResultImpl(hline.geneAccession(), model));
                 GeneResult hbaresult = resultsMap.get(ensgAccession);
-                if (hline.isIsoform) {
-                    hbaresult.addTranscriptResult(hline.isoform, hline.expFC, hline.raw_p);
+                if (hline.isIsoform()) {
+                    hbaresult.addTranscriptResult(hline.isoform(), hline.expFC(), hline.raw_p());
                 } else {
-                    hbaresult.addExpressionResult(hline.expFC, hline.raw_p);
+                    hbaresult.addExpressionResult(hline.expFC(), hline.raw_p());
                 }
                 found_symbol++;
             } else {
-                unfound.add(hline.geneAccession.getAccessionString());
+                unfound.add(hline.geneAccession().getAccessionString());
             }
 
         }
