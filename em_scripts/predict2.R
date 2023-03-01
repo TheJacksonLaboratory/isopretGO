@@ -15,11 +15,22 @@ library(bestNormalize)
 #This script optimizes isoform function assignment to predict local alignment between isoforms optimally.  There are 200 instances of this script
 #that are executed each iteration, each handles a different subset of isoforms.
 
+#Change the following paths as needed:
+
+path.to.gtf.file='/projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/Homo_sapiens.GRCh38.91.gtf'
+
+path.to.hgnc='hgnc_complete_set.txt'
+
+path.to.interpro='interpro_domains.txt'
+
+path.to.gaf='goa_human.gaf'
+
+path.to.sequences='/projects/robinson-lab/USERS/karleg/projects/isopret/isoform_seqs'
 
 num.cores=4  #The number of cores that will be used by this script
 
 
-#The following function calculates the fitness, i.e. minus the sum of absolute residuals, of the regression model
+#The following function calculates the fitness, i.e. minus the sum of squared residuals, of the regression model
 #for a given assignment of GO terms to isoforms(the input parameter sol). The prefix 'ga' is used because the optimization of function
 #assignment is performed by a Genetic Algorithm (appears later in this script)
 
@@ -107,7 +118,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   set.seed(123)  #set a randon seed
   
-  interpro.tab=read.table('interpro_domains.txt',sep='\t',header=TRUE)
+  interpro.tab=read.table(path.to.interpro,sep='\t',header=TRUE)
   
   interpro.tab=interpro.tab[interpro.tab[,2]!="",]
   
@@ -135,7 +146,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   #The following lines read the GTF files with all genes and isoforms, and extract their Ensembl IDs
   
-  gtf.file=fread('/projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/Homo_sapiens.GRCh38.91.gtf',sep='\t',quote = '',data.table = FALSE)
+  gtf.file=fread(path.to.gtf.file,sep='\t',quote = '',data.table = FALSE)
   
   gtf.file=gtf.file[gtf.file$V3=='transcript',]
   
@@ -149,9 +160,9 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   #Using the gene ensembl IDs from above, we obtain each gene's GO terms
   
-  hgnc.tab=fread('hgnc_complete_set.txt',sep='\t',quote = '',data.table = FALSE)
+  hgnc.tab=fread(path.to.hgnc,sep='\t',quote = '',data.table = FALSE)
   
-  gaf.file=fread('goa_human.gaf',sep='\t',quote = '',data.table = FALSE)
+  gaf.file=fread(path.to.gaf,sep='\t',quote = '',data.table = FALSE)
   
   gaf.file=gaf.file[gaf.file$V9=='F',]
   
@@ -192,7 +203,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   #check that we have a protein sequence for each isoform, if not (non-coding) remove its ID
   
-  sequence.exists=transcript.ids %in% gsub('translated_','',gsub('.fa','',list.files('/projects/robinson-lab/USERS/karleg/projects/isopret/isoform_seqs/')))
+  sequence.exists=transcript.ids %in% gsub('translated_','',gsub('.fa','',list.files(path.to.sequences)))
   
   gene.ids=gene.ids[sequence.exists]
   
@@ -203,7 +214,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   unique.iso=!duplicated(transcript.ids) & ((1:length(transcript.ids))%%number.of.nodes+1==node.number)  & unlist(mclapply(transcript.ids,function(x){
     
-    seq=(readAAStringSet(paste0('/projects/robinson-lab/USERS/karleg/projects/isopret/isoform_seqs/translated_',x,'.fa')))
+    seq=(readAAStringSet(paste0(path.to.sequences,'/translated_',x,'.fa')))
     
     if (length(seq)==0)
       
@@ -267,7 +278,7 @@ if (!file.exists(paste0('interpro_state_',node.number,'.RData')))  #if this is t
   
   #read the protein sequences for all the isoforms
   
-  x.seq=mclapply(paste0('/projects/robinson-lab/USERS/karleg/projects/isopret/isoform_seqs/translated_',transcript.ids,'.fa'),function(x)as.character(readFASTA(x)),mc.cores = num.cores)
+  x.seq=mclapply(paste0(path.to.sequences,'/translated_',transcript.ids,'.fa'),function(x)as.character(readFASTA(x)),mc.cores = num.cores)
   
   print('Read sequences')
   
