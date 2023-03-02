@@ -12,7 +12,7 @@
     </parent>
     <groupId>org.jax.isopret</groupId>
     <artifactId>isopret</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.15</version>
     <modules>
         <module>isopret-core</module>
         <module>isopret-cli</module>
@@ -91,8 +91,7 @@
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
-                <version>1.33</version>
-                <version>1.32</version>
+                <version>2.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

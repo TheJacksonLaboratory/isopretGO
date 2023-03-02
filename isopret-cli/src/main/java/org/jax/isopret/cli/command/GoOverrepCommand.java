@@ -79,7 +79,7 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
 
     @Override
     public Integer call() {
-
+        checkDownloadDir(downloadDirectory);
         // validate input file and determine if it is HBA-DEALS or edgeR
         if (exclusive.edgeRFile == null && exclusive.hbadealsFile != null) {
             isHbaDeals = true;
