@@ -1,9 +1,10 @@
-===============================
-Isopret: Isoform interpretation
-===============================
+=================================
+IsopretGO: Isoform interpretation
+=================================
 
-Isopret (Isoform Interpretation) is  an expectation-maximization algorithm able
-to infer isoform specific functions using a global optimization approach.
+IsopretGO (Isoform Interpretation for Gene Ontology) leverages predictions of isoform-specific functions (i.e., Gene Ontology annotations)
+made by the `isopret expectation maximization algorithm <https://www.biorxiv.org/content/10.1101/2022.05.13.491897v1>`_ to perform gene-level
+and isoform-level `Gene Ontology.
 
 
 
