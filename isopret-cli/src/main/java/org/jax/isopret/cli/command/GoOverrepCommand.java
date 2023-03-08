@@ -62,12 +62,18 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
                     " Sidak," +
                     " None)")
     private String mtc = "Bonferroni";
+
+    @CommandLine.Option(names = {"--export-all"},
+            description = "Export results for all GO terms (i.e., do not threshold by p-value)")
+    boolean exportAll = false;
+
+
     @CommandLine.Option(names = {"-v", "--verbose"}, description = "Show stats on commandline")
     private boolean verbose = true;
     @CommandLine.Option(names = {"--outfile"}, description = "Name of output file to write stats (default: \"gene-ontology-overrep-<infilename>.tsv\")")
     private String outfile;
 
-    @CommandLine.Option(names = {"-s", "--significant-only"}, description = "Limit output to significant terms (default: ${DEFAULT_VALUE}")
+    @CommandLine.Option(names = {"-s", "--significant-only"}, description = "Limit output to significant terms (default: ${DEFAULT_VALUE})")
     boolean significantOnly = false;
 
     /**
@@ -120,12 +126,15 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
         /* ---------- 7. Set up HbaDeal GO analysis ------------------------- */
         GoMethod goMethod = GoMethod.fromString(this.ontologizerCalculation);
         LOGGER.info("Using Gene Ontology approach {}", goMethod.name());
-        LOGGER.info("About to create HbaDealsGoContainer");
+        LOGGER.info("Creating HbaDealsGoContainer");
         IsopretGoAnalysisRunner runner;
         if (isHbaDeals) {
             runner = IsopretGoAnalysisRunner.hbadeals(provider, rnaseqDataFile, mtcMethod, goMethod);
         } else {
             runner = IsopretGoAnalysisRunner.edgeR(provider, rnaseqDataFile, mtcMethod, goMethod);
+        }
+        if (this.exportAll) {
+            runner.exportAll();
         }
 
         GoAnalysisResults results = runner.run();
@@ -171,8 +180,8 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
                             bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
                             outputDasGoTerms++;
                         }
-                    }else {
-                            bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
+                    } else {
+                        bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
                         outputDasGoTerms++;
                         }
                     } catch(IOException e){
@@ -184,10 +193,10 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
                     try {
                         if (significantOnly) {
                             if (cts.passesThreshold(GO_PVAL_THRESHOLD))
-                                bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
+                                bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
                                 outputDgeGoTerms++;
                         } else {
-                            bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
+                            bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
                             outputDgeGoTerms++;
                         }
                     } catch (Exception e) {

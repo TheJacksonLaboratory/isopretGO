@@ -24,4 +24,6 @@ public interface IsopretGoAnalysisRunner {
                                          GoMethod goMethod) {
         return new DefaultIsopretGoAnalysisRunner(provider, hbaDealsFile, mtcMethod, goMethod, RnaSeqAnalysisMethod.EDGER);
     }
+
+    void exportAll();
 }
