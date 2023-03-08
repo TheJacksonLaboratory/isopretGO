@@ -79,8 +79,7 @@ public class HbaDealsThresholder {
      */
     private double getThreshold(List<Double> probs) {
        PosteriorErrorProbThreshold pthresh = new PosteriorErrorProbThreshold(probs, this.fdrThreshold);
-       double pepThresh = pthresh.getPepThreshold();
-       return pepThresh;
+        return pthresh.getPepThreshold();
     }
 
 

@@ -34,11 +34,11 @@ public class JannovarReader {
     public JannovarReader(String path, GenomicAssembly assembly) {
         this(new File(path), assembly);
     }
-    public JannovarReader(File file, GenomicAssembly assembly) {
+    public JannovarReader(File jannovarSerFile, GenomicAssembly assembly) {
         // singleton pattern
         if (geneToTranscriptListMap == null) {
-            LOGGER.info("Creating JannovarData from {} with assembly {}", file.getAbsolutePath(), assembly.name());
-            File jannovarSerFile = file;
+            LOGGER.info("Creating JannovarData from {} with assembly {}",
+                    jannovarSerFile.getAbsolutePath(), assembly.name());
             JannovarTxMapper jmapper = new JannovarTxMapper(assembly);
             geneToTranscriptListMap = new HashMap<>();
             try {

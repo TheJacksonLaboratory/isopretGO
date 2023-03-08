@@ -111,7 +111,7 @@ public class Transcript extends BaseGenomicRegion<Transcript> {
     /**
      * Returns an array whose entries correspond to the lengths of exons that are part of the CDS.
      * All entries are zero for non-coding genes.
-     * @return an array of the length of the CDS portions of exons (individual entries can be zero).
+     * @return a List of the length of the CDS portions of exons (individual entries can be zero).
      */
     public List<Integer> codingExonLengths() {
         List<Integer> cdsExonLengths = new ArrayList<>();

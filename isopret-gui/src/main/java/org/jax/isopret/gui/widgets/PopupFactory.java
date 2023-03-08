@@ -126,8 +126,7 @@ public class PopupFactory {
         dialog.setTitle(title);
         dialog.setContentText(message);
         Optional<Boolean> result = dialog.showAndWait();
-        if (result.isEmpty()) return false;
-        else  return result.get();
+        return result.orElse(false);
     }
 
 

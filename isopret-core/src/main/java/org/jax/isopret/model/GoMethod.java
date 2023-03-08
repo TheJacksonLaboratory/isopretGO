@@ -16,28 +16,23 @@ public enum GoMethod {
 
     public static GoMethod fromString(String calculation) {
         switch (calculation.toLowerCase()) {
-            case "term-for-term":
-            case "term for term":
-            case "tft":
+            case "term-for-term", "term for term", "tft" -> {
                 return TFT;
-            case "parent-child-union":
-            case "parent-child union":
-            case "pc-union":
-            case "pcu":
+            }
+            case "parent-child-union", "parent-child union", "pc-union", "pcu" -> {
                 return PCunion;
-            case "parent-child-intersection":
-            case "parent-child-intersect":
-            case "parent-child intersect":
-            case "pc-intersection":
-            case "pc-intersect":
-            case "pci":
+            }
+            case "parent-child-intersection", "parent-child-intersect", "parent-child intersect", "pc-intersection", "pc-intersect", "pci" -> {
                 return PCintersect;
-            case "mgsa":
+            }
+            case "mgsa" -> {
                 return MGSA;
-            default:
+            }
+            default -> {
                 System.err.printf("[ERROR] Did not recognize calculation (%s), using default (%s) instead.\n",
                         calculation, TFT);
                 return TFT;
+            }
         }
     }
 }

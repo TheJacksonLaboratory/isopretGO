@@ -23,8 +23,6 @@ import java.util.*;
 public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisRunner {
     private final static Logger LOGGER = LoggerFactory.getLogger(IsopretInterpoAnalysisRunnerImpl.class);
 
-    //private final String hbadealsFile;
-   // private final IsopretProvider provider;
     private final List<AnnotatedGene> annotatedGeneList;
 
     private IsopretAssociationContainer transcriptContainer = null;
@@ -48,8 +46,6 @@ public class IsopretInterpoAnalysisRunnerImpl implements IsopretInterpoAnalysisR
     }
 
     private IsopretInterpoAnalysisRunnerImpl(String hbadealsFile, IsopretProvider provider) {
-       // this.hbadealsFile = hbadealsFile;
-      //  this.provider = provider;
         this.annotatedGeneList = getAnnotatedGeneList(hbadealsFile, provider);
     }
 
