@@ -152,8 +152,8 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
 
     /**
      * TODO ADD TEST
-     * @param termId
-     * @return
+     * @param termId a Gene Ontology id
+     * @return List of genes/transcripts annotation by this GO term
      */
     @Override
     public Set<TermId> getDomainItemsAnnotatedByOntologyTerm(TermId termId) {

@@ -22,25 +22,29 @@ public enum MtcMethod {
 
     public static MtcMethod fromString(String mtc) {
         switch (mtc.toLowerCase()) {
-            case "benjamini-hochberg":
-            case "bh":
+            case "benjamini-hochberg", "bh" -> {
                 return BENJAMINI_HOCHBERG;
-            case "benjamini-yekutieli":
-            case "by":
+            }
+            case "benjamini-yekutieli", "by" -> {
                 return BENJAMINI_YEKUTIELI;
-            case "bonferroni":
+            }
+            case "bonferroni" -> {
                 return BONFERRONI;
-            case "bonferroni-holm":
-            case "holm":
+            }
+            case "bonferroni-holm", "holm" -> {
                 return BONFERRONI_HOLM;
-            case "sidak":
+            }
+            case "sidak" -> {
                 return SIDAK;
-            case "none":
+            }
+            case "none" -> {
                 return NONE;
-            default:
+            }
+            default -> {
                 System.err.printf("[ERROR] Did not recognize MTC (%s), using default (%s) instead.\n",
                         mtc, BONFERRONI);
                 return BONFERRONI;
+            }
         }
     }
 }

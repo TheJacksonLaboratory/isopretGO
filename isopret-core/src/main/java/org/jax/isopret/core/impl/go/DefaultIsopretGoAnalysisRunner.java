@@ -31,7 +31,10 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
     private final MtcMethod mtcMethod;
     private final GoMethod goMethod;
     private final IsopretProvider provider;
-
+    /** Threshold for considering differential expression or splicing in HBA-DEALS or edgeR */
+    private final double fdrThreshold = 0.05;
+    /** Multiple testing p-value threshold for Gene Ontology Overrepresentation analysis. */
+    private final double alphaThreshold = 0.05;
 
     private boolean exportAll = false;
 
@@ -75,12 +78,12 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
         IsoformSpecificThresholder isoThresholder;
         if (rnaSeqAnalysisMethod == RnaSeqAnalysisMethod.HBADEALS) {
             isoThresholder = IsoformSpecificThresholder.fromHbaDeals(geneResults,
-                    0.05,
+                    fdrThreshold,
                     geneContainer,
                     transcriptContainer);
         } else {
             isoThresholder = IsoformSpecificThresholder.fromEdgeR(geneResults,
-                    0.05,
+                    fdrThreshold,
                     geneContainer,
                     transcriptContainer);
         }
@@ -95,11 +98,11 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
                 geneOntology,
                 isoThresholder.getDgeStudy(),
                 isoThresholder.getDgePopulation());
-        System.out.println("Go enrichments, DGE");
+        LOGGER.trace("Go enrichments, DGE");
         for (var cts : dgeGoTerms) {
-            if (cts.passesThreshold(0.05))
+            if (cts.passesThreshold(alphaThreshold))
                 try {
-                    System.out.println(cts.getRow(geneOntology));
+                    LOGGER.trace(cts.getRow(geneOntology));
                 } catch (Exception e) {
                     // some issue with getting terms, probably ontology is not in sync
                     LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
@@ -111,11 +114,11 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
                 geneOntology,
                 isoThresholder.getDasStudy(),
                 isoThresholder.getDasPopulation());
-        System.out.println("Go enrichments, DAS");
+        LOGGER.trace("Go enrichments, DAS");
         for (var cts : dasGoTerms) {
-            if (cts.passesThreshold(0.05))
+            if (cts.passesThreshold(alphaThreshold))
                 try {
-                    System.out.println(cts.getRow(geneOntology));
+                    LOGGER.trace(cts.getRow(geneOntology));
                 } catch (Exception e) {
                     // some issue with getting terms, probably ontology is not in sync
                     LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
@@ -137,7 +140,7 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
      * @param geneOntology Link to the phenol {@link Ontology} object for Gene Ontology
      * @param studySet The set of differentially expressed genes (or the set of differentially spliced isoforms)
      * @param populationSet The set of all considered genes (or isoforms)
-     * @return
+     * @return list of GO Overrepresentation analysis results
      */
     private List<GoTerm2PValAndCounts> doGoAnalysis(GoMethod goMethod,
                                                     MtcMethod mtcMethod,
@@ -179,11 +182,13 @@ public class DefaultIsopretGoAnalysisRunner implements IsopretGoAnalysisRunner {
             throw new IsopretRuntimeException("Did not recognise GO Method");
         }
         if (this.exportAll) {
+            LOGGER.info("Returning GO Overrepresentation results with no p-value threshold");
             return pvalcal.calculatePVals()
                     .stream()
                     .sorted()
                     .collect(Collectors.toList());
         } else {
+            LOGGER.info("Returning GO Overrepresentation results with p-value threshold of {}", ALPHA);
             return pvalcal.calculatePVals()
                     .stream()
                     .filter(item -> item.passesThreshold(ALPHA))

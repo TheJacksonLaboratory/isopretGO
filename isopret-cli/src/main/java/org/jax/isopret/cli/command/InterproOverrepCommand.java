@@ -32,15 +32,9 @@ public class InterproOverrepCommand extends AbstractRnaseqAnalysisCommand
     private String outfile = "isopret-interpro-overrep.txt";
 
 
-    private InterproMapper interproMapper = null;
-
-    private IsopretProvider provider = null;
-
-
-
     @Override
     public Integer call() {
-        provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
+        IsopretProvider provider = IsopretProvider.provider(Paths.get(this.downloadDirectory));
         Map<AccessionNumber, GeneResult> hbaDealsResults =
                 RnaSeqResultsParser.fromHbaDeals(new File(this.hbadealsFile), provider.ensemblGeneModelMap());
         LOGGER.trace("Analyzing {} genes.", hbaDealsResults.size());

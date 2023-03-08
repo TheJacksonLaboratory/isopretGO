@@ -72,10 +72,6 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
     private boolean verbose = true;
     @CommandLine.Option(names = {"--outfile"}, description = "Name of output file to write stats (default: \"gene-ontology-overrep-<infilename>.tsv\")")
     private String outfile;
-
-    @CommandLine.Option(names = {"-s", "--significant-only"}, description = "Limit output to significant terms (default: ${DEFAULT_VALUE})")
-    boolean significantOnly = false;
-
     /**
      * Set to true if we are using HbaDeals, otherwise set to false (indicates edgeR).
      */
@@ -175,41 +171,43 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outfile))) {
             for (var cts : dasGoTerms) {
                 try {
-                    if (significantOnly) {
+                    if (exportAll) {
+                        bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
+                        outputDasGoTerms++;
+
+                    } else {
                         if (cts.passesThreshold(GO_PVAL_THRESHOLD)) {
                             bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
                             outputDasGoTerms++;
                         }
-                    } else {
-                        bw.write("DAS\t" + cts.getRow(geneOntology) + "\n");
-                        outputDasGoTerms++;
-                        }
-                    } catch(IOException e){
-                        // some issue with getting terms, probably ontology is not in sync
-                        LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
                     }
+                } catch (IOException e) {
+                    // some issue with getting terms, probably ontology is not in sync
+                    LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
                 }
-                for (var cts : dgeGoTerms) {
-                    try {
-                        if (significantOnly) {
-                            if (cts.passesThreshold(GO_PVAL_THRESHOLD))
-                                bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
-                                outputDgeGoTerms++;
-                        } else {
-                            bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
-                            outputDgeGoTerms++;
-                        }
-                    } catch (Exception e) {
-                        // some issue with getting terms, probably ontology is not in sync
-                        LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
-                    }
-                }
-            } catch(IOException e){
-                e.printStackTrace();
             }
+            for (var cts : dgeGoTerms) {
+                try {
+                    if (exportAll) {
+                        bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
+                        outputDgeGoTerms++;
+
+                    } else {
+                        if (cts.passesThreshold(GO_PVAL_THRESHOLD))
+                            bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
+                        outputDgeGoTerms++;
+                    }
+                } catch (Exception e) {
+                    // some issue with getting terms, probably ontology is not in sync
+                    LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.printf("We output %d/%d DGE GO terms and %d/%d DAS GO terms",
                 outputDgeGoTerms, totalDgeGoTerms, outputDasGoTerms, totalDasGoTerms);
 
-        }
-
     }
+
+}
