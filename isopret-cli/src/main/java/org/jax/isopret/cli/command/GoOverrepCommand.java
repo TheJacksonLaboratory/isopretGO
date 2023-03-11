@@ -63,6 +63,11 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
                     " None)")
     private String mtc = "Bonferroni";
 
+    @CommandLine.Option(names = {"-o", "--outdir"},
+            description = "output directory")
+    private File outdir = null;
+
+
     @CommandLine.Option(names = {"--export-all"},
             description = "Export results for all GO terms (i.e., do not threshold by p-value)")
     boolean exportAll = false;
@@ -162,13 +167,18 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
 
         List<GoTerm2PValAndCounts> dasGoTerms = results.dasGoTerms();
         List<GoTerm2PValAndCounts> dgeGoTerms = results.dgeGoTerms();
-
-        LOGGER.info("Writing GO Overrepresentation analysis results to {}", outfile);
+        File output_path;
+        if (outdir == null) {
+            output_path = new File(outfile);
+        } else {
+            output_path = new File(outdir + File.separator + outfile);
+        }
+        LOGGER.info("Writing GO Overrepresentation analysis results to {}", output_path.getAbsolutePath());
         int totalDasGoTerms = dasGoTerms.size();
         int outputDasGoTerms = 0;
         int totalDgeGoTerms = dgeGoTerms.size();
         int outputDgeGoTerms = 0;
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(outfile))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(output_path))) {
             for (var cts : dasGoTerms) {
                 try {
                     if (exportAll) {
