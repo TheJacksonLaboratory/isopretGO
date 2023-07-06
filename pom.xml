@@ -30,14 +30,14 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <javafx.version>${java.version}</javafx.version>
-        <phenol.version>2.0.0-RC5</phenol.version>
+        <phenol.version>2.0.0</phenol.version>
         <spring.version>4.3.8.RELEASE</spring.version>
         <jackson.fasterxml.version>2.13.2</jackson.fasterxml.version>
         <commons.io>2.8.0</commons.io>
         <junit.version>5.9.0</junit.version>
         <junit.platform.version>1.9.0</junit.platform.version>
         <jannovar.version>0.38</jannovar.version>
-        <svart.version>2.0.0-RC1</svart.version>
+        <svart.version>2.0.0-RC4</svart.version>
     </properties>
 
     <scm>
@@ -185,6 +185,29 @@
                 <configuration>
                     <useModulePath>false</useModulePath>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0.5</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>17</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
