@@ -1,51 +1,48 @@
-.. _rstexamples:
-===============================
-Example input files for isopret
-===============================
+# Example input files for isopret
 
-RNA-Seq datasets were obtained from NCBI's `Sequence Read Archive (SRA) <https://www.ncbi.nlm.nih.gov/sra>`_.
+
+RNA-Seq datasets were obtained from NCBI's [Sequence Read Archive (SRA)](https://www.ncbi.nlm.nih.gov/sra).
 These experiments study a broad range of conditons, but they all contained two distinct sets of
 samples that could be compared in a case-control design.
 
 A zip archive containing HBADEALS output files for each of the datasets can be obtained
-from the zenodo archive `6483996 <https://zenodo.org/record/6483996>`_.
+from the zenodo archive ([6483996](https://zenodo.org/record/6483996)).
 
-.. _33524399: https://pubmed.ncbi.nlm.nih.gov/33524399/
-.. _31468702: https://pubmed.ncbi.nlm.nih.gov/31468702/
-.. _30641038: https://pubmed.ncbi.nlm.nih.gov/30641038/
-.. _33876188: https://pubmed.ncbi.nlm.nih.gov/33876188/
-.. _34413880: https://pubmed.ncbi.nlm.nih.gov/34413880/
-.. _34295332: https://pubmed.ncbi.nlm.nih.gov/34295332/
-.. _32152472: https://pubmed.ncbi.nlm.nih.gov/32152472/
-.. _30554964: https://pubmed.ncbi.nlm.nih.gov/30554964/
-.. _34669477: https://pubmed.ncbi.nlm.nih.gov/34669477/
-.. _33749664: https://pubmed.ncbi.nlm.nih.gov/33749664/
-.. _32243809: https://pubmed.ncbi.nlm.nih.gov/32243809/
-.. _30340504: https://pubmed.ncbi.nlm.nih.gov/30340504/
-.. _31829804: https://pubmed.ncbi.nlm.nih.gov/31829804/
-.. _32817457: https://pubmed.ncbi.nlm.nih.gov/32817457/
-.. _33188283: https://pubmed.ncbi.nlm.nih.gov/33188283/
-.. _30503522: https://pubmed.ncbi.nlm.nih.gov/30503522/
-.. _32487996: https://pubmed.ncbi.nlm.nih.gov/32487996/
-.. _31474574: https://pubmed.ncbi.nlm.nih.gov/31474574/
-.. _32735620: https://pubmed.ncbi.nlm.nih.gov/32735620/
-.. _32615169: https://pubmed.ncbi.nlm.nih.gov/32615169/
-.. _32441123: https://pubmed.ncbi.nlm.nih.gov/32441123/
-.. _31221130: https://pubmed.ncbi.nlm.nih.gov/31221130/
-.. _30135250: https://pubmed.ncbi.nlm.nih.gov/30135250/
-.. _33327559: https://pubmed.ncbi.nlm.nih.gov/33327559/
-.. _32294156: https://pubmed.ncbi.nlm.nih.gov/32294156/
-.. _34793334: https://pubmed.ncbi.nlm.nih.gov/34793334/
-.. _26679344: https://pubmed.ncbi.nlm.nih.gov/26679344/
-.. _34450236: https://pubmed.ncbi.nlm.nih.gov/34450236/
-.. _34215830: https://pubmed.ncbi.nlm.nih.gov/34215830/
-.. _32354235: https://pubmed.ncbi.nlm.nih.gov/32354235/
-.. _35310884: https://pubmed.ncbi.nlm.nih.gov/35310884/
-.. _24747576: https://pubmed.ncbi.nlm.nih.gov/24747576/
+- [PMID:33524399](https://pubmed.ncbi.nlm.nih.gov/33524399/)
+- [PMID:31468702](https://pubmed.ncbi.nlm.nih.gov/31468702/)
+- [PMID:30641038](https://pubmed.ncbi.nlm.nih.gov/30641038/)
+- [PMID:33876188](https://pubmed.ncbi.nlm.nih.gov/33876188/)
+- [PMID:34413880](https://pubmed.ncbi.nlm.nih.gov/34413880/)
+- [PMID:34295332](https://pubmed.ncbi.nlm.nih.gov/34295332/)
+- [PMID:32152472](https://pubmed.ncbi.nlm.nih.gov/32152472/)
+- [PMID:30554964](https://pubmed.ncbi.nlm.nih.gov/30554964/)
+- [PMID:34669477](https://pubmed.ncbi.nlm.nih.gov/34669477/)
+- [PMID:33749664](https://pubmed.ncbi.nlm.nih.gov/33749664/)
+- [PMID:32243809](https://pubmed.ncbi.nlm.nih.gov/32243809/)
+- [PMID:30340504](https://pubmed.ncbi.nlm.nih.gov/30340504/)
+- [PMID:31829804](https://pubmed.ncbi.nlm.nih.gov/31829804/)
+- [PMID:32817457](https://pubmed.ncbi.nlm.nih.gov/32817457/)
+- [PMID:33188283](https://pubmed.ncbi.nlm.nih.gov/33188283/)
+- [PMID:30503522](https://pubmed.ncbi.nlm.nih.gov/30503522/)
+- [PMID:32487996](https://pubmed.ncbi.nlm.nih.gov/32487996/)
+- [PMID:31474574](https://pubmed.ncbi.nlm.nih.gov/31474574/)
+- [PMID:32735620](https://pubmed.ncbi.nlm.nih.gov/32735620/)
+- [PMID:32615169](https://pubmed.ncbi.nlm.nih.gov/32615169/)
+- [PMID:32441123](https://pubmed.ncbi.nlm.nih.gov/32441123/)
+- [PMID:31221130](https://pubmed.ncbi.nlm.nih.gov/31221130/)
+- [PMID:30135250](https://pubmed.ncbi.nlm.nih.gov/30135250/)
+- [PMID:33327559](https://pubmed.ncbi.nlm.nih.gov/33327559/)
+- [PMID:32294156](https://pubmed.ncbi.nlm.nih.gov/32294156/)
+- [PMID:34793334](https://pubmed.ncbi.nlm.nih.gov/34793334/)
+- [PMID:26679344](https://pubmed.ncbi.nlm.nih.gov/26679344/)
+- [PMID:34450236](https://pubmed.ncbi.nlm.nih.gov/34450236/)
+- [PMID:34215830](https://pubmed.ncbi.nlm.nih.gov/34215830/)
+- [PMID:32354235](https://pubmed.ncbi.nlm.nih.gov/32354235/)
+- [PMID:35310884](https://pubmed.ncbi.nlm.nih.gov/35310884/)
+- [PMID:24747576](https://pubmed.ncbi.nlm.nih.gov/24747576/)
 
+## Pathophysiology
 
-Pathophysiology
-###############
 
 The RNA-seq datasets in this group involve investigations of diseases and disease mechanisms.
 
@@ -93,34 +90,34 @@ The RNA-seq datasets in this group involve investigations of diseases and diseas
 
 
 
-.. _32652799: https://pubmed.ncbi.nlm.nih.gov/32652799/
-.. _35115664: https://pubmed.ncbi.nlm.nih.gov/35115664/
-.. _29025019: https://pubmed.ncbi.nlm.nih.gov/29025019/
-.. _32891909: https://pubmed.ncbi.nlm.nih.gov/32891909/
-.. _31827286: https://pubmed.ncbi.nlm.nih.gov/31827286/
-.. _30333485: https://pubmed.ncbi.nlm.nih.gov/30333485/
-.. _33986176: https://pubmed.ncbi.nlm.nih.gov/33986176/
-.. _34755188: https://pubmed.ncbi.nlm.nih.gov/34755188/
-.. _34739170: https://pubmed.ncbi.nlm.nih.gov/34739170/
-.. _28101782: https://pubmed.ncbi.nlm.nih.gov/28101782/
-.. _34758327: https://pubmed.ncbi.nlm.nih.gov/34758327/
-.. _30993572: https://pubmed.ncbi.nlm.nih.gov/30993572/
-.. _32710624: https://pubmed.ncbi.nlm.nih.gov/32710624/
-.. _31339449: https://pubmed.ncbi.nlm.nih.gov/31339449/
-.. _32365352: https://pubmed.ncbi.nlm.nih.gov/32365352/
-.. _34587152: https://pubmed.ncbi.nlm.nih.gov/34587152/
-.. _31941840: https://pubmed.ncbi.nlm.nih.gov/31941840/
-.. _34784250: https://pubmed.ncbi.nlm.nih.gov/34784250/
-.. _32645954: https://pubmed.ncbi.nlm.nih.gov/32645954/
-.. _34215830: https://pubmed.ncbi.nlm.nih.gov/34215830/
-.. _34886891: https://pubmed.ncbi.nlm.nih.gov/34886891/
-.. _33024153: https://pubmed.ncbi.nlm.nih.gov/33024153/
-.. _31029854: https://pubmed.ncbi.nlm.nih.gov/31029854/
-.. _32066997: https://pubmed.ncbi.nlm.nih.gov/32066997/
-.. _30367166: https://pubmed.ncbi.nlm.nih.gov/30367166/
+- [PMID:32652799](https://pubmed.ncbi.nlm.nih.gov/32652799/)
+- [PMID:35115664](https://pubmed.ncbi.nlm.nih.gov/35115664/)
+- [PMID:29025019](https://pubmed.ncbi.nlm.nih.gov/29025019/)
+- [PMID:32891909](https://pubmed.ncbi.nlm.nih.gov/32891909/)
+- [PMID:31827286](https://pubmed.ncbi.nlm.nih.gov/31827286/)
+- [PMID:30333485](https://pubmed.ncbi.nlm.nih.gov/30333485/)
+- [PMID:33986176](https://pubmed.ncbi.nlm.nih.gov/33986176/)
+- [PMID:34755188](https://pubmed.ncbi.nlm.nih.gov/34755188/)
+- [PMID:34739170](https://pubmed.ncbi.nlm.nih.gov/34739170/)
+- [PMID:28101782](https://pubmed.ncbi.nlm.nih.gov/28101782/)
+- [PMID:34758327](https://pubmed.ncbi.nlm.nih.gov/34758327/)
+- [PMID:30993572](https://pubmed.ncbi.nlm.nih.gov/30993572/)
+- [PMID:32710624](https://pubmed.ncbi.nlm.nih.gov/32710624/)
+- [PMID:31339449](https://pubmed.ncbi.nlm.nih.gov/31339449/)
+- [PMID:32365352](https://pubmed.ncbi.nlm.nih.gov/32365352/)
+- [PMID:34587152](https://pubmed.ncbi.nlm.nih.gov/34587152/)
+- [PMID:31941840](https://pubmed.ncbi.nlm.nih.gov/31941840/)
+- [PMID:34784250](https://pubmed.ncbi.nlm.nih.gov/34784250/)
+- [PMID:32645954](https://pubmed.ncbi.nlm.nih.gov/32645954/)
+- [PMID:34215830](https://pubmed.ncbi.nlm.nih.gov/34215830/)
+- [PMID:34886891](https://pubmed.ncbi.nlm.nih.gov/34886891/)
+- [PMID:33024153](https://pubmed.ncbi.nlm.nih.gov/33024153/)
+- [PMID:31029854](https://pubmed.ncbi.nlm.nih.gov/31029854/)
+- [PMID:32066997](https://pubmed.ncbi.nlm.nih.gov/32066997/)
+- [PMID:30367166](https://pubmed.ncbi.nlm.nih.gov/30367166/)
 
-Physiology
-##########
+## Physiology
+
 
 The RNA-seq datasets in this group involve investigations of physiology, cell biology, and gene regulation.
 
@@ -160,46 +157,44 @@ The RNA-seq datasets in this group involve investigations of physiology, cell bi
    SRP149366_329,4:4,breast cells,Meng P (2019),30993572_
 
 
-.. _34903601: https://pubmed.ncbi.nlm.nih.gov/34903601/
-.. _34458010: https://pubmed.ncbi.nlm.nih.gov/34458010/
-.. _32463448: https://pubmed.ncbi.nlm.nih.gov/32463448/
-.. _26566875: https://pubmed.ncbi.nlm.nih.gov/26566875/
-.. _34493867: https://pubmed.ncbi.nlm.nih.gov/34493867/
-.. _30014619: https://pubmed.ncbi.nlm.nih.gov/30014619/
-.. _34301266: https://pubmed.ncbi.nlm.nih.gov/34301266/
-.. _31048689: https://pubmed.ncbi.nlm.nih.gov/31048689/
-.. _29108258: https://pubmed.ncbi.nlm.nih.gov/29108258/
-.. _34546978: https://pubmed.ncbi.nlm.nih.gov/34546978/
-.. _34580113: https://pubmed.ncbi.nlm.nih.gov/34580113/
-.. _34986855: https://pubmed.ncbi.nlm.nih.gov/34986855/
-.. _34359754: https://pubmed.ncbi.nlm.nih.gov/34359754/
-.. _32109375: https://pubmed.ncbi.nlm.nih.gov/32109375/
-.. _29066513: https://pubmed.ncbi.nlm.nih.gov/29066513/
-.. _34238982: https://pubmed.ncbi.nlm.nih.gov/34238982/
-.. _34458146: https://pubmed.ncbi.nlm.nih.gov/34458146/
-.. _26367798: https://pubmed.ncbi.nlm.nih.gov/26367798/
-.. _24929677: https://pubmed.ncbi.nlm.nih.gov/24929677/
-.. _33203734: https://pubmed.ncbi.nlm.nih.gov/33203734/
-.. _28350380: https://pubmed.ncbi.nlm.nih.gov/28350380/
-.. _33499129: https://pubmed.ncbi.nlm.nih.gov/33499129/
-.. _34059508: https://pubmed.ncbi.nlm.nih.gov/34059508/
-.. _24176112: https://pubmed.ncbi.nlm.nih.gov/24176112/
-.. _33147339: https://pubmed.ncbi.nlm.nih.gov/33147339/
-.. _33318192: https://pubmed.ncbi.nlm.nih.gov/33318192/
-.. _30037853: https://pubmed.ncbi.nlm.nih.gov/30037853/
-.. _31843922: https://pubmed.ncbi.nlm.nih.gov/31843922/
-.. _29152775: https://pubmed.ncbi.nlm.nih.gov/29152775/
-.. _23024189: https://pubmed.ncbi.nlm.nih.gov/23024189/
-.. _33106178: https://pubmed.ncbi.nlm.nih.gov/33106178/
-.. _34270926: https://pubmed.ncbi.nlm.nih.gov/34270926/
-.. _30770362: https://pubmed.ncbi.nlm.nih.gov/30770362/
-.. _32629178: https://pubmed.ncbi.nlm.nih.gov/32629178/
-.. _32888433: https://pubmed.ncbi.nlm.nih.gov/32888433/
+- [PMID:34903601](https://pubmed.ncbi.nlm.nih.gov/34903601/)
+- [PMID:34458010](https://pubmed.ncbi.nlm.nih.gov/34458010/)
+- [PMID:32463448](https://pubmed.ncbi.nlm.nih.gov/32463448/)
+- [PMID:26566875](https://pubmed.ncbi.nlm.nih.gov/26566875/)
+- [PMID:34493867](https://pubmed.ncbi.nlm.nih.gov/34493867/)
+- [PMID:30014619](https://pubmed.ncbi.nlm.nih.gov/30014619/)
+- [PMID:34301266](https://pubmed.ncbi.nlm.nih.gov/34301266/)
+- [PMID:31048689](https://pubmed.ncbi.nlm.nih.gov/31048689/)
+- [PMID:29108258](https://pubmed.ncbi.nlm.nih.gov/29108258/)
+- [PMID:34546978](https://pubmed.ncbi.nlm.nih.gov/34546978/)
+- [PMID:34580113](https://pubmed.ncbi.nlm.nih.gov/34580113/)
+- [PMID:34986855](https://pubmed.ncbi.nlm.nih.gov/34986855/)
+- [PMID:34359754](https://pubmed.ncbi.nlm.nih.gov/34359754/)
+- [PMID:32109375](https://pubmed.ncbi.nlm.nih.gov/32109375/)
+- [PMID:29066513](https://pubmed.ncbi.nlm.nih.gov/29066513/)
+- [PMID:34238982](https://pubmed.ncbi.nlm.nih.gov/34238982/)
+- [PMID:34458146](https://pubmed.ncbi.nlm.nih.gov/34458146/)
+- [PMID:26367798](https://pubmed.ncbi.nlm.nih.gov/26367798/)
+- [PMID:24929677](https://pubmed.ncbi.nlm.nih.gov/24929677/)
+- [PMID:33203734](https://pubmed.ncbi.nlm.nih.gov/33203734/)
+- [PMID:28350380](https://pubmed.ncbi.nlm.nih.gov/28350380/)
+- [PMID:33499129](https://pubmed.ncbi.nlm.nih.gov/33499129/)
+- [PMID:34059508](https://pubmed.ncbi.nlm.nih.gov/34059508/)
+- [PMID:24176112](https://pubmed.ncbi.nlm.nih.gov/24176112/)
+- [PMID:33147339](https://pubmed.ncbi.nlm.nih.gov/33147339/)
+- [PMID:33318192](https://pubmed.ncbi.nlm.nih.gov/33318192/)
+- [PMID:30037853](https://pubmed.ncbi.nlm.nih.gov/30037853/)
+- [PMID:31843922](https://pubmed.ncbi.nlm.nih.gov/31843922/)
+- [PMID:29152775](https://pubmed.ncbi.nlm.nih.gov/29152775/)
+- [PMID:23024189](https://pubmed.ncbi.nlm.nih.gov/23024189/)
+- [PMID:33106178](https://pubmed.ncbi.nlm.nih.gov/33106178/)
+- [PMID:34270926](https://pubmed.ncbi.nlm.nih.gov/34270926/)
+- [PMID:30770362](https://pubmed.ncbi.nlm.nih.gov/30770362/)
+- [PMID:32629178](https://pubmed.ncbi.nlm.nih.gov/32629178/)
+- [PMID:32888433](https://pubmed.ncbi.nlm.nih.gov/32888433/)
 
+## Cancer
 
-
-Cancer
-######
 
 The RNA-seq datasets in this group involve investigations of cancer.
 
@@ -247,14 +242,12 @@ The RNA-seq datasets in this group involve investigations of cancer.
    SRP312693_314,4:4,medulloblastoma,Rea J (2021),34359754_
    SRP254646_315,11:11,prostate cancer,He YD (2021),34301266_
 
-.. _26873097: https://pubmed.ncbi.nlm.nih.gov/26873097/
-.. _31434901: https://pubmed.ncbi.nlm.nih.gov/31434901/
-.. _33897690: https://pubmed.ncbi.nlm.nih.gov/33897690/
-.. _34128839: https://pubmed.ncbi.nlm.nih.gov/34128839/
-.. _31844885: https://pubmed.ncbi.nlm.nih.gov/31844885/
-
-Infectious disease
-##################
+- [PMID:26873097](https://pubmed.ncbi.nlm.nih.gov/26873097/)
+- [PMID:31434901](https://pubmed.ncbi.nlm.nih.gov/31434901/)
+- [PMID:33897690](https://pubmed.ncbi.nlm.nih.gov/33897690/)
+- [PMID:34128839](https://pubmed.ncbi.nlm.nih.gov/34128839/)
+- [PMID:31844885](https://pubmed.ncbi.nlm.nih.gov/31844885/)
+## Infectious disease
 
 The RNA-seq datasets in this group involve investigations of infectious disease.
 

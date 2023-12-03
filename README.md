@@ -39,7 +39,7 @@ We offer pre-built installation files for MacIntosh (M1 and Intel) in the Releas
 
 The easiest way to run isopret-gui on a linux system is to run the downloadable JAR file from the releases page.
 
-```aidl
+```bash
 java -jar isopret-gui.jar
 ```
 
@@ -50,6 +50,24 @@ Additionally, an installation file is provided as explained in [PACKAGE](PACKAGE
 
 Please see the [ReadTheDocs](https://isopret.readthedocs.io/en/latest/).
 A manuscript is in preparation.
+
+
+
+## Set up documentation
+
+Enter the following code to install mkdocs and run a server locally. The GitHub action will create a comparable site online.
+
+```
+python3 -m venv venv
+source venv/bin/activate
+pip install mkdocs-material
+pip install mkdocs-material[imaging]
+pip install mkdocs-material-extensions
+pip install pillow cairosvg
+pip install mkdocstrings[python]
+mkdocs serve
+```
+
 
 
 
