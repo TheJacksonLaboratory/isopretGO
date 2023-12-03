@@ -319,7 +319,7 @@ public class AnalysisController implements Initializable {
             tabPane.getSelectionModel().select(tab);
             this.openTabs.put(hbadealsResult, tab);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not load hbaGenePane.fxml file: {}", e.getMessage());
         }
 
 

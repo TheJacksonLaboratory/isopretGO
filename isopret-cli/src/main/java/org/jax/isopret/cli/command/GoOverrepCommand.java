@@ -213,7 +213,8 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write GO overrep results to file: {}", e.getMessage());
+            return;
         }
         System.out.printf("We output %d/%d DGE GO terms and %d/%d DAS GO terms",
                 outputDgeGoTerms, totalDgeGoTerms, outputDasGoTerms, totalDasGoTerms);

@@ -65,11 +65,11 @@ java -jar isopret-cli.jar GO --hbadeals <path>
 
 The options are
 
-|  Option          | Explanation                                                                           |
+| Option           | Explanation                                                                           |
 |:-----------------|:--------------------------------------------------------------------------------------|
 | -b,--hbadeals    | Path to HBA-DEALS output file (required)                                              |
 | -c,--calculation | Ontologizer calculation (Term-for-Term, PC-Union, PC-Intersection; default: TfT)      |
-|  --mtc           | Multiple-Testing-Correction for GO analysis (default Bonferroni)                      |
+| --mtc            | Multiple-Testing-Correction for GO analysis (default Bonferroni)                      |
 | -v", --verbose   | Print stats in shell                                                                  |
 | --outfile        | Name of output file to write stats (default gene-ontology-overrep-{input}.tsv         |
 

@@ -30,14 +30,14 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <javafx.version>${java.version}</javafx.version>
-        <phenol.version>2.0.0</phenol.version>
+        <phenol.version>2.0.4</phenol.version>
         <spring.version>4.3.8.RELEASE</spring.version>
         <jackson.fasterxml.version>2.13.2</jackson.fasterxml.version>
         <commons.io>2.8.0</commons.io>
         <junit.version>5.9.0</junit.version>
         <junit.platform.version>1.9.0</junit.platform.version>
         <jannovar.version>0.38</jannovar.version>
-        <svart.version>2.0.0-RC4</svart.version>
+        <svart.version>2.0.0-RC5</svart.version>
     </properties>
 
     <scm>
