@@ -6,12 +6,12 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.*;
 import javafx.stage.Stage;
 import org.jax.isopret.gui.service.model.GoCompTerm;
 import org.jax.isopret.gui.service.model.GoComparison;
@@ -24,24 +24,23 @@ import java.util.List;
 public class GoCompWidget {
     private final Logger LOGGER = LoggerFactory.getLogger(GoCompWidget.class);
     private final GoComparison goComparison;
-    private final int nSignificantGoTerms;
 
     private final static String dgeTitle = "DGE-predominant overrepresentation\n";
     private final static String dasTitle = "DAS-predominant overrepresentation\n";
     private final static String dgeBody = """
-            These GO terms displayed a higher degree of overexpression in the set of differentially expressed
-            genes set than in the set of differentially expressed transcripts.
+            These GO terms displayed a higher degree of overrepresentation in the set of differentially expressed
+            genes (DGE) than in the set of differentially alternatively spliced (DAS) transcripts.
             """;
     private final static String dasBody = """
-            These GO terms displayed a higher degree of overexpression in the set of differentially
-            expressed transcripts set than in the DGE set of differentially expressed genes.
+            These GO terms displayed a higher degree of overrepresentation in the set of differentially
+            alternatively spliced (DAS) transcripts set than in the set of differentially expressed genes (DGE).
             """;
 
 
 
     public GoCompWidget(GoComparison comparison) {
         goComparison = comparison;
-        nSignificantGoTerms = comparison.getGoCompTermList().size();
+        int nSignificantGoTerms = comparison.getGoCompTermList().size();
     }
 
     BarChart<Number, String > getBarChart(List<GoCompTerm> goTerms) {
@@ -71,24 +70,19 @@ public class GoCompWidget {
     }
 
     private VBox getBarChartPane(String type, List<GoCompTerm> goTerms) {
-        TextFlow text_flow = new TextFlow();
-        Text titleText;
-        Text bodyText;
+        String bodyText;
         if (type.equals("DGE")) {
-            titleText = new Text(dgeTitle);
-            bodyText = new Text(dgeBody);
+            bodyText = dgeBody;
         } else {
-            titleText = new Text(dasTitle);
-            bodyText = new Text(dasBody);
+            bodyText = dasBody;
         }
-        titleText.setFont(Font.font("Verdana", FontPosture.ITALIC,16));
-        titleText.setStyle(".break-word { word-wrap: break-word; }");
-        text_flow.getChildren().addAll(titleText, bodyText);
+        Label label = new Label(bodyText);
+        label.setWrapText(true);
         BarChart<Number, String> barChart = getBarChart(goTerms);
         ScrollPane pane = new ScrollPane(barChart);
         int n_terms = goTerms.size();
         LOGGER.info("{} with {} go terms for display", type, n_terms);
-        return new VBox(text_flow, pane);
+        return new VBox(label, pane);
     }
 
 
@@ -97,36 +91,31 @@ public class GoCompWidget {
 
        HBox hbox = new HBox();
 
-       VBox dgeVbox = getBarChartPane("DGE", goComparison.getDgePredominentGoCompTerms());
+       VBox dgeVbox = getBarChartPane("DGE", goComparison.getDgePredominantGoCompTerms());
        dgeVbox.setSpacing(15);
-       VBox dasVbox = getBarChartPane("DAS", goComparison.getDasPredominentGoCompTerms());
+       VBox dasVbox = getBarChartPane("DAS", goComparison.getDasPredominantGoCompTerms());
        dasVbox.setSpacing(15);
        Region r = new Region();
        r.setMinWidth(20);
        HBox.setHgrow(r, Priority.ALWAYS);
        hbox.getChildren().addAll(dgeVbox, r, dasVbox);
-       Font plain = Font.font("TimeRoman", 16);
-       Font bold = Font.font("TimesRoman", FontWeight.BOLD, FontPosture.ITALIC, 16);
-       Text text1 = new Text("Gene Ontology (GO) overenrichment analysis was performed using ");
-       Text text2 = new Text(goComparison.goMethod());
-       Text text3 = new Text(" and ");
-       Text text4 = new Text(goComparison.mtcMethod());
-       Text text5= new Text(". The negative decadic logarithm of the p-value for enrichment is "+
-               "displayed separately for GO terms with predominant enrichment in the set of "+
-               "differentially expressed genes (DGE) and the set of differential alternative "+
-               "splicing (DAS), i.e., differentially spliced transcripts.");
-       text1.setFont(plain);
-       text2.setFont(bold);
-       text3.setFont(plain);
-       text4.setFont(bold);
-       text5.setFont(plain);
-       TextFlow tflow = new TextFlow(text1, text2, text3, text4, text5);
-       VBox vb = new VBox(20, hbox, tflow);
+
+        String sb = "Gene Ontology (GO) overrepresentation analysis was performed using the " +
+                goComparison.goMethod().longNameWithAbbreviation() + " approach with " + goComparison.mtcMethod().display() +
+                " multiple-testing correction. " +
+                "The negative decadic logarithm of the p-value for enrichment is displayed separately " +
+                "for GO terms with predominant enrichment in the set of differentially expressed " +
+                "genes (DGE) and the set of differential alternatively spliced (DAS), transcripts.";
+        Label label = new Label(sb);
+        label.setWrapText(true);
+        label.setStyle("-fx-font: 12pt Arial");
+
+       VBox vb = new VBox(20, hbox, label);
        vb.setPadding(new Insets(20, 20, 10, 20));
        Scene scene = new Scene(vb, 1200, 800);
 
         Stage newWindow = new Stage();
-        newWindow.setTitle("Gene Ontology: DGE vs. DAS Overenrichment");
+        newWindow.setTitle("Gene Ontology: DGE vs. DAS Overrepresentation");
         newWindow.setScene(scene);
 
         // Set position of second window, related to primary window.

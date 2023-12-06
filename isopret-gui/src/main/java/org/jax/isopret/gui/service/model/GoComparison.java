@@ -35,7 +35,7 @@ public class GoComparison {
                         MtcMethod mtcMethod) {
         this.goMethod = goMethod;
         this.mtcMethod = mtcMethod;
-        // Collect all signficant GO Term ids
+        // Collect all significant GO Term ids
         Set<TermId> significantGoTerms =
                 Stream.concat(dge.stream(), das.stream())
                         .filter(t -> t.getAdjustedPValue() <= ALPHA)
@@ -73,11 +73,11 @@ public class GoComparison {
         return goCompTermList;
     }
 
-    public List<GoCompTerm> getDgePredominentGoCompTerms() {
+    public List<GoCompTerm> getDgePredominantGoCompTerms() {
         return this.dgeGoCompTermList;
     }
 
-    public List<GoCompTerm> getDasPredominentGoCompTerms() {
+    public List<GoCompTerm> getDasPredominantGoCompTerms() {
         return this.dasGoCompTermList;
     }
 
@@ -93,12 +93,12 @@ public class GoComparison {
                 .collect(Collectors.toList());
     }
 
-    public String goMethod() {
-        return this.goMethod.name();
+    public GoMethod goMethod() {
+        return this.goMethod;
     }
 
-    public String mtcMethod() {
-        return this.mtcMethod.name();
+    public MtcMethod mtcMethod() {
+        return this.mtcMethod;
     }
 
 

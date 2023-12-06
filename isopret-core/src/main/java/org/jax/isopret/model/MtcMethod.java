@@ -14,6 +14,10 @@ public enum MtcMethod {
         this.name = name;
     }
 
+    public String display() {
+        return name;
+    }
+
 
     @Override
     public String toString() {
