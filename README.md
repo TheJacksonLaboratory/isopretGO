@@ -9,8 +9,8 @@ Releases page.
 
 ## Background
 [Gene Ontology](http://geneontology.org/) traditionally has provided
-annotations for genes rather than for specific isoforms. However, in 
-some cases, the functions of the individual isoforms of a gene are 
+annotations for genes rather than for specific isoforms. However, in
+some cases, the functions of the individual isoforms of a gene are
 differ with respect to one or more of the gene's function. In this project,
 we have developed an algorithm for prediction of isoform-specific function
 across the entire transcriptome. The isopret app offers a number of
@@ -33,7 +33,7 @@ Macintosh laptops with the new ARM M1 chip when using Oracle's SDK (version 17.0
 have used [Azul Zulu](https://www.azul.com/downloads/?package=jdk) JDKs on M1 Macintoshes and
 could run Isopret and other JavaFX apps without problems.
 
-We offer pre-built installation files for MacIntosh (M1 and Intel) in the Release section. 
+We offer pre-built installation files for MacIntosh (M1 and Intel) in the Release section.
 
 ## Note to Linux users
 

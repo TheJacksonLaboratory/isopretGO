@@ -1,14 +1,14 @@
-IsopretGO: Isoform interpretation
+# IsopretGO: Isoform interpretation
 
-IsopretGO (Isoform Interpretation for Gene Ontology) leverages predictions of isoform-specific functions (i.e., Gene Ontology annotations)
-made by the [isopret expectation maximization algorithm](https://pubmed.ncbi.nlm.nih.gov/36929917/){:target="_blank"}
-to perform gene-level  and isoform-level `Gene Ontology.
+IsopretGO (Isoform Interpretation for Gene Ontology) leverages predictions of isoform-specific functions (i.e., Gene Ontology[GO] annotations)
+made by the [isopret expectation maximization algorithm](https://pubmed.ncbi.nlm.nih.gov/36929917/){:target="\_blank"}.
+to perform gene-level  and isoform-level GO overrepresentation analysis.
 
 
 
 
 Isopret uses the analysis (output) file of
-[HBA-DEALS](https://pubmed.ncbi.nlm.nih.gov/32660516/){:target="_blank"}. 
+[HBA-DEALS](https://pubmed.ncbi.nlm.nih.gov/32660516/){:target="_blank"}.
 
 TODO -- point to tutorial amd also mention EDGER
 
