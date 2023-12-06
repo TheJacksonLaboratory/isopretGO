@@ -60,6 +60,7 @@ Enter the following code to install mkdocs and run a server locally. The GitHub 
 ```
 python3 -m venv venv
 source venv/bin/activate
+pip install mkdocs
 pip install mkdocs-material
 pip install mkdocs-material[imaging]
 pip install mkdocs-material-extensions

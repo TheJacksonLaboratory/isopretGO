@@ -22,21 +22,24 @@ build isopret-gui from source, then the build process described below requires
 
 
 Go the GitHub page of [isopretGO](https://github.com/TheJacksonLaboratory/isopretGO), and clone the project.
-Build the executable from source with maven, and then test the build. ::
+Build the executable from source with maven, and then test the build.
 
-    git clone https://github.com/TheJacksonLaboratory/isopret.git
-    cd isopret
-    mvn package
-    java -jar target/isopret.jar
-      Usage: isopret [-hV] [COMMAND]
-        Isoform interpretation tool.
-        -h, --help      Show this help message and exit.
-        -V, --version   Print version information and exit.
-      Commands:
-        download, D  Download files for prositometry
-        hbadeals, H  Analyze HBA-DEALS files
-        svg, V       Create SVG/PDF files for a specific gene
-        stats, S     Show descriptive statistics about data
+```bash
+git clone https://github.com/TheJacksonLaboratory/isopret.git
+cd isopret
+mvn package
+java -jar target/isopret.jar
+  Usage: isopret [-hV] [COMMAND]
+    Isoform interpretation tool.
+    -h, --help      Show this help message and exit.
+    -V, --version   Print version information and exit.
+  Commands:
+    download, D  Download files for prositometry
+    hbadeals, H  Analyze HBA-DEALS files
+    svg, V       Create SVG/PDF files for a specific gene
+    stats, S     Show descriptive statistics about data
+```
+
 
 
 
