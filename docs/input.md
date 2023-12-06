@@ -11,11 +11,15 @@ Hierarchical Bayesian Analysis of Differential Expression and ALternative Splici
 simultaneously characterizes differential expression and splicing in cohorts.
 
 
-.. figure:: /img/hbadeals.png
-   :width: 80%
-   :align: center
 
-   HBA-DEALS. The log-transformed expression of a gene with three isoforms (green, orange, and blue) is shown. The gene expression is the sum of the expression of the isoforms. Differential gene expression is modeled as two Normal distributions whose means differ by the parameter β. The proportions of the corresponding isoforms have a Dirichlet prior, and the difference in proportions between controls and cases is modeled by α (symbolized by the two triangles). An MCMC procedure is used to solve for the posterior distribution of the parameters of the model for all genes and isoforms at once.
+<figure markdown>
+![HBA-DEALS.](./img/hbadeals.png){ width="1000" }
+<figcaption>HBA-DEALS..</figcaption>
+</figure>
+
+
+
+The log-transformed expression of a gene with three isoforms (green, orange, and blue) is shown. The gene expression is the sum of the expression of the isoforms. Differential gene expression is modeled as two Normal distributions whose means differ by the parameter β. The proportions of the corresponding isoforms have a Dirichlet prior, and the difference in proportions between controls and cases is modeled by α (symbolized by the two triangles). An MCMC procedure is used to solve for the posterior distribution of the parameters of the model for all genes and isoforms at once.
 
 The HBA-DEALS algorithm is explained in [Karlebach et al, 2020, Genome Biology 21:171](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6).
 Source code is available at the [HBA-DEALS GitHub repository](https://github.com/TheJacksonLaboratory/HBA-DEALS).
@@ -64,7 +68,7 @@ only [Ensembl](http://ensembl.org/) gene/transcript models.
 ## Running HBA-DEALS
 
 
-A Snakemake pipeline for running HBA-DEALS is described in the 
+A Snakemake pipeline for running HBA-DEALS is described in the
 [GitHub repository](https://github.com/TheJacksonLaboratory/covid19splicing)
 for the paper  [Betacoronavirus-specific alternate splicing](https://pubmed.ncbi.nlm.nih.gov/35074468/). The GitHub repository
 also contains 15 HBA-DEALS output files related to that publication that can be used as input for Isopret-Gui.

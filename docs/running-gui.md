@@ -18,7 +18,7 @@ java -jar Isopret.jar
 
 
 <figure markdown>
-![First run](/img/isopret1.png){ width="1000" }
+![First run](./img/isopret1.png){ width="1000" }
 <figcaption>Appearance of the app when started for the first time.</figcaption>
 </figure>
 
@@ -48,7 +48,7 @@ The drawback of the term-for-term approach is that it does not respect dependenc
 are caused by overlapping annotations. As a result of the true-path rule, each term in GO shares all the
 annotations of all of its descendants. Isopret also offers two algorithms for GO analysis that
 assess GO term overrepresentation that examines each term in the context of its parent terms,
-which we call the parent–child approach 
+which we call the parent–child approach
 ([Grossmann et al., 2007](https://academic.oup.com/bioinformatics/article/23/22/3024/208216?login=false)).
 In our experiments, the ``parent–child-intersection`` approach is generally more conservative than
 the ``parent–child-union`` approach.
@@ -57,13 +57,13 @@ the ``parent–child-union`` approach.
 
 
 Isopret offers the following multiple-testing correction options for the GO analysis: Bonferroni, Bonferroni-Holm,
-Sidak, Benjamini-Hochberg, Benjamini-Yukutieli, None. The book 
+Sidak, Benjamini-Hochberg, Benjamini-Yukutieli, None. The book
 [Introduction to Bio-Ontologies](https://www.routledge.com/Introduction-to-Bio-Ontologies/Robinson-Bauer/p/book/9780367659271)
 provides detailed explanations of the GO Overrepresentation analysis procedures and multiple testing correction approaches.
 
 <figure markdown>
 ![First run](/img/isopret2.png){ width="1000" }
-<figcaption>Appearance of the app after data download with an HBA-DEAL file chosen and the analysis set to 
+<figcaption>Appearance of the app after data download with an HBA-DEAL file chosen and the analysis set to
 Parent-Child Intersection with Benjamini-Hochberg MTC.</figcaption>
 </figure>
 

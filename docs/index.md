@@ -12,10 +12,6 @@ Isopret uses the analysis (output) file of
 
 TODO -- point to tutorial amd also mention EDGER
 
-HBA-DEALS
-analyzes RNA-Seq data to determine differentially expression and differential
-splicing simultaneous. Isopret then performs
-Gene Ontology analysis using a Java 17 implementation of code from
-the [Ontologizer](https://pubmed.ncbi.nlm.nih.gov/18511468/){:target="_blank"}.
+HBA-DEALS analyzes RNA-Seq data to determine differentially expression and differential splicing simultaneous. Isopret then performs Gene Ontology analysis using an updated implementation of code from the [Ontologizer](https://pubmed.ncbi.nlm.nih.gov/18511468/){:target="_blank"}.
 
 

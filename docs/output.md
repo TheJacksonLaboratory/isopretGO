@@ -15,7 +15,7 @@ false discovery rate (FDR) are highlighted in color.
 
 
 <figure markdown>
-![Overview tab](/img/isopret3.png){ width="1000" }
+![Overview tab](./img/isopret3.png){ width="1000" }
 <figcaption>IsopretGO overview tab.
 </figcaption>
 </figure>
@@ -33,7 +33,7 @@ and analysis results for that gene. The tab has three parts -- isoforms, protein
 The isoform section shows the structure of each isoform that has at least one read in the RNA-seq data.
 
 <figure markdown>
-![Gene tab](/img/isopret4.png){ width="1000" }
+![Gene tab](./img/isopret4.png){ width="1000" }
 <figcaption>IsopretGO gene tab, isoforms section.
 </figcaption>
 </figure>
@@ -57,7 +57,7 @@ at the top of the table and highlighted green.
 
 
 <figure markdown>
-![Gene Ontology section](/img/isopret6.png){ width="1000" }
+![Gene Ontology section](./img/isopret6.png){ width="1000" }
 <figcaption>IsopretGO gene tab, Gene Ontology section.
 </figcaption>
 </figure>
@@ -83,20 +83,24 @@ Clicking on the ``Compare DGE & DAS`` button will open a dialog that shows the n
 of GO terms to compare results for expression and splicing.
 
 <figure markdown>
-![Gene Ontology DAS tab](/img/isopret7.png){ width="1000" }
+![Gene Ontology DAS tab](./img/isopret7.png){ width="1000" }
 <figcaption>IsopretGO gene tab, Gene Ontology DAS tab.
 </figcaption>
 </figure>
-.. figure:: /img/isopret8.png
-   :width: 70%
-   :align: center
-
-   Isopret. Gene Ontology tab, compare differential expression and differential splicing
 
 
+<figure markdown>
+![Gene Ontology DAS tab](./img/isopret8.png){ width="1000" }
+<figcaption>Gene Ontology tab, compare differential expression and differential splicing
+</figcaption>
+</figure>
 
-Clicking on the ``Export`` button next to a GO term will show summaries for each gene that is annotated to the GO term
+
+
+
+
+
+Clicking on the **Export** button next to a GO term will show summaries for each gene that is annotated to the GO term
 and is also differentially expressed (for DGE) or spliced (for DAS). This generates an HTML page that can be
-used to explore the genes associated with the GO term together with their corresponding patterns of differential expression and splicing
-Note that the output is restricted to the first 100 genes to limit the size of the resulting HTML page.
+used to explore the genes associated with the GO term together with their corresponding patterns of differential expression and splicing. Note that the output is restricted to the first 100 genes to limit the size of the resulting HTML page.
 

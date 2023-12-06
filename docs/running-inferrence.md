@@ -1,14 +1,16 @@
-.. _rstrunninginferrence:
+# Inference
 
-=====================================
-Running the isopret inferrence script
-=====================================
+
+
 
 Here, we explain how to set up and run the R scripts developed to perform expectation-maximization analysis to infer
 GO annotations for isoforms.
 
+## Running the isopret inferrence script
+
+
 The scripts are stored in the directory ``em-scripts`` in the project
-`GitHub repository <https://github.com/TheJacksonLaboratory/isopret>`_.
+[GitHub repository](https://github.com/TheJacksonLaboratory/isopret).
 
 The script ``translate_all_isoforms.R`` can be used for obtaining isoform amino-acid sequences.  It extracts isoform coordinates from a .gtf file and calls the tool gffread to translate the genomic sequence.  The variables containing the paths to the .fasta file containing the genome sequence and the .gtf file with isoform coordinates ('fasta.file' and 'gtf.file', respectively) should match the locations of the files in the system.
 
