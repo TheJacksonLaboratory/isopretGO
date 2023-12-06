@@ -1,8 +1,8 @@
-package org.jax.isopret.core;
+package org.jax.isopret.io.impl;
 
 import java.net.URL;
 
-public class DownloadItem{
+public class DownloadItem {
 
     private final URL url;
     private final String basename;

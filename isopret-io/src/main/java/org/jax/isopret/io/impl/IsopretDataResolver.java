@@ -1,4 +1,4 @@
-package org.jax.isopret.impl;
+package org.jax.isopret.io.impl;
 
 
 import org.slf4j.Logger;

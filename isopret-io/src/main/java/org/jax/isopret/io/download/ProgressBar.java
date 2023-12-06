@@ -1,4 +1,4 @@
-package org.jax.isopret.download;
+package org.jax.isopret.io.download;
 
 
 /**

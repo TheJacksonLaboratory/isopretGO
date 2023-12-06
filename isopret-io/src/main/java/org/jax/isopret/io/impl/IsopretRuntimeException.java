@@ -1,5 +1,4 @@
-package org.jax.isopret.impl;
-
+package org.jax.isopret.io.impl;
 public class IsopretRuntimeException extends RuntimeException {
 
     public IsopretRuntimeException() { super();}

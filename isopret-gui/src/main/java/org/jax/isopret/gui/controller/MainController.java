@@ -12,7 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import org.jax.isopret.core.InputFileChecker;
+import org.jax.isopret.io.InputFileChecker;
 import org.jax.isopret.core.InterproAnalysisResults;
 import org.jax.isopret.core.IsopretInterpoAnalysisRunner;
 import org.jax.isopret.core.analysis.InterproFisherExact;
@@ -458,7 +458,7 @@ public class MainController implements Initializable {
 
         }
         InputFileChecker checker = new InputFileChecker(dir.getAbsolutePath());
-        DownloadPopup pop = new DownloadPopup(checker.getSuccessulDownloads(),
+        DownloadPopup pop = new DownloadPopup(checker.getSuccessfulDownloads(),
                 checker.getFailedDownloads(),
                 dir.getAbsolutePath(),
                 this.hostServicesWrapper);

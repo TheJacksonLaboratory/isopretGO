@@ -1,4 +1,4 @@
-package org.jax.isopret.core.impl.download;
+package org.jax.isopret.io.download;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;

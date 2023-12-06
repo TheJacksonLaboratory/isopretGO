@@ -1,4 +1,4 @@
-package org.jax.isopret.core;
+package org.jax.isopret.io;
 
 
 
@@ -14,10 +14,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.GZIPInputStream;
 
-import org.jax.isopret.impl.DownloadItem;
-import org.jax.isopret.impl.IsopretDataResolver;
-import org.jax.isopret.impl.IsopretRuntimeException;
-import org.jax.isopret.download.*;
+import org.jax.isopret.io.impl.DownloadItem;
+import org.jax.isopret.io.impl.IsopretDataResolver;
+import org.jax.isopret.io.impl.IsopretRuntimeException;
+import org.jax.isopret.io.download.*;
 
 /**
  * Command to download the {@code hp.obo} and {@code phenotype.hpoa} files that

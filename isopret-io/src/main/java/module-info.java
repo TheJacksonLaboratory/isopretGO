@@ -1,4 +1,4 @@
-module isopret.io {
+module org.jax.isopret.io {
     requires org.slf4j;
     requires org.apache.commons.net;
 
