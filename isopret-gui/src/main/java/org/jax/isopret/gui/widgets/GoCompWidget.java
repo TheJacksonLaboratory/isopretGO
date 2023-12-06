@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 
-public class GoCompWidget {
+public class GoCompWidget implements GoWidget {
     private final Logger LOGGER = LoggerFactory.getLogger(GoCompWidget.class);
     private final GoComparison goComparison;
 
@@ -58,7 +58,7 @@ public class GoCompWidget {
         XYChart.Series<Number, String> dataSeriesDAS = new XYChart.Series<>();
         dataSeriesDAS.setName("DAS");
         for (GoCompTerm goComp : goTerms) {
-            String label = goComp.getLabel();
+            String label = limitLabelLength(goComp.getLabel());
             double dge = goComp.getDge();
             double das = goComp.getDas();
             dataSeriesDGE.getData().add(new XYChart.Data<>(dge,label));

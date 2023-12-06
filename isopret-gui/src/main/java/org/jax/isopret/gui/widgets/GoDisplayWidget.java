@@ -1,6 +1,7 @@
 package org.jax.isopret.gui.widgets;
 
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -19,12 +20,16 @@ import org.jax.isopret.model.MtcMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A widget to display either DAS or DGE enriched GO terms
  */
-public class GoDisplayWidget {
+public class GoDisplayWidget implements GoWidget{
     private final Logger LOGGER = LoggerFactory.getLogger(GoDisplayWidget.class);
     private final List<GoCompTerm> sigGoTerms;
 
@@ -64,6 +69,7 @@ public class GoDisplayWidget {
         this.mtcMethod = comparison.mtcMethod();
     }
 
+
     BarChart<Number, String> getBarChart(List<GoCompTerm> goTerms) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("-log10(p-value)");
@@ -77,7 +83,7 @@ public class GoDisplayWidget {
         XYChart.Series<Number, String> dataSeriesPvals = new XYChart.Series<>();
         dataSeriesPvals.setName(compMode.name());
         for (GoCompTerm goComp : goTerms) {
-            String label = goComp.getLabel();
+            String label = limitLabelLength(goComp.getLabel());
             double pval = switch (compMode) {
                 case DAS -> goComp.getDas();
                 case DGE -> goComp.getDge();
