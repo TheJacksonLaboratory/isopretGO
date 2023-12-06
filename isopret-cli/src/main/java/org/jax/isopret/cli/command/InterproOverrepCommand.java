@@ -56,7 +56,7 @@ public class InterproOverrepCommand extends AbstractRnaseqAnalysisCommand
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outfile))) {
             bw.write(visualizer.getTsv());
         } catch (IOException e) {
-           e.printStackTrace();
+            LOGGER.error("Could not write interpro overrep file: {}", e.getMessage());
         }
         return null;
     }

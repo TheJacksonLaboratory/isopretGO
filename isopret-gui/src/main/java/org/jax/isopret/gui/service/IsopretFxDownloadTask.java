@@ -1,7 +1,7 @@
 package org.jax.isopret.gui.service;
 
 import javafx.concurrent.Task;
-import org.jax.isopret.core.IsopretDownloader;
+import org.jax.isopret.io.IsopretDownloader;
 
 /**
  * A version of {@link IsopretDownloader} intended to be used as a {@link Task} in

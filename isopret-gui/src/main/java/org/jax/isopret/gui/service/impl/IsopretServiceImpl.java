@@ -121,7 +121,7 @@ public class IsopretServiceImpl implements IsopretService  {
         try {
             pgProperties.store(new FileWriter(isopretSettingsFile), "store to properties file");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write settings: {}", e.getMessage());
         }
     }
 

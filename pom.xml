@@ -3,20 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.3</version>
+        <version>3.2.0</version>
     </parent>
     <groupId>org.jax.isopret</groupId>
     <artifactId>isopret</artifactId>
-    <version>1.1.16</version>
+    <version>1.1.17</version>
     <modules>
         <module>isopret-core</module>
         <module>isopret-cli</module>
         <module>isopret-gui</module>
+        <module>isopret-io</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -30,14 +29,14 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <javafx.version>${java.version}</javafx.version>
-        <phenol.version>2.0.0-RC5</phenol.version>
+        <phenol.version>2.0.4</phenol.version>
         <spring.version>4.3.8.RELEASE</spring.version>
-        <jackson.fasterxml.version>2.13.2</jackson.fasterxml.version>
-        <commons.io>2.8.0</commons.io>
+        <jackson.fasterxml.version>2.16.0</jackson.fasterxml.version>
+        <commons.io.version>2.8.0</commons.io.version>
         <junit.version>5.9.0</junit.version>
         <junit.platform.version>1.9.0</junit.platform.version>
         <jannovar.version>0.38</jannovar.version>
-        <svart.version>2.0.0-RC1</svart.version>
+        <svart.version>2.0.0-RC5</svart.version>
     </properties>
 
     <scm>
@@ -58,12 +57,12 @@
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
-                <version>3.8.0</version>
+                <version>3.9.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>${commons.io}</version>
+                <version>${commons.io.version}</version>
             </dependency>
 
             <dependency>
@@ -91,7 +90,7 @@
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
-                <version>2.0</version>
+                <version>2.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -185,6 +184,29 @@
                 <configuration>
                     <useModulePath>false</useModulePath>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0.5</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>17</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
