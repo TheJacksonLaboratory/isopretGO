@@ -28,7 +28,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <javafx.version>${java.version}</javafx.version>
+        <javafx.version>21.0.1</javafx.version>
         <phenol.version>2.0.4</phenol.version>
         <spring.version>4.3.8.RELEASE</spring.version>
         <jackson.fasterxml.version>2.16.0</jackson.fasterxml.version>
@@ -65,6 +65,11 @@
                 <version>${commons.io.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javafx.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>

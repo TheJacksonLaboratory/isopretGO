@@ -9,13 +9,23 @@ module org.jax.isopret.gui {
     requires guava;
 
 
-    requires org.jax.isopret.core.analysis;
-    requires org.jax.isopret.model;
-    requires org.jax.isopret.except;
-    requires org.jax.isopret.core.impl.rnaseqdata;
-    requires org.jax.isopret.visualization;
+
     requires org.jax.isopret.core;
-    requires org.jax.isopret.core.impl.interpro;
     requires org.jax.isopret.io;
+    requires javafx.base;
+    requires javafx.controls;
+    requires javafx.fxml;
+    requires javafx.graphics;
+    requires javafx.web;
+    requires spring.beans;
+    requires spring.boot;
+    requires spring.boot.autoconfigure;
+    requires spring.context;
+    requires spring.core;
+
+    requires org.apache.commons.io;
+
+
+    exports org.jax.isopret.gui;
 
 }

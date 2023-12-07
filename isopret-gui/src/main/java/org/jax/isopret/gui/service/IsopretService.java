@@ -1,5 +1,6 @@
 package org.jax.isopret.gui.service;
 
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import org.jax.isopret.core.analysis.IsopretStats;
