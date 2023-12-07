@@ -10,12 +10,14 @@
     </parent>
     <groupId>org.jax.isopret</groupId>
     <artifactId>isopret</artifactId>
-    <version>1.1.18</version>
+    <version>1.1.19</version>
     <modules>
         <module>isopret-core</module>
         <module>isopret-cli</module>
         <module>isopret-gui</module>
         <module>isopret-io</module>
+        <module>isopret-data</module>
+        <module>isopret-exception</module>
     </modules>
     <packaging>pom</packaging>
 

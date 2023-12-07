@@ -1,17 +1,14 @@
 package org.jax.isopret.core.configuration;
 
 //import org.jax.isopret.core.DownloadItem;
-import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.exception.IsopretRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class IsopretDataResolver {
 

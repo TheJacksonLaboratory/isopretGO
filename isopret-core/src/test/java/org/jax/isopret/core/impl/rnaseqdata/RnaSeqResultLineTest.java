@@ -1,6 +1,6 @@
 package org.jax.isopret.core.impl.rnaseqdata;
 
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

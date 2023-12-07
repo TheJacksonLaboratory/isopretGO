@@ -1,7 +1,7 @@
 package org.jax.isopret.core.impl.rnaseqdata;
 
 import org.jax.isopret.model.TranscriptResult;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 
 
 /**

@@ -1,5 +1,6 @@
 package org.jax.isopret.cli.command;
 
+import org.jax.isopret.data.Transcript;
 import org.jax.isopret.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

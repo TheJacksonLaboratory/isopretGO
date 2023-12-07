@@ -5,6 +5,7 @@ import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.TestBase;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.core.impl.jannovar.JannovarReader;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.*;
 import org.junit.jupiter.api.Test;
 

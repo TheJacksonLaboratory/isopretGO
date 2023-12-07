@@ -1,10 +1,10 @@
 package org.jax.isopret.gui.service;
 
 import org.jax.isopret.core.analysis.InterproOverrepResult;
-import org.jax.isopret.model.GoTermIdPlusLabel;
+import org.jax.isopret.data.GoTermIdPlusLabel;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.DisplayInterproAnnotation;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.visualization.HtmlUtil;
 import org.monarchinitiative.phenol.ontology.data.TermId;

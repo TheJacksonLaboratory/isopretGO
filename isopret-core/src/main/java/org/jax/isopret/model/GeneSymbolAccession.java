@@ -1,4 +1,7 @@
 package org.jax.isopret.model;
+
+import org.jax.isopret.data.AccessionNumber;
+
 /**
  * A convenience class to record both the symbol and the accession number of a gene.
  */

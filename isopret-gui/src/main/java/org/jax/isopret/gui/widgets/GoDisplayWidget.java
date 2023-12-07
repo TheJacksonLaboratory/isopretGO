@@ -1,7 +1,6 @@
 package org.jax.isopret.gui.widgets;
 
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -15,16 +14,12 @@ import javafx.stage.Stage;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoCompTerm;
 import org.jax.isopret.gui.service.model.GoComparison;
-import org.jax.isopret.model.GoMethod;
-import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.data.GoMethod;
+import org.jax.isopret.data.MtcMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * A widget to display either DAS or DGE enriched GO terms

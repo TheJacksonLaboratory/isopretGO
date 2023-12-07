@@ -1,6 +1,6 @@
-package org.jax.isopret.model;
+package org.jax.isopret.data;
 
-import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.exception.IsopretRuntimeException;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 /**
  * This class is used to help display Interpro protein domain annotations. It is a superclass
- * for {@link DisplayInterproAnnotation}.
+ * for  DisplayInterproAnnotation. TODO IMPROVE DOCUMENTATION
  */
 public class InterproAnnotation {
     /**

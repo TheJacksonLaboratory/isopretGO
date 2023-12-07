@@ -1,6 +1,9 @@
 package org.jax.isopret.visualization;
 
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
+import org.jax.isopret.data.AccessionNumber;
+import org.jax.isopret.data.InterproEntry;
+import org.jax.isopret.data.Transcript;
 import org.jax.isopret.model.*;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.svart.Contig;

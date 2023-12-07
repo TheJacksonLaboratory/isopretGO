@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.jax.isopret</groupId>
         <artifactId>isopret</artifactId>
-        <version>1.1.18</version>
+        <version>1.1.19</version>
     </parent>
 
     <artifactId>isopret-core</artifactId>
@@ -17,6 +17,11 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.jax.isopret</groupId>
+            <artifactId>isopret-data</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.monarchinitiative.phenol</groupId>
             <artifactId>phenol-annotations</artifactId>
@@ -75,9 +80,6 @@
             <scope>test</scope>
         </dependency>
 
-
-
-        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -91,10 +93,6 @@
             <version>5.1.1</version>
             <scope>test</scope>
         </dependency>
-
-
-
-        <!-- https://mvnrepository.com/artifact/de.charite.compbio/Jannovar -->
         <dependency>
             <groupId>de.charite.compbio</groupId>
             <artifactId>Jannovar</artifactId>
@@ -107,14 +105,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/de.charite.compbio/jannovar-core -->
         <dependency>
             <groupId>de.charite.compbio</groupId>
             <artifactId>jannovar-core</artifactId>
             <version>${jannovar.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.monarchinitiative.svart</groupId>
             <artifactId>svart</artifactId>
@@ -124,7 +119,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
-
     </dependencies>
 
 

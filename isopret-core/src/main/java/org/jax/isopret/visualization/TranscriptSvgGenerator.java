@@ -1,12 +1,12 @@
 package org.jax.isopret.visualization;
 
 
-import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.exception.IsopretRuntimeException;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.model.GeneResult;
-import org.jax.isopret.model.Transcript;
+import org.jax.isopret.data.Transcript;
 import org.monarchinitiative.svart.*;
 
 import java.io.IOException;

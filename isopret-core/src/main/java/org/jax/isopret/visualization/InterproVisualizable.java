@@ -1,6 +1,6 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.model.InterproEntry;
+import org.jax.isopret.data.InterproEntry;
 
 public class InterproVisualizable implements Comparable<InterproVisualizable> {
 

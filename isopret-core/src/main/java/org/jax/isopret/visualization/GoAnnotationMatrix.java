@@ -1,8 +1,8 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.GeneModel;
-import org.jax.isopret.model.Transcript;
+import org.jax.isopret.data.Transcript;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 package org.jax.isopret.core;
 
-import org.jax.isopret.model.GoMethod;
-import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.data.GoMethod;
+import org.jax.isopret.data.MtcMethod;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 
 import java.io.File;

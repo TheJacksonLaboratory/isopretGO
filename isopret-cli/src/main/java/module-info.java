@@ -5,6 +5,8 @@ module isopret.cli {
     requires org.jax.isopret.core;
     requires org.jax.isopret.io;
     requires org.monarchinitiative.phenol.analysis;
+    requires org.jax.isopret.data;
+    requires org.jax.isopret.exception;
 
     opens org.jax.isopret.cli.command to info.picocli;
 }

@@ -1,6 +1,7 @@
 package org.jax.isopret.model;
 
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
+import org.jax.isopret.data.AccessionNumber;
 
 import java.util.*;
 

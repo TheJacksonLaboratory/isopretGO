@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.jax.isopret</groupId>
         <artifactId>isopret</artifactId>
-        <version>1.1.18</version>
+        <version>1.1.19</version>
     </parent>
 
     <artifactId>isopret-cli</artifactId>
@@ -17,6 +17,11 @@
         <dependency>
             <groupId>org.jax.isopret</groupId>
             <artifactId>isopret-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jax.isopret</groupId>
+            <artifactId>isopret-data</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

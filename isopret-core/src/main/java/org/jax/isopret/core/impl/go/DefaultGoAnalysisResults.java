@@ -1,8 +1,8 @@
 package org.jax.isopret.core.impl.go;
 
 import org.jax.isopret.core.GoAnalysisResults;
-import org.jax.isopret.model.GoMethod;
-import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.data.GoMethod;
+import org.jax.isopret.data.MtcMethod;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 
 import java.io.File;

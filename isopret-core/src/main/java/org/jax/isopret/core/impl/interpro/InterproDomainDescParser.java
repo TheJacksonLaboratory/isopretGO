@@ -1,9 +1,9 @@
 package org.jax.isopret.core.impl.interpro;
 
 
-import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.model.InterproEntry;
-import org.jax.isopret.model.InterproEntryType;
+import org.jax.isopret.exception.IsopretRuntimeException;
+import org.jax.isopret.data.InterproEntry;
+import org.jax.isopret.data.InterproEntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
