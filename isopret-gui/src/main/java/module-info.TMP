@@ -10,7 +10,6 @@ module org.jax.isopret.gui {
 
 
     requires org.jax.isopret.core.analysis;
-    requires org.jax.isopret.core.impl.go;
     requires org.jax.isopret.model;
     requires org.jax.isopret.except;
     requires org.jax.isopret.core.impl.rnaseqdata;
