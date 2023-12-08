@@ -1,6 +1,6 @@
 package org.jax.isopret.core.impl.go;
 
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.monarchinitiative.phenol.base.PhenolRuntimeException;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;

@@ -3,7 +3,7 @@ package org.jax.isopret.hgnc;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.TestBase;
 
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -1,10 +1,12 @@
 package org.jax.isopret.interpro;
 
-import org.jax.isopret.model.InterproEntry;
-import org.junit.jupiter.api.Test;
 
-import static org.jax.isopret.model.InterproEntryType.ACTIVE_SITE;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.jax.isopret.data.InterproEntry;
+import static org.jax.isopret.data.InterproEntryType.ACTIVE_SITE;
+
 
 /**
  * This simple test class tests the construction of the {@link InterproEntry}

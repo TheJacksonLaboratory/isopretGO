@@ -3,6 +3,7 @@ package org.jax.isopret.cli.command;
 import org.jax.isopret.core.*;
 import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.*;
 import org.jax.isopret.visualization.InterproOverrepVisualizer;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;

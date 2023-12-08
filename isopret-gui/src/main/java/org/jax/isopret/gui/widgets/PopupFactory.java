@@ -10,7 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.jax.isopret.except.IsopretFileNotFoundException;
+import org.jax.isopret.exception.IsopretFileNotFoundException;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 
 import java.io.PrintWriter;

@@ -9,12 +9,13 @@ import org.jax.isopret.core.impl.go.*;
 import org.jax.isopret.core.impl.rnaseqdata.IsoformSpecificThresholder;
 import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
+import org.jax.isopret.data.*;
+import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.model.*;
 import org.jax.isopret.visualization.DasDgeGoVisualizer;
 import org.jax.isopret.visualization.EnsemblVisualizable;
 import org.jax.isopret.visualization.GoAnnotationMatrix;
 import org.jax.isopret.visualization.Visualizable;
-import org.jax.isopret.gui.service.IsopretDataLoadTask;
 import org.jax.isopret.gui.service.IsopretService;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoComparison;
@@ -410,7 +411,7 @@ public class IsopretServiceImpl implements IsopretService  {
     @Override
     public String getGoSummary() {
         String version = geneOntology.getMetaInfo().getOrDefault("data-version", "no version found");
-        String nterms = String.valueOf(geneOntology.countNonObsoleteTerms());
+        String nterms = String.valueOf(geneOntology.nonObsoleteTermIdCount());
         return "Gene Ontology (version: " + version +"), " + nterms + " terms.";
     }
 

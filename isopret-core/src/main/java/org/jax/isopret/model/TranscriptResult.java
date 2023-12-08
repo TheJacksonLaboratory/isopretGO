@@ -1,5 +1,7 @@
 package org.jax.isopret.model;
 
+import org.jax.isopret.data.AccessionNumber;
+
 public interface TranscriptResult {
     String getTranscript();
 

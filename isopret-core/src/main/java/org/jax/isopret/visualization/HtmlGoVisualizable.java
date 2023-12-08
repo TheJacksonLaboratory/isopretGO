@@ -1,9 +1,11 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.exception.IsopretRuntimeException;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
+
+import java.util.Optional;
 
 public class HtmlGoVisualizable implements GoVisualizable {
 
@@ -18,11 +20,13 @@ public class HtmlGoVisualizable implements GoVisualizable {
 
     public HtmlGoVisualizable(GoTerm2PValAndCounts gt2pc, Ontology ontology) {
         TermId goId = gt2pc.getItem();
-        if (! ontology.getTermMap().containsKey(goId)) {
+        Optional<String> opt = ontology.getTermLabel(goId);
+        if (opt.isPresent()) {
+            this.termLabel = opt.get();
+        } else {
             throw new IsopretRuntimeException("Could not find label for " + goId.getValue());
         }
         this.termId = goId.getValue();
-        this.termLabel = ontology.getTermMap().get(goId).getName();
         this.studyCount = gt2pc.getAnnotatedStudyGenes();
         this.studyTotal = gt2pc.getTotalStudyGenes();
         this.populationCount = gt2pc.getAnnotatedPopulationGenes();

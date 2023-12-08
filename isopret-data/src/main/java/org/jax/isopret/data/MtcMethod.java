@@ -1,4 +1,4 @@
-package org.jax.isopret.model;
+package org.jax.isopret.data;
 
 public enum MtcMethod {
     BENJAMINI_HOCHBERG("Benjamini-Hochberg"),
@@ -12,6 +12,10 @@ public enum MtcMethod {
 
     MtcMethod(String name) {
         this.name = name;
+    }
+
+    public String display() {
+        return name;
     }
 
 

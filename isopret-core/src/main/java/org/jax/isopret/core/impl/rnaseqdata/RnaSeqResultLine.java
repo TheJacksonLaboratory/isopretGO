@@ -1,7 +1,7 @@
 package org.jax.isopret.core.impl.rnaseqdata;
 
-import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.exception.IsopretRuntimeException;
+import org.jax.isopret.data.AccessionNumber;
 
 
 /**

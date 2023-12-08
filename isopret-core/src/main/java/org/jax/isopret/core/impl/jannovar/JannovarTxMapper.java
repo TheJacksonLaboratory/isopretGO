@@ -3,8 +3,8 @@ package org.jax.isopret.core.impl.jannovar;
 import de.charite.compbio.jannovar.reference.GenomeInterval;
 import de.charite.compbio.jannovar.reference.TranscriptModel;
 
-import org.jax.isopret.model.AccessionNumber;
-import org.jax.isopret.model.Transcript;
+import org.jax.isopret.data.AccessionNumber;
+import org.jax.isopret.data.Transcript;
 import org.monarchinitiative.svart.*;
 
 import org.monarchinitiative.svart.assembly.GenomicAssembly;

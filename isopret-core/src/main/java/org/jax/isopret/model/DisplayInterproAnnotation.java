@@ -1,5 +1,8 @@
 package org.jax.isopret.model;
 
+import org.jax.isopret.data.InterproAnnotation;
+import org.jax.isopret.data.InterproEntry;
+import org.jax.isopret.data.InterproEntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

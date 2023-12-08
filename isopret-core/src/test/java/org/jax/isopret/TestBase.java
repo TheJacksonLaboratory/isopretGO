@@ -1,6 +1,10 @@
 package org.jax.isopret;
 
-import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.data.AccessionNumber;
+import org.jax.isopret.data.InterproAnnotation;
+import org.jax.isopret.data.InterproEntry;
+import org.jax.isopret.data.Transcript;
+import org.jax.isopret.exception.IsopretRuntimeException;
 import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.core.impl.interpro.InterproDomainDescParser;

@@ -1,7 +1,7 @@
 package org.jax.isopret.gui.service.model;
 
-import org.jax.isopret.model.GoMethod;
-import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.data.GoMethod;
+import org.jax.isopret.data.MtcMethod;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
@@ -35,7 +35,7 @@ public class GoComparison {
                         MtcMethod mtcMethod) {
         this.goMethod = goMethod;
         this.mtcMethod = mtcMethod;
-        // Collect all signficant GO Term ids
+        // Collect all significant GO Term ids
         Set<TermId> significantGoTerms =
                 Stream.concat(dge.stream(), das.stream())
                         .filter(t -> t.getAdjustedPValue() <= ALPHA)
@@ -73,11 +73,11 @@ public class GoComparison {
         return goCompTermList;
     }
 
-    public List<GoCompTerm> getDgePredominentGoCompTerms() {
+    public List<GoCompTerm> getDgePredominantGoCompTerms() {
         return this.dgeGoCompTermList;
     }
 
-    public List<GoCompTerm> getDasPredominentGoCompTerms() {
+    public List<GoCompTerm> getDasPredominantGoCompTerms() {
         return this.dasGoCompTermList;
     }
 
@@ -93,12 +93,12 @@ public class GoComparison {
                 .collect(Collectors.toList());
     }
 
-    public String goMethod() {
-        return this.goMethod.name();
+    public GoMethod goMethod() {
+        return this.goMethod;
     }
 
-    public String mtcMethod() {
-        return this.mtcMethod.name();
+    public MtcMethod mtcMethod() {
+        return this.mtcMethod;
     }
 
 

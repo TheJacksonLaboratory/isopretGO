@@ -1,12 +1,12 @@
 package org.jax.isopret.core;
 
-import org.jax.isopret.except.IsopretRuntimeException;
+import org.jax.isopret.exception.IsopretRuntimeException;
 import org.jax.isopret.core.impl.interpro.InterproDomainDescParser;
 import org.jax.isopret.core.impl.interpro.InterproDomainParser;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.DisplayInterproAnnotation;
-import org.jax.isopret.model.InterproAnnotation;
-import org.jax.isopret.model.InterproEntry;
+import org.jax.isopret.data.InterproAnnotation;
+import org.jax.isopret.data.InterproEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -7,6 +7,8 @@ import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.core.impl.go.TranscriptFunctionFileParser;
 import org.jax.isopret.core.InterproMapper;
 import org.jax.isopret.core.impl.jannovar.JannovarReader;
+import org.jax.isopret.data.AccessionNumber;
+import org.jax.isopret.data.Transcript;
 import org.jax.isopret.model.*;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.io.OntologyLoader;
@@ -57,7 +59,7 @@ public class DefaultIsopretProvider implements IsopretProvider {
         if (geneOntology == null) {
             Path goPath = dataResolver.goJson();
             geneOntology = OntologyLoader.loadOntology(goPath.toFile());
-            int n_terms = geneOntology.countNonObsoleteTerms();
+            int n_terms = geneOntology.nonObsoleteTermIdCount();
             LOGGER.info("Loaded Gene Ontology json file with {} terms.", n_terms);
         }
         return geneOntology;

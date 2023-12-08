@@ -1,10 +1,10 @@
 package org.jax.isopret.core.impl.hgnc;
 
-import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.exception.IsopretRuntimeException;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.GeneSymbolAccession;
 import org.jax.isopret.model.GeneModel;
-import org.jax.isopret.model.Transcript;
+import org.jax.isopret.data.Transcript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

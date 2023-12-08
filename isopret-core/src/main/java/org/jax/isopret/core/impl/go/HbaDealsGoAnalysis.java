@@ -1,8 +1,8 @@
 package org.jax.isopret.core.impl.go;
 
 
-import org.jax.isopret.model.GoMethod;
-import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.data.GoMethod;
+import org.jax.isopret.data.MtcMethod;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.DirectAndIndirectTermAnnotations;
 import org.monarchinitiative.phenol.analysis.StudySet;
@@ -62,7 +62,6 @@ public class HbaDealsGoAnalysis {
             case TFT -> termForTerm();
             case PCunion -> parentChildUnion();
             case PCintersect -> parentChildIntersect();
-            case MGSA -> mgsa();
         };
         pvals.sort(new SortByPvalue());
         return List.copyOf(pvals); // make immutable
@@ -114,9 +113,6 @@ public class HbaDealsGoAnalysis {
                 .collect(Collectors.toList());
     }
 
-    private List<GoTerm2PValAndCounts> mgsa() {
-        throw new UnsupportedOperationException(); // TODO
-    }
 
 
 
@@ -148,13 +144,7 @@ public class HbaDealsGoAnalysis {
         return new HbaDealsGoAnalysis(ontology, study, population, GoMethod.PCintersect, mtcMethod);
     }
 
-    public static HbaDealsGoAnalysis mgsa(Ontology ontology,
-                                          AssociationContainer<TermId> associationContainer,
-                                          StudySet study,
-                                          StudySet population,
-                                          MtcMethod mtcMethod) {
-        return new HbaDealsGoAnalysis(ontology, study, population, GoMethod.MGSA, mtcMethod);
-    }
+
 
 
     /**
@@ -171,9 +161,14 @@ public class HbaDealsGoAnalysis {
                 LOGGER.error("Could not find Ontology id {}", ontologyId.getValue());
                 continue;
             }
-            Term term = ontology.getTermMap().get(ontologyId);
-            for (TermId domainItemId : dai.getTotalAnnotatedDomainItemSet()) {
-                symbolToGoTermResults.computeIfAbsent(domainItemId, r -> new HashSet<>()).add(term);
+            Optional<Term> opt = ontology.termForTermId(ontologyId);
+            if (opt.isEmpty()) {
+                LOGGER.error("Could not retrieve term for {}", ontologyId);
+            } else {
+                Term term = opt.get();
+                for (TermId domainItemId : dai.getTotalAnnotatedDomainItemSet()) {
+                    symbolToGoTermResults.computeIfAbsent(domainItemId, r -> new HashSet<>()).add(term);
+                }
             }
         }
         return symbolToGoTermResults;

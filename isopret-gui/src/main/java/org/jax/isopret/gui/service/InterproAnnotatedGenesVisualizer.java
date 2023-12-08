@@ -1,10 +1,10 @@
 package org.jax.isopret.gui.service;
 
 import org.jax.isopret.core.analysis.InterproOverrepResult;
-import org.jax.isopret.model.GoTermIdPlusLabel;
+import org.jax.isopret.data.GoTermIdPlusLabel;
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.model.DisplayInterproAnnotation;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.visualization.HtmlUtil;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -67,10 +67,10 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
                 includedGenes.add(gene);
             }
         }
-        // when we get here, we want to display only the genes in "incudedGenes".
+        // when we get here, we want to display only the genes in "includedGenes".
         // let's get a Table with their GO annotations.
         LOGGER.info("Total of {} included genes", includedGenes.size());
-        LOGGER.info("Gettings transcripts for interpro output. n={}", transcriptAccessions.size());
+        LOGGER.info("Getting transcripts for interpro output. n={}", transcriptAccessions.size());
         this.countsMap = isopretService.getGoAnnotationsForTranscript(transcriptAccessions);
         Set<AccessionNumber> includedEnsgSet = includedGenes
                 .stream()
@@ -97,8 +97,6 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
 
     private String getGoTable() {
         StringBuilder sb = new StringBuilder();
-
-        //Map<GoTermIdPlusLabel, Integer> countsMap
         List<Map.Entry<GoTermIdPlusLabel, Integer>> list = new ArrayList<>(countsMap.entrySet());
         int THRESHOLD = 3;
         int aboveThreshold = (int) list.stream().filter(e -> e.getValue() >= THRESHOLD).count();

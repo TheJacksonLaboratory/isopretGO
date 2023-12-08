@@ -1,7 +1,7 @@
 package org.jax.isopret.transcript;
 
-import org.jax.isopret.except.IsopretRuntimeException;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.exception.IsopretRuntimeException;
+import org.jax.isopret.data.AccessionNumber;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

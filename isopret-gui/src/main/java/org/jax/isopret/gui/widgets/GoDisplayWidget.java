@@ -6,14 +6,16 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.*;
 import javafx.stage.Stage;
 import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
 import org.jax.isopret.gui.service.model.GoCompTerm;
 import org.jax.isopret.gui.service.model.GoComparison;
+import org.jax.isopret.data.GoMethod;
+import org.jax.isopret.data.MtcMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,24 +24,24 @@ import java.util.List;
 /**
  * A widget to display either DAS or DGE enriched GO terms
  */
-public class GoDisplayWidget {
+public class GoDisplayWidget implements GoWidget{
     private final Logger LOGGER = LoggerFactory.getLogger(GoDisplayWidget.class);
     private final List<GoCompTerm> sigGoTerms;
 
     private final static String dgeTitle = "GO Terms with DGE overrepresentation\n";
     private final static String dasTitle = "GO Terms with DAS overrepresentation\n";
     private final static String dgeBody = """
-            These GO terms displayed overexpression in the set of differentially expressed genes set.
+            These GO terms displayed overrepresentation in the set of differentially expressed genes (DGE).
             """;
     private final static String dasBody = """
-            These GO terms displayed overexpression in the set of differentially expressed transcripts.
+            These GO terms displayed overrepresentation in the set of differentially alternatively spliced transcripts (DAS).
             """;
 
     private final String title;
     private final String body;
 
-    private final String goMethod;
-    private final String mtcMethod;
+    private final GoMethod goMethod;
+    private final MtcMethod mtcMethod;
 
     private final GeneOntologyComparisonMode compMode;
 
@@ -62,6 +64,7 @@ public class GoDisplayWidget {
         this.mtcMethod = comparison.mtcMethod();
     }
 
+
     BarChart<Number, String> getBarChart(List<GoCompTerm> goTerms) {
         NumberAxis xAxis = new NumberAxis();
         xAxis.setLabel("-log10(p-value)");
@@ -75,7 +78,7 @@ public class GoDisplayWidget {
         XYChart.Series<Number, String> dataSeriesPvals = new XYChart.Series<>();
         dataSeriesPvals.setName(compMode.name());
         for (GoCompTerm goComp : goTerms) {
-            String label = goComp.getLabel();
+            String label = limitLabelLength(goComp.getLabel());
             double pval = switch (compMode) {
                 case DAS -> goComp.getDas();
                 case DGE -> goComp.getDge();
@@ -87,17 +90,14 @@ public class GoDisplayWidget {
     }
 
     private VBox getBarChartPane() {
-        TextFlow text_flow = new TextFlow();
-        Text titleText= new Text(this.title);
-        Text bodyText  = new Text(this.body);
-        titleText.setFont(Font.font("Verdana", FontPosture.ITALIC,16));
-        titleText.setStyle(".break-word { word-wrap: break-word; }");
-        text_flow.getChildren().addAll(titleText, bodyText);
+        Label  label = new Label(this.body);
+        label.setWrapText(true);
+        label.setStyle("-fx-font: 12pt Arial");
         BarChart<Number, String> barChart = getBarChart(this.sigGoTerms);
         ScrollPane pane = new ScrollPane(barChart);
         int n_terms = this.sigGoTerms.size();
-        LOGGER.info("{} go terms for display",  n_terms);
-        return new VBox(text_flow, pane);
+        LOGGER.info("{} GO terms for display",  n_terms);
+        return new VBox(label, pane);
     }
 
     public void show(Stage window) {
@@ -105,26 +105,20 @@ public class GoDisplayWidget {
         VBox dgeVbox = getBarChartPane();
         dgeVbox.setSpacing(15);
         hbox.getChildren().addAll(dgeVbox);
-        Font plain = Font.font("TimeRoman", 16);
-        Font bold = Font.font("TimesRoman", FontWeight.BOLD, FontPosture.ITALIC, 16);
-        Text text1 = new Text("Gene Ontology (GO) overenrichment analysis was performed using ");
-        Text text2 = new Text(goMethod);
-        Text text3 = new Text(" and ");
-        Text text4 = new Text(mtcMethod);
-        Text text5= new Text(". The negative decadic logarithm of the p-value for enrichment is "+
-                "displayed for GO terms.");
-        text1.setFont(plain);
-        text2.setFont(bold);
-        text3.setFont(plain);
-        text4.setFont(bold);
-        text5.setFont(plain);
-        TextFlow tflow = new TextFlow(text1, text2, text3, text4, text5);
-        VBox vb = new VBox(20, hbox, tflow);
+        String sb = "Gene Ontology (GO) overrepresentation analysis was performed using the " +
+                goMethod.longNameWithAbbreviation() + " approach with " + mtcMethod.display() +
+                " multiple-testing correction. " +
+                "The negative decadic logarithm of the p-value for enrichment is " +
+                "displayed for GO terms.";
+        Label label = new Label(sb);
+        label.setWrapText(true);
+        label.setStyle("-fx-font: 12pt Arial");
+        VBox vb = new VBox(20, hbox, label);
         vb.setPadding(new Insets(20, 20, 10, 20));
         Scene scene = new Scene(vb, 1200, 800);
 
         Stage newWindow = new Stage();
-        newWindow.setTitle("Gene Ontology: DGE vs. DAS Overenrichment");
+        newWindow.setTitle(this.title);
         newWindow.setScene(scene);
 
         // Set position of second window, related to primary window.

@@ -10,12 +10,14 @@
     </parent>
     <groupId>org.jax.isopret</groupId>
     <artifactId>isopret</artifactId>
-    <version>1.1.17</version>
+    <version>1.1.19</version>
     <modules>
         <module>isopret-core</module>
         <module>isopret-cli</module>
         <module>isopret-gui</module>
         <module>isopret-io</module>
+        <module>isopret-data</module>
+        <module>isopret-exception</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -28,7 +30,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <javafx.version>${java.version}</javafx.version>
+        <javafx.version>21.0.1</javafx.version>
         <phenol.version>2.0.4</phenol.version>
         <spring.version>4.3.8.RELEASE</spring.version>
         <jackson.fasterxml.version>2.16.0</jackson.fasterxml.version>
@@ -65,6 +67,11 @@
                 <version>${commons.io.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javafx.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>

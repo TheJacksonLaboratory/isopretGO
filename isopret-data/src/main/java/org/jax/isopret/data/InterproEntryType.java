@@ -1,4 +1,4 @@
-package org.jax.isopret.model;
+package org.jax.isopret.data;
 
 /**
  * Interpro entry types that appear in the interpro domain description file.

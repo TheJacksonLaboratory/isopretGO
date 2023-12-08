@@ -2,7 +2,7 @@ package org.jax.isopret.gui.service;
 
 import org.jax.isopret.core.analysis.InterproOverrepResult;
 import org.jax.isopret.model.DisplayInterproAnnotation;
-import org.jax.isopret.model.InterproEntry;
+import org.jax.isopret.data.InterproEntry;
 import org.jax.isopret.visualization.IsoformVisualizable;
 import org.jax.isopret.visualization.Visualizable;
 import org.monarchinitiative.phenol.ontology.data.Ontology;

@@ -1,4 +1,4 @@
-package org.jax.isopret.except;
+package org.jax.isopret.exception;
 
 public class IsopretFileNotFoundException extends IsopretException{
     public IsopretFileNotFoundException() { super();}

@@ -1,6 +1,6 @@
 package org.jax.isopret.core.impl.rnaseqdata;
 
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.GeneResult;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;

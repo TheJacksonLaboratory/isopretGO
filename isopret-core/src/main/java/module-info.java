@@ -7,14 +7,17 @@ module org.jax.isopret.core {
     requires org.apache.commons.net;
     requires org.monarchinitiative.phenol.io;
     requires guava;
+    requires org.jax.isopret.data;
+    requires org.jax.isopret.exception;
 
     exports org.jax.isopret.core.analysis;
-    exports org.jax.isopret.core.impl.go;
     exports org.jax.isopret.model;
-    exports org.jax.isopret.except;
     exports org.jax.isopret.core.impl.rnaseqdata;
     exports org.jax.isopret.visualization;
     exports org.jax.isopret.core;
     exports org.jax.isopret.core.impl.interpro;
+    //exports org.jax.isopret.core.impl.hgnc;
+    exports org.jax.isopret.core.impl.go;
+    exports org.jax.isopret.core.impl.hgnc;
 
 }

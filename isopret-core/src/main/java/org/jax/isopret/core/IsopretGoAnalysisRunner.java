@@ -2,8 +2,8 @@ package org.jax.isopret.core;
 
 import org.jax.isopret.core.impl.go.DefaultIsopretGoAnalysisRunner;
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
-import org.jax.isopret.model.GoMethod;
-import org.jax.isopret.model.MtcMethod;
+import org.jax.isopret.data.GoMethod;
+import org.jax.isopret.data.MtcMethod;
 
 import java.io.File;
 

@@ -1,6 +1,6 @@
 package org.jax.isopret.core.analysis;
 
-import org.jax.isopret.model.InterproEntry;
+import org.jax.isopret.data.InterproEntry;
 
 import java.util.Formatter;
 

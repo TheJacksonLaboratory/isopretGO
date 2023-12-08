@@ -4,9 +4,23 @@ IsopretGO (Isoform Interpretation for Gene Ontology) leverages predictions of is
 made by the [isopret expectation maximization algorithm](https://pubmed.ncbi.nlm.nih.gov/36929917/){:target="\_blank"}.
 to perform gene-level  and isoform-level GO overrepresentation analysis.
 
+## Background: Gene Ontology
+[Gene Ontology](http://geneontology.org/) traditionally has provided
+annotations for genes rather than for specific isoforms. However, in
+some cases, the functions of the individual isoforms of a gene are
+differ with respect to one or more of the gene's function. In this project,
+we have developed an algorithm for prediction of isoform-specific function
+across the entire transcriptome. The isopret app offers a number of
+ways to visualize and analyze RNA-seq datasets for Gene Ontology
+functions that are overrepresented either among the differentially
+expressed genes or the differentially spliced isoforms.
 
-
-
+## Background: HBA-DEALS
+Isopret requires as input a file that has the fold changes and p-values
+for genes and isoforms in a case-control cohort that has been studied
+by RNA-seq. We have previously published [HBA-DEALS](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6),
+a hierarchical Bayesian algorithm that performs such an analysis, and this
+is the recommended input file.
 Isopret uses the analysis (output) file of
 [HBA-DEALS](https://pubmed.ncbi.nlm.nih.gov/32660516/){:target="_blank"}.
 

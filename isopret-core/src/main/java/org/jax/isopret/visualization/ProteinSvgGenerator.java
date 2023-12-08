@@ -2,10 +2,10 @@ package org.jax.isopret.visualization;
 
 
 import org.jax.isopret.model.DisplayInterproAnnotation;
-import org.jax.isopret.model.InterproEntry;
-import org.jax.isopret.model.AccessionNumber;
+import org.jax.isopret.data.InterproEntry;
+import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
-import org.jax.isopret.model.Transcript;
+import org.jax.isopret.data.Transcript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

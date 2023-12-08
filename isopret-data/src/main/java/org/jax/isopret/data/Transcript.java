@@ -1,5 +1,6 @@
-package org.jax.isopret.model;
+package org.jax.isopret.data;
 
+import org.jax.isopret.data.AccessionNumber;
 import org.monarchinitiative.svart.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
