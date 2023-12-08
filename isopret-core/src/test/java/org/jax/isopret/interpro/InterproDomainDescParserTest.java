@@ -1,8 +1,9 @@
 package org.jax.isopret.interpro;
 
 import org.jax.isopret.core.impl.interpro.InterproDomainDescParser;
-import org.jax.isopret.model.InterproEntry;
-import org.jax.isopret.model.InterproEntryType;
+
+import org.jax.isopret.data.InterproEntry;
+import org.jax.isopret.data.InterproEntryType;
 import org.junit.jupiter.api.Test;
 
 

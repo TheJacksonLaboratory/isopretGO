@@ -35,7 +35,7 @@ public class GoSingleGeneExpressionVisualizer extends AnnotatedGenesVisualizer {
         StringBuilder sb = new StringBuilder();
         sb.append("<p>A total of ").append(visualizableList.size()).append(" genes that are annotated to ");
         sb.append(this.termLabel).append(" (").append(geneOntologyId.getValue()).append(") were ");
-        sb.append("identifed as differentially expressed.");
+        sb.append("identified as differentially expressed.");
         sb.append("</p>");
         sb.append("<ul>\n");
         for (var viz : visualizableList) {
@@ -54,7 +54,7 @@ public class GoSingleGeneExpressionVisualizer extends AnnotatedGenesVisualizer {
                 <head>
                 <meta charset="utf-8">
                 <meta http-equiv="x-ua-compatible" content="ie=edge">
-                <title>Isopret: Differentially expressedgenes annotated to %s (%s)</title>
+                <title>Isopret: Differentially expressed genes annotated to %s (%s)</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
                 %s
                 </head>
