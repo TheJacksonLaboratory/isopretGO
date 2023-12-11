@@ -24,6 +24,12 @@ public class SvgUtil {
                 x, y, width, height, strokeColor);
     }
 
+    public static String unfilledRoundedBox(double x, double y, double width, double height, String strokeColor) {
+        return String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" rx=\"10\" ry=\"10\"" +
+                        "style=\"stroke:%s; fill:none \" />\n",
+                x, y, width, height, strokeColor);
+    }
+
     public static String filledBox(double x, double y, double width, double height, String strokeColor, String fillColor) {
         return String.format("<rect x=\"%f\" y=\"%f\" width=\"%f\" height=\"%f\" " +
                         "style=\"stroke:%s; fill:%s \" />\n",
