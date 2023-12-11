@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private static final int SVG_WIDTH = 1400;
 
+    /** width of region on right of the window in which we show the fold change of gene expression */
+    private static final double EFFECTIVE_PPOPORTION = 0.85;
+
     private static final int HEIGHT_FOR_SV_DISPLAY = 150;
     private static final int HEIGHT_PER_DISPLAY_ITEM = 100;
 
@@ -90,20 +93,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private final static int SECOND_THIRD_OF_SVG = 2;
     private final static int THIRD_THIRD_OF_SVG = 3;
 
-    /**
-     *
-     * @param annotatedGene an object with all information about a gene that is relevant for making the SVG/HTML output
-     * @return list of transcripts
-     */
-    private List<Transcript> getAffectedTranscripts(AnnotatedGene annotatedGene) {
-        List<Transcript> transcripts = annotatedGene.getTranscripts();
-        GeneResult result = annotatedGene.getHbaDealsResult();
-        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
-        return transcripts
-                .stream()
-                .filter(t -> transcriptMap.containsKey(t.accessionId()))
-                .collect(Collectors.toList());
-    }
 
 
     /**
@@ -137,6 +126,22 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         this.splicingThreshold = annotatedGene.getSplicingThreshold();
     }
 
+    /**
+     *
+     * @param annotatedGene an object with all information about a gene that is relevant for making the SVG/HTML output
+     * @return list of transcripts
+     */
+    private List<Transcript> getAffectedTranscripts(AnnotatedGene annotatedGene) {
+        List<Transcript> transcripts = annotatedGene.getTranscripts();
+        GeneResult result = annotatedGene.getHbaDealsResult();
+        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
+        return transcripts
+                .stream()
+                .filter(t -> transcriptMap.containsKey(t.accessionId()))
+                .collect(Collectors.toList());
+    }
+
+
 
     /**
      * @return SVG coordinate that corresponds to a genomic position.
@@ -146,7 +151,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         if (pos < 0) {
             throw new IsopretRuntimeException("Bad left boundary (genomic coordinate-"); // should never happen
         }
-        double prop = pos / paddedGenomicSpan;
+        double prop = EFFECTIVE_PPOPORTION * pos / paddedGenomicSpan;
         return prop * SVG_WIDTH;
     }
 
@@ -241,11 +246,9 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     }
 
     private void writeNonCodingTranscript(Transcript tmod, int ypos, Writer writer) throws IOException {
-        //Transcript transcript = tmod.withStrand(Strand.POSITIVE);
         List<GenomicRegion> exons = exonsOnPositiveStrand(tmod);
         double minX = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
-        // write a line for UTR, otherwise write a box
         for (GenomicRegion exon : exons) {
             double exonStart = translateGenomicToSvg(exon.start());
             double exonEnd = translateGenomicToSvg(exon.end());
@@ -451,30 +454,48 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      * @throws IOException if we cannot write
      */
     private void writeGeneExpression(Writer writer, int ypos) throws IOException {
-        double xpos = this.scaleMaxPos/2.0;
         String symbol = this.hbaDealsResult.getGeneModel().geneSymbol();
-        double boxlen = 15 * symbol.length();
-        writer.write(SvgUtil.boldItalicText(xpos, ypos, DARKBLUE, 24, symbol));
-       // ypos += 20;
+
+        double REMAINING_PROPORTION = 1.0 - EFFECTIVE_PPOPORTION;
+        double xpos  = EFFECTIVE_PPOPORTION * SVG_WIDTH + 0.5 * REMAINING_PROPORTION;
+        double boxX = xpos - 100;
+        double boxY = ypos + 50;
+        ypos += 100;
+        double boxWidth = 200;
+        double boxHeight = 180;
+        if (symbol.length() < 10) {
+            boxWidth = 150;
+        } else {
+            boxWidth = 200;
+        }
+        int x_adjust = 12*symbol.length();
+
+
+        writer.write(SvgUtil.boldItalicText(xpos - x_adjust, ypos, DARKBLUE, 24, symbol));
         double logFc = this.hbaDealsResult.getExpressionFoldChange();
         double expressionPval = this.hbaDealsResult.getExpressionP();
-        xpos += 20 * symbol.length();
-        writer.write(SvgUtil.line(xpos, ypos, xpos+30, ypos));
+        ypos += 20;
         double width = 20.0;
-        double factor = 25; // multiple logFC by this to get height
-        double boxstart = xpos + 5.0;
+        double LOG_FC_FACTOR = 25; // multiple logFC by this to get height
+        //xpos += 20 * symbol.length();
+        double adjusted_xpos = xpos - x_adjust;
+        double boxstart = adjusted_xpos + 5.0;
         if (logFc > 0.0) {
-            double height = logFc * factor;
-            double ybase = (double) ypos - height;
-            writer.write(SvgUtil.filledBox(boxstart, ybase, width, height, BLACK, GREEN));
+            double height = logFc * LOG_FC_FACTOR;
+            ypos = ypos +(int) height;
+            writer.write(SvgUtil.filledBox(boxstart, ypos, width, height, BLACK, GREEN));
         } else {
-            double height = logFc * -factor;
+            double height = logFc * -LOG_FC_FACTOR;
             writer.write(SvgUtil.filledBox(boxstart, ypos, width, height, BLACK, RED));
         }
+        writer.write(SvgUtil.line(adjusted_xpos, ypos, adjusted_xpos+30, ypos));
+        ypos += 40;
 
-        xpos += 50;
-        String pvalTxt = SvgUtil.text(xpos, ypos,PURPLE, 24, getFormatedPvalue(logFc, expressionPval, this.differentiallyExpressed));
+        String pvalTxt = SvgUtil.text(adjusted_xpos, ypos+35,PURPLE, 24, getFormatedPvalue(logFc, expressionPval, this.differentiallyExpressed));
         writer.write(pvalTxt);
+        String svgBox = SvgUtil.unfilledRoundedBox(boxX, boxY, boxWidth, boxHeight, PURPLE);
+        writer.write(svgBox);
+
     }
 
     /**
