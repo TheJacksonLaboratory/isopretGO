@@ -2,7 +2,10 @@ package org.jax.isopret.visualization;
 
 import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 
-public class EnsemblIsoformVisualizable implements IsoformVisualizable {
+/**
+ * A visualizable object to display either an Ensembl gene or isoform in the SVG Panel table
+ */
+public class EnsemblGeneIsoformVisualizable implements IsoformVisualizable {
 
 
     private final String transcriptAccession;
@@ -15,13 +18,29 @@ public class EnsemblIsoformVisualizable implements IsoformVisualizable {
 
     private final boolean isSignificant;
 
-    public EnsemblIsoformVisualizable(TranscriptResultImpl transcriptResult, double splicingPepThreshold){
+    private final boolean isGene;
+
+    public EnsemblGeneIsoformVisualizable(TranscriptResultImpl transcriptResult, double splicingPepThreshold){
         this.transcriptAccession = transcriptResult.getTranscript();
         String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
         this.isoformUrlAnchor =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());
         this.log2FoldChange = transcriptResult.getLog2FoldChange();
         this.isoformP = transcriptResult.getPvalue();
         this.isSignificant = transcriptResult.isSignificant(splicingPepThreshold);
+        isGene = false;
+    }
+
+    /**
+     * This contructor can be used to add a Gene to the list of visualizables for the SVG panel
+     * @param geneVisualizable
+     */
+    public EnsemblGeneIsoformVisualizable(Visualizable geneVisualizable) {
+        transcriptAccession = String.format("%s (%s)", geneVisualizable.getGeneAccession(), geneVisualizable.getGeneSymbol());
+        isoformUrlAnchor = geneVisualizable.getGeneEnsemblUrl();
+        log2FoldChange = Math.log(geneVisualizable.getExpressionFoldChange()) / Math.log(2);
+        isoformP = geneVisualizable.getExpressionPep();
+        isSignificant = geneVisualizable.isDifferentiallyExpressed();
+        isGene = true;
     }
 
     private String getEnsemblTranscriptUrl(String accession) {

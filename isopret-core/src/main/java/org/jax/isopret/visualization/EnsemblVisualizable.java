@@ -78,7 +78,7 @@ public class EnsemblVisualizable implements Visualizable {
         double SPLICING_THRESHOLD = agene.getSplicingThreshold();
         this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().
                 stream().
-                map(x -> new EnsemblIsoformVisualizable(x, SPLICING_THRESHOLD))
+                map(x -> new EnsemblGeneIsoformVisualizable(x, SPLICING_THRESHOLD))
                 .collect(Collectors.toList());
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         this.isoformSvg = svggen.getSvg();
