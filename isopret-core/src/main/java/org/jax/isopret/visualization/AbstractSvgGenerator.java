@@ -48,7 +48,7 @@ public abstract class AbstractSvgGenerator {
      * //preserveAspectRatio="xMidYMid meet" viewBox="0 0 700 550"
      * @param writer file handle
      * @param blackBorder if true, write a black border around the SVG
-     * @throws IOException if we cannot writ the SVG
+     * @throws IOException if we cannot write the SVG
      */
     private void writeHeader(Writer writer, boolean blackBorder) throws IOException {
         //viewBox="0 0 800 1100" preserveAspectRatio="xMinYMin meet"

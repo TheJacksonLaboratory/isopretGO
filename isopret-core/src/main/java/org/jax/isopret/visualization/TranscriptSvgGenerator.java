@@ -370,7 +370,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         String symbol = tmod.hgvsSymbol();
         AccessionNumber accession = tmod.accessionId();
        // String positionString = String.format("%s:%d-%d (%s strand)", chrom, start, end, strand);
-        String geneName = String.format("%s (%s)", symbol, accession.getAccessionString());
+       // String geneName = String.format("%s (%s)", symbol, accession.getAccessionString());
         double y = Y_SKIP_BENEATH_TRANSCRIPTS + ypos;
         int region = getRegionOfSvgCanvas(minX);
         String textAnchor = "start";
@@ -389,7 +389,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             }
         }
         String txt = String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-size:24px;text-anchor:%s\">%s</text>\n",
-                textBeginX, y, PURPLE, textAnchor, String.format("%s", geneName));
+                textBeginX, y, PURPLE, textAnchor, accession.getAccessionString());
         writer.write(txt);
     }
 
