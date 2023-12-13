@@ -10,8 +10,6 @@ public record DoublePepValue(double pep, boolean isSignificant) implements Compa
 
     @Override
     public int compareTo(DoublePepValue o) {
-        if (this.pep < o.pep) return -1;
-        else if (this.pep > o.pep) return 1;
-        else return 0;
+        return Double.compare(this.pep, o.pep);
     }
 }

@@ -8,6 +8,8 @@ import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.model.GeneResult;
 import org.jax.isopret.data.Transcript;
 import org.monarchinitiative.svart.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
  * @author Peter N Robinson
  */
 public class TranscriptSvgGenerator extends AbstractSvgGenerator {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(TranscriptSvgGenerator.class);
     private static final int SVG_WIDTH = 1400;
 
     /** width of region on right of the window in which we show the fold change of gene expression */
@@ -526,7 +530,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             }
             writeScale(writer, y);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write transcript SVG: {}", e.getMessage());
         }
     }
 

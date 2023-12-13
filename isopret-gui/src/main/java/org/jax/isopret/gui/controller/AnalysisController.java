@@ -173,7 +173,7 @@ public class AnalysisController implements Initializable {
         });
         // allow titles of all table columns to be broken into multiple lines
         hbaGeneResultTableView.getColumns().forEach(AnalysisController::makeHeaderWrappable);
-        hbaGeneResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        hbaGeneResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
 
     }
 

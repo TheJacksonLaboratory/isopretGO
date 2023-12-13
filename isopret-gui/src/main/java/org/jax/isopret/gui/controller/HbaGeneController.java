@@ -129,7 +129,7 @@ public class HbaGeneController implements Initializable {
         isoformPColumn.setSortable(false);
         isoformPColumn.setEditable(false);
         isoformPColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().isoformP()));
-        isoformTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        isoformTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
         LOGGER.trace("Adding isoform vis n={} items", visualizable.getIsoformVisualizable().size());
         WebEngine webEngine = hbaGeneWebView.getEngine();
         webEngine.loadContent(this.visualizable.getIsoformHtml());
@@ -143,7 +143,7 @@ public class HbaGeneController implements Initializable {
         interproDescription.setEditable(false);
         interproDescription.setSortable(false);
         interproDescription.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().getDescription()));
-        interproTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        interproTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
         WebEngine interprebEngine = hbaProteinWebView.getEngine();
         interprebEngine.loadContent(this.visualizable.getProteinHtml());
 

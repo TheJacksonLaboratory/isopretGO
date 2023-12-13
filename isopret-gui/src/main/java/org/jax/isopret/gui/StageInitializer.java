@@ -52,7 +52,7 @@ public class StageInitializer implements ApplicationListener<IsopretFxApplicatio
             readAppIcon().ifPresent(stage.getIcons()::add);
             stage.show();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not initialize stage: {}", e.getMessage());
         }
     }
 

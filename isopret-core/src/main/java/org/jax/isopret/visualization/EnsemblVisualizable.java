@@ -288,7 +288,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getNofMsplicing() {
-        if (isoformVisualizables.size() == 0) {
+        if (isoformVisualizables.isEmpty()) {
             return "n/a";
         }
         return String.format("%d/%d", this.significantIsoforms, isoformVisualizables.size());

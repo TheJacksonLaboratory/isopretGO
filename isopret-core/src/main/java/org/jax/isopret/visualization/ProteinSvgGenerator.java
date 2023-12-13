@@ -301,7 +301,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             }
             writeInterproLabelsWithColorBoxes(writer, y);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write protein SVG: {}", e.getMessage());
         }
     }
 

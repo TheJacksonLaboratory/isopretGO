@@ -138,7 +138,7 @@ public class MainController implements Initializable {
         dirChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         dirChooser.setTitle("Choose directory for downloading files required for isopret.");
         File file = dirChooser.showDialog(rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().equals("")) {
+        if (file==null || file.getAbsolutePath().isEmpty()) {
             LOGGER.error("Could not get directory for download");
             PopupFactory.displayError("Error","Could not get directory for download.");
             return;
@@ -369,7 +369,7 @@ public class MainController implements Initializable {
         }
         chooser.setInitialFileName(opt.get());
         File file = chooser.showSaveDialog(rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().equals("")) {
+        if (file==null || file.getAbsolutePath().isEmpty()) {
             String msg = "Could not get  GO Overrepresentation file for saving";
             LOGGER.error(msg);
             PopupFactory.displayError("Error",msg);
@@ -398,7 +398,7 @@ public class MainController implements Initializable {
         }
         chooser.setInitialFileName(opt.get());
         File file = chooser.showSaveDialog(rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().equals("")) {
+        if (file==null || file.getAbsolutePath().isEmpty()) {
             String msg = "Could not get Isopret domain overrepresentation file for saving";
             LOGGER.error(msg);
             PopupFactory.displayError("Error",msg);
@@ -418,7 +418,7 @@ public class MainController implements Initializable {
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         chooser.setTitle("Choose "+ methodName + "File");
         File file = chooser.showOpenDialog(rootNode.getScene().getWindow());
-        if (file==null || file.getAbsolutePath().equals("")) {
+        if (file==null || file.getAbsolutePath().isEmpty()) {
             LOGGER.error("Could not get {} file", methodName);
             PopupFactory.displayError("Error","Could not get " + methodName + " file.");
             return;

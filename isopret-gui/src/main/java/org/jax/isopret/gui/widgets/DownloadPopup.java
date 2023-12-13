@@ -109,7 +109,7 @@ public class DownloadPopup {
         tableView.getColumns().add(successColumn);
         tableView.getColumns().add(manualDownloadColumn);
         tableView.getItems().addAll(this.rows);
-        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
         vbox.getChildren().add(tableView);
         StackPane root = new StackPane();
         root.getChildren().add(vbox);

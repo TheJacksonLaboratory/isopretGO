@@ -28,7 +28,7 @@ public class TranscriptToGeneStats {
         try (Writer stdout =  new BufferedWriter(new OutputStreamWriter(System.out))) {
             write(stdout);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not display TranscriptToGeneStats: {}", e.getMessage());
         }
     }
 
@@ -37,7 +37,7 @@ public class TranscriptToGeneStats {
         try (Writer bw =  new BufferedWriter(new FileWriter(file))) {
             write(bw);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write TranscriptToGeneStats: {}", e.getMessage());
         }
     }
 

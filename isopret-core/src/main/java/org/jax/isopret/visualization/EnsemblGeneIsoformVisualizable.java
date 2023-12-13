@@ -32,7 +32,7 @@ public class EnsemblGeneIsoformVisualizable implements IsoformVisualizable {
 
     /**
      * This contructor can be used to add a Gene to the list of visualizables for the SVG panel
-     * @param geneVisualizable
+     * @param geneVisualizable Object representing visualizable parts of a Gene.
      */
     public EnsemblGeneIsoformVisualizable(Visualizable geneVisualizable) {
         transcriptAccession = String.format("%s (%s)", geneVisualizable.getGeneAccession(), geneVisualizable.getGeneSymbol());

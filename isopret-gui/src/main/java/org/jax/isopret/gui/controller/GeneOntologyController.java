@@ -146,7 +146,7 @@ public class GeneOntologyController implements Initializable {
             });
         }
 
-        goPvalTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        goPvalTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
         Text text1 = new Text(this.label + "\n");
         text1.setFont(Font.font("Verdana", 16));
         Text text2 = new Text(this.methodsLabel);
