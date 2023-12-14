@@ -1,0 +1,36 @@
+fastq_dir:
+ ./
+
+rsem_ref_path:
+ /projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/human_genome/
+
+#rsem_ref_path:
+ #/projects/chesler-lab/jcpg/snakemake/genomes/mouse/rsem_ref
+
+#genome:
+# /projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/GRCm39.genome.fa
+
+#gtf:
+ #/projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/gencode.vM26.chr_patch_hapl_scaff.annotation.gtf
+
+#rsem_ref_path:
+ #/fastscratch/genomes/C57BL/rsem_ref
+
+
+genome:
+ /projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/GRCh38_r91.all.fa 
+
+gtf:
+ /projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/Homo_sapiens.GRCh38.109.gtf
+
+#genome:
+ #/projects/chesler-lab/jcpg/snakemake/genomes/mouse/GRCm39.genome.fa
+
+#genome:
+# /projects/compsci/omics_share/mouse/GRCm38/genome/sequence/imputed/C57BL_10J.with_unplac_unloc.fa
+
+#gtf:
+ #/projects/chesler-lab/jcpg/snakemake/genomes/mouse/gencode.vM30.annotation.gtf
+
+#gtf:
+ #/projects/compsci/omics_share/mouse/GRCm38/transcriptome/annotation/imputed/C57BL_10J.with_unplac_unloc.gtf
