@@ -112,7 +112,7 @@ public class InterproController implements Initializable {
             });
         }
 
-        interproResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        interproResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
 
         Text text1 = new Text( "Interpro Overrepresentation Analysis\n");
         text1.setFont(Font.font("Verdana", 16));

@@ -45,5 +45,10 @@ public class SvgUtil {
                 x1, y1, x2, y2);
     }
 
+    public static String line(double x1, double y1, double x2, double y2, int strokeWidth) {
+        return String.format("<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" stroke=\"black\" stroke-width=\"%d\"/>\n",
+                x1, y1, x2, y2, strokeWidth);
+    }
+
 
 }

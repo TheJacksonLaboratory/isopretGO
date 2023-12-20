@@ -232,13 +232,13 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     public String getSvg() {
         StringWriter swriter = new StringWriter();
         try {
-            writeHeader(swriter);
             if (hasVisualizableDomains()) {
+                writeHeader(swriter);
                 write(swriter);
+                writeFooter(swriter);
             } else {
                 writeExcuse(swriter);
             }
-            writeFooter(swriter);
             return swriter.toString();
         } catch (IOException e) {
             return getSvgErrorMessage(e.getMessage());
@@ -246,9 +246,9 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
     }
 
     private void writeExcuse(StringWriter swriter) {
-        String svg = "<text>" +
+        String svg = "<?xml version=\"1.0\" standalone=\"no\"?><svg height=\"150\" width=\"480\"><text>" +
                 "No protein domains for " + this.annotatedGene.getHbaDealsResult().getGeneModel() +
-                "  </text>";
+                "  </text></svg>";
         swriter.write(svg);
     }
 
@@ -301,7 +301,7 @@ public class ProteinSvgGenerator extends AbstractSvgGenerator {
             }
             writeInterproLabelsWithColorBoxes(writer, y);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write protein SVG: {}", e.getMessage());
         }
     }
 

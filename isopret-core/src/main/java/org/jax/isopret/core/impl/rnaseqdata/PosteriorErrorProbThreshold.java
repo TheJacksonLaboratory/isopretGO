@@ -10,14 +10,14 @@ import java.util.stream.IntStream;
  * false-discovery rate (FDR) over the current dataset. Explanations can be found in
  * Käll L, Storey JD, MacCoss MJ, Noble WS. Posterior error probabilities and false discovery rates:
  * two sides of the same coin. J Proteome Res. 2008 Jan;7(1):40-4. PMID:18052118.
- * In brief, the The q-value of a test measures the proportion of false positives incurred (called the false discovery
+ * In brief, the q-value of a test measures the proportion of false positives incurred (called the false discovery
  * rate) when that particular test is called significant (thus, the q-value is the minimum FDR at which the test would be
  * called significant in the context of the current dataset). The local FDR (another name for the PEP) measures the
  * posterior probability the null hypothesis is true given the test's p-value. Whereas the FDR measures the error rate
  * associated with a collection of tests, the PEP measures the probability of error for a single test.
  * The mean value of all PEPs that are called significant corresponds to the FDR at the corresponding threshold.
  * Our goal is to set the FDR to a given threshold (by default, 0.01) and to define the PEP threshold that calls
- * as many tests as possible signficant while still maintaining this threshold. We apply the additional criterion that
+ * as many tests as possible significant while still maintaining this threshold. We apply the additional criterion that
  * if the PEP is larger than 0.25 the test is not called significant, regardless of the FDR.
  * @author Peter N Robinson
  */

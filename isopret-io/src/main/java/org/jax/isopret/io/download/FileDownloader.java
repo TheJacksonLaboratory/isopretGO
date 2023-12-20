@@ -38,10 +38,10 @@ public class FileDownloader {
     /** configuration for the downloader */
     private final Options options;
 
-    /** Initializer FileDownloader with the given options string */
+    /* Initializer FileDownloader with the given options string
     public FileDownloader(Options options) {
         this.options = options;
-    }
+    }*/
 
     /** Downloader with default options */
     public FileDownloader() {

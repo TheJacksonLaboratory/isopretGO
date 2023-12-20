@@ -2,12 +2,14 @@ package org.jax.isopret.visualization;
 
 
 import org.jax.isopret.exception.IsopretRuntimeException;
-import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.model.GeneResult;
 import org.jax.isopret.data.Transcript;
+import org.jax.isopret.model.TranscriptResult;
 import org.monarchinitiative.svart.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -26,10 +28,12 @@ import java.util.stream.Collectors;
  * @author Peter N Robinson
  */
 public class TranscriptSvgGenerator extends AbstractSvgGenerator {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(TranscriptSvgGenerator.class);
     private static final int SVG_WIDTH = 1400;
 
     /** width of region on right of the window in which we show the fold change of gene expression */
-    private static final double EFFECTIVE_PPOPORTION = 0.85;
+    private static final double EFFECTIVE_PPOPORTION = 0.95;
 
     private static final int HEIGHT_FOR_SV_DISPLAY = 150;
     private static final int HEIGHT_PER_DISPLAY_ITEM = 100;
@@ -73,7 +77,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private final int scaleBasePairs;
 
 
-    private final double INTRON_MIDPOINT_ELEVATION = 10.0;
+    private static final double INTRON_MIDPOINT_ELEVATION = 10.0;
     /**
      * Height of the symbols that represent the transcripts
      */
@@ -81,7 +85,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     /**
      * Y skip to put text underneath transcripts. Works with {@link #writeTranscriptName}
      */
-    private final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
+    private static final double Y_SKIP_BENEATH_TRANSCRIPTS = 30;
 
     private final GeneResult hbaDealsResult;
 
@@ -134,7 +138,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private List<Transcript> getAffectedTranscripts(AnnotatedGene annotatedGene) {
         List<Transcript> transcripts = annotatedGene.getTranscripts();
         GeneResult result = annotatedGene.getHbaDealsResult();
-        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResult> transcriptMap = result.getTranscriptMap();
         return transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))
@@ -263,14 +267,14 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
 
 
     private double getLogFoldChage(AccessionNumber id) {
-        Map<AccessionNumber, TranscriptResultImpl> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         if (!transcriptResultMap.containsKey(id)) return 0.0;
         double fc = transcriptResultMap.get(id).getFoldChange();
         return Math.log(fc) / Math.log(2);
     }
 
     private String getFormatedPvalue(AccessionNumber id) {
-        Map<AccessionNumber, TranscriptResultImpl> transcriptResultMap = hbaDealsResult.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResult> transcriptResultMap = hbaDealsResult.getTranscriptMap();
         double logFC = getLogFoldChage(id);
         if (!transcriptResultMap.containsKey(id)) return String.valueOf(logFC);
         double p = transcriptResultMap.get(id).getPvalue();
@@ -366,7 +370,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         String symbol = tmod.hgvsSymbol();
         AccessionNumber accession = tmod.accessionId();
        // String positionString = String.format("%s:%d-%d (%s strand)", chrom, start, end, strand);
-        String geneName = String.format("%s (%s)", symbol, accession.getAccessionString());
+       // String geneName = String.format("%s (%s)", symbol, accession.getAccessionString());
         double y = Y_SKIP_BENEATH_TRANSCRIPTS + ypos;
         int region = getRegionOfSvgCanvas(minX);
         String textAnchor = "start";
@@ -385,7 +389,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             }
         }
         String txt = String.format("<text x=\"%f\" y=\"%f\" style=\"fill:%s;font-size:24px;text-anchor:%s\">%s</text>\n",
-                textBeginX, y, PURPLE, textAnchor, String.format("%s", geneName));
+                textBeginX, y, PURPLE, textAnchor, accession.getAccessionString());
         writer.write(txt);
     }
 
@@ -455,46 +459,26 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
      */
     private void writeGeneExpression(Writer writer, int ypos) throws IOException {
         String symbol = this.hbaDealsResult.getGeneModel().geneSymbol();
-
-        double REMAINING_PROPORTION = 1.0 - EFFECTIVE_PPOPORTION;
-        double xpos  = EFFECTIVE_PPOPORTION * SVG_WIDTH + 0.5 * REMAINING_PROPORTION;
-        double boxX = xpos - 100;
-        double boxY = ypos + 50;
-        ypos += 100;
-        double boxWidth = 200;
-        double boxHeight = 180;
-        if (symbol.length() < 10) {
-            boxWidth = 150;
-        } else {
-            boxWidth = 200;
-        }
-        int x_adjust = 12*symbol.length();
-
-
-        writer.write(SvgUtil.boldItalicText(xpos - x_adjust, ypos, DARKBLUE, 24, symbol));
-        double logFc = this.hbaDealsResult.getExpressionFoldChange();
+        double xpos  = 0.45 * SVG_WIDTH ;
+        writer.write(SvgUtil.boldItalicText(xpos, ypos, DARKBLUE, 24, symbol));
+        double logFc = this.hbaDealsResult.getExpressionLog2FoldChange();
         double expressionPval = this.hbaDealsResult.getExpressionP();
-        ypos += 20;
-        double width = 20.0;
+        double height = 20.0;
         double LOG_FC_FACTOR = 25; // multiple logFC by this to get height
-        //xpos += 20 * symbol.length();
-        double adjusted_xpos = xpos - x_adjust;
-        double boxstart = adjusted_xpos + 5.0;
+        xpos += 20 * symbol.length();
+        double boxstart = xpos + 5.0;
+        int y_boxpos = ypos - 15;
+        double width = Math.abs(logFc * LOG_FC_FACTOR);
+        int strokeWidth = 2;
         if (logFc > 0.0) {
-            double height = logFc * LOG_FC_FACTOR;
-            ypos = ypos +(int) height;
-            writer.write(SvgUtil.filledBox(boxstart, ypos, width, height, BLACK, GREEN));
+            writer.write(SvgUtil.filledBox(boxstart, y_boxpos, width, height, BLACK, GREEN));
+            writer.write(SvgUtil.line(boxstart, ypos-30, boxstart, ypos+20, strokeWidth));
         } else {
-            double height = logFc * -LOG_FC_FACTOR;
-            writer.write(SvgUtil.filledBox(boxstart, ypos, width, height, BLACK, RED));
+            writer.write(SvgUtil.filledBox(boxstart, y_boxpos, width, height, BLACK, RED));
+            writer.write(SvgUtil.line(boxstart+width, ypos-30, boxstart+width, ypos+20, strokeWidth));
         }
-        writer.write(SvgUtil.line(adjusted_xpos, ypos, adjusted_xpos+30, ypos));
-        ypos += 40;
-
-        String pvalTxt = SvgUtil.text(adjusted_xpos, ypos+35,PURPLE, 24, getFormatedPvalue(logFc, expressionPval, this.differentiallyExpressed));
+        String pvalTxt = SvgUtil.text(boxstart+width+30, ypos,PURPLE, 24, getFormatedPvalue(logFc, expressionPval, this.differentiallyExpressed));
         writer.write(pvalTxt);
-        String svgBox = SvgUtil.unfilledRoundedBox(boxX, boxY, boxWidth, boxHeight, PURPLE);
-        writer.write(svgBox);
 
     }
 
@@ -546,14 +530,14 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
             }
             writeScale(writer, y);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write transcript SVG: {}", e.getMessage());
         }
     }
 
     public static AbstractSvgGenerator factory(AnnotatedGene annotatedTranscript) {
         List<Transcript> transcripts = annotatedTranscript.getTranscripts();
         GeneResult result = annotatedTranscript.getHbaDealsResult();
-        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResult> transcriptMap = result.getTranscriptMap();
         List<Transcript> affectedTranscripts = transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))

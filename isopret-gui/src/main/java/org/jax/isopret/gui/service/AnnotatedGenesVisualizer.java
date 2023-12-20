@@ -110,7 +110,7 @@ public abstract class AnnotatedGenesVisualizer {
         String ensemblUrl = visualizable.getGeneEnsemblUrl();
         String esemblAnchor = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", ensemblUrl, ensemblGeneAccession);
         double expressionFC = visualizable.getExpressionFoldChange();
-        double expressionLogFc = visualizable.getExpressionLogFoldChange();
+        double expressionLogFc = visualizable.getExpressionLog2FoldChange();
         double expressionP = visualizable.getExpressionPep();
         int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
 

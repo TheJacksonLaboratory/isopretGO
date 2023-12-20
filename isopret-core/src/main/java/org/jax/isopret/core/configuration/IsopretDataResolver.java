@@ -31,30 +31,6 @@ public class IsopretDataResolver {
     private static final String ISOFORM_FUNCTION_BP_FILENAME = "isoform_function_list_bp.txt";
     private static final String ISOFORM_FUNCTION_CC_URL = ZENODO_BASE_URL + "files/isoform_function_list_cc.txt?download=1";
     private static final String ISOFORM_FUNCTION_CC_FILENAME = "isoform_function_list_cc.txt";
-   /*
-    private static final DownloadItem go = makeItem(GO_JSON_URL, GO_JSON);
-    private static final DownloadItem jannovarHg38 = makeItem(JANNOVAR_ZENODO_URL, JANNOVAR_FILENAME);
-    private static final DownloadItem hgnc = makeItem(HGNC_URL,HGNC_FILENAME);
-    private static final DownloadItem interproDomainDesc = makeItem(INTERPRO_DOMAIN_DESC_URL, INTERPRO_DOMAIN_DESC_FILENAME);
-    private static final DownloadItem interproDomains = makeItem(INTERPRO_DOMAINS_URL, INTERPRO_DOMAINS_FILENAME);
-    private static final DownloadItem isoformFunctionMf = makeItem(ISOFORM_FUNCTION_MF_URL, ISOFORM_FUNCTION_MF_FILENAME);
-    private static final DownloadItem isoformFunctionBp = makeItem(ISOFORM_FUNCTION_BP_URL, ISOFORM_FUNCTION_BP_FILENAME);
-    private static final DownloadItem isoformFunctionCc = makeItem(ISOFORM_FUNCTION_CC_URL, ISOFORM_FUNCTION_CC_FILENAME);
-    static DownloadItem makeItem(String urlString, String base) {
-        try {
-            URL url = new URL(urlString);
-            return new DownloadItem(url, base);
-        } catch (MalformedURLException e) {
-            // should never happen
-            throw new IsopretRuntimeException("Could not create URL from " + urlString);
-        }
-    }
-    private static final Set<DownloadItem> allDownloadItems = Set.of(go,
-            jannovarHg38, hgnc, interproDomainDesc, interproDomains,
-            isoformFunctionMf, isoformFunctionBp, isoformFunctionCc);
-    */
-
-
 
     private final Path dataDirectory;
 
@@ -105,20 +81,5 @@ public class IsopretDataResolver {
     public Path interproDomainsPath() {
         return dataDirectory.resolve(INTERPRO_DOMAINS_FILENAME);
     }
-
-
-    /** @return Download data for Gene Ontology (go.json)>
-    public static DownloadItem go() { return go; }
-    /** @return Download data for Gene Ontology (go.json)>
-    public static DownloadItem jannovarHg38() { return jannovarHg38; }
-    public static DownloadItem hgnc() { return hgnc; }
-    public static DownloadItem interproDomainDesc() { return interproDomainDesc; }
-    public static DownloadItem interproDomains() { return interproDomains; }
-    public static DownloadItem isoformFunctionMf() { return isoformFunctionMf; }
-    public static DownloadItem isoformFunctionBp() { return isoformFunctionBp; }
-    public static DownloadItem isoformFunctionCc() { return isoformFunctionCc; }
-    public static Set<DownloadItem> allDownloadItems() { return allDownloadItems; }
-*/
-
 
 }

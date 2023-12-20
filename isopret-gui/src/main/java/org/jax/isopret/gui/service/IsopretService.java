@@ -9,8 +9,6 @@ import org.jax.isopret.data.GoTermIdPlusLabel;
 import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.AnnotatedGene;
 import org.jax.isopret.visualization.Visualizable;
-import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
-import org.jax.isopret.gui.service.model.GoComparison;
 import org.monarchinitiative.phenol.ontology.data.Ontology;
 import org.monarchinitiative.phenol.analysis.stats.GoTerm2PValAndCounts;
 import org.monarchinitiative.phenol.ontology.data.TermId;

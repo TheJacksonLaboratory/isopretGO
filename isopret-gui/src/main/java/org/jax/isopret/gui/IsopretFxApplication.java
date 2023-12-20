@@ -89,7 +89,7 @@ public class IsopretFxApplication extends Application {
     }
 
 
-    static class StageReadyEvent extends ApplicationEvent {
+    public static class StageReadyEvent extends ApplicationEvent {
         public StageReadyEvent(Stage stage) {
             super(stage);
         }

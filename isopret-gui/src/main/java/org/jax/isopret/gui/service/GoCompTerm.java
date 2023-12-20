@@ -1,4 +1,4 @@
-package org.jax.isopret.gui.service.model;
+package org.jax.isopret.gui.service;
 
 import org.monarchinitiative.phenol.ontology.data.TermId;
 

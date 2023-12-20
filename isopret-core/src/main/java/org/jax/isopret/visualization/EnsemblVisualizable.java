@@ -1,6 +1,5 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.data.InterproEntry;
 import org.jax.isopret.data.Transcript;
@@ -31,7 +30,8 @@ public class EnsemblVisualizable implements Visualizable {
     private final int totalTranscriptCount;
 
     /**
-     * All annotated transcripts of some gene that were expressed according to HBA deals
+     * All annotated transcripts of some gene that were expressed in the RNA-SEQ data (and thus present in
+     * the output file of HBA-DEALS or edgeR)
      */
     private final List<Transcript> expressedTranscripts;
 
@@ -73,12 +73,12 @@ public class EnsemblVisualizable implements Visualizable {
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
         this.differentiallyExpressed = agene.passesExpressionThreshold();
         this.differentiallySpliced = agene.passesSplicingThreshold();
-        Predicate<TranscriptResultImpl> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
+        Predicate<TranscriptResult> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
         this.significantIsoforms = (int) hbaDealsResult.getTranscriptMap().values().stream().filter(passesExpressionThreshold).count();
-        double SPLICING_THRESHOLD = agene.getSplicingThreshold();
+        double splicingThreshold = agene.getSplicingThreshold();
         this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().
                 stream().
-                map(x -> new EnsemblIsoformVisualizable(x, SPLICING_THRESHOLD))
+                map(x -> new EnsemblGeneIsoformVisualizable(x, splicingThreshold))
                 .collect(Collectors.toList());
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         this.isoformSvg = svggen.getSvg();
@@ -176,13 +176,14 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public double getExpressionFoldChange() {
-        double logFc = getExpressionLogFoldChange();
-        return Math.exp(logFc);
+       // double logFc = getExpressionLogFoldChange();
+       // return Math.exp(logFc);
+        return this.hbaDealsResult.getExpressionFoldChange();
     }
 
     @Override
-    public double getExpressionLogFoldChange() {
-        return this.hbaDealsResult.getExpressionFoldChange();
+    public double getExpressionLog2FoldChange() {
+        return this.hbaDealsResult.getExpressionLog2FoldChange();
     }
 
     @Override
@@ -288,7 +289,7 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public String getNofMsplicing() {
-        if (isoformVisualizables.size() == 0) {
+        if (isoformVisualizables.isEmpty()) {
             return "n/a";
         }
         return String.format("%d/%d", this.significantIsoforms, isoformVisualizables.size());

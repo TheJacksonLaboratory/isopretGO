@@ -95,7 +95,7 @@ public class HtmlVisualizer implements Visualizer {
         String ensemblUrl = visualizable.getGeneEnsemblUrl();
         String esemblAnchor = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", ensemblUrl, ensemblGeneAccession);
         double expressionFC = visualizable.getExpressionFoldChange();
-        double expressionLogFc = visualizable.getExpressionLogFoldChange();
+        double expressionLogFc = visualizable.getExpressionLog2FoldChange();
         double expressionP = visualizable.getExpressionPep();
         int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
         return  "<p>" + symbol + " (" + esemblAnchor + ") had an expression fold change of " +
@@ -125,7 +125,7 @@ public class HtmlVisualizer implements Visualizer {
         String ensemblUrl = visualizable.getGeneEnsemblUrl();
         String esemblAnchor = String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", ensemblUrl, ensemblGeneAccession);
         double expressionFC = visualizable.getExpressionFoldChange();
-        double expressionLogFc = visualizable.getExpressionLogFoldChange();
+        double expressionLogFc = visualizable.getExpressionLog2FoldChange();
         double expressionP = visualizable.getExpressionPep();
         int signDiffIsoCount = visualizable.getDifferentialTranscriptCount();
 

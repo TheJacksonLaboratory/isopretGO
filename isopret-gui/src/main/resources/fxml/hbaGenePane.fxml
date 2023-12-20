@@ -1,32 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Hyperlink?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.web.WebView?>
-
-<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jax.isopret.gui.controller.HbaGeneController">
     <VBox prefHeight="887.0" prefWidth="1203.0">
         <padding><Insets bottom="5" left="10" right="5" top="10" /></padding>
         <spacing>10</spacing>
         <VBox fx:id="hbaGeneVbox" prefHeight="887.0" prefWidth="1203.0">
-            <HBox prefHeight="100.0" prefWidth="1200.0">
-                <Label fx:id="hbaGeneLabel" minWidth="150.0" styleClass="mylabel" stylesheets="@../css/isopretstyle.css">
-               <HBox.margin>
-                  <Insets left="20.0" />
-               </HBox.margin></Label>
-                <Hyperlink fx:id="geneHyperlink" minWidth="150.0">
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin></Hyperlink>
+            <HBox prefHeight="40.0" prefWidth="1200.0">
             <MenuButton mnemonicParsing="false" text="Export">
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#htmlSummaryExport" text="HTML Summary" />
@@ -40,19 +24,11 @@
                </HBox.margin>
             </MenuButton>
             </HBox>
-            <HBox prefHeight="100.0" prefWidth="1200.0">
-                <Label fx:id="geneFoldChangeLabel" minWidth="300.0">
-               <HBox.margin>
-                  <Insets left="20.0" />
-               </HBox.margin></Label>
-                <Label fx:id="geneProbabilityLabel" minWidth="200.0" />
-            </HBox>
             <ScrollPane prefHeight="772.0" prefWidth="1203.0">
-
                 <VBox VBox.vgrow="ALWAYS">
                     <TableView fx:id="isoformTableView" stylesheets="@../css/isopretstyle.css">
                         <columns>
-                            <TableColumn fx:id="accessionColumn" editable="false" maxWidth="-1.0" minWidth="300.0" prefWidth="300" resizable="false" text="Isoform" />
+                            <TableColumn fx:id="accessionColumn" editable="false" maxWidth="-1.0" minWidth="300.0" prefWidth="300" resizable="false" text="Gene/Isoform" />
                             <TableColumn fx:id="urlColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Ensembl" />
                             <TableColumn fx:id="isoformLogFcColumn" editable="false" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Log2 Foldchange" />
                             <TableColumn fx:id="isoformPColumn" maxWidth="-1.0" minWidth="150.0" prefWidth="150" styleClass="mycolumn" text="Probability (PEP)" />

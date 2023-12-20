@@ -1,6 +1,8 @@
 package org.jax.isopret.core.analysis;
 
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqAnalysisMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -41,6 +43,7 @@ import java.util.*;
  * @author Peter N Robinson
  */
 public class IsopretStats {
+    private final static Logger LOGGER = LoggerFactory.getLogger(IsopretStats.class);
 
    private final Map<String, String> data;
    /** errors and warnings encountered during the analysis */
@@ -60,7 +63,7 @@ public class IsopretStats {
         try (Writer stdout =  new BufferedWriter(new OutputStreamWriter(System.out))) {
             write(stdout);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not display statistics: {}", e.getMessage());
         }
     }
     /** Output to TSV file. */
@@ -69,7 +72,7 @@ public class IsopretStats {
         try (Writer bw =  new BufferedWriter(new FileWriter(file))) {
             write(bw);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not write statistics: {}", e.getMessage());
         }
     }
 

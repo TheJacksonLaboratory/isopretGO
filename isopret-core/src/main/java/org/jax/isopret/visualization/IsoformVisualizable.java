@@ -2,7 +2,7 @@ package org.jax.isopret.visualization;
 
 /**
  * Interface for classes that help display results for isoforms.
- * See {@link EnsemblIsoformVisualizable} for the implementation
+ * See {@link EnsemblGeneIsoformVisualizable} for the implementation
  * we are currently using.
  * @author Peter Robinson
  */

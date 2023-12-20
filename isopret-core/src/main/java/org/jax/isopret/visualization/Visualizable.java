@@ -35,7 +35,7 @@ public interface Visualizable {
 
     double getExpressionFoldChange();
 
-    double getExpressionLogFoldChange();
+    double getExpressionLog2FoldChange();
 
     double getMostSignificantSplicingPval();
 

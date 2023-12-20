@@ -61,7 +61,7 @@ public class AnalysisController implements Initializable {
     @FXML
     private TableColumn<Visualizable, String> accessionColumn;
     @FXML
-    private TableColumn<Visualizable, Double> foldChangeColumn;
+    private TableColumn<Visualizable, Double> log2FoldChangeColumn;
     @FXML
     private TableColumn<Visualizable, DoublePepValue> genePepColumn;
     @FXML
@@ -96,10 +96,10 @@ public class AnalysisController implements Initializable {
         accessionColumn.setEditable(false);
         accessionColumn.setCellValueFactory(cdf -> new ReadOnlyStringWrapper(cdf.getValue().getGeneAccession()));
 
-        foldChangeColumn.setSortable(true);
-        foldChangeColumn.setEditable(false);
-        foldChangeColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getExpressionFoldChange()));
-        foldChangeColumn.setCellFactory(c -> new TableCell<>() {
+        log2FoldChangeColumn.setSortable(true);
+        log2FoldChangeColumn.setEditable(false);
+        log2FoldChangeColumn.setCellValueFactory(cdf -> new ReadOnlyObjectWrapper<>(cdf.getValue().getExpressionLog2FoldChange()));
+        log2FoldChangeColumn.setCellFactory(c -> new TableCell<>() {
             @Override
             protected void updateItem(Double balance, boolean empty) {
                 super.updateItem(balance, empty);
@@ -173,7 +173,7 @@ public class AnalysisController implements Initializable {
         });
         // allow titles of all table columns to be broken into multiple lines
         hbaGeneResultTableView.getColumns().forEach(AnalysisController::makeHeaderWrappable);
-        hbaGeneResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        hbaGeneResultTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
 
     }
 

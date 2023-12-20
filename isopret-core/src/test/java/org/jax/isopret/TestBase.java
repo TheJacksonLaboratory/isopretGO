@@ -5,7 +5,6 @@ import org.jax.isopret.data.InterproAnnotation;
 import org.jax.isopret.data.InterproEntry;
 import org.jax.isopret.data.Transcript;
 import org.jax.isopret.exception.IsopretRuntimeException;
-import org.jax.isopret.core.impl.rnaseqdata.GeneResultImpl;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.core.impl.interpro.InterproDomainDescParser;
 import org.jax.isopret.core.impl.interpro.InterproDomainParser;
@@ -57,7 +56,7 @@ public class TestBase {
     private static final Map<Integer, InterproEntry> interproDomainMap = InterproDomainDescParser.getInterproDescriptionMap(new File(INTERPRO_ADAR_DOMAIN_DESC));
     private static final Map<AccessionNumber, List<InterproAnnotation>> annotationMap = InterproDomainParser.getInterproAnnotationMap(INTERPRO_ADAR_PATH.toFile());
     private static final Path HBADEALS_ADAR_PATH = Paths.get("src/test/resources/hbadeals/ADAR_HBADEALS.tsv");
-    private static Map<String, GeneResultImpl> hbaDealsResultMap ;
+    private static Map<String, GeneResult> hbaDealsResultMap ;
 
 
 

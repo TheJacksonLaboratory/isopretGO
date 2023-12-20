@@ -64,7 +64,7 @@ public class TranscriptFunctionFileParser {
         } catch (IOException e) {
             throw new PhenolRuntimeException("Could not import isoform_function_list.txt :" + e.getMessage());
         }
-        if (notFound.size() > 0) {
+        if (!notFound.isEmpty()) {
             int n_missing = notFound.size(); // keep logger sane
             LOGGER.warn("Could not find " + n_missing + " terms in Ontology");
         }

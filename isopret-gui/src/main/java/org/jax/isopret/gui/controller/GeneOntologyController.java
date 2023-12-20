@@ -15,9 +15,9 @@ import javafx.stage.Stage;
 import org.jax.isopret.gui.service.AnnotatedGenesVisualizer;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
-import org.jax.isopret.gui.service.model.GeneOntologyComparisonMode;
-import org.jax.isopret.gui.service.model.GoComparison;
-import org.jax.isopret.gui.service.model.GoTermAndPvalVisualized;
+import org.jax.isopret.gui.service.GeneOntologyComparisonMode;
+import org.jax.isopret.gui.service.GoComparison;
+import org.jax.isopret.gui.service.GoTermAndPvalVisualized;
 import org.jax.isopret.gui.widgets.GoCompWidget;
 import org.jax.isopret.gui.widgets.GoDisplayWidget;
 import org.jax.isopret.gui.widgets.PopupFactory;
@@ -146,7 +146,7 @@ public class GeneOntologyController implements Initializable {
             });
         }
 
-        goPvalTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        goPvalTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
         Text text1 = new Text(this.label + "\n");
         text1.setFont(Font.font("Verdana", 16));
         Text text2 = new Text(this.methodsLabel);

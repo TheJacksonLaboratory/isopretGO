@@ -1,6 +1,5 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.data.InterproEntry;
 import org.jax.isopret.data.Transcript;
@@ -53,7 +52,7 @@ public class AnnotatedGene implements Comparable<AnnotatedGene> {
 
         this.hbaDealsResult = result;
         // use HBA Deals results to filter for transcripts that are actually expressed
-        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = result.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResult> transcriptMap = result.getTranscriptMap();
         expressedTranscripts = transcripts
                 .stream()
                 .filter(t -> transcriptMap.containsKey(t.accessionId()))

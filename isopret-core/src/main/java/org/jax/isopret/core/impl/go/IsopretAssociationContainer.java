@@ -77,7 +77,6 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
     public Set<TermId> getDomainItemsAnnotatedByGoTerm(TermId goTermId) {
         Set<TermId> domainItemSet = new HashSet<>();
         Set<TermId> descendentSet = OntologyAlgorithm.getDescendents(this.ontology, goTermId);
-       // descendentSet.add(goTermId);
         for (Map.Entry<TermId, IsopretAnnotations> entry : associationMap.entrySet()) {
             TermId gene = entry.getKey();
             for (TermId ontologyTermId : entry.getValue().getAnnotatingTermIds()) {
@@ -108,13 +107,12 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
                 /* In this step add the direct annotations only */
                 TermId ontologyTermId = ita.getTermId();
                 // check if the term is in the ontology (sometimes, obsoletes are used in the bla32 files)
-                Term term = this.ontology.getTermMap().get(ontologyTermId);
-                if (term == null) {
+                Optional<Term> termOpt = ontology.termForTermId(ontologyTermId);
+                if (termOpt.isEmpty()) {
                     ontology_term_not_found++;
                     LOGGER.warn("Unable to retrieve ontology term {} (omitted).", ontologyTermId.getValue());
                     continue;
                 }
-                // if necessary, replace with the latest primary term id
                 ontologyTermId = this.ontology.getPrimaryTermId(ontologyTermId);
                 directAnnotationMap.computeIfAbsent(domainTermId, k -> new HashSet<>()).add(ontologyTermId);
             }
@@ -134,8 +132,9 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
                 annotationMap.putIfAbsent(ontologyId, new DirectAndIndirectTermAnnotations(ontologyId));
                 annotationMap.get(ontologyId).addDirectAnnotatedItem(domainItemTermId);
                 // In addition to the direct annotation, the gene is also indirectly annotated
-                // to all of the GO Term's ancestors
-                Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology, ontologyId, false);
+                // to all the GO Term's ancestors
+                //Set<TermId> ancs = OntologyAlgorithm.getAncestorTerms(ontology,  ontology.getRootTermId(), ontologyId, false);
+                Iterable<TermId> ancs =  ontology.graph().getAncestors(ontologyId, false);
                 for (TermId ancestor : ancs) {
                     annotationMap.putIfAbsent(ancestor, new DirectAndIndirectTermAnnotations(ancestor));
                     annotationMap.get(ancestor).addIndirectAnnotatedItem(domainItemTermId);
@@ -153,7 +152,7 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
     /**
      * TODO ADD TEST
      * @param termId a Gene Ontology id
-     * @return List of genes/transcripts annotation by this GO term
+     * @return set of genes/transcripts annotation by this GO term
      */
     @Override
     public Set<TermId> getDomainItemsAnnotatedByOntologyTerm(TermId termId) {

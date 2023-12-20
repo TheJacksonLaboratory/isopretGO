@@ -33,10 +33,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Optional;
-import java.util.Random;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Scope("prototype")
@@ -63,16 +60,6 @@ public class HbaGeneController implements Initializable {
     private TableColumn<InterproVisualizable, String> interproEntryType;
     @FXML
     private TableColumn<InterproVisualizable, String> interproDescription;
-
-    @FXML
-    private Label hbaGeneLabel;
-
-    @FXML
-    private Hyperlink geneHyperlink;
-    @FXML
-    private Label geneFoldChangeLabel;
-    @FXML
-    private  Label geneProbabilityLabel;
     @FXML
     private VBox hbaGeneVbox;
     @FXML
@@ -98,8 +85,6 @@ public class HbaGeneController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        String geneAndStrand = String.format("%s (%s)", visualizable.getGeneSymbol(), visualizable.getStrand());
-        this.hbaGeneLabel.setText(geneAndStrand);
         Text geneSymbolText = new Text(String.format("Gene Ontology annotations for %s (%s)\n",
                 visualizable.getGeneSymbol(),
                 visualizable.getGeneAccession()));
@@ -121,22 +106,11 @@ public class HbaGeneController implements Initializable {
         Text transcriptText = new Text(String.format("%s has %d transcripts, of which %d were found to be expressed in this dataset and are shown here.\n",
                 visualizable.getGeneSymbol(), visualizable.getTotalTranscriptCount(), visualizable.getExpressedTranscriptCount()));
         this.goAnnotationsTextFlow.getChildren().addAll(geneSymbolText, explanation,transcriptText);
-
-
-        String geneAccession = visualizable.getGeneAccession();
-        geneHyperlink.setText(geneAccession);
-
-        String fc = String.format("Gene expression fold-change: %.2f", visualizable.getExpressionFoldChange());
-        geneFoldChangeLabel.setText(fc);
-        String prob = String.format("Probability (PEP): %.2f", visualizable.getExpressionPep());
-        this.geneProbabilityLabel.setText(prob);
-        // isoform table
         accessionColumn.setSortable(false);
         accessionColumn.setEditable(false);
         accessionColumn.setCellValueFactory(v ->  new ReadOnlyStringWrapper(v.getValue().transcriptAccession()));
         urlColumn.setEditable(false);
         urlColumn.setSortable(false);
-        //urlColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper("todo"));
 
         urlColumn.setCellValueFactory(cdf -> {
             IsoformVisualizable vis = cdf.getValue();
@@ -155,7 +129,7 @@ public class HbaGeneController implements Initializable {
         isoformPColumn.setSortable(false);
         isoformPColumn.setEditable(false);
         isoformPColumn.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().isoformP()));
-        isoformTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        isoformTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
         LOGGER.trace("Adding isoform vis n={} items", visualizable.getIsoformVisualizable().size());
         WebEngine webEngine = hbaGeneWebView.getEngine();
         webEngine.loadContent(this.visualizable.getIsoformHtml());
@@ -169,7 +143,7 @@ public class HbaGeneController implements Initializable {
         interproDescription.setEditable(false);
         interproDescription.setSortable(false);
         interproDescription.setCellValueFactory(v -> new ReadOnlyStringWrapper(v.getValue().getDescription()));
-        interproTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY); // do not show "extra column"
+        interproTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN); // do not show "extra column"
         WebEngine interprebEngine = hbaProteinWebView.getEngine();
         interprebEngine.loadContent(this.visualizable.getProteinHtml());
 
@@ -179,19 +153,12 @@ public class HbaGeneController implements Initializable {
      * Add content to the tables.
      */
     public void refreshTables() {
-        geneHyperlink.setOnAction(e -> {
-            String geneAccession = visualizable.getGeneAccession();
-            String address = "https://www.ensembl.org/Homo_sapiens/Gene/Summary?db=core;g=" + geneAccession;
-            if (hostServicesWrapper != null) {
-                hostServicesWrapper.showDocument(address);
-            } else {
-                LOGGER.error("Could not get reference to host services");
-            }
-            e.consume();
-        });
         javafx.application.Platform.runLater(() -> {
             isoformTableView.getItems().clear();
-            isoformTableView.getItems().addAll(visualizable.getIsoformVisualizable());
+            List<IsoformVisualizable> visualizableList = new ArrayList<>();
+            visualizableList.add(new EnsemblGeneIsoformVisualizable(visualizable));
+            visualizableList.addAll(visualizable.getIsoformVisualizable());
+            isoformTableView.getItems().addAll(visualizableList);
             isoformTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
             isoformTableView.setFixedCellSize(30);
             isoformTableView.prefHeightProperty().bind(Bindings.size(isoformTableView.getItems()).multiply(isoformTableView.getFixedCellSize()).add(40));
@@ -227,7 +194,7 @@ public class HbaGeneController implements Initializable {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("HTML files (*.html)", "*.html");
         fileChooser.getExtensionFilters().add(extFilter);
         fileChooser.setInitialFileName(fname);
-        Stage stage = (Stage) this.hbaGeneLabel.getScene().getWindow();
+        Stage stage = (Stage) this.interproTableView.getScene().getWindow();
         File file = fileChooser.showSaveDialog(stage);
         if (file == null) {
             PopupFactory.displayError("Error", "Could not retrieve file.");
@@ -311,7 +278,7 @@ public class HbaGeneController implements Initializable {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SVG files (*.svg)", "*.svg");
         fileChooser.getExtensionFilters().add(extFilter);
         fileChooser.setInitialFileName(fname);
-        Stage stage = (Stage) this.hbaGeneLabel.getScene().getWindow();
+        Stage stage = (Stage) this.isoformTableView.getScene().getWindow();
         File file = fileChooser.showSaveDialog(stage);
         if (file == null) {
             PopupFactory.displayError("Error", "Could not retrieve file.");
@@ -329,7 +296,7 @@ public class HbaGeneController implements Initializable {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
         fileChooser.getExtensionFilters().add(extFilter);
         fileChooser.setInitialFileName(fname);
-        Stage stage = (Stage) this.hbaGeneLabel.getScene().getWindow();
+        Stage stage = (Stage) this.isoformTableView.getScene().getWindow();
         File file = fileChooser.showSaveDialog(stage);
         return Optional.ofNullable(file);
     }
