@@ -1,6 +1,6 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
+import org.jax.isopret.model.TranscriptResult;
 
 /**
  * A visualizable object to display either an Ensembl gene or isoform in the SVG Panel table
@@ -20,7 +20,7 @@ public class EnsemblGeneIsoformVisualizable implements IsoformVisualizable {
 
     private final boolean isGene;
 
-    public EnsemblGeneIsoformVisualizable(TranscriptResultImpl transcriptResult, double splicingPepThreshold){
+    public EnsemblGeneIsoformVisualizable(TranscriptResult transcriptResult, double splicingPepThreshold){
         this.transcriptAccession = transcriptResult.getTranscript();
         String url = getEnsemblTranscriptUrl(transcriptResult.getTranscript());
         this.isoformUrlAnchor =  String.format("<a href=\"%s\" target=\"__blank\">%s</a>\n", url, transcriptResult.getTranscript());

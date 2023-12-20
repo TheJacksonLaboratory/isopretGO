@@ -3,6 +3,8 @@ package org.jax.isopret.core.impl.rnaseqdata;
 import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.GeneResult;
+import org.jax.isopret.model.TranscriptResult;
+
 import org.monarchinitiative.phenol.ontology.data.TermId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +165,7 @@ public class HbaDealsThresholder {
                 .map(GeneResult::getTranscriptMap)
                 .map(Map::values)
                 .flatMap(Collection::stream)
-                .map(TranscriptResultImpl::getTranscriptId)
+                .map(TranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
     }
@@ -184,7 +186,7 @@ public class HbaDealsThresholder {
                 .map(Map::values)
                 .flatMap(Collection::stream)
                 .filter(r -> r.isSignificant(this.splicingThreshold ))
-               .map(TranscriptResultImpl::getTranscriptId)
+               .map(TranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
     }

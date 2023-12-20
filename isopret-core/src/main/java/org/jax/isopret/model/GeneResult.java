@@ -1,6 +1,5 @@
 package org.jax.isopret.model;
 
-import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.data.AccessionNumber;
 
 import java.util.*;
@@ -19,6 +18,8 @@ public interface GeneResult {
 
     double getExpressionFoldChange();
 
+    double getExpressionLog2fc();
+
     double getExpressionP();
 
     List<Double> getSplicingPlist() ;
@@ -27,7 +28,7 @@ public interface GeneResult {
     void addTranscriptResult(AccessionNumber isoform, double expFC, double P);
 
 
-    Map<AccessionNumber, TranscriptResultImpl> getTranscriptMap();
+    Map<AccessionNumber, TranscriptResult> getTranscriptMap();
 
     /**
      * Only expressed transcripts are added to the HBA-DEALS results file.
@@ -56,5 +57,7 @@ public interface GeneResult {
     double getSmallestSplicingP();
 
 
-    Set<TranscriptResultImpl> getTranscriptResults();
+    Set<TranscriptResult> getTranscriptResults();
+
+
 }

@@ -4,6 +4,7 @@ import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.GeneModel;
 import org.jax.isopret.model.GeneResult;
 import org.jax.isopret.model.GeneSymbolAccession;
+import org.jax.isopret.model.TranscriptResult;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
     private final GeneModel geneModel;
     private double expressionFoldChange;
     private double expressionP;
-    private final Map<AccessionNumber, TranscriptResultImpl> transcriptMap;
+    private final Map<AccessionNumber, TranscriptResult> transcriptMap;
 
 
 
@@ -39,7 +40,7 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
     }
     @Override
     public void addTranscriptResult(AccessionNumber isoform, double expFC, double P) {
-        TranscriptResultImpl tresult = new TranscriptResultImpl(isoform, expFC, P);
+        TranscriptResult tresult = new TranscriptResultImpl(isoform, expFC, P);
         transcriptMap.putIfAbsent(isoform, tresult);
     }
 
@@ -65,6 +66,12 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
     public double getExpressionFoldChange() {
         return expressionFoldChange;
     }
+
+    @Override
+    public double getExpressionLog2fc() {
+        return Math.log(expressionFoldChange)/Math.log(2.0);
+    }
+
     @Override
     public double getExpressionP() {
         return expressionP;
@@ -74,12 +81,12 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
         return this.transcriptMap
                 .values()
                 .stream()
-                .map(TranscriptResultImpl::getPvalue)
+                .map(TranscriptResult::getPvalue)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Map<AccessionNumber, TranscriptResultImpl> getTranscriptMap() {
+    public Map<AccessionNumber, TranscriptResult> getTranscriptMap() {
         return Collections.unmodifiableMap(transcriptMap);
     }
 
@@ -123,7 +130,7 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
         return this.transcriptMap
                 .values()
                 .stream()
-                .map(TranscriptResultImpl::getPvalue)
+                .map(TranscriptResult::getPvalue)
                 .min(Double::compareTo)
                 .orElse(1.0);
     }
@@ -132,7 +139,7 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
         return Math.min(getExpressionP(), getSmallestSplicingP());
     }
     @Override
-    public Set<TranscriptResultImpl> getTranscriptResults() {
+    public Set<TranscriptResult> getTranscriptResults() {
         return new HashSet<>(this.transcriptMap.values());
     }
 

@@ -1,7 +1,6 @@
 package org.jax.isopret.hbadeals;
 
 import org.jax.isopret.core.impl.rnaseqdata.RnaSeqResultsParser;
-import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.TestBase;
 import org.jax.isopret.core.impl.hgnc.HgncParser;
 import org.jax.isopret.core.impl.jannovar.JannovarReader;
@@ -64,36 +63,48 @@ public class HbaDealsParserTest extends TestBase {
         assertTrue(adar.hasDifferentialSplicingResult(THRESHOLD));
         double pva = adar.getSmallestSplicingP();
         assertEquals(1e-05, pva, EPSILON);
-        Map<AccessionNumber, TranscriptResultImpl> transcriptMap = adar.getTranscriptMap();
+        Map<AccessionNumber, TranscriptResult> transcriptMap = adar.getTranscriptMap();
         assertEquals(5, transcriptMap.size());
         AccessionNumber ENST00000368471 = AccessionNumber.ensemblTranscript("ENST00000368471");
-        TranscriptResultImpl ENST00000368471result = transcriptMap.get(ENST00000368471);
+        TranscriptResult ENST00000368471result = transcriptMap.get(ENST00000368471);
         assertTrue(ENST00000368471result.isSignificant(PEP_THRESHOLD));
         assertEquals(1e-05, ENST00000368471result.getPvalue(), EPSILON);
         var ENST00000368474 = AccessionNumber.ensemblTranscript("ENST00000368474");
-        TranscriptResultImpl ENST00000368474result = transcriptMap.get(ENST00000368474);
+        TranscriptResult ENST00000368474result = transcriptMap.get(ENST00000368474);
         assertEquals(1.45668870537677, ENST00000368474result.getFoldChange(), EPSILON);
         assertEquals(0.00192, ENST00000368474result.getPvalue(), EPSILON);
         //	ENST00000463920	0.84541220998081
         var ENST00000463920 = AccessionNumber.ensemblTranscript("ENST00000463920");
-        TranscriptResultImpl ENST00000463920result = transcriptMap.get(ENST00000463920);
+        TranscriptResult ENST00000463920result = transcriptMap.get(ENST00000463920);
         assertEquals(0.84541220998081, ENST00000463920result.getFoldChange(), EPSILON);
         assertEquals(0.7134, ENST00000463920result.getPvalue(), EPSILON);
         //ENST00000529168	1.05034162415497	0.9602
         var ENST00000529168 = AccessionNumber.ensemblTranscript("ENST00000529168");
-        TranscriptResultImpl ENST00000529168result = transcriptMap.get(ENST00000529168);
+        TranscriptResult ENST00000529168result = transcriptMap.get(ENST00000529168);
         assertEquals(1.05034162415497, ENST00000529168result.getFoldChange(), EPSILON);
         assertEquals(0.9602, ENST00000529168result.getPvalue(), EPSILON);
         // ENST00000649021	0.833370141719852	0.66569
         var ENST00000649021 = AccessionNumber.ensemblTranscript("ENST00000649021");
-        TranscriptResultImpl ENST00000649021result = transcriptMap.get(ENST00000649021);
+        TranscriptResult ENST00000649021result = transcriptMap.get(ENST00000649021);
         assertEquals(0.833370141719852, ENST00000649021result.getFoldChange(), EPSILON);
         assertEquals(0.66569, ENST00000649021result.getPvalue(), EPSILON);
     }
 
 
-
-
+    /**
+     * ENSG00000160710	Expression	1.54770825394965	0
+     * Thus, the expression foldchange is 1.54
+     * The log2 fold change is log2(1.54)=0.6301335462576204.
+     */
+    @Test
+    public void testGeneFoldChange() {
+        GeneResult adar = hbaDealsResultMap.get(adarAccession);
+        final double EPSILON = 1E-10;
+        double expressionFC = adar.getExpressionFoldChange();
+        assertEquals(1.54770825394965, expressionFC, EPSILON);
+        double log2FC =  Math.log(expressionFC)/Math.log(2.0);
+        assertEquals(log2FC, adar.getExpressionLog2fc(), EPSILON);
+    }
 
 
 }

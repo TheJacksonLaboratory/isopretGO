@@ -1,6 +1,5 @@
 package org.jax.isopret.visualization;
 
-import org.jax.isopret.core.impl.rnaseqdata.TranscriptResultImpl;
 import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.data.InterproEntry;
 import org.jax.isopret.data.Transcript;
@@ -31,7 +30,8 @@ public class EnsemblVisualizable implements Visualizable {
     private final int totalTranscriptCount;
 
     /**
-     * All annotated transcripts of some gene that were expressed according to HBA deals
+     * All annotated transcripts of some gene that were expressed in the RNA-SEQ data (and thus present in
+     * the output file of HBA-DEALS or edgeR)
      */
     private final List<Transcript> expressedTranscripts;
 
@@ -73,7 +73,7 @@ public class EnsemblVisualizable implements Visualizable {
         this.chromosome = chr.startsWith("chr") ? chr : "chr" + chr;
         this.differentiallyExpressed = agene.passesExpressionThreshold();
         this.differentiallySpliced = agene.passesSplicingThreshold();
-        Predicate<TranscriptResultImpl> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
+        Predicate<TranscriptResult> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
         this.significantIsoforms = (int) hbaDealsResult.getTranscriptMap().values().stream().filter(passesExpressionThreshold).count();
         double SPLICING_THRESHOLD = agene.getSplicingThreshold();
         this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().

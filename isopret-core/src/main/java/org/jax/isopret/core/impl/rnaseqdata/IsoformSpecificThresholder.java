@@ -2,6 +2,7 @@ package org.jax.isopret.core.impl.rnaseqdata;
 
 import org.jax.isopret.data.AccessionNumber;
 import org.jax.isopret.model.GeneResult;
+import org.jax.isopret.model.TranscriptResult;
 import org.monarchinitiative.phenol.analysis.AssociationContainer;
 import org.monarchinitiative.phenol.analysis.StudySet;
 import org.monarchinitiative.phenol.ontology.data.TermId;
@@ -155,14 +156,14 @@ public class IsoformSpecificThresholder {
                 .stream()
                 .flatMap(r -> r.getTranscriptResults().stream())
                 .filter(tr -> tr.getPvalue() <= splicingPepThreshold)
-                .map(TranscriptResultImpl::getTranscriptId)
+                .map(TranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         Set<TermId> dasIsoformPopulation = results
                 .values()
                 .stream()
                 .flatMap(r -> r.getTranscriptResults().stream())
-                .map(TranscriptResultImpl::getTranscriptId)
+                .map(TranscriptResult::getTranscriptId)
                 .map(AccessionNumber::toTermId)
                 .collect(Collectors.toSet());
         LOGGER.info("DAS: {} study set and {} population genes", dasIsoformStudy.size(), dasIsoformPopulation.size());
