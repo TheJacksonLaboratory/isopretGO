@@ -136,7 +136,7 @@ public class DefaultIsopretProvider implements IsopretProvider {
     }
 
     private void initContainers() {
-        IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology,
+        IsopretContainerFactory isoContainerFac = new IsopretContainerFactory(geneOntology(),
                 transcriptIdToGoTermsMap(), gene2GoMap());
         this.transcriptContainer = isoContainerFac.transcriptContainer();
         LOGGER.info("transcriptContainer terms n={}", transcriptContainer.getAnnotatingTermCount());
