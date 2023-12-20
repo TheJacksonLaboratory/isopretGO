@@ -22,7 +22,7 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
     /** Accession number of the gene, e.g., ENSG00000001167. */
     private final AccessionNumber geneAccession;
     private final GeneModel geneModel;
-    private double expressionFoldChange;
+    private double expressionLog2FoldChange;
     private double expressionP;
     private final Map<AccessionNumber, TranscriptResult> transcriptMap;
 
@@ -35,7 +35,7 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
     }
     @Override
     public void addExpressionResult(double fc, double p) {
-        this.expressionFoldChange = fc;
+        this.expressionLog2FoldChange = fc;
         this.expressionP = p;
     }
     @Override
@@ -63,13 +63,13 @@ public class GeneResultImpl implements GeneResult, Comparable<GeneResultImpl> {
         return new GeneSymbolAccession(geneModel.geneSymbol(), geneAccession);
     }
     @Override
-    public double getExpressionFoldChange() {
-        return expressionFoldChange;
+    public double getExpressionLog2FoldChange() {
+        return expressionLog2FoldChange;
     }
 
     @Override
-    public double getExpressionLog2fc() {
-        return Math.log(expressionFoldChange)/Math.log(2.0);
+    public double getExpressionFoldChange() {
+        return Math.pow(expressionLog2FoldChange, 2.0);
     }
 
     @Override

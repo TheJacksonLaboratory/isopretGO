@@ -75,10 +75,10 @@ public class EnsemblVisualizable implements Visualizable {
         this.differentiallySpliced = agene.passesSplicingThreshold();
         Predicate<TranscriptResult> passesExpressionThreshold = result -> result.getPvalue() < agene.getExpressionThreshold();
         this.significantIsoforms = (int) hbaDealsResult.getTranscriptMap().values().stream().filter(passesExpressionThreshold).count();
-        double SPLICING_THRESHOLD = agene.getSplicingThreshold();
+        double splicingThreshold = agene.getSplicingThreshold();
         this.isoformVisualizables = agene.getHbaDealsResult().getTranscriptMap().values().
                 stream().
-                map(x -> new EnsemblGeneIsoformVisualizable(x, SPLICING_THRESHOLD))
+                map(x -> new EnsemblGeneIsoformVisualizable(x, splicingThreshold))
                 .collect(Collectors.toList());
         AbstractSvgGenerator svggen = TranscriptSvgGenerator.factory(agene);
         this.isoformSvg = svggen.getSvg();
@@ -176,13 +176,14 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public double getExpressionFoldChange() {
-        double logFc = getExpressionLogFoldChange();
-        return Math.exp(logFc);
+       // double logFc = getExpressionLogFoldChange();
+       // return Math.exp(logFc);
+        return this.hbaDealsResult.getExpressionFoldChange();
     }
 
     @Override
-    public double getExpressionLogFoldChange() {
-        return this.hbaDealsResult.getExpressionFoldChange();
+    public double getExpressionLog2FoldChange() {
+        return this.hbaDealsResult.getExpressionLog2FoldChange();
     }
 
     @Override

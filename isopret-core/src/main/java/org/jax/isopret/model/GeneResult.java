@@ -16,9 +16,9 @@ public interface GeneResult {
 
     GeneSymbolAccession getGeneSymbolAccession() ;
 
-    double getExpressionFoldChange();
+    double getExpressionLog2FoldChange();
 
-    double getExpressionLog2fc();
+    double getExpressionFoldChange();
 
     double getExpressionP();
 

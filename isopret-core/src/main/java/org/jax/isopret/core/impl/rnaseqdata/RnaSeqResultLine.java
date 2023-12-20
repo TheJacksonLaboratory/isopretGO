@@ -5,14 +5,14 @@ import org.jax.isopret.data.AccessionNumber;
 
 
 /**
- * With the exception of the header line, the HBA-DEALS and the edgeR results file (from our script to
+ * Except for the header line, the HBA-DEALS and the edgeR results file (from our script to
  * analyze both DGE and DAS) are the same. This class is therefore used to parse lines from either
  * HBA-DEALS or edgeR. Note that the objects are only used for parsing and are not a part of the
  * analysis model. Each line will be transformed either to a {@link org.jax.isopret.model.GeneResult} or
  * a {@link org.jax.isopret.model.TranscriptResult}.
  * @param geneAccession ENSEMBL accession number for a gene, e.g., ENSG00000139618
  * @param isoform ENSEMBL accession number for a transcript (can be null), e.g., ENST00000560355.1
- * @param expFC expression fold change (from HBA-DEALS)
+ * @param expFC expression fold change (from HBA-DEALS). For expression: log2 FC; for splicing: FC.
  * @param raw_p raw p-value (from HBA-DEALS)
  * @author Peter N Robinson
  */

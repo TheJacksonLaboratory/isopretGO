@@ -37,7 +37,7 @@ public class EnsemblGeneIsoformVisualizable implements IsoformVisualizable {
     public EnsemblGeneIsoformVisualizable(Visualizable geneVisualizable) {
         transcriptAccession = String.format("%s (%s)", geneVisualizable.getGeneAccession(), geneVisualizable.getGeneSymbol());
         isoformUrlAnchor = geneVisualizable.getGeneEnsemblUrl();
-        log2FoldChange = Math.log(geneVisualizable.getExpressionFoldChange()) / Math.log(2);
+        log2FoldChange = geneVisualizable.getExpressionLog2FoldChange();
         isoformP = geneVisualizable.getExpressionPep();
         isSignificant = geneVisualizable.isDifferentiallyExpressed();
         isGene = true;

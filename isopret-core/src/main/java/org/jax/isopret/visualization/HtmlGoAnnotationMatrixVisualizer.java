@@ -58,7 +58,7 @@ public class HtmlGoAnnotationMatrixVisualizer {
         StringBuilder sb = new StringBuilder();
         List<String> expressedCoding = matrix.getExpressedCodingTranscripts();
         List<TermId> expressedNonCoding = matrix.getExpressedNoncodingTranscriptIds();
-        if (expressedNonCoding.size() > 0) {
+        if (!expressedNonCoding.isEmpty()) {
             sb.append("<p>").append(matrix.getGeneSymbol()).append(" displayed ").append(expressedNonCoding.size())
                     .append(" non-coding expressed transcripts (");
             String idlist = expressedNonCoding.stream().map(TermId::getValue).collect(Collectors.joining("; "));

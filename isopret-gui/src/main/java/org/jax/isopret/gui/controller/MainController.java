@@ -44,8 +44,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
 
-import static org.jax.isopret.gui.service.model.GeneOntologyComparisonMode.DAS;
-import static org.jax.isopret.gui.service.model.GeneOntologyComparisonMode.DGE;
+import static org.jax.isopret.gui.service.GeneOntologyComparisonMode.DAS;
+import static org.jax.isopret.gui.service.GeneOntologyComparisonMode.DGE;
 import static org.jax.isopret.gui.widgets.PopupFactory.displayIsopretThrown;
 
 /**

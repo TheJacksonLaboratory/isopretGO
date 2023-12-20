@@ -1,4 +1,4 @@
-package org.jax.isopret.gui.service.model;
+package org.jax.isopret.gui.service;
 
 import org.jax.isopret.data.GoMethod;
 import org.jax.isopret.data.MtcMethod;

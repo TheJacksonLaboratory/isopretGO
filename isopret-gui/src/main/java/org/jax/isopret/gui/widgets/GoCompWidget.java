@@ -13,8 +13,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.jax.isopret.gui.service.model.GoCompTerm;
-import org.jax.isopret.gui.service.model.GoComparison;
+import org.jax.isopret.gui.service.GoCompTerm;
+import org.jax.isopret.gui.service.GoComparison;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -461,7 +461,7 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
         String symbol = this.hbaDealsResult.getGeneModel().geneSymbol();
         double xpos  = 0.45 * SVG_WIDTH ;
         writer.write(SvgUtil.boldItalicText(xpos, ypos, DARKBLUE, 24, symbol));
-        double logFc = this.hbaDealsResult.getExpressionFoldChange();
+        double logFc = this.hbaDealsResult.getExpressionLog2FoldChange();
         double expressionPval = this.hbaDealsResult.getExpressionP();
         double height = 20.0;
         double LOG_FC_FACTOR = 25; // multiple logFC by this to get height

@@ -93,17 +93,17 @@ public class HbaDealsParserTest extends TestBase {
 
     /**
      * ENSG00000160710	Expression	1.54770825394965	0
-     * Thus, the expression foldchange is 1.54
-     * The log2 fold change is log2(1.54)=0.6301335462576204.
+     * Thus, the expression log 2 foldchange is 1.54
+     * The expression fold change is 2**1.54=0.6301335462576204.
      */
     @Test
     public void testGeneFoldChange() {
         GeneResult adar = hbaDealsResultMap.get(adarAccession);
         final double EPSILON = 1E-10;
-        double expressionFC = adar.getExpressionFoldChange();
-        assertEquals(1.54770825394965, expressionFC, EPSILON);
-        double log2FC =  Math.log(expressionFC)/Math.log(2.0);
-        assertEquals(log2FC, adar.getExpressionLog2fc(), EPSILON);
+        double expressionlog2FC = adar.getExpressionLog2FoldChange();
+        assertEquals(1.54770825394965, expressionlog2FC, EPSILON);
+        double foldChange =  Math.pow(expressionlog2FC, 2.0);
+        assertEquals(foldChange, adar.getExpressionFoldChange(), EPSILON);
     }
 
 
