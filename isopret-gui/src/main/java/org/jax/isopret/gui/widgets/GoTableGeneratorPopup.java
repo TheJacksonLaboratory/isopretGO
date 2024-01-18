@@ -30,7 +30,7 @@ public class GoTableGeneratorPopup {
         goMatrix = matrix;
         geneSymbol = goMatrix.getGeneSymbol();
         geneAccession = goMatrix.getAccession();
-        basename = baseName;
+        basename = baseName.replaceAll("(\\.+)",""); // remove suffix, if any
         Alert dialog = new Alert(Alert.AlertType.INFORMATION);
         dialog.setTitle("Export GO annotations");
         dialog.setHeaderText("Choose export format");

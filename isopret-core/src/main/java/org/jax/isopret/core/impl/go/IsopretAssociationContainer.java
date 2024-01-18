@@ -76,6 +76,7 @@ public class IsopretAssociationContainer implements AssociationContainer<TermId>
     //  in interface AssociationContainer<T> after PR merged to only use Interface in client code
     public Set<TermId> getDomainItemsAnnotatedByGoTerm(TermId goTermId) {
         Set<TermId> domainItemSet = new HashSet<>();
+        //ontology.graph().getDescendants(goTermId, )
         Set<TermId> descendentSet = OntologyAlgorithm.getDescendents(this.ontology, goTermId);
         for (Map.Entry<TermId, IsopretAnnotations> entry : associationMap.entrySet()) {
             TermId gene = entry.getKey();

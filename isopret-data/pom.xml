@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.jax.isopret</groupId>
         <artifactId>isopret</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
     </parent>
 
     <artifactId>isopret-data</artifactId>
@@ -35,12 +35,7 @@
             <artifactId>svart</artifactId>
             <version>${svart.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.jax.isopret</groupId>
-            <artifactId>isopret-exception</artifactId>
-            <version>1.2.0</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
 </project>

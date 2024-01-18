@@ -368,15 +368,15 @@ public class HbaGeneController implements Initializable {
 
     /**
      * Export a TSV file with isopret annotations for this gene
-     * @param actionEvent
      */
     @FXML
-    public void goAnnotExport(ActionEvent actionEvent) {
-        // String name = rnaSeqResultsFile.getName() + "-" + mtcMethod.name() + "-" + goMethod.name() + ".tsv";
+    public void goAnnotExport(ActionEvent e) {
+        e.consume();
         Optional<String> opt = service.getGoReportDefaultFilename();
         String baseName;
         if (opt.isPresent()) {
             baseName = opt.get().replace(".tsv", "");
+            baseName = String.format("%s-%s", baseName, visualizable.getGeneSymbol());
         } else {
             baseName = visualizable.getGeneSymbol();
         }

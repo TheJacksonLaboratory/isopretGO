@@ -262,7 +262,7 @@ public class MainController implements Initializable {
                 interproTab = new Tab("Interpro");
                 interproTab.setClosable(false);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
             // Now the same for DAS
             try {
@@ -283,7 +283,7 @@ public class MainController implements Initializable {
                 GeneOntologyController gc2 = loader.getController();
                 gc2.refreshGeneOntologyTable();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
 
             // now for interpro
@@ -311,13 +311,12 @@ public class MainController implements Initializable {
                 interproController.refreshTable();
 
             }catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
         });
         task.setOnFailed(eh -> {
             Exception exc = (Exception)eh.getSource().getException();
-            eh.getSource().getException().printStackTrace();
-            //eh.getSource().getException().toString()
+            LOGGER.error(eh.getSource().getException().getMessage());
             PopupFactory.displayException("Error",
                     "Exception encountered while attempting to perform isopret analysis",
                     exc);
