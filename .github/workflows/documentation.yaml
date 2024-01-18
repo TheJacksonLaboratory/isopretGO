@@ -21,6 +21,5 @@ jobs:
       - run: pip install mkdocs-material
       - run: pip install mkdocs-material[imaging]
       - run: pip install pillow cairosvg
-      - run: pip install mkdocs-material-extensions
       - run: pip install mkdocstrings[python]
       - run: mkdocs gh-deploy --force

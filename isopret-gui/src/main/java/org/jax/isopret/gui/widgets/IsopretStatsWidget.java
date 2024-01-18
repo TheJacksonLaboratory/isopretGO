@@ -32,24 +32,25 @@ public class IsopretStatsWidget {
     /** The initial file name that will be suggested to the user, equivalent
      * to the name of the HBA-DEALS file plus -isopret-stats.txt
      */
-    private final String defaultFileName;
+    private final String inputFileName;
 
     public IsopretStatsWidget(IsopretStats stats, String basename) {
         this.isopretStats = stats;
-        this.defaultFileName = basename + "-isopret-stats.txt";
+        this.inputFileName = basename;
+        this.isopretStats.addInfo("Input file", basename);
     }
 
     public void show() {
+        String defaultFileName = this.inputFileName + "-isopret-stats.txt";
         if (isopretStats == null || isopretStats.getAllEntries().isEmpty()) {
-            PopupFactory.displayError("Error", "Cannot show stats before analysis is finished");
+            PopupFactory.displayError("Error", "Cannot show settings before analysis is finished");
             return;
         }
-        Text text = new Text("Statistics for isopret analysis");
+        Text text = new Text("IsopretGO Settings");
         text.setFont(Font.font("Verdana", FontWeight.BOLD,16));
         TextFlow tflow = new TextFlow();
         tflow.getChildren().add(text);
         VBox vbox = new VBox();
-        //trbl
         vbox.setPadding(new Insets(20, 20, 10, 20));
         vbox.setSpacing(10);
         vbox.getChildren().add(tflow);
@@ -91,9 +92,8 @@ public class IsopretStatsWidget {
         buttonBox.setSpacing(10);
         buttonBox.getChildren().addAll(saveButton, closeButton);
         vbox.getChildren().add(buttonBox);
-        //ScrollPane spane = new ScrollPane(vbox);
         Scene scene = new Scene(vbox, 800, 800);
-        newWindow.setTitle("Isopret Analysis Stats");
+        newWindow.setTitle("IsopretGO Settings");
         newWindow.setScene(scene);
         newWindow.show();
     }
@@ -104,7 +104,7 @@ public class IsopretStatsWidget {
                 writer.write(entry.getKey() + "\t" + entry.getValue() + "\n");
             }
         } catch (IOException e) {
-            PopupFactory.displayException("Error", "Could not write stats to file", e);
+            PopupFactory.displayException("Error", "Could not write settings to file", e);
         }
     }
 
