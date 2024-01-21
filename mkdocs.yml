@@ -44,21 +44,12 @@ nav:
 
 
 plugins:
-  - social
   - search
   - mkdocstrings:
       handlers:
         python:
           options:
             docstring_style: sphinx
-
-
-extra:
-  social:
-    - icon: fontawesome/brands/github-alt
-      link: https://github.com/pnrobinson
-    - icon: fontawesome/brands/linkedin
-      link: https://www.linkedin.com/in/peter-n-robinson-b7833811/
 
 
 markdown_extensions:
@@ -76,10 +67,7 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - tables
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 copyright: |
-  &copy; 2023 <a href="https://github.com/pnrobinson"  target="_blank" rel="noopener">Peter N Robinson</a>
+  &copy; 2024 <a href="https://github.com/pnrobinson"  target="_blank" rel="noopener">Peter N Robinson</a>
 
