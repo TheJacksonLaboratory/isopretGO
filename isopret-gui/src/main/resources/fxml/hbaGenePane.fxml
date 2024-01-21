@@ -18,6 +18,8 @@
                   <MenuItem mnemonicParsing="false" onAction="#genePDFexport" text="Gene PDF" />
                   <MenuItem mnemonicParsing="false" onAction="#proteinSVGexport" text="Protein SVG" />
                   <MenuItem mnemonicParsing="false" onAction="#proteinPDFexport" text="Protein PDF" />
+                  <MenuItem mnemonicParsing="false" onAction="#goAnnotExport" text="GO Annotations" />
+
               </items>
                <HBox.margin>
                   <Insets left="20.0" />

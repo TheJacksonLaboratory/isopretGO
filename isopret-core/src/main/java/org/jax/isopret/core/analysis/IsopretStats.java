@@ -107,6 +107,10 @@ public class IsopretStats {
         return all;
     }
 
+    public void addInfo(String inputFile, String basename) {
+        this.info.put(inputFile, basename);
+    }
+
     /**
      * Convenient way of collecting data about the current run.
      */

@@ -1,9 +1,11 @@
-site_name: pyphetools
+site_name: isopretGO
 
 theme:
   name: "material"
   features:
-    #- navigation.tabs
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.path
     - navigation.sections
     - toc.integrate
     - navigation.top
@@ -29,8 +31,16 @@ theme:
       accent: lime
 
 
-#nav:
-#  - Home: 'index.md'
+nav:
+  - Home: 'index.md'
+  - Setup: 'setup.md'
+  - Running isopretGO:
+    - Overview: 'running.md'
+    - GUI: 'running-gui.md'
+    - CLI: 'running-cmd.md'
+    - PDF output: 'running-pdf.md'
+  - Output: 'output.md'
+  - Tutorial: 'tutorial.md'
 
 
 plugins:
@@ -47,8 +57,6 @@ extra:
   social:
     - icon: fontawesome/brands/github-alt
       link: https://github.com/pnrobinson
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/pnrobins
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/in/peter-n-robinson-b7833811/
 
@@ -69,8 +77,8 @@ markdown_extensions:
   - md_in_html
   - tables
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 copyright: |
   &copy; 2023 <a href="https://github.com/pnrobinson"  target="_blank" rel="noopener">Peter N Robinson</a>

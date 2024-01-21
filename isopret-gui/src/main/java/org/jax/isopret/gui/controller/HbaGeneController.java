@@ -17,6 +17,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.IOUtils;
+import org.jax.isopret.gui.widgets.GoTableGeneratorPopup;
 import org.jax.isopret.visualization.*;
 import org.jax.isopret.gui.service.HostServicesWrapper;
 import org.jax.isopret.gui.service.IsopretService;
@@ -365,5 +366,22 @@ public class HbaGeneController implements Initializable {
         PopupFactory.showInfoMessage( "Successfully created " + pdfFile.getAbsolutePath(), "Info");
     }
 
+    /**
+     * Export a TSV file with isopret annotations for this gene
+     */
+    @FXML
+    public void goAnnotExport(ActionEvent e) {
+        e.consume();
+        Optional<String> opt = service.getGoReportDefaultFilename();
+        String baseName;
+        if (opt.isPresent()) {
+            baseName = opt.get().replace(".tsv", "");
+            baseName = String.format("%s-%s", baseName, visualizable.getGeneSymbol());
+        } else {
+            baseName = visualizable.getGeneSymbol();
+        }
+        GoAnnotationMatrix goMatrix = visualizable.getGoAnnotationMatrix();
+        GoTableGeneratorPopup popup = new GoTableGeneratorPopup(goMatrix, baseName);
 
+    }
 }
