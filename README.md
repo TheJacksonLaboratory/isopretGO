@@ -2,19 +2,24 @@
 
 Isoform Interpretation (isopret) with Gene Ontology (isopretGO) is Java desktop application to 
 visualize the functional implications of differential gene expression and differential alternative splicing
-in RNA-seq data. isopretGO leverages isoform-specific functional (GO) annotations presented in
-[Karlebach G, et al. (2023) Bioinformatics 39:btad132](https://pubmed.ncbi.nlm.nih.gov/36929917/)
-for an approach towards GO overrepresentation analysis of differential transcripts, and presents
-a graphicual user interface (GUI) application to perform the analysis and explore the results.
+in RNA-seq data. 
+
+
+|            Setup            | Overview | Gene visualization |
+|:---------------------------:|:-------------------------:|:-------------------------:|
+|  ![](docs/img/isopret1.png) | ![](docs/img/isopret3.png) | ![](docs/img/isopret4.png) |
+
+|    Protein visualization    | Inferred isoform specific GO | GO overrepresentation |
+|:---------------------------:|:----------------------------:|:-------------------------:|
+|  ![](docs/img/isopret5.png) |  ![](docs/img/isopret6.png)  | ![](docs/img/isopret7.png) |
+
+
 
 See the [online documentation](https://thejacksonlaboratory.github.io/isopretGO/) for installation and usage instructions.
 
+See the [Release page](https://github.com/TheJacksonLaboratory/isopretGO/releases) for the executable JAR file.
 
-interpret the potential biological  functions that are affected by differential alternative splicing. Isopret is
-available as a Java desktop application. Most users should download the latest version from the
-Releases page.
 
-A manuscript is in preparation.
 
 
 
