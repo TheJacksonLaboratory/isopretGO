@@ -1,0 +1,129 @@
+import pandas as pd
+import os
+import tempfile
+from snakemake.shell import shell
+from pathlib import Path
+import numpy as np
+import re
+
+configfile: "/projects/chesler-lab/jcpg/snakemake/config.yaml"
+
+sample_table    = pd.read_table(config['samples_table'], sep='\t')
+sample_table    = sample_table.drop_duplicates(subset='srr', keep='first', inplace=False)
+sample_table    = sample_table.dropna()
+sample_table.set_index('srr',inplace=True)
+srp=sample_table.iloc[1,1]
+cohort=sample_table.iloc[1,0]
+dir=config["fastq_dir"]
+samples_pe=sample_table[sample_table['isPaired']=='PAIRED'].index.values
+biosamples=sample_table.BioSample.unique()
+
+rule all:
+    input:
+         expand("{dir}/rsem/pe/{samples_pe}/",samples_pe=samples_pe,dir=config["fastq_dir"])
+
+
+rule get_fastq_pe:
+    output:
+        down=expand("{dir}/{samples_pe}_{num}.fastq",dir=config["fastq_dir"],num=[1,2],samples_pe=samples_pe)
+    params:
+        outdir=config["fastq_dir"],
+        samples=expand("{samples}",samples=samples_pe)
+    threads: 32
+    run:
+        for s in samples_pe:
+            try:
+              shell("prefetch  --max-size 500G  "+s)
+              shell("fasterq-dump -t tmp/  --split-files --threads {threads} --outdir {params.outdir}/ "+s)
+            #  shell("rm -r "+s)
+            except:
+              print('retrying '+s)
+
+rule fastp_pe:
+    input:
+        i=expand("{dir}/{{samples_pe}}_1.fastq",dir=config["fastq_dir"]),
+        I=expand("{dir}/{{samples_pe}}_2.fastq",dir=config["fastq_dir"])
+    output:
+        o=expand("{dir}/trimmed/{{samples_pe}}_1.fastq",dir=config["fastq_dir"]),
+        O=expand("{dir}/trimmed/{{samples_pe}}_2.fastq",dir=config["fastq_dir"])
+    log:
+        expand("logs/fastp/{{samples_pe}}.log")
+    params:
+        # list of trimmers (see manual)
+        # optional parameters
+    threads:
+        32
+    run:
+        shell("fastp -i {input.i} -I {input.I} -o {output.o} -O {output.O}")
+       # shell("rm {input.i}")
+       # shell("rm {input.I}")
+
+   	
+
+rule prepare_rsem_reference:
+        input:
+           gtf = expand("{gtf}",gtf=config["gtf"]),
+           genome = expand("{genome}",genome=config["genome"]) 
+        output:
+           directory(expand("{rsem_ref_path}",genome=config["genome"],rsem_ref_path=config["rsem_ref_path"]))
+        log:
+           log=expand("logs/rsem/rsem_reference_{genome}.log",genome=config["genome"])
+        threads:
+           32
+        shell:
+           "rsem-prepare-reference  --gtf {input.gtf} --num-threads {threads} --star "
+    	   "{input.genome} "
+  	   "{output}rsem"
+
+
+rule rsem_calculate_expression_pe:
+        input:
+           fq1 = expand("{dir}/trimmed/{samples_pe}_1.fastq",dir=config["fastq_dir"],samples_pe=samples_pe),
+           fq2 = expand("{dir}/trimmed/{samples_pe}_2.fastq",dir=config["fastq_dir"],samples_pe=samples_pe),
+           ref = expand("{rsem_ref_path}/",rsem_ref_path=config["rsem_ref_path"]) 
+        output:
+           samp = expand("{dir}/rsem/pe/{samples_pe}/",samples_pe=samples_pe,dir=config["fastq_dir"])
+        log:
+           log=expand("logs/rsem/rsem_expression_{samples_pe}.log",samples_pe=samples_pe)
+        threads:
+           32
+        run:
+           shell('mkdir -p '+dir+'/rsem/pe/')
+           for x in input.fq1:
+             shell('touch '+dir+'/rsem/pe/'+ os.path.basename(Path(re.sub('_1','',str(x))).with_suffix('')))
+           for val in sample_table.BioSample.unique():
+               if os.path.exists(dir+'/rsem/pe/'+val+'/rsem.isoforms.results'):
+                    continue
+               fastq_files=sample_table.index.values[sample_table['BioSample']==val]
+               fastq_string1=''
+               fastq_string2=''
+               wait_next=False
+               shell('echo next > '+dir+'/rsem/pe/'+ os.path.basename(Path(re.sub('_1','',str(input.fq1))).with_suffix('')))
+               for file in fastq_files:
+                    if os.path.exists(dir+'/trimmed/'+file+'_1.fastq'):
+                    	fastq_string1=fastq_string1+dir+'/trimmed/'+file+'_1.fastq '
+                    	fastq_string2=fastq_string2+dir+'/trimmed/'+file+'_2.fastq '
+                    else:
+                        wait_next=True
+                        break
+               if wait_next:
+                        break
+               shell('cat '+fastq_string1+' > '+dir+'/trimmed/'+val+'_1.fastq')
+               shell('cat '+fastq_string2+' > '+dir+'/trimmed/'+val+'_2.fastq')
+               shell('mkdir '+dir+'/rsem/pe/'+val)
+               shell("rsem-calculate-expression --star --paired-end --no-bam-output --num-threads {threads} "+dir+"/trimmed/"+val+"_1.fastq "+dir+"/trimmed/"+val+"_2.fastq"+ " {input.ref}/rsem "+dir+'/rsem/pe/'+val+"/rsem")
+
+rule run_hbadeals:
+        threads: 32
+        input:
+          samp = expand("{dir}/rsem/pe/{samples_pe}/",dir=config["fastq_dir"],samples_pe=samples_pe)
+        output:
+          '/projects/chesler-lab/jcpg/snakemake/'+str(srp)+'_'+str(cohort)+'.txt'
+        params:
+          cohort=str(cohort),
+          fastq_dir=config["fastq_dir"]
+        run:
+          shell("Rscript  /projects/chesler-lab/jcpg/snakemake/run_hba_deals.R  /projects/chesler-lab/jcpg/snakemake/case_control_c{params.cohort}.tsv {params.cohort} {params.fastq_dir}/rsem/pe/")
+          shell("rm -f "+dir+"/trimmed/*.fastq")
+
+
