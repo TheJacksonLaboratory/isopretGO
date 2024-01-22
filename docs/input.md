@@ -76,5 +76,5 @@ also contains 15 HBA-DEALS output files related to that publication that can be 
 
 # edgeR
 
-
-todo
+Alternatively, [edgeR](https://pubmed.ncbi.nlm.nih.gov/19910308/) can be used to call differential gene expression
+and alternative splicing.
