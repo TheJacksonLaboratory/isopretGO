@@ -14,26 +14,18 @@ countsData=NULL
 
 labels=c()
 
-for (next.file.name in list.files(args[1],full.names = TRUE))
-{
-  
-  if (is.null(countsData))
-  {
+for (next.file.name in list.files(args[1],full.names = TRUE)) {
+  if (is.null(countsData)) {
     countsData=read.table(next.file.name,header=TRUE)[c(2,1)]
   }
     next.file=read.table(next.file.name,header=TRUE)
-    
     countsData=cbind(countsData,next.file$expected_count)
-  
     labels=c(labels,1)  
 }
 
-for (next.file.name in list.files(args[2],full.names = TRUE))
-{
+for (next.file.name in list.files(args[2],full.names = TRUE)) {
    next.file=read.table(next.file.name,header=TRUE)
-   
    countsData=cbind(countsData,next.file$expected_count)
-   
    labels=c(labels,2)
 }
 
@@ -65,7 +57,7 @@ edger.out=(topTags(lrt,n = nrow(y))$table)
 isopret.input=edger.out[,c(1,5)]
 
 isopret.input[,1]=2^isopret.input[,1]
-  
+
 isopret.input=cbind(do.call(rbind,lapply(rownames(edger.out),
                               function(x)c(unlist(strsplit(x,split=' '))[1],unlist(strsplit(x,split=' '))[2]))),isopret.input)  
   
@@ -82,13 +74,9 @@ countsData=countsData[countsData[,1] %in% isopret.input[,1],]
 #run edgeR on gene counts
 
 gene.counts=do.call(rbind,lapply(split(countsData,countsData[,1]),function(m){
-  
   res=matrix(colSums(m[,-c(1,2)]),nrow=1)
-
   rownames(res)=m[1,1]
-  
   res
-  
 }))
 
 y=DGEList(counts=gene.counts,group=labels)
@@ -110,11 +98,8 @@ lrt=glmLRT(fit,coef=2)
 edger.out=(topTags(lrt,n = nrow(y))$table)
 
 gene.results=do.call(rbind,lapply(rownames(edger.out),function(x){
-  
   v=edger.out[rownames(edger.out)==x,]
-  
   matrix(unlist(c(rownames(v),'Expression',v[1],v[5])),nrow=1)
-  
 }))
 
 colnames(gene.results)=colnames(isopret.input)
@@ -126,7 +111,7 @@ isopret.input=isopret.input[order(isopret.input[,1]),]
 colnames(isopret.input)=c('Gene','Isoform','ExplogFC/FC','BH')
 
 isopret.input$`ExplogFC/FC`=as.numeric(isopret.input$`ExplogFC/FC`)
-  
+
 isopret.input$BH=as.numeric(isopret.input$BH)
 
 isopret.input$BH[abs(isopret.input$`ExplogFC/FC`)<log2(1.5)]=1
