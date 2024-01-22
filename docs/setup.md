@@ -63,7 +63,7 @@ pip install mkdocstrings[python]
 mkdocs serve
 ```
 
-Note that on an M! Mac we have encountered a difficulty with mkdocs not finding the cairo library. This can be solved
+Note that on an M1   Mac we have encountered a difficulty with mkdocs not finding the cairo library. This can be solved
 by running
 
 ```

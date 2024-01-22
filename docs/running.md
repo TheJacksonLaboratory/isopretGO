@@ -1,15 +1,11 @@
 # Running isopretGO
 
 
-Isopret offers a  command-line tools that performs Gene Ontology overrepresentation
-analysis with the inferred isoform GO annotations. A GUI version with additional
-visualization tools is in preparation.
+Isopret-GO offers tools that performs Gene Ontology overrepresentation
+analysis with the inferred isoform GO annotations. 
 
-- [running-inferrence](running-inferrence.md)
-- [running-cmd](running-cmd.md)
-
-   
-   
-
+- [GUI version](running-gui.md)
+- [Command-line version](running-cmd.md)
+- [Exporting PDF files](running-pdf.md)
 
 

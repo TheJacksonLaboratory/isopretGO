@@ -76,5 +76,7 @@ also contains 15 HBA-DEALS output files related to that publication that can be 
 
 # edgeR
 
+Alternatively [edgeR](https://pubmed.ncbi.nlm.nih.gov/19910308/) can be used to call differential expresison and alternative splicing. We provide an R script to perform the analysis
+and format the results in HBA-DEALS format (which is required to use isopret-GO):
 
-todo
+[edgeR_output.R](../scripts/edgeR_output.R)
