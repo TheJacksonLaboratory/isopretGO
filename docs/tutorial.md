@@ -9,8 +9,8 @@ the required input files.
 
 Two HBA-DEALS files are provided for this tutorial in the `tutorial_files` directory of the GitHub repository:
 
-- [Hooks_HBADEALS_output.txt](../tutorial_files/Hooks_HBADEALS_output.txt)
-- [Wagner_HBADEALS_output.txt](../tutorial_files/Wagner_HBADEALS_output.txt)
+- [Hooks_HBADEALS_output.txt](https://github.com/TheJacksonLaboratory/isopretGO/blob/main/tutorial_files/Hooks_HBADEALS_output.txt)
+- [Wagner_HBADEALS_output.txt](https://github.com/TheJacksonLaboratory/isopretGO/blob/main/tutorial_files/)
 
 
 Both files contain the results of HBA-DEALS analysis of hepatoblastoma datasets, i.e., with Bayesian analysis of differential gene expression and differential alternative splicing.
