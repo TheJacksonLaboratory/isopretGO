@@ -33,8 +33,6 @@ module org.jax.isopret.gui {
     exports org.jax.isopret.gui.service.impl to spring.beans, spring.core;
     exports org.jax.isopret.gui.controller to spring.beans, spring.context;
 
-
-
     opens org.jax.isopret.gui to spring.core;
     opens org.jax.isopret.gui.configuration to spring.core;
     opens org.jax.isopret.gui.controller to spring.core;

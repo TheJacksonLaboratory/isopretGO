@@ -16,7 +16,6 @@ module org.jax.isopret.core {
     exports org.jax.isopret.visualization;
     exports org.jax.isopret.core;
     exports org.jax.isopret.core.impl.interpro;
-    //exports org.jax.isopret.core.impl.hgnc;
     exports org.jax.isopret.core.impl.go;
     exports org.jax.isopret.core.impl.hgnc;
 
