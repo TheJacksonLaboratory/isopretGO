@@ -46,5 +46,16 @@ record RnaSeqResultLine (AccessionNumber geneAccession,
     }
 
 
+    /**
+     * Check for a common user error -- the splice fold change is "raw" (not logarithm), which the expression
+     * fold change is log2. These are separate lines in the HBADEALS result file.
+     * @return true if the line does not have negative and thus potentially log2-transformed splicing value
+     */
+    public boolean isValid() {
+        final double EPSILON = 0.001;
+        return !isIsoform() || !((expFC + EPSILON) < 0);
+    }
+
+
 
 }

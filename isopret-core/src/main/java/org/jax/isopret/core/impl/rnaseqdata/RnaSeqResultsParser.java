@@ -11,7 +11,12 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Parse the HBA-DEALS output file, e.g.,
+ * Parse the HBA-DEALS output file.
+ * The HBA-DEALS output file contains 4 columns. The first column is the gene name, the second is the transcript name, the third is the fold change,
+ * and the fourth is 1-probability of differential expression or proportion(splicing), which is the posterior error probability (PEP).
+ * Entries that refer to expression have ‘Expression’ in their second column. If isoform.level is FALSE, entries that refer to differential
+ * splicing of the gene will have ‘Splicing’ in their second column entry.
+ * The fold change for expression is given as log2 fold change, and for splicing as fold change.
  * <p>
  * Gene	Isoform	ExplogFC/FC	P
  * ENSG00000160710	Expression	1.54770825394965	0
@@ -87,7 +92,12 @@ public class RnaSeqResultsParser {
             }
 
         int found_symbol = 0;
+        int invalid_lines = 0;
         for (RnaSeqResultLine hline : lines) {
+            if (! hline.isValid()) {
+                invalid_lines++;
+                continue;
+            }
             AccessionNumber ensgAccession = hline.geneAccession(); // if we cannot find symbol, just show the accession
             if (hgncMap.containsKey(ensgAccession)) {
                 GeneModel model = hgncMap.get(ensgAccession);
@@ -113,6 +123,11 @@ public class RnaSeqResultsParser {
         LOGGER.trace("We got {} genes with HBA DEALS results\n", resultsMap.size());
         if (! unfound.isEmpty()) {
             LOGGER.info("Could not find symbols for {} accessions.", unfound.size());
+        }
+        if (invalid_lines > 0) {
+            String errmsg = String.format("%d invalid lines (splicing fold change negative-but only expr values should be log2). Fix before continuing.",
+                    invalid_lines);
+            throw new IsopretRuntimeException(errmsg);
         }
         return resultsMap;
     }
@@ -145,13 +160,5 @@ public class RnaSeqResultsParser {
         }
         return parser.ensgAcc2geneResultMap;
     }
-
-
-    private Map<AccessionNumber, GeneResult> getEnsgAcc2geneResultMap() {
-        return this.ensgAcc2geneResultMap;
-    }
-
-
-
 
 }
