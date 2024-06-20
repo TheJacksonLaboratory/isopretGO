@@ -17,8 +17,8 @@ BUILD_DIR=${SRC_DIR}/target
 JAR_NAME="isopret-gui.jar"
 VENDOR="The Jackson Laboratory"
 DESCRIPTION="Isopret-gui is a Java application for investigating and visualizing overrepresentation of Gene Ontology (GO) annotations in differentially spliced or differentially expressed genes."
-COPYRIGHT="Copyright 2022, All rights reserved"
-ICON="${BUILD_DIR}/classes/img/dna_rna_icon"
+COPYRIGHT="Copyright 2024, All rights reserved"
+ICON="${BUILD_DIR}/classes/img/dna_rna_icon.ico"
 
 
 function detect_platform() {
