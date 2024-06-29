@@ -4,7 +4,9 @@
 isopret-gui is a desktop Java application. You can download precompiled executable
 JAR files from the [Releases page](https://github.com/TheJacksonLaboratory/isopret/releases){:target="\_blank"}..
 of the GitHub site. Later, we will generate stand-alone Windows and Mac native apps.
-This is currently the recommended way of using isopret-gui.
+This is currently the recommended way of using isopret-gui. 
+
+Unfortunately, currently isopretGO does not support old (intel) MacIntosh hardware.
 
 
 Additionally, the following text describes how to build isopret-gui from source.
