@@ -25,6 +25,14 @@ The HBA-DEALS algorithm is explained in [Karlebach et al, 2020, Genome Biology 2
 Source code is available at the [HBA-DEALS GitHub repository](https://github.com/TheJacksonLaboratory/HBA-DEALS).
 
 
+
+A Snakemake pipeline for running HBA-DEALS is described in the
+[GitHub repository](https://github.com/TheJacksonLaboratory/covid19splicing)
+for the paper  [Betacoronavirus-specific alternate splicing](https://pubmed.ncbi.nlm.nih.gov/35074468/). The GitHub repository
+also contains 15 HBA-DEALS output files related to that publication that can be used as input for isopretGO.
+
+
+
 ### Important
 
 
