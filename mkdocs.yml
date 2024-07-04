@@ -34,6 +34,8 @@ theme:
 nav:
   - Home: 'index.md'
   - Setup: 'setup.md'
+  - Input: "input.md"
+  - Example input files: "examples.md"
   - Running isopretGO:
     - Overview: 'running.md'
     - GUI: 'running-gui.md'

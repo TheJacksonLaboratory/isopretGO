@@ -46,33 +46,5 @@ java -jar target/isopret.jar
 
 
 
-## Set up documentation
-
-This step is not needed to run the application, but rather describes the code we use to
-generate the isopretGO documentation.
-Enter the following code to install mkdocs and run a server with the documentation locally.
-The GitHub action will create a comparable site online.
-
-```
-python3 -m venv venv
-source venv/bin/activate
-pip install mkdocs
-pip install mkdocs-material
-pip install mkdocs-material[imaging]
-pip install mkdocs-material-extensions
-pip install pillow cairosvg
-pip install mkdocstrings[python]
-mkdocs serve
-```
-
-Note that on an M1   Mac we have encountered a difficulty with mkdocs not finding the cairo library. This can be solved
-by running
-
-```
-export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
-```
-before running mkdocs serve.
-
-
 
 
