@@ -74,7 +74,7 @@ function build_for_class_path() {
       --input "${PACKAGE_DIR}" \
       --main-jar "${JAR_NAME}" \
       --app-version "${VERSION}" \
-      --icon "${ICON}.ico" \
+    #   --icon "${ICON}.ico" \
       --description "${DESCRIPTION}" \
       --linux-menu-group Science \
       --linux-shortcut \
