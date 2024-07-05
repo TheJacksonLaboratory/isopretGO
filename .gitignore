@@ -42,3 +42,4 @@ hs_err_pid*
 .vscode/
 isopret-io/target/
 venv/
+/isopret-gui-1.0.0.dmg

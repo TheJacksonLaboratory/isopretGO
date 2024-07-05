@@ -17,7 +17,8 @@ in RNA-seq data.
 
 See the [online documentation](https://thejacksonlaboratory.github.io/isopretGO/) for installation and usage instructions.
 
-See the [Release page](https://github.com/TheJacksonLaboratory/isopretGO/releases) for the executable JAR file.
+See the [Release page](https://github.com/TheJacksonLaboratory/isopretGO/releases) for the executable JAR file, as well as an installation file (*.dmg) for ARM Macs and one for
+debian linux. Unfortunately, the Graphic User Interface component of isopretGO is not supported for Intel Macs.
 
 
 
