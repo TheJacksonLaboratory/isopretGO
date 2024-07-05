@@ -7,7 +7,6 @@ module org.jax.isopret.gui {
     requires javafx.web;
 
 
-    requires org.apache.commons.net;
     requires org.apache.commons.io;
     requires org.slf4j;
 

@@ -23,7 +23,7 @@ public class HtmlVisualizer implements Visualizer {
     public final String HBADEALS_A = """
         <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6"
          target=__blank>HBA-DEALS</a>
-         """;
+        """;
 
     public HtmlVisualizer(String experiment) {
         this.experiment = experiment;

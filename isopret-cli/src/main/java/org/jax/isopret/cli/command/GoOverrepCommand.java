@@ -204,13 +204,10 @@ public class GoOverrepCommand extends AbstractRnaseqAnalysisCommand
                 try {
                     if (exportAll) {
                         bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
-                        outputDgeGoTerms++;
-
-                    } else {
-                        if (cts.passesThreshold(GO_PVAL_THRESHOLD))
-                            bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
-                        outputDgeGoTerms++;
+                    } else if (cts.passesThreshold(GO_PVAL_THRESHOLD)) {
+                        bw.write("DGE\t" + cts.getRow(geneOntology) + "\n");
                     }
+                    outputDgeGoTerms++;
                 } catch (Exception e) {
                     // some issue with getting terms, probably ontology is not in sync
                     LOGGER.error("Could not get data for {}: {}", cts, e.getLocalizedMessage());

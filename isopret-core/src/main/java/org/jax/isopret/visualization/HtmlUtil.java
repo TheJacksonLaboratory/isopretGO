@@ -6,7 +6,6 @@ public class HtmlUtil {
     public static final String header = """
             <!doctype html>
             <html class="no-js" lang="">
-                        
             <head>
               <meta charset="utf-8">
               <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -25,73 +24,58 @@ public class HtmlUtil {
                 -webkit-box-sizing: border-box;
                 box-sizing: border-box
             }
-                        
             html, body, h1, li, a, article, aside, footer, header, main, nav, section {
             	padding: 0;
             	margin: 0;
             }
-                        
             html, body {
             	font-size:14px;
             }
-                        
             body {
             	font-family:"DIN Next", Helvetica, Arial, sans-serif;
             	line-height:1.25;
             	background-color: white;
             }
-                        
-                        
             body > header, nav, main, body > section, footer {
             max-width:1200px;
             margin-left:auto;
             margin-right:auto;
             }
-                        
             @media(min-width:1440px) {
             body > header, nav, main, body > section, footer {
                 width:90%;
                 max-width:unset;
                 }
             }
-                        
             main, body > section {
             	margin-top:1.5rem;
             	margin-bottom:1.5rem;
             }
-                        
             body > header, body > section {
             	padding:2.1rem 2rem 1.6rem;
             }
-                        
             .fr {
               float: right;
             }
-                        
             a[href] {
             	color:#05396b;
             }
-                        
             a[href]:hover {
             	color:#009ed0;
             }
-                        
             p {
             	padding:0;
             	margin:0.75rem 0;
             }
-                        
             h1 {
             	font-family:"DIN Next", Helvetica, Arial, sans-serif;
             	font-weight:700;
             	font-size:1.8rem;
             	line-height:1;
             }
-                        
             .center {
               text-align: center;
             }
-                        
             main > section > a[name="othergenes"] > h3,
             h2 {
             	font-family:"DIN Next", Helvetica, Arial, sans-serif;
@@ -101,7 +85,6 @@ public class HtmlUtil {
             	margin:0 0 0.5rem;
             	padding:0;
             }
-                        
             h3 {
             	font-family:"DIN Next", Helvetica, Arial, sans-serif;
             	font-weight:700;
@@ -110,24 +93,18 @@ public class HtmlUtil {
             	margin:0 0 0.5rem;
             	padding:0;
             }
-                        
-                        
-                        
             main ul, main ol {
             	margin:0.5rem 0 0.5rem 1.4rem;
             	padding:0;
             }
-                        
             main li {
             	margin:0.25rem 0;
             	padding:0;
             }
-                        
             .banner {
             	background-color: #05396b;
             	color: white;
             }
-                        
             nav {
             	background-color: #4DA8DA;
             	margin-top:1px;
@@ -135,7 +112,6 @@ public class HtmlUtil {
             	zoom:1;
             	padding:0;
             }
-                        
             nav a[href] {
             	color:white;
             	text-decoration:none;
@@ -145,58 +121,48 @@ public class HtmlUtil {
             	padding:1rem;
             	font-weight:400;
             }
-                        
             nav li:last-child a[href] {
             	padding-right:2.25rem;
             }
-                        
             nav a[href]:hover {
             	color:#05396b;
             	background-color:#04c3ff;
             }
-                        
             #navi ul {
             	display:table;
             	float:right;
             	margin:0;
             }
-                        
             #navi li {
             	display:block;
             	float:left;
             }
-                        
             main > section:first-child {
             	margin-top:1.5rem;
             	margin-bottom:1.5rem;
             	background-color:white;
             	padding:2.1rem 2rem 1.6rem;
             }
-                        
             main > section {
             	margin-top:1.5rem;
             	margin-bottom:0;
             	background-color:white;
             	padding: .5rem;
             }
-                        
             main > section > article {
             	padding: 1.5rem;
             	margin-top:1px;
             	background-color:white;
             }
-                        
             table {
             	border-collapse: collapse;
             	width:100%;
             	margin:0.5rem 0;
             }
-                        
             th, td {
             	text-align:left;
             	padding:0.4rem 0.5rem 0.25rem;
             }
-                        
             th {
             	background-color: #e0e3ea;
             	border-bottom:1px solid white;
@@ -215,7 +181,6 @@ public class HtmlUtil {
                padding: 5px 10px;
                 margin: 0 auto;
              }
-                             
             .svgrow{
                 width: 90%;
                 min-height: 100px;
@@ -223,7 +188,6 @@ public class HtmlUtil {
                 display: -webkit-flex; /* Safari */
                 display: flex; /* Standard syntax */
             }
-                
             div.go {
                border: 0.5rem outset black;
                 border-radius: 4px;
@@ -232,29 +196,23 @@ public class HtmlUtil {
                 padding: 1rem;
                 outline-offset: 0.5rem;
             }
-                        
-                                
             footer {
             	background-color: #05396b;
             	color: white;
             	padding: 1rem 2rem;
             }
-                        
             /* The following links are in the SVG for the differentials */
             a.svg:link, a.svg:visited {
               cursor: pointer;
             }
-                        
             a.svg text,
             text a.svg {
               fill: blue; /* Even for text, SVG uses fill over color */
               text-decoration: underline;
             }
-                        
             a.svg:hover, a.svg:active {
               outline: dotted 1px blue;
             }
-
             .table-btn {
                 display: block;
                 font-weight: bold;
@@ -264,7 +222,6 @@ public class HtmlUtil {
                 color: white;
                 cursor: pointer;
             }
-  
             </style>
             """;
 
@@ -315,7 +272,6 @@ public class HtmlUtil {
                 tooltip.style.left = evt.pageX + 10 + 'px';
                 tooltip.style.top = evt.pageY + 10 + 'px';
               }
-                        
               function hideTooltip() {
                 var tooltip = document.getElementById("tooltip");
                 tooltip.style.display = "none";
@@ -323,7 +279,7 @@ public class HtmlUtil {
             </script>
             </body>
             </html>
-            """;
+           """;
 
 
     public static String wrap(String html) {
@@ -337,7 +293,7 @@ public class HtmlUtil {
             <html class="no-js" lang="">
             <head>
               <meta charset="utf-8">
-                """ +
+            """ +
                 css +
                 "</head>\n" +
                html

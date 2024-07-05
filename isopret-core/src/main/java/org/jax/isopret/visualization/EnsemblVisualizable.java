@@ -176,8 +176,6 @@ public class EnsemblVisualizable implements Visualizable {
 
     @Override
     public double getExpressionFoldChange() {
-       // double logFc = getExpressionLogFoldChange();
-       // return Math.exp(logFc);
         return this.hbaDealsResult.getExpressionFoldChange();
     }
 

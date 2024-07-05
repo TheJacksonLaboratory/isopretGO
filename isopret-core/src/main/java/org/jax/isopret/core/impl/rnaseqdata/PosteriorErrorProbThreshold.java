@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- * This class is used to calculate the threshold posterior error proibability (PEP) threshold that achieves a desired
+ * This class is used to calculate the threshold posterior error probability (PEP) threshold that achieves a desired
  * false-discovery rate (FDR) over the current dataset. Explanations can be found in
  * Käll L, Storey JD, MacCoss MJ, Noble WS. Posterior error probabilities and false discovery rates:
  * two sides of the same coin. J Proteome Res. 2008 Jan;7(1):40-4. PMID:18052118.
