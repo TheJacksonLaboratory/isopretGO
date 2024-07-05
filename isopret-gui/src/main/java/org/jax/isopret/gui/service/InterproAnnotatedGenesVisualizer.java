@@ -154,7 +154,6 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
                vertical-align: bottom;
                text-align: center;
              }
-             
              gotable.th span
              {
                -ms-writing-mode: tb-rl;
@@ -199,7 +198,7 @@ public class InterproAnnotatedGenesVisualizer extends AnnotatedGenesVisualizer {
             </footer>
              </body>
              </html>
-             """;
+            """;
 
 
     public String getTitle() {

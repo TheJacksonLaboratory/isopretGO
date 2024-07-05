@@ -369,8 +369,6 @@ public class TranscriptSvgGenerator extends AbstractSvgGenerator {
     private void writeTranscriptName(Transcript tmod, double minX, double maxX, int ypos, Writer writer) throws IOException {
         String symbol = tmod.hgvsSymbol();
         AccessionNumber accession = tmod.accessionId();
-       // String positionString = String.format("%s:%d-%d (%s strand)", chrom, start, end, strand);
-       // String geneName = String.format("%s (%s)", symbol, accession.getAccessionString());
         double y = Y_SKIP_BENEATH_TRANSCRIPTS + ypos;
         int region = getRegionOfSvgCanvas(minX);
         String textAnchor = "start";

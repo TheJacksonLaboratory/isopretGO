@@ -17,7 +17,7 @@ public abstract class AnnotatedGenesVisualizer {
     private final String HBADEALS_A = """
         <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02072-6"
          target=__blank>HBA-DEALS</a>
-         """;
+        """;
 
     protected final String htmlHeader;
     protected final String basename;
@@ -63,7 +63,7 @@ public abstract class AnnotatedGenesVisualizer {
            </footer>
             </body>
             </html>
-            """;
+           """;
 
 
     public static AnnotatedGenesVisualizer splicing(TermId goId, IsopretService isopretService) {

@@ -90,7 +90,6 @@ public class HtmlGoAnnotationMatrixVisualizer {
                margin: 20;
                font-size:14px;
             }
-
             body {
                font-family:"DIN Next", Helvetica, Arial, sans-serif;
                line-height:1.25;
@@ -99,18 +98,15 @@ public class HtmlGoAnnotationMatrixVisualizer {
                 margin-left:auto;
                 margin-right:auto;
              }
-             
              gotable, gotable.th, gotable.td {
                  border: 0.5px solid;
                  border-collapse: collapse;
              }
-
              gotable.th
              {
                vertical-align: bottom;
                text-align: center;
              }
-             
              gotable.th span
              {
                -ms-writing-mode: tb-rl;

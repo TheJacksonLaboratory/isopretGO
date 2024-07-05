@@ -4,7 +4,6 @@ module org.jax.isopret.core {
     requires org.monarchinitiative.svart;
     requires org.monarchinitiative.phenol.analysis;
     requires jannovar.core;
-    requires org.apache.commons.net;
     requires org.monarchinitiative.phenol.io;
     requires guava;
     requires org.jax.isopret.data;
